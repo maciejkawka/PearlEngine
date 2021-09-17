@@ -9,10 +9,12 @@
     <ClInclude Include="include\Core\Common\test.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="include\Core\Utils\Logger.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Common\test.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="src\Utils\Logger.cpp" />
   </ItemGroup>
 </Project>
