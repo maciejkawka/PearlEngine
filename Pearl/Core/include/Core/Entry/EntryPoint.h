@@ -1,13 +1,13 @@
 #pragma once
 #include"Application.h"
 
-PrCore::Entry::Application* InstansiateApplication();
+PrCore::Entry::Application* CreateApplication();
 
 
 int main(int argc, char** argv)
 {
 	//Create app outside the engine
-	auto app = InstansiateApplication();
+	auto app = CreateApplication();
 
 	//Run app
 	app->Run();

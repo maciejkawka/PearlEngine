@@ -2,7 +2,7 @@
 #include"Core/Entry/EntryPoint.h"
 
 
-PrCore::Entry::Application* InstansiateApplication()
+PrCore::Entry::Application* CreateApplication()
 {
 	return new PrEditor::Core::Editor();
 }
