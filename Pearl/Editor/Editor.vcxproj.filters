@@ -7,8 +7,20 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="scr\main.cpp">
+    <ClCompile Include="include\Editor\Core\Editor.h">
       <Filter>main</Filter>
     </ClCompile>
+    <ClCompile Include="EditorApp.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="scr\Core\Editor.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="scr\Core\EditorContext.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Editor\Core\EditorContext.h" />
   </ItemGroup>
 </Project>

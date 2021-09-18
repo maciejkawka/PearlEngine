@@ -10,11 +10,16 @@
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Utils\Logger.h" />
+    <ClInclude Include="include\Core\Entry\Application.h" />
+    <ClInclude Include="include\Core\Entry\AppContext.h" />
+    <ClInclude Include="include\Core\Entry\EntryPoint.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Common\test.cpp">
       <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="src\Utils\Logger.cpp" />
+    <ClCompile Include="src\Entry\Application.cpp" />
+    <ClCompile Include="src\Entry\AppContext.cpp" />
   </ItemGroup>
 </Project>
