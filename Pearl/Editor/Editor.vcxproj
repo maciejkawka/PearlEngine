@@ -88,7 +88,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="EditorApp.cpp" />
+    <ClCompile Include="scr\EditorApp.cpp" />
     <ClCompile Include="scr\Core\Editor.cpp" />
     <ClCompile Include="scr\Core\EditorContext.cpp" />
   </ItemGroup>
