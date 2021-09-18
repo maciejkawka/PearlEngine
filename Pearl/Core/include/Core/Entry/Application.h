@@ -25,10 +25,6 @@ namespace PrCore::Entry {
 		bool IsMinimalised();
 
 	protected:
-	//TODO
-	//check why it doesn't work
-	AppContext* m_appContext;
+		AppContext* m_appContext;
 	};
-
-	Application* InstansiateApplication();
 }

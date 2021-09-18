@@ -1,6 +1,6 @@
 #pragma once
 #include"Core/Entry/Application.h"
-#include"Core/Entry/EntryPoint.h"
+
 
 namespace PrEditor::Core {
 
