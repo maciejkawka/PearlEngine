@@ -5,9 +5,11 @@ using namespace PrEditor::Core;
 EditorContext::EditorContext():
 	AppContext()
 {
-	PrCore::Utils::Logger::Init();
+	
+	PRLOG_INFO("Building EditorContext")
 }
 
 EditorContext::~EditorContext()
 {
+	PRLOG_INFO("Deleting EditorContext")
 }

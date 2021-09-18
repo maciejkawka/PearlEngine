@@ -1,4 +1,5 @@
 #include "Core/Entry/Application.h"
+#include"Core/Utils/Logger.h"
 
 using namespace PrCore::Entry;
 

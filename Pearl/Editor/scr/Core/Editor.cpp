@@ -10,11 +10,11 @@ Editor::Editor()
 
 Editor::~Editor()
 {
-
+	delete m_appContext;
 }
 void Editor::PreFrame()
 {
-	PRLOG_ERROR("TEST ERROR");
+
 }
 
 void Editor::OnFrame()
