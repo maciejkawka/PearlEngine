@@ -7,9 +7,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\Editor\Core\Editor.h">
-      <Filter>main</Filter>
-    </ClCompile>
     <ClCompile Include="EditorApp.cpp">
       <Filter>main</Filter>
     </ClCompile>
@@ -22,5 +19,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Editor\Core\EditorContext.h" />
+    <ClInclude Include="include\Editor\Core\Editor.h" />
   </ItemGroup>
 </Project>

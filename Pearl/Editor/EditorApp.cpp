@@ -1,6 +1,6 @@
-#pragma once
-#include"Editor/Core/Editor.h"
-//#include"Core/Entry/EntryPoint.h"
+//#pragma once
+//#include"Editor/Core/Editor.h"
+//
 
 
 //PrCore::Entry::Application* InstansiateApplication()

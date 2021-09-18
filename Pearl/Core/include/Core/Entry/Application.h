@@ -29,4 +29,6 @@ namespace PrCore::Entry {
 	//check why it doesn't work
 	AppContext* m_appContext;
 	};
+
+	Application* InstansiateApplication();
 }

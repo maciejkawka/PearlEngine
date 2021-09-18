@@ -89,7 +89,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="EditorApp.cpp" />
-    <ClCompile Include="include\Editor\Core\Editor.h" />
     <ClCompile Include="scr\Core\Editor.cpp" />
     <ClCompile Include="scr\Core\EditorContext.cpp" />
   </ItemGroup>
@@ -99,6 +98,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Editor\Core\Editor.h" />
     <ClInclude Include="include\Editor\Core\EditorContext.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,5 +1,4 @@
 #include "Editor/Core/Editor.h"
-
 #include"Editor/Core/EditorContext.h"
 
 using namespace PrEditor::Core;
@@ -27,7 +26,7 @@ void Editor::PostFrame()
 }
 
 
-PrCore::Entry::Application* InstansiateApplication()
+PrCore::Entry::Application* PrCore::Entry::InstansiateApplication()
 {
 	return new Editor();
 }
