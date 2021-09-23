@@ -14,7 +14,7 @@ Editor::Editor()
 	listener.connect<&Editor::OnEvent>(this);
 	PrCore::Events::TestEvent e;
 	listener(&e);
-	PrCore::Events::EventManager::GetInstance()->AddListener(listener, PrCore::Events::TestEvent::GetType());
+	PrCore::Events::EventManager::GetInstance()->AddListener(listener, PrCore::Events::TestEvent::s_type);
 }
 
 Editor::~Editor()

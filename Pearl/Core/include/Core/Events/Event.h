@@ -4,33 +4,30 @@
 namespace PrCore::Events {
 
 	using  EventType = uint32_t;
+	using  EventID = unsigned int;
 
 	enum class EventCategory {
 		none = 0,
 		mouseEvent,
 		windowEvent,
-		other
+		other,
+		custom
 	};
 
 	class Event {
 	public:
-		Event():
-		m_name(nullptr) {}
+		Event() {}
 
-		Event(char* p_name) :
-			m_name(p_name) {}
+		virtual ~Event() { s_eventID++; }
 
-		virtual ~Event() {}
 
-		inline static EventType GetType() { return s_type; }
-		virtual inline const char* GetName() const { return m_name; }
-		virtual inline EventCategory GetCategory() const { return s_category; }
+		virtual inline EventType GetType() = 0;
+		virtual inline EventCategory GetCategory() = 0;
 
-	protected:
-		inline static EventType s_type = 0x00000000;
-		inline static EventCategory s_category = EventCategory::none;
-		char* m_name;
+		inline EventID GetID() { return s_eventID; }
 
+	private:
+		inline static EventID s_eventID = 0;
 	}; 
 	
 
