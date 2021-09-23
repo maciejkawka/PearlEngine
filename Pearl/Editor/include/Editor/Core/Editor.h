@@ -1,6 +1,6 @@
 #pragma once
 #include"Core/Entry/Application.h"
-
+#include"Core/Events/Event.h"
 
 namespace PrEditor::Core {
 
@@ -15,6 +15,7 @@ namespace PrEditor::Core {
 
 		void PostFrame() override;
 		
+		void OnEvent(PrCore::Events::Event* e);
 	};
 
 }

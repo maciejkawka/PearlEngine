@@ -15,12 +15,18 @@
     <ClInclude Include="include\Core\Entry\AppContext.h" />
     <ClInclude Include="include\Core\Entry\Application.h" />
     <ClInclude Include="include\Core\Entry\EntryPoint.h" />
+    <ClInclude Include="include\Core\Events\Event.h" />
+    <ClInclude Include="include\Core\Events\EventManager.h" />
+    <ClInclude Include="include\Core\Events\TestEvent.h" />
     <ClInclude Include="include\Core\Utils\Logger.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Common\test.cpp" />
     <ClCompile Include="src\Entry\AppContext.cpp" />
     <ClCompile Include="src\Entry\Application.cpp" />
+    <ClCompile Include="src\Entry\TestEvent.cpp" />
+    <ClCompile Include="src\Events\Event.cpp" />
+    <ClCompile Include="src\Events\EventManager.cpp" />
     <ClCompile Include="src\Utils\Logger.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -75,7 +81,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/fastDelegates/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -91,7 +97,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/fastDelegates/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
