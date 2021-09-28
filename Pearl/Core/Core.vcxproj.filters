@@ -10,6 +10,9 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{a5b18668-61dc-4abc-8a6e-25f8e67888bf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Events">
+      <UniqueIdentifier>{6e14f417-2935-44cc-8ae3-1c65a5668077}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Common\test.h">
@@ -27,9 +30,15 @@
     <ClInclude Include="include\Core\Utils\Logger.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Events\Event.h" />
-    <ClInclude Include="include\Core\Events\EventManager.h" />
-    <ClInclude Include="include\Core\Events\TestEvent.h" />
+    <ClInclude Include="include\Core\Events\Event.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Events\EventManager.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Events\TestEvent.h">
+      <Filter>Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Common\test.cpp">
@@ -44,8 +53,8 @@
     <ClCompile Include="src\Utils\Logger.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="src\Events\EventManager.cpp" />
-    <ClCompile Include="src\Events\Event.cpp" />
-    <ClCompile Include="src\Entry\TestEvent.cpp" />
+    <ClCompile Include="src\Events\EventManager.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -24,8 +24,6 @@
     <ClCompile Include="src\Common\test.cpp" />
     <ClCompile Include="src\Entry\AppContext.cpp" />
     <ClCompile Include="src\Entry\Application.cpp" />
-    <ClCompile Include="src\Entry\TestEvent.cpp" />
-    <ClCompile Include="src\Events\Event.cpp" />
     <ClCompile Include="src\Events\EventManager.cpp" />
     <ClCompile Include="src\Utils\Logger.cpp" />
   </ItemGroup>
