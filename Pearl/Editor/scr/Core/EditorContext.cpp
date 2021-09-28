@@ -6,10 +6,10 @@ EditorContext::EditorContext():
 	AppContext()
 {
 	
-	PRLOG_INFO("Building EditorContext")
+	PRLOG_INFO("Building EditorContext");
 }
 
 EditorContext::~EditorContext()
 {
-	PRLOG_INFO("Deleting EditorContext")
+	PRLOG_INFO("Deleting EditorContext");
 }
