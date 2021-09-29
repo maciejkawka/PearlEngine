@@ -1,3 +1,5 @@
+#include"Core/Common/pearl_pch.h"
+
 #include "Core/Entry/Application.h"
 #include"Core/Utils/Logger.h"
 

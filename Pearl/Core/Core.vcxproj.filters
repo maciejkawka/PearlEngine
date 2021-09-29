@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Core\Common\test.h">
-      <Filter>Common</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Entry\AppContext.h">
       <Filter>Entry</Filter>
     </ClInclude>
@@ -39,11 +36,11 @@
     <ClInclude Include="include\Core\Events\TestEvent.h">
       <Filter>Events</Filter>
     </ClInclude>
+    <ClInclude Include="include\Core\Common\pearl_pch.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Common\test.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
     <ClCompile Include="src\Entry\AppContext.cpp">
       <Filter>Entry</Filter>
     </ClCompile>
@@ -55,6 +52,9 @@
     </ClCompile>
     <ClCompile Include="src\Events\EventManager.cpp">
       <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Common\pearl_pch.cpp">
+      <Filter>Common</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

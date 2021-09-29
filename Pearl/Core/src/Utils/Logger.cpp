@@ -1,9 +1,8 @@
-#include "Core\Utils\Logger.h"
+#include"Core/Common/pearl_pch.h"
 
+#include "Core/Utils/Logger.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/basic_file_sink.h"
-
-#include<ctime>
 
 using namespace PrCore::Utils;
 

@@ -1,3 +1,6 @@
+#include"Core/Common/pearl_pch.h"
+
+
 #include"Core/Events/EventManager.h"
 #include"Core/Utils/Logger.h"
 

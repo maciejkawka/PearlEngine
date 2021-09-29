@@ -5,9 +5,11 @@
 #include"Core/Events/TestEvent.h"
 
 using namespace PrEditor::Core;
+using namespace PrCore::Events;
 
 Editor::Editor()
 {
+	m_appContext = new EditorContext();
 }
 
 Editor::~Editor()
@@ -16,12 +18,11 @@ Editor::~Editor()
 }
 void Editor::PreFrame()
 {
-
 }
 
 void Editor::OnFrame()
 {
-	
+	EventManager::GetInstance().Update();
 }
 
 void Editor::PostFrame()

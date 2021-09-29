@@ -11,21 +11,26 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Core\Common\test.h" />
     <ClInclude Include="include\Core\Entry\AppContext.h" />
     <ClInclude Include="include\Core\Entry\Application.h" />
     <ClInclude Include="include\Core\Entry\EntryPoint.h" />
     <ClInclude Include="include\Core\Events\Event.h" />
     <ClInclude Include="include\Core\Events\EventManager.h" />
     <ClInclude Include="include\Core\Events\TestEvent.h" />
+    <ClInclude Include="include\Core\Common\pearl_pch.h" />
     <ClInclude Include="include\Core\Utils\Logger.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Common\test.cpp" />
     <ClCompile Include="src\Entry\AppContext.cpp" />
     <ClCompile Include="src\Entry\Application.cpp" />
     <ClCompile Include="src\Events\EventManager.cpp" />
     <ClCompile Include="src\Utils\Logger.cpp" />
+    <ClCompile Include="src\Common\pearl_pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Core/Common/pearl_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Core/Common/pearl_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -80,6 +85,10 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/fastDelegates/include</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -96,6 +105,10 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/fastDelegates/include</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
