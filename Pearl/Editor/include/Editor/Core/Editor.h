@@ -14,8 +14,6 @@ namespace PrEditor::Core {
 		void OnFrame() override;
 
 		void PostFrame() override;
-		
-		void OnEvent(PrCore::Events::Event* e);
 	};
 
 }
