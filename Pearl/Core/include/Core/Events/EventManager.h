@@ -1,7 +1,7 @@
 #pragma once
 #include"Event.h"
 
-#include"fastDelegates/delegateV2.hpp"
+#include"entt.hpp"
 #include<map>
 #include<list>
 
