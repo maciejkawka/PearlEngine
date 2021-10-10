@@ -1,5 +1,5 @@
 #pragma once
-
+#include"Core/Events/Event.h"
 
 namespace PrCore::Entry {
 
@@ -13,6 +13,8 @@ namespace PrCore::Entry {
 
 		void Run();
 
+		void SubscribeEvents();
+
 		virtual void PreFrame() = 0;
 
 		virtual void OnFrame(/*pass deltaTime*/) = 0;
@@ -20,11 +22,13 @@ namespace PrCore::Entry {
 		virtual void PostFrame() = 0;
 	
 	private:
-		bool IsRunning();
+		void OnWindowClose(PrCore::Events::EventPtr p_event);
 
-		bool IsMinimalised();
+		void OnWindowMinimalized(PrCore::Events::EventPtr p_event);
 
 	protected:
 		AppContext* m_appContext;
+		bool m_shouldClose;
+		bool m_minimalized;
 	};
 }

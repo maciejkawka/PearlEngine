@@ -66,6 +66,7 @@
     <ClInclude Include="include\Core\Windowing\GLWindow.h">
       <Filter>Windowing</Filter>
     </ClInclude>
+    <ClInclude Include="include\Core\Events\WindowEvents.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Entry\AppContext.cpp">

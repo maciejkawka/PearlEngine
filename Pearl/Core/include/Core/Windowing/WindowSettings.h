@@ -12,7 +12,7 @@ namespace PrCore::Windowing {
 
 		bool fullScreen = false;
 
-		bool resizable = false;
+		bool resizable = true;
 
 		//CoursorMode
 

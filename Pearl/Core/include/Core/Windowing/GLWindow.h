@@ -30,7 +30,7 @@ namespace PrCore::Windowing {
 		void SetIcon(std::string p_path) override; //TODO
 
 	private:
-		void BindCallbacks() {}
+		void BindCallbacks();
 
 		GLFWwindow* m_window;
 		WindowSettings m_settings;

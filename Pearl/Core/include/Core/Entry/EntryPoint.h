@@ -12,6 +12,9 @@ int main(int argc, char** argv)
 	//Create app outside the engine
 	auto app = CreateApplication();
 
+	//Subscribe proper events
+	app->SubscribeEvents();
+	
 	//Run app
 	app->Run();
 

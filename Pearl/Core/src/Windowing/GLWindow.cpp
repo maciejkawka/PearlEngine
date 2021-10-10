@@ -3,6 +3,8 @@
 #include"Core/Windowing/GLWindow.h"
 #include"GLFW/glfw3.h"
 #include"Core/Utils/Logger.h"
+#include"Core/Events/EventManager.h"
+#include"Core/Events/WindowEvents.h"
 
 using namespace PrCore::Windowing;
 
@@ -90,7 +92,8 @@ GLWindow::GLWindow(const WindowSettings& p_settings) :
 		glfwSwapBuffers(0);
 
 	s_windowsCount++;
-	//BindCallbacks();
+	glfwSetWindowUserPointer(m_window, &m_settings);
+	BindCallbacks();
 }
 
 GLWindow::~GLWindow()
@@ -123,4 +126,35 @@ void GLWindow::SetIcon(std::string p_path)
 	//images[0] = load_icon("my_icon.png");
 
 	//glfwSetWindowIcon(window, 2, images);
+}
+
+void GLWindow::BindCallbacks()
+{
+	using namespace PrCore::Events;
+
+	//Close Window Callback
+	glfwSetWindowCloseCallback(m_window, [](GLFWwindow* p_window)
+		{
+			EventPtr event = std::make_shared<WindowCloseEvent>();
+			EventManager::GetInstance().QueueEvent(event);
+		});
+
+	//Resize Window Callback
+	glfwSetWindowSizeCallback(m_window, [](GLFWwindow* p_window, int p_width, int p_height)
+		{
+			WindowSettings* windowSettings = (WindowSettings*)glfwGetWindowUserPointer(p_window);
+			windowSettings->width = p_width;
+			windowSettings->height = p_height;
+
+			EventPtr event = std::make_shared<WindowResizeEvent>(p_width, p_height);
+			EventManager::GetInstance().QueueEvent(event);
+		});
+
+	//Minimalize Window Callback
+	glfwSetWindowIconifyCallback(m_window, [](GLFWwindow* m_window, int p_iconified) {
+
+			EventPtr event = std::make_shared<WindowMinimalizeEvent>(p_iconified);
+			EventManager::GetInstance().QueueEvent(event);
+		});
+
 }
