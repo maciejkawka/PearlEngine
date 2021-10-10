@@ -11,7 +11,7 @@ namespace PrCore::Events {
 	class WindowResizeEvent: public Event {
 	public:
 		WindowResizeEvent(float p_width, float p_height):
-		m_width(p_width), m_height(p_height)
+			m_width(p_width), m_height(p_height)
 		{}
 
 		float m_width;

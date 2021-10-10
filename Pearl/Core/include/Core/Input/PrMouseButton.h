@@ -1,6 +1,8 @@
+#pragma once
+
 namespace PrCore::Input {
 
-	enum PrMouseButton {
+	enum class PrMouseButton {
 		BUTTON_1			= 0,
 		BUTTON_2			= 1,
 		BUTTON_3			= 2,
@@ -9,9 +11,9 @@ namespace PrCore::Input {
 		BUTTON_6			= 5,
 		BUTTON_7			= 6,
 		BUTTON_8			= 7,
-		BUTTON_LAST			= BUTTON_8,
-		BUTTON_LEFT			= BUTTON_1,
-		BUTTON_RIGHT		= BUTTON_2,
-		BUTTON_MIDDLE		= BUTTON_3,
+		BUTTON_LAST			= 7,
+		BUTTON_LEFT			= 0,
+		BUTTON_RIGHT		= 1,
+		BUTTON_MIDDLE		= 2,
 	};
 }

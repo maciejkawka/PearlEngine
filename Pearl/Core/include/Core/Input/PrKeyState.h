@@ -1,8 +1,8 @@
-namespace PrCode::Input {
+#pragma once
+namespace PrCore::Input {
 
-	enum PrKeyState {
+	enum class PrKeyState {
 		PRESS			= 1,
-		RELEASE			= 2,
-		REPEAT			= 3
+		RELEASE			= 2
 	};
 }

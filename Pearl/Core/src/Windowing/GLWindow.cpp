@@ -5,6 +5,7 @@
 #include"Core/Utils/Logger.h"
 #include"Core/Events/EventManager.h"
 #include"Core/Events/WindowEvents.h"
+#include"Core/Events/InputEvents.h"
 
 using namespace PrCore::Windowing;
 
@@ -151,10 +152,62 @@ void GLWindow::BindCallbacks()
 		});
 
 	//Minimalize Window Callback
-	glfwSetWindowIconifyCallback(m_window, [](GLFWwindow* m_window, int p_iconified) {
+	glfwSetWindowIconifyCallback(m_window, [](GLFWwindow* p_window, int p_iconified)
+		{
 
 			EventPtr event = std::make_shared<WindowMinimalizeEvent>(p_iconified);
 			EventManager::GetInstance().QueueEvent(event);
 		});
 
+
+	//Key State Callback
+	glfwSetKeyCallback(m_window, [](GLFWwindow* p_window, int p_key, int p_scancode, int p_action, int p_mods)
+		{
+			if (p_action == GLFW_PRESS)
+			{
+				EventPtr event = std::make_shared<KeyPressedEvent>(p_key);
+				EventManager::GetInstance().QueueEvent(event);
+				PRLOG_INFO("Pressed Key: {0}", p_key);
+			}
+			else if (p_action == GLFW_RELEASE)
+			{
+				EventPtr event = std::make_shared<KeyReleasedEvent>(p_key);
+				EventManager::GetInstance().QueueEvent(event);
+				PRLOG_INFO("Released Key: {0}", p_key);
+			}
+		});
+
+	//Mouse Button State Callback
+	glfwSetMouseButtonCallback(m_window, [](GLFWwindow* p_window, int p_button, int p_action, int p_mods)
+		{
+			if (p_action == GLFW_PRESS)
+			{
+				EventPtr event = std::make_shared<MouseButtonPressedEvent>(p_button);
+				EventManager::GetInstance().QueueEvent(event);
+				PRLOG_INFO("Pressed Mouse Button: {0}", p_button);
+			}
+			else if (p_action == GLFW_RELEASE)
+			{
+				EventPtr event = std::make_shared<MouseButtonReleasedEvent>(p_button);
+				EventManager::GetInstance().QueueEvent(event);
+				PRLOG_INFO("Released Mouse Button: {0}", p_button);
+			}
+		});
+
+	//Mouse Position Callback
+	glfwSetCursorPosCallback(m_window, [](GLFWwindow* p_window, double p_xPos, double p_yPos)
+		{
+			EventPtr event = std::make_shared<MousePositionEvent>(p_xPos, p_yPos);
+			EventManager::GetInstance().QueueEvent(event);
+
+			PRLOG_INFO("Mouse Position  x:{0}, y:{1}", p_xPos, p_yPos);
+		});
+
+	glfwSetScrollCallback(m_window, [](GLFWwindow* p_window, double p_xOffset, double p_yOffset)
+		{
+			EventPtr event = std::make_shared<MouseScrollEvent>(p_xOffset, p_yOffset);
+			EventManager::GetInstance().QueueEvent(event);
+
+			PRLOG_INFO("Mouse Scroll  x:{0}, y:{1}", p_xOffset, p_yOffset);
+		});
 }
