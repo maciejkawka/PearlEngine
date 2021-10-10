@@ -1,6 +1,7 @@
 #include"Core/Common/pearl_pch.h"
 
 #include "Core/Entry/Application.h"
+#include"Core/Entry/AppContext.h"
 #include"Core/Utils/Logger.h"
 
 using namespace PrCore::Entry;
@@ -32,7 +33,7 @@ void Application::Run()
 
 bool Application::IsRunning()
 {
-	return true;
+	return !m_appContext->m_window->ShouldClose();
 }
 
 bool Application::IsMinimalised()

@@ -13,6 +13,9 @@
     <Filter Include="Events">
       <UniqueIdentifier>{6e14f417-2935-44cc-8ae3-1c65a5668077}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Windowing">
+      <UniqueIdentifier>{0f56568e-1f21-4f9a-b589-2f2d49cb5908}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Entry\AppContext.h">
@@ -39,6 +42,16 @@
     <ClInclude Include="include\Core\Common\pearl_pch.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="include\Core\Windowing\Window.h">
+      <Filter>Windowing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Windowing\WindowContext.h">
+      <Filter>Windowing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Windowing\WindowSettings.h">
+      <Filter>Windowing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Windowing\GLWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Entry\AppContext.cpp">
@@ -56,5 +69,6 @@
     <ClCompile Include="src\Common\pearl_pch.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="src\Windowing\GLWindow.cpp" />
   </ItemGroup>
 </Project>

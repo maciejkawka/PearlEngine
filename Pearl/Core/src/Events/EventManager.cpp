@@ -26,7 +26,7 @@ void EventManager::Terminate()
 	if (s_instance)
 	{
 		delete s_instance;
-		PRLOG_INFO("EventManager Init");
+		PRLOG_INFO("EventManager Terminate");
 	}
 }
 

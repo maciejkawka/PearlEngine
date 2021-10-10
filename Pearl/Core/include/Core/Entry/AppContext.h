@@ -1,4 +1,6 @@
 #pragma once
+#include"Core/Windowing/GLWindow.h"
+#include<memory>
 
 namespace PrCore::Entry {
 	
@@ -8,5 +10,7 @@ namespace PrCore::Entry {
 		AppContext();
 
 		virtual ~AppContext();
+
+		std::unique_ptr<PrCore::Windowing::GLWindow> m_window;
 	};
 }

@@ -19,6 +19,10 @@
     <ClInclude Include="include\Core\Events\TestEvent.h" />
     <ClInclude Include="include\Core\Common\pearl_pch.h" />
     <ClInclude Include="include\Core\Utils\Logger.h" />
+    <ClInclude Include="include\Core\Windowing\GLWindow.h" />
+    <ClInclude Include="include\Core\Windowing\Window.h" />
+    <ClInclude Include="include\Core\Windowing\WindowContext.h" />
+    <ClInclude Include="include\Core\Windowing\WindowSettings.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Entry\AppContext.cpp" />
@@ -31,6 +35,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Core/Common/pearl_pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="src\Windowing\GLWindow.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -79,12 +84,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level1</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/entt/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>
@@ -94,17 +99,21 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>glfw3.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../Dependencies/glfw/lib</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level1</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/entt/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>
@@ -116,6 +125,10 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>glfw3.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../Dependencies/glfw/lib</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

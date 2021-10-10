@@ -18,16 +18,18 @@ Editor::~Editor()
 }
 void Editor::PreFrame()
 {
+	m_appContext->m_window->PollEvents();
 }
 
 void Editor::OnFrame()
 {
-	EventManager::GetInstance().Update();
+
 }
 
 void Editor::PostFrame()
 {
-
+	m_appContext->m_window->SwapBuffers();
+	EventManager::GetInstance().Update();
 }
 
 
