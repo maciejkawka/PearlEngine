@@ -16,6 +16,9 @@
     <Filter Include="Windowing">
       <UniqueIdentifier>{0f56568e-1f21-4f9a-b589-2f2d49cb5908}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{6a97908e-ed8a-4117-83ce-08f3976b684b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Entry\AppContext.h">
@@ -51,7 +54,18 @@
     <ClInclude Include="include\Core\Windowing\WindowSettings.h">
       <Filter>Windowing</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Windowing\GLWindow.h" />
+    <ClInclude Include="include\Core\Input\PrKey.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Input\PrKeyState.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Input\PrMouseButton.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Windowing\GLWindow.h">
+      <Filter>Windowing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Entry\AppContext.cpp">
@@ -69,6 +83,8 @@
     <ClCompile Include="src\Common\pearl_pch.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="src\Windowing\GLWindow.cpp" />
+    <ClCompile Include="src\Windowing\GLWindow.cpp">
+      <Filter>Windowing</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

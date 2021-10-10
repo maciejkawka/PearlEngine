@@ -18,8 +18,11 @@
     <ClInclude Include="include\Core\Events\EventManager.h" />
     <ClInclude Include="include\Core\Events\TestEvent.h" />
     <ClInclude Include="include\Core\Common\pearl_pch.h" />
+    <ClInclude Include="include\Core\Input\PrKeyState.h" />
+    <ClInclude Include="include\Core\Input\PrMouseButton.h" />
     <ClInclude Include="include\Core\Utils\Logger.h" />
     <ClInclude Include="include\Core\Windowing\GLWindow.h" />
+    <ClInclude Include="include\Core\Input\PrKey.h" />
     <ClInclude Include="include\Core\Windowing\Window.h" />
     <ClInclude Include="include\Core\Windowing\WindowContext.h" />
     <ClInclude Include="include\Core\Windowing\WindowSettings.h" />
