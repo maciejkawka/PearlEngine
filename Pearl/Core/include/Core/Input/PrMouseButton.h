@@ -3,6 +3,9 @@
 namespace PrCore::Input {
 
 	enum class PrMouseButton {
+		BUTTON_LEFT			= 0,
+		BUTTON_RIGHT		= 1,
+		BUTTON_MIDDLE		= 2,
 		BUTTON_1			= 0,
 		BUTTON_2			= 1,
 		BUTTON_3			= 2,
@@ -12,8 +15,5 @@ namespace PrCore::Input {
 		BUTTON_7			= 6,
 		BUTTON_8			= 7,
 		BUTTON_LAST			= 7,
-		BUTTON_LEFT			= 0,
-		BUTTON_RIGHT		= 1,
-		BUTTON_MIDDLE		= 2,
 	};
 }

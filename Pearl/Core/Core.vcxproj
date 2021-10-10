@@ -19,6 +19,7 @@
     <ClInclude Include="include\Core\Events\InputEvents.h" />
     <ClInclude Include="include\Core\Common\pearl_pch.h" />
     <ClInclude Include="include\Core\Events\WindowEvents.h" />
+    <ClInclude Include="include\Core\Input\InputManager.h" />
     <ClInclude Include="include\Core\Input\PrKeyState.h" />
     <ClInclude Include="include\Core\Input\PrMouseButton.h" />
     <ClInclude Include="include\Core\Utils\Logger.h" />
@@ -32,6 +33,7 @@
     <ClCompile Include="src\Entry\AppContext.cpp" />
     <ClCompile Include="src\Entry\Application.cpp" />
     <ClCompile Include="src\Events\EventManager.cpp" />
+    <ClCompile Include="src\Input\InputManager.cpp" />
     <ClCompile Include="src\Utils\Logger.cpp" />
     <ClCompile Include="src\Common\pearl_pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

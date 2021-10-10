@@ -29,17 +29,17 @@ namespace PrCore::Events {
 		PrCore::Input::PrKey m_key;
 
 		virtual inline EventType GetType() { return s_type; }
-		inline const static EventType s_type = 0x80e66091;
+		inline const static EventType s_type = 0x26dfe3a;
 	};
 
 	class MouseButtonPressedEvent : public Event {
 	public:
-		MouseButtonPressedEvent(int p_key)
+		MouseButtonPressedEvent(int p_button)
 		{
-			m_key = (PrCore::Input::PrKey)p_key;
+			m_button = (PrCore::Input::PrMouseButton)p_button;
 		}
 
-		PrCore::Input::PrKey m_key;
+		PrCore::Input::PrMouseButton m_button;
 
 		virtual inline EventType GetType() { return s_type; }
 		inline const static EventType s_type = 0xb84be5a9;
@@ -47,20 +47,20 @@ namespace PrCore::Events {
 
 	class MouseButtonReleasedEvent : public Event {
 	public:
-		MouseButtonReleasedEvent(int p_key)
+		MouseButtonReleasedEvent(int p_button)
 		{
-			m_key = (PrCore::Input::PrKey)p_key;
+			m_button = (PrCore::Input::PrMouseButton)p_button;
 		}
 
-		PrCore::Input::PrKey m_key;
+		PrCore::Input::PrMouseButton m_button;
 
 		virtual inline EventType GetType() { return s_type; }
-		inline const static EventType s_type = 0xb84be5a9;
+		inline const static EventType s_type = 0xe4f62295;
 	};
 
-	class MousePositionEvent : public Event {
+	class MouseMovedEvent : public Event {
 	public:
-		MousePositionEvent(double p_xPos, double p_yPos) :
+		MouseMovedEvent(double p_xPos, double p_yPos) :
 			m_xPos(p_xPos),
 			m_yPos(p_yPos)
 		{}

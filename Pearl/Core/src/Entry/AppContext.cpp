@@ -3,7 +3,7 @@
 #include "Core/Entry/AppContext.h"
 #include"Core/Events/EventManager.h"
 #include"Core/Utils/Logger.h"
-#include"Core/Windowing/GLWindow.h"
+
 
 PrCore::Entry::AppContext::AppContext()
 {
@@ -18,6 +18,8 @@ PrCore::Entry::AppContext::AppContext()
 
 	PrCore::Windowing::WindowSettings windowSettings;
 	m_window = std::make_unique<PrCore::Windowing::GLWindow>(windowSettings);
+	
+	m_input = std::make_unique<PrCore::Input::InputManager>();
 }
 
 PrCore::Entry::AppContext::~AppContext()

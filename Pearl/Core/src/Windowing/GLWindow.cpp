@@ -167,13 +167,11 @@ void GLWindow::BindCallbacks()
 			{
 				EventPtr event = std::make_shared<KeyPressedEvent>(p_key);
 				EventManager::GetInstance().QueueEvent(event);
-				PRLOG_INFO("Pressed Key: {0}", p_key);
 			}
 			else if (p_action == GLFW_RELEASE)
 			{
 				EventPtr event = std::make_shared<KeyReleasedEvent>(p_key);
 				EventManager::GetInstance().QueueEvent(event);
-				PRLOG_INFO("Released Key: {0}", p_key);
 			}
 		});
 
@@ -184,30 +182,24 @@ void GLWindow::BindCallbacks()
 			{
 				EventPtr event = std::make_shared<MouseButtonPressedEvent>(p_button);
 				EventManager::GetInstance().QueueEvent(event);
-				PRLOG_INFO("Pressed Mouse Button: {0}", p_button);
 			}
 			else if (p_action == GLFW_RELEASE)
 			{
 				EventPtr event = std::make_shared<MouseButtonReleasedEvent>(p_button);
 				EventManager::GetInstance().QueueEvent(event);
-				PRLOG_INFO("Released Mouse Button: {0}", p_button);
 			}
 		});
 
 	//Mouse Position Callback
 	glfwSetCursorPosCallback(m_window, [](GLFWwindow* p_window, double p_xPos, double p_yPos)
 		{
-			EventPtr event = std::make_shared<MousePositionEvent>(p_xPos, p_yPos);
+			EventPtr event = std::make_shared<MouseMovedEvent>(p_xPos, p_yPos);
 			EventManager::GetInstance().QueueEvent(event);
-
-			PRLOG_INFO("Mouse Position  x:{0}, y:{1}", p_xPos, p_yPos);
 		});
 
 	glfwSetScrollCallback(m_window, [](GLFWwindow* p_window, double p_xOffset, double p_yOffset)
 		{
 			EventPtr event = std::make_shared<MouseScrollEvent>(p_xOffset, p_yOffset);
 			EventManager::GetInstance().QueueEvent(event);
-
-			PRLOG_INFO("Mouse Scroll  x:{0}, y:{1}", p_xOffset, p_yOffset);
 		});
 }

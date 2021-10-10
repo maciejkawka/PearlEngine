@@ -69,6 +69,7 @@
     <ClInclude Include="include\Core\Events\WindowEvents.h">
       <Filter>Events</Filter>
     </ClInclude>
+    <ClInclude Include="include\Core\Input\InputManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Entry\AppContext.cpp">
@@ -89,5 +90,6 @@
     <ClCompile Include="src\Windowing\GLWindow.cpp">
       <Filter>Windowing</Filter>
     </ClCompile>
+    <ClCompile Include="src\Input\InputManager.cpp" />
   </ItemGroup>
 </Project>
