@@ -28,14 +28,14 @@ void Editor::OnFrame()
 	if (PrCore::Input::InputManager::IsButtonReleased(PrCore::Input::PrMouseButton::BUTTON_MIDDLE))
 		PRLOG_INFO("Works 4");
 
-	if (PrCore::Input::InputManager::IsAnyKeyPressed())
+	if (PrCore::Input::InputManager::IsAnyKeyHold())
 		PRLOG_INFO("ANY PRESSED");
 }
 
 void Editor::PostFrame()
 {
 	m_appContext->m_window->SwapBuffers();
-	m_appContext->m_input->ResetFlag();
+	m_appContext->m_input->ResetFlags();
 	
 	EventManager::GetInstance().Update();
 }

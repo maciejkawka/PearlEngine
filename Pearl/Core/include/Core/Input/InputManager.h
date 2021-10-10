@@ -28,14 +28,14 @@ namespace PrCore::Input {
 		static bool IsButtonHold(PrCore::Input::PrMouseButton p_key);
 
 		static bool IsAnyKeyPressed();
-		//static bool IsAnyKeyHold();
+		static bool IsAnyKeyHold();
 
 		//static double GetMouseScroll();
 		//static double GetMouseX();
 		//static double GetMouseY();
 		//static GetMousePosition();
 
-		void ResetFlag();
+		void ResetFlags();
 
 	private:
 

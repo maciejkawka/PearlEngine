@@ -123,18 +123,24 @@ bool PrCore::Input::InputManager::IsButtonHold(PrCore::Input::PrMouseButton p_ke
 
 bool PrCore::Input::InputManager::IsAnyKeyPressed()
 {
-	if (s_keyState.empty())
-		return false;
-
-	bool isAnyPressed = true;
-	for (auto it = s_keyState.begin(); it != s_keyState.end(); ++it)
-		isAnyPressed &= (it->second == PrCore::Input::PrInputState::PRESS);
-
-	return isAnyPressed;
+	return s_anyPressed;
 }
 
-void InputManager::ResetFlag()
+bool InputManager::IsAnyKeyHold()
 {
+	return s_anyHold;
+}
+
+void InputManager::ResetFlags()
+{
+	s_anyPressed = false;
+	for (auto it = s_keyState.begin(); it != s_keyState.end(); ++it)
+ 		s_anyPressed |= (it->second == PrCore::Input::PrInputState::PRESS);
+
+	s_anyHold = false;
+	for (auto it = s_keyHold.begin(); it != s_keyHold.end(); ++it)
+		s_anyHold |= it->second;
+	
 	s_keyState.clear();
 	s_buttonState.clear();
 }
