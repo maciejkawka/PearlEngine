@@ -50,29 +50,29 @@ InputManager::InputManager()
 
 PrCore::Input::InputManager::~InputManager()
 {
-	//PrCore::Events::EventListener keyPressedListener;
-	//keyPressedListener.connect<&InputManager::OnKeyPressed>(this);
-	//PrCore::Events::EventManager::GetInstance().RemoveListener(keyPressedListener, PrCore::Events::KeyPressedEvent::s_type);
+	PrCore::Events::EventListener keyPressedListener;
+	keyPressedListener.connect<&InputManager::OnKeyPressed>(this);
+	PrCore::Events::EventManager::GetInstance().RemoveListener(keyPressedListener, PrCore::Events::KeyPressedEvent::s_type);
 
-	//PrCore::Events::EventListener keyReleasedListener;
-	//keyReleasedListener.connect<&InputManager::OnKeyReleased>(this);
-	//PrCore::Events::EventManager::GetInstance().RemoveListener(keyReleasedListener, PrCore::Events::KeyReleasedEvent::s_type);
+	PrCore::Events::EventListener keyReleasedListener;
+	keyReleasedListener.connect<&InputManager::OnKeyReleased>(this);
+	PrCore::Events::EventManager::GetInstance().RemoveListener(keyReleasedListener, PrCore::Events::KeyReleasedEvent::s_type);
 
-	//PrCore::Events::EventListener buttonPressedListener;
-	//buttonPressedListener.connect<&InputManager::OnMouseButtonPressed>(this);
-	//PrCore::Events::EventManager::GetInstance().RemoveListener(buttonPressedListener, PrCore::Events::MouseButtonPressedEvent::s_type);
+	PrCore::Events::EventListener buttonPressedListener;
+	buttonPressedListener.connect<&InputManager::OnMouseButtonPressed>(this);
+	PrCore::Events::EventManager::GetInstance().RemoveListener(buttonPressedListener, PrCore::Events::MouseButtonPressedEvent::s_type);
 
-	//PrCore::Events::EventListener buttonReleasedListener;
-	//buttonReleasedListener.connect<&InputManager::OnMouseButtonReleased>(this);
-	//PrCore::Events::EventManager::GetInstance().RemoveListener(buttonReleasedListener, PrCore::Events::MouseButtonReleasedEvent::s_type);
+	PrCore::Events::EventListener buttonReleasedListener;
+	buttonReleasedListener.connect<&InputManager::OnMouseButtonReleased>(this);
+	PrCore::Events::EventManager::GetInstance().RemoveListener(buttonReleasedListener, PrCore::Events::MouseButtonReleasedEvent::s_type);
 
-	//PrCore::Events::EventListener mouseMovedListener;
-	//mouseMovedListener.connect<&InputManager::OnMouseMoved>(this);
-	//PrCore::Events::EventManager::GetInstance().RemoveListener(mouseMovedListener, PrCore::Events::MouseMovedEvent::s_type);
+	PrCore::Events::EventListener mouseMovedListener;
+	mouseMovedListener.connect<&InputManager::OnMouseMoved>(this);
+	PrCore::Events::EventManager::GetInstance().RemoveListener(mouseMovedListener, PrCore::Events::MouseMovedEvent::s_type);
 
-	//PrCore::Events::EventListener mouseScrollListener;
-	//mouseScrollListener.connect<&InputManager::OnMouseScroll>(this);
-	//PrCore::Events::EventManager::GetInstance().RemoveListener(mouseScrollListener, PrCore::Events::MouseScrollEvent::s_type);
+	PrCore::Events::EventListener mouseScrollListener;
+	mouseScrollListener.connect<&InputManager::OnMouseScroll>(this);
+	PrCore::Events::EventManager::GetInstance().RemoveListener(mouseScrollListener, PrCore::Events::MouseScrollEvent::s_type);
 
 	PRLOG_INFO("Terminate InputManager");
 }
