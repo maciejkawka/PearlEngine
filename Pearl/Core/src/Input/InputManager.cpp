@@ -131,6 +131,21 @@ bool InputManager::IsAnyKeyHold()
 	return s_anyHold;
 }
 
+double InputManager::GetMouseScroll()
+{
+	return s_mouseScroll;
+}
+
+double InputManager::GetMouseX()
+{
+	return s_mouseXPos;
+}
+
+double InputManager::GetMouseY()
+{
+	return s_mouseYPos;
+}
+
 void InputManager::ResetFlags()
 {
 	s_anyPressed = false;

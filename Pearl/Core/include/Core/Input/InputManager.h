@@ -30,15 +30,14 @@ namespace PrCore::Input {
 		static bool IsAnyKeyPressed();
 		static bool IsAnyKeyHold();
 
-		//static double GetMouseScroll();
-		//static double GetMouseX();
-		//static double GetMouseY();
-		//static GetMousePosition();
+		static double GetMouseScroll();
+		static double GetMouseX();
+		static double GetMouseY();
+		//static Vector2 GetMousePosition();
 
 		void ResetFlags();
 
 	private:
-
 		void OnKeyPressed(PrCore::Events::EventPtr p_event);
 		void OnKeyReleased(PrCore::Events::EventPtr p_event);
 

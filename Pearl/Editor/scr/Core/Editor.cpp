@@ -22,13 +22,17 @@ void Editor::PreFrame()
 
 void Editor::OnFrame()
 {
-	if(PrCore::Input::InputManager::IsButtonHold(PrCore::Input::PrMouseButton::BUTTON_LEFT))
-		PRLOG_INFO("Works B");
+	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::LEFT_CONTROL))
+	{
+		auto xPos = PrCore::Input::InputManager::GetMouseX();
+		auto yPos = PrCore::Input::InputManager::GetMouseY();
+		PRLOG_INFO("Mouse Pos x: {0}, y: {1}", xPos, yPos);
+	}
 
 	if (PrCore::Input::InputManager::IsButtonReleased(PrCore::Input::PrMouseButton::BUTTON_MIDDLE))
 		PRLOG_INFO("Works 4");
 
-	if (PrCore::Input::InputManager::IsAnyKeyHold())
+	if (PrCore::Input::InputManager::IsAnyKeyPressed())
 		PRLOG_INFO("ANY PRESSED");
 }
 
