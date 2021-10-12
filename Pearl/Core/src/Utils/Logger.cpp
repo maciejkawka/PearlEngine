@@ -38,5 +38,5 @@ void PrCore::Utils::Logger::Init()
 	s_fileLogger->set_level(spdlog::level::debug);
 	spdlog::register_logger(s_fileLogger);
 
-	PRLOG_INFO("Logger Init!");
+	PRLOG_INFO("Init Logger");
 }

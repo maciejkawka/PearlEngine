@@ -17,7 +17,7 @@ void EventManager::Init()
 	if (!s_instance)
 	{
 		s_instance = new EventManager();
-		PRLOG_INFO("EventManager Init");
+		PRLOG_INFO("Init EventManager");
 	}
 }
 
@@ -26,7 +26,7 @@ void EventManager::Terminate()
 	if (s_instance)
 	{
 		delete s_instance;
-		PRLOG_INFO("EventManager Terminate");
+		PRLOG_INFO("Terminate EventManager");
 	}
 }
 

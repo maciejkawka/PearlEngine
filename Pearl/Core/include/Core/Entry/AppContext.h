@@ -12,7 +12,7 @@ namespace PrCore::Entry {
 
 		virtual ~AppContext();
 
-		std::unique_ptr<PrCore::Windowing::GLWindow> m_window;
-		std::unique_ptr<PrCore::Input::InputManager> m_input;
+		PrCore::Windowing::GLWindow* m_window;
+		PrCore::Input::InputManager* m_input;
 	};
 }

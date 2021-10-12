@@ -44,6 +44,8 @@ InputManager::InputManager()
 	PrCore::Events::EventListener mouseScrollListener;
 	mouseScrollListener.connect<&InputManager::OnMouseScroll>(this);
 	PrCore::Events::EventManager::GetInstance().AddListener(mouseScrollListener, PrCore::Events::MouseScrollEvent::s_type);
+
+	PRLOG_INFO("Init InputManager");
 }
 
 PrCore::Input::InputManager::~InputManager()
@@ -71,6 +73,8 @@ PrCore::Input::InputManager::~InputManager()
 	//PrCore::Events::EventListener mouseScrollListener;
 	//mouseScrollListener.connect<&InputManager::OnMouseScroll>(this);
 	//PrCore::Events::EventManager::GetInstance().RemoveListener(mouseScrollListener, PrCore::Events::MouseScrollEvent::s_type);
+
+	PRLOG_INFO("Terminate InputManager");
 }
 
 bool InputManager::IsKeyPressed(PrCore::Input::PrKey p_key)

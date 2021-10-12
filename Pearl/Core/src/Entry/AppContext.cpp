@@ -17,15 +17,17 @@ PrCore::Entry::AppContext::AppContext()
 	PrCore::Windowing::GLWindow::InitDevice(context);
 
 	PrCore::Windowing::WindowSettings windowSettings;
-	m_window = std::make_unique<PrCore::Windowing::GLWindow>(windowSettings);
+	m_window = new PrCore::Windowing::GLWindow(windowSettings);
 	
-	m_input = std::make_unique<PrCore::Input::InputManager>();
+	m_input = new PrCore::Input::InputManager();
 }
 
 PrCore::Entry::AppContext::~AppContext()
 {
 	PRLOG_INFO("Deleting AppContext");
-
+	
+	delete m_input;
+	delete m_window;
 	PrCore::Windowing::GLWindow::TerminateDevice();
 	PrCore::Events::EventManager::Terminate();
 }

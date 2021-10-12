@@ -29,7 +29,7 @@ void GLWindow::InitDevice(const WindowContext& p_context)
 		return;
 	}
 
-	PRLOG_INFO("Init GLFW!");
+	PRLOG_INFO("Init GLFW");
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, p_context.versionMajor);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, p_context.varsionMinor);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, p_context.forwardCompatibility);
@@ -42,9 +42,9 @@ void GLWindow::InitDevice(const WindowContext& p_context)
 void GLWindow::TerminateDevice()
 {
 	if (s_windowsCount > 0)
-		PRLOG_WARN("Not all windows were closed!");
+		PRLOG_WARN("Not all windows were closed");
 	glfwTerminate();
-	PRLOG_INFO("Terminate GLFW!");
+	PRLOG_INFO("Terminate GLFW");
 }
 
 void GLWindow::PollEvents()
@@ -102,7 +102,7 @@ GLWindow::~GLWindow()
 	glfwDestroyWindow(m_window);
 	s_windowsCount--;
 
-	PRLOG_INFO("Deleting Window!");
+	PRLOG_INFO("Deleting Window");
 }
 
 bool GLWindow::ShouldClose()
