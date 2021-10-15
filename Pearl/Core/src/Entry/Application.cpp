@@ -32,6 +32,7 @@ void Application::Run()
 			OnFrame(gameClock.GetUnscaledDeltaTime());
 		PostFrame();
 
+		//PRLOG_INFO("{0}", gameClock.GetRealTime());
 		gameClock.Tick();
 	}
 }

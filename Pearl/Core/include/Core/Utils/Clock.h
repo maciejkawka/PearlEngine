@@ -32,6 +32,7 @@ namespace PrCore::Utils {
 		std::chrono::time_point <std::chrono::steady_clock> m_frameStart;
 
 		float m_deltaTime;
+		float m_realTime;
 		float m_timeScale;
 		float m_maxDeltaTime;
 		float m_defaultDeltaTime;

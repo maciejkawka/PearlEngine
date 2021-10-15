@@ -11,7 +11,7 @@ namespace PrEditor::Core {
 
 		void PreFrame() override;
 
-		void OnFrame(float deltaTime) override;
+		void OnFrame(float p_deltaTime) override;
 
 		void PostFrame() override;
 	};

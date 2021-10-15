@@ -11,6 +11,7 @@ Clock::Clock()
 	m_maxDeltaTime = 2.0f;
 	m_defaultDeltaTime = 1.0f / 30.0f;
 	m_deltaTime = m_defaultDeltaTime;
+	m_realTime = 0.0f;
 
 	m_beginning = steady_clock::now();
 	m_frameStart = m_beginning;
@@ -33,9 +34,7 @@ float Clock::GetTimeScale()
 
 float Clock::GetRealTime()
 {
-	auto timeNow = steady_clock::now();
-	auto simeSinceBegining = duration<float>(timeNow - m_beginning);
-	return simeSinceBegining.count();
+	return m_realTime;
 }
 
 int Clock::GetFPS()
@@ -61,6 +60,9 @@ void Clock::SetDefaultDeltaTime(float p_defaultDeltaTime)
 void Clock::Tick()
 {
 	auto timeNow = steady_clock::now();
+
+	auto timeSinceBegining = duration<float>(timeNow - m_beginning);
+	m_realTime = timeSinceBegining.count();
 
 	m_deltaTime = duration<float>(timeNow - m_frameStart).count();
 	if (m_deltaTime > m_maxDeltaTime)
