@@ -17,7 +17,7 @@ namespace PrCore::Entry {
 
 		virtual void PreFrame() = 0;
 
-		virtual void OnFrame(/*pass deltaTime*/) = 0;
+		virtual void OnFrame(float p_deltaTime) = 0;
 
 		virtual void PostFrame() = 0;
 	

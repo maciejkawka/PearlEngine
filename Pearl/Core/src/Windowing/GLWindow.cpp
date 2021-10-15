@@ -90,7 +90,7 @@ GLWindow::GLWindow(const WindowSettings& p_settings) :
 	if (m_settings.vSync)
 		glfwSwapInterval(1);
 	else
-		glfwSwapBuffers(0);
+		glfwSwapInterval(0);
 
 	s_windowsCount++;
 	glfwSetWindowUserPointer(m_window, &m_settings);

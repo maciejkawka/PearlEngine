@@ -69,7 +69,12 @@
     <ClInclude Include="include\Core\Events\WindowEvents.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Input\InputManager.h" />
+    <ClInclude Include="include\Core\Input\InputManager.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Utils\Clock.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Entry\AppContext.cpp">
@@ -90,6 +95,11 @@
     <ClCompile Include="src\Windowing\GLWindow.cpp">
       <Filter>Windowing</Filter>
     </ClCompile>
-    <ClCompile Include="src\Input\InputManager.cpp" />
+    <ClCompile Include="src\Input\InputManager.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utils\Clock.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

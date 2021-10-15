@@ -20,7 +20,7 @@ void Editor::PreFrame()
 	m_appContext->m_window->PollEvents();
 }
 
-void Editor::OnFrame()
+void Editor::OnFrame(float p_deltaTime)
 {
 	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::LEFT_CONTROL))
 	{
@@ -29,11 +29,12 @@ void Editor::OnFrame()
 		PRLOG_INFO("Mouse Pos x: {0}, y: {1}", xPos, yPos);
 	}
 
-	if (PrCore::Input::InputManager::IsButtonReleased(PrCore::Input::PrMouseButton::BUTTON_MIDDLE))
-		PRLOG_INFO("Works 4");
-
 	if (PrCore::Input::InputManager::IsAnyKeyPressed())
 		PRLOG_INFO("ANY PRESSED");
+
+	//Show FPS
+	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::LEFT_SHIFT))
+		PRLOG_INFO("{0}", 1/p_deltaTime);
 }
 
 void Editor::PostFrame()

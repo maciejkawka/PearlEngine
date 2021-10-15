@@ -5,7 +5,7 @@
 #include"Core/Utils/Logger.h"
 #include"Core/Events/WindowEvents.h"
 #include"Core/Events/EventManager.h"
-
+#include"Core/Utils/Clock.h"
 
 
 using namespace PrCore::Entry;
@@ -23,18 +23,16 @@ Application::~Application()
 
 void Application::Run()
 {
-	//Init Time
+	PrCore::Utils::Clock gameClock;
 
 	while (!m_shouldClose)
 	{
-		
-
 		PreFrame();
-		if (!m_minimalized) //If minimalized do not update game
-			OnFrame(/*pass deltaTime*/);
+		if (!m_minimalized)
+			OnFrame(gameClock.GetUnscaledDeltaTime());
 		PostFrame();
 
-		//Update Time
+		gameClock.Tick();
 	}
 }
 
