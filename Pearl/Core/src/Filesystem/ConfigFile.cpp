@@ -17,7 +17,10 @@ bool ConfigFile::Open(const std::string& p_fileName)
 	dir += ("/" + p_fileName);
 	FileStreamPtr file = FileSystem::GetInstance().OpenFileStream(dir.c_str());
 	if (file == nullptr)
+	{
+		m_isValid = false;
 		return false;
+	}
 
 	m_fileName = p_fileName;
 	char* data = new char[file->GetSize()];
@@ -30,6 +33,8 @@ bool ConfigFile::Open(const std::string& p_fileName)
 	delete[] data;
 
 	m_jsonFile = json::parse(dataVector);
+
+	m_isValid = true;
 	return true;
 }
 
