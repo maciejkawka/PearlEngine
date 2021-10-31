@@ -2,6 +2,7 @@
 
 //Windows
 #include<Windows.h>
+#include<winbase.h>
 
 //STD Algorythms
 #include<memory>

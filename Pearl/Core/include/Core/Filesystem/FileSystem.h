@@ -4,7 +4,7 @@
 
 namespace PrCore::Filesystem {
 	
-#define ROOT_DIR "Resources"
+#define ROOT_DIR "C:/Users/Maciej/Current Projects/GitHub/PearlEngine/PearlEngine/Resources"
 #define CONFIG_DIR "Config"
 
 	class FileSystem {
@@ -22,6 +22,8 @@ namespace PrCore::Filesystem {
 		PrFile* OpenFileDirect(const std::string& p_name, DataAccess p_access = DataAccess::Read);
 		FileStreamPtr OpenFileStream(const std::string& p_name, DataAccess p_access = DataAccess::Read);
 		FileStreamPtr OpenFileStreamDirect(const std::string& p_name, DataAccess p_access = DataAccess::Read);
+
+		void CloseFile(PrFile* p_file);
 
 		StandardFileStreamPtr OpenFileStandard(const std::string& p_name, DataAccess p_access = DataAccess::Read);
 

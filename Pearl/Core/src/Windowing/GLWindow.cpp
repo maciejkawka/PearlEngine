@@ -31,7 +31,7 @@ void GLWindow::InitDevice(const WindowContext& p_context)
 
 	PRLOG_INFO("Init GLFW");
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, p_context.versionMajor);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, p_context.varsionMinor);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, p_context.versionMinor);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, p_context.forwardCompatibility);
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, p_context.debugMode);
 	glfwWindowHint(GLFW_SAMPLES, p_context.multiSampling);

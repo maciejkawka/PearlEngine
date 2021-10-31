@@ -10,12 +10,14 @@ FileSystem* FileSystem::s_fileSystem = nullptr;
 PrCore::Filesystem::FileSystem::FileSystem()
 {
 	PHYSFS_init(NULL);
+	PRLOG_INFO("Init Filesystem");
 	InitDir();
 }
 
 PrCore::Filesystem::FileSystem::~FileSystem()
 {
 	PHYSFS_deinit();
+	PRLOG_INFO("Terminate Filesystem");
 }
 
 void PrCore::Filesystem::FileSystem::Init()
@@ -53,6 +55,17 @@ FileStreamPtr FileSystem::OpenFileStream(const std::string& p_name, DataAccess p
 
 	FileStreamPtr fileStream = std::make_shared<FileStream>(file, p_access);
 	return fileStream;
+
+}
+
+void PrCore::Filesystem::FileSystem::CloseFile(PrFile* p_file)
+{
+	int error = PHYSFS_close(p_file);
+	if (error)
+	{
+		PRLOG_ERROR("File cannot be closed");
+		return;
+	}
 
 }
 
@@ -102,9 +115,6 @@ std::vector<std::string> FileSystem::GetFileList(const std::string& p_dir)
 
 void FileSystem::InitDir()
 {
-	PHYSFS_mount("Resources", "/", 0);
-	std::string baseDir = PHYSFS_getBaseDir();
-	baseDir += "/Resources";
-	PHYSFS_setWriteDir("Resources");
-	std::string elo = PHYSFS_getWriteDir();
+	PHYSFS_mount(ROOT_DIR, NULL, 0);
+	PHYSFS_setWriteDir(ROOT_DIR);
 }

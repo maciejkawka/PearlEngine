@@ -6,7 +6,7 @@ namespace PrCore::Windowing{
 
 		int versionMajor = 3;
 
-		int varsionMinor = 2;
+		int versionMinor = 2;
 
 		bool forwardCompatibility = false;
 

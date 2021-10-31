@@ -11,11 +11,13 @@ ConfigFile::ConfigFile(const std::string& p_fileName)
 	m_fileName = p_fileName;
 }
 
-void ConfigFile::Open(const std::string& p_fileName)
+bool ConfigFile::Open(const std::string& p_fileName)
 {
-	FileStreamPtr file = FileSystem::GetInstance().OpenFileStream("Config/" + p_fileName);
+	std::string dir = CONFIG_DIR;
+	dir += ("/" + p_fileName);
+	FileStreamPtr file = FileSystem::GetInstance().OpenFileStream(dir.c_str());
 	if (file == nullptr)
-		return;
+		return false;
 
 	m_fileName = p_fileName;
 	char* data = new char[file->GetSize()];
@@ -25,13 +27,15 @@ void ConfigFile::Open(const std::string& p_fileName)
 
 	for (auto i = 0; i < file->GetSize(); i++)
 		dataVector.push_back(*(data + i));
+	delete[] data;
 
 	m_jsonFile = json::parse(dataVector);
+	return true;
 }
 
 void ConfigFile::Create(const std::string& p_fileName)
 {
-	FileStreamPtr file = FileSystem::GetInstance().OpenFileStream("Config/" + p_fileName, DataAccess::Write);
+	FileStreamPtr file = FileSystem::GetInstance().OpenFileStream(CONFIG_DIR + '/' + p_fileName, DataAccess::Write);
 	m_fileName = p_fileName;
 	std::string dumpJson = m_jsonFile.dump(4);
 	int lenght = dumpJson.length();
