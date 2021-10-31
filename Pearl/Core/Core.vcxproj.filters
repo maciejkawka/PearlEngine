@@ -96,6 +96,8 @@
     <ClInclude Include="include\Core\Filesystem\MemoryStream.h">
       <Filter>Filesystem</Filter>
     </ClInclude>
+    <ClInclude Include="include\Core\Resources\Resource.h" />
+    <ClInclude Include="include\Core\Resources\ResourceManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Entry\AppContext.cpp">
@@ -137,5 +139,7 @@
     <ClCompile Include="src\Filesystem\StandardFileStream.cpp">
       <Filter>Filesystem</Filter>
     </ClCompile>
+    <ClCompile Include="src\Resources\Resource.cpp" />
+    <ClCompile Include="src\Resources\ResourceManager.cpp" />
   </ItemGroup>
 </Project>

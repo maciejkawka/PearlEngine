@@ -16,6 +16,7 @@
 #include<ctime>
 #include<cstring>
 #include<cstdio>
+#include<climits>
 
 //Containers and data structures
 #include<string>
