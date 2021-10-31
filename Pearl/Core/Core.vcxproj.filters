@@ -19,6 +19,9 @@
     <Filter Include="Input">
       <UniqueIdentifier>{6a97908e-ed8a-4117-83ce-08f3976b684b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Filesystem">
+      <UniqueIdentifier>{bc90fd0b-a3a3-425a-92ba-faaa2886d93f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Entry\AppContext.h">
@@ -75,6 +78,24 @@
     <ClInclude Include="include\Core\Utils\Clock.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="include\Core\Filesystem\StandardFileStream.h">
+      <Filter>Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Filesystem\ConfigFile.h">
+      <Filter>Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Filesystem\DataStream.h">
+      <Filter>Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Filesystem\FileStream.h">
+      <Filter>Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Filesystem\FileSystem.h">
+      <Filter>Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Filesystem\MemoryStream.h">
+      <Filter>Filesystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Entry\AppContext.cpp">
@@ -100,6 +121,21 @@
     </ClCompile>
     <ClCompile Include="src\Utils\Clock.cpp">
       <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Filesystem\ConfigFile.cpp">
+      <Filter>Filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Filesystem\FileStream.cpp">
+      <Filter>Filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Filesystem\Filesystem.cpp">
+      <Filter>Filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Filesystem\MemoryStream.cpp">
+      <Filter>Filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Filesystem\StandardFileStream.cpp">
+      <Filter>Filesystem</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

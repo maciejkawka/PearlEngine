@@ -13,6 +13,8 @@
 #include<future>
 #include <stdint.h>
 #include<ctime>
+#include<cstring>
+#include<cstdio>
 
 //Containers and data structures
 #include<string>

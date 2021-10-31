@@ -19,6 +19,12 @@
     <ClInclude Include="include\Core\Events\InputEvents.h" />
     <ClInclude Include="include\Core\Common\pearl_pch.h" />
     <ClInclude Include="include\Core\Events\WindowEvents.h" />
+    <ClInclude Include="include\Core\Filesystem\ConfigFile.h" />
+    <ClInclude Include="include\Core\Filesystem\DataStream.h" />
+    <ClInclude Include="include\Core\Filesystem\FileStream.h" />
+    <ClInclude Include="include\Core\Filesystem\FileSystem.h" />
+    <ClInclude Include="include\Core\Filesystem\MemoryStream.h" />
+    <ClInclude Include="include\Core\Filesystem\StandardFileStream.h" />
     <ClInclude Include="include\Core\Input\InputManager.h" />
     <ClInclude Include="include\Core\Input\PrKeyState.h" />
     <ClInclude Include="include\Core\Input\PrMouseButton.h" />
@@ -34,6 +40,11 @@
     <ClCompile Include="src\Entry\AppContext.cpp" />
     <ClCompile Include="src\Entry\Application.cpp" />
     <ClCompile Include="src\Events\EventManager.cpp" />
+    <ClCompile Include="src\Filesystem\ConfigFile.cpp" />
+    <ClCompile Include="src\Filesystem\FileStream.cpp" />
+    <ClCompile Include="src\Filesystem\Filesystem.cpp" />
+    <ClCompile Include="src\Filesystem\MemoryStream.cpp" />
+    <ClCompile Include="src\Filesystem\StandardFileStream.cpp" />
     <ClCompile Include="src\Input\InputManager.cpp" />
     <ClCompile Include="src\Utils\Clock.cpp" />
     <ClCompile Include="src\Utils\Logger.cpp" />
@@ -97,7 +108,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>
@@ -121,7 +132,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>
