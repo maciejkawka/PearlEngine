@@ -1,6 +1,8 @@
 #include"Core/Common/pearl_pch.h"
 
 #include"Core/Resources/ResourceManager.h"
+#include"Core/Events/EventManager.h"
+#include"Core/Events/ResourceEvents.h"
 
 using namespace PrCore::Resources;
 
@@ -10,6 +12,15 @@ ResourceManager::ResourceManager() :
 	m_memoryUsage(0)
 {
 	m_maxMemory = UINT_MAX;
+
+	using namespace PrCore::Events;
+	EventListener loadedListener;
+	loadedListener.connect<&ResourceManager::OnResourceLoaded>(this);
+	EventManager::GetInstance().AddListener(loadedListener, ResourceLoadedEvent::s_type);
+
+	EventListener unloadedListener;
+	unloadedListener.connect<&ResourceManager::OnResourceUnloaded>(this);
+	EventManager::GetInstance().AddListener(unloadedListener, ResourceUnloadedEvent::s_type);
 }
 
 ResourceManager::~ResourceManager()
@@ -37,7 +48,8 @@ ResourcePtr ResourceManager::CreateResource(const std::string& p_name)
 
 void ResourceManager::FireCacheMiss(CacheMiss p_cacheMiss)
 {
-	int i = 0;
+	PrCore::Events::EventPtr event = std::make_shared<PrCore::Events::CacheMissEvent>(p_cacheMiss);
+	PrCore::Events::EventManager::GetInstance().QueueEvent(event);
 }
 
 ResourcePtr ResourceManager::Load(const std::string& p_name)
@@ -160,16 +172,16 @@ ResourcePtr ResourceManager::GetResource(const std::string& p_name)
 	return resource;
 }
 
-void ResourceManager::OnResourceLoaded(ResourceSize p_size)
+void ResourceManager::OnResourceLoaded(PrCore::Events::EventPtr p_event)
 {
-	//m_memoryUsage += p_size;
+	auto event = std::static_pointer_cast<PrCore::Events::ResourceLoadedEvent>(p_event);
+	PRLOG_INFO("Resource {0} loaded", event->m_ID);
 }
 
-void ResourceManager::OnResourceUnloaded(ResourceSize p_size)
+void ResourceManager::OnResourceUnloaded(PrCore::Events::EventPtr p_event)
 {
-	/*m_memoryUsage -= p_size;
-	if (m_memoryUsage <= 0)
-		std::cout << "ELO";*/
+	auto event = std::static_pointer_cast<PrCore::Events::ResourceUnloadedEvent>(p_event);
+	PRLOG_INFO("Resource {0} loaded", event->m_ID);
 }
 
 ResourceID ResourceManager::ResNameToID(const std::string& p_name)

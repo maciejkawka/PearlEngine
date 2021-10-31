@@ -1,5 +1,6 @@
 #pragma once
 #include"Core/Resources/Resource.h"
+#include"Core/Events/Event.h"
 #include<string>
 #include<map>
 #include<list>
@@ -55,8 +56,8 @@ namespace PrCore::Resources {
 
 		ResourcePtr GetResource(const std::string& p_name);
 
-		void OnResourceLoaded(ResourceSize p_size);
-		void OnResourceUnloaded(ResourceSize p_size);
+		void OnResourceLoaded(PrCore::Events::EventPtr p_event);
+		void OnResourceUnloaded(PrCore::Events::EventPtr p_event);
 
 	protected:
 		ResourceID ResNameToID(const std::string& p_name);

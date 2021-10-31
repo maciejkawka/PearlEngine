@@ -18,6 +18,7 @@
     <ClInclude Include="include\Core\Events\EventManager.h" />
     <ClInclude Include="include\Core\Events\InputEvents.h" />
     <ClInclude Include="include\Core\Common\pearl_pch.h" />
+    <ClInclude Include="include\Core\Events\ResourceEvents.h" />
     <ClInclude Include="include\Core\Events\WindowEvents.h" />
     <ClInclude Include="include\Core\Filesystem\ConfigFile.h" />
     <ClInclude Include="include\Core\Filesystem\DataStream.h" />

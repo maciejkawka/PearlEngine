@@ -98,6 +98,7 @@
     </ClInclude>
     <ClInclude Include="include\Core\Resources\Resource.h" />
     <ClInclude Include="include\Core\Resources\ResourceManager.h" />
+    <ClInclude Include="include\Core\Events\ResourceEvents.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Entry\AppContext.cpp">

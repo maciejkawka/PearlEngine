@@ -29,8 +29,7 @@ namespace PrCore::Resources {
 		inline std::string GetName() { return m_name; }
 		inline ResourceID GetID() { return m_ID; }
 
-		//Taking a Resource's status
-		inline ResourceStatus GetState() { return m_state; }
+		inline ResourceStatus GetStatus() { return m_state; }
 
 		inline bool IsLoading() { return m_state == ResourceStatus::Loading; }
 		inline bool IsLoaded() { return m_state == ResourceStatus::Loaded; }
