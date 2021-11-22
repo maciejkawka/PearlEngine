@@ -25,6 +25,9 @@
     <Filter Include="Resources">
       <UniqueIdentifier>{49449acd-d5c6-49ad-ba70-1316e32e6d84}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{f1ff6dae-ab70-4c0a-9afc-783017fc58a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Entry\AppContext.h">
@@ -107,6 +110,9 @@
     </ClInclude>
     <ClInclude Include="include\Core\Resources\ResourceManager.h">
       <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Math\Math.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

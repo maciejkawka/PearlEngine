@@ -29,6 +29,7 @@
     <ClInclude Include="include\Core\Input\InputManager.h" />
     <ClInclude Include="include\Core\Input\PrKeyState.h" />
     <ClInclude Include="include\Core\Input\PrMouseButton.h" />
+    <ClInclude Include="include\Core\Math\Math.h" />
     <ClInclude Include="include\Core\Resources\Resource.h" />
     <ClInclude Include="include\Core\Resources\ResourceManager.h" />
     <ClInclude Include="include\Core\Utils\Logger.h" />
@@ -113,12 +114,13 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/glm/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,12 +140,13 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/glm/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
