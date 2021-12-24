@@ -3,6 +3,7 @@
 #include"PrMouseButton.h"
 #include"PrKeyState.h"
 #include"Core/Events/Event.h"
+#include"Core/Math/Math.h"
 #include<unordered_map>
 
 namespace PrCore::Input {
@@ -33,7 +34,7 @@ namespace PrCore::Input {
 		static double GetMouseScroll();
 		static double GetMouseX();
 		static double GetMouseY();
-		//static Vector2 GetMousePosition();
+		static Math::vec2 GetMousePosition();
 
 		void ResetFlags();
 

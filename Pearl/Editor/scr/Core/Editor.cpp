@@ -24,8 +24,10 @@ void Editor::OnFrame(float p_deltaTime)
 {
 	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::LEFT_CONTROL))
 	{
-		auto xPos = PrCore::Input::InputManager::GetMouseX();
-		auto yPos = PrCore::Input::InputManager::GetMouseY();
+		auto mousePos = PrCore::Input::InputManager::GetMousePosition();
+		auto xPos = mousePos.x;
+		auto yPos = mousePos.y;
+
 		PRLOG_INFO("Mouse Pos x: {0}, y: {1}", xPos, yPos);
 	}
 
