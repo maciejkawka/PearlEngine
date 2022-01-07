@@ -1,7 +1,7 @@
-#include "Editor/Core/Editor.h"
+#include"Editor/Core/Editor.h"
 #include"Editor/Core/EditorContext.h"
-#include"Core/Utils/Logger.h"
-#include"Core/Events/EventManager.h"
+#include"Engine/Core/Utils/Logger.h"
+#include"Engine/Core/Events/EventManager.h"
 
 using namespace PrEditor::Core;
 using namespace PrCore::Events;

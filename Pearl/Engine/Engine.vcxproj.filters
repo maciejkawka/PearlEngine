@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{4f01b89d-d7f5-4803-a08e-f25e4fbcad88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Common">
+      <UniqueIdentifier>{29a3879c-3eea-4993-82dc-1ffdc7ad4b02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Entry">
+      <UniqueIdentifier>{c85352fa-5766-48a5-ae38-6931688772ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Events">
+      <UniqueIdentifier>{6e14f417-2935-44cc-8ae3-1c65a5668077}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Filesystem">
+      <UniqueIdentifier>{bc90fd0b-a3a3-425a-92ba-faaa2886d93f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Input">
+      <UniqueIdentifier>{6a97908e-ed8a-4117-83ce-08f3976b684b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Math">
+      <UniqueIdentifier>{f1ff6dae-ab70-4c0a-9afc-783017fc58a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Resources">
+      <UniqueIdentifier>{49449acd-d5c6-49ad-ba70-1316e32e6d84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Utils">
+      <UniqueIdentifier>{a5b18668-61dc-4abc-8a6e-25f8e67888bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Windowing">
+      <UniqueIdentifier>{0f56568e-1f21-4f9a-b589-2f2d49cb5908}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Engine\Core\Entry\AppContext.h">
+      <Filter>Core\Entry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Entry\Application.h">
+      <Filter>Core\Entry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Entry\EntryPoint.h">
+      <Filter>Core\Entry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Utils\Logger.h">
+      <Filter>Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Events\Event.h">
+      <Filter>Core\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Events\EventManager.h">
+      <Filter>Core\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Common\pearl_pch.h">
+      <Filter>Core\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Windowing\Window.h">
+      <Filter>Core\Windowing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Windowing\WindowContext.h">
+      <Filter>Core\Windowing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Windowing\WindowSettings.h">
+      <Filter>Core\Windowing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Input\PrKey.h">
+      <Filter>Core\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Input\PrKeyState.h">
+      <Filter>Core\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Input\PrMouseButton.h">
+      <Filter>Core\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Windowing\GLWindow.h">
+      <Filter>Core\Windowing</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Events\InputEvents.h">
+      <Filter>Core\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Events\WindowEvents.h">
+      <Filter>Core\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Input\InputManager.h">
+      <Filter>Core\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Utils\Clock.h">
+      <Filter>Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Filesystem\StandardFileStream.h">
+      <Filter>Core\Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Filesystem\ConfigFile.h">
+      <Filter>Core\Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Filesystem\DataStream.h">
+      <Filter>Core\Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Filesystem\FileStream.h">
+      <Filter>Core\Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Filesystem\FileSystem.h">
+      <Filter>Core\Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Filesystem\MemoryStream.h">
+      <Filter>Core\Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Resources\Resource.h">
+      <Filter>Core\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Events\ResourceEvents.h">
+      <Filter>Core\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Resources\ResourceManager.h">
+      <Filter>Core\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Math\Math.h">
+      <Filter>Core\Math</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Core\Entry\AppContext.cpp">
+      <Filter>Core\Entry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Entry\Application.cpp">
+      <Filter>Core\Entry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Utils\Logger.cpp">
+      <Filter>Core\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Events\EventManager.cpp">
+      <Filter>Core\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Common\pearl_pch.cpp">
+      <Filter>Core\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Windowing\GLWindow.cpp">
+      <Filter>Core\Windowing</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Input\InputManager.cpp">
+      <Filter>Core\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Utils\Clock.cpp">
+      <Filter>Core\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Filesystem\ConfigFile.cpp">
+      <Filter>Core\Filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Filesystem\FileStream.cpp">
+      <Filter>Core\Filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Filesystem\Filesystem.cpp">
+      <Filter>Core\Filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Filesystem\MemoryStream.cpp">
+      <Filter>Core\Filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Filesystem\StandardFileStream.cpp">
+      <Filter>Core\Filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Resources\Resource.cpp">
+      <Filter>Core\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Resources\ResourceManager.cpp">
+      <Filter>Core\Resources</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

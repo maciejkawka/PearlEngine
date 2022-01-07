@@ -1,5 +1,5 @@
 #include"Editor/Core/Editor.h"
-#include"Core/Entry/EntryPoint.h"
+#include"Engine/Core/Entry/EntryPoint.h"
 
 
 PrCore::Entry::Application* CreateApplication()

@@ -1,6 +1,6 @@
 #pragma once
-#include"Core/Entry/Application.h"
-#include"Core/Events/Event.h"
+#include"Engine/Core/Entry/Application.h"
+#include"Engine/Core/Events/Event.h"
 
 namespace PrEditor::Core {
 

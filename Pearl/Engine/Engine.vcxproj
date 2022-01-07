@@ -11,56 +11,56 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Core\Entry\AppContext.h" />
-    <ClInclude Include="include\Core\Entry\Application.h" />
-    <ClInclude Include="include\Core\Entry\EntryPoint.h" />
-    <ClInclude Include="include\Core\Events\Event.h" />
-    <ClInclude Include="include\Core\Events\EventManager.h" />
-    <ClInclude Include="include\Core\Events\InputEvents.h" />
-    <ClInclude Include="include\Core\Common\pearl_pch.h" />
-    <ClInclude Include="include\Core\Events\ResourceEvents.h" />
-    <ClInclude Include="include\Core\Events\WindowEvents.h" />
-    <ClInclude Include="include\Core\Filesystem\ConfigFile.h" />
-    <ClInclude Include="include\Core\Filesystem\DataStream.h" />
-    <ClInclude Include="include\Core\Filesystem\FileStream.h" />
-    <ClInclude Include="include\Core\Filesystem\FileSystem.h" />
-    <ClInclude Include="include\Core\Filesystem\MemoryStream.h" />
-    <ClInclude Include="include\Core\Filesystem\StandardFileStream.h" />
-    <ClInclude Include="include\Core\Input\InputManager.h" />
-    <ClInclude Include="include\Core\Input\PrKeyState.h" />
-    <ClInclude Include="include\Core\Input\PrMouseButton.h" />
-    <ClInclude Include="include\Core\Math\Math.h" />
-    <ClInclude Include="include\Core\Resources\Resource.h" />
-    <ClInclude Include="include\Core\Resources\ResourceManager.h" />
-    <ClInclude Include="include\Core\Utils\Logger.h" />
-    <ClInclude Include="include\Core\Utils\Clock.h" />
-    <ClInclude Include="include\Core\Windowing\GLWindow.h" />
-    <ClInclude Include="include\Core\Input\PrKey.h" />
-    <ClInclude Include="include\Core\Windowing\Window.h" />
-    <ClInclude Include="include\Core\Windowing\WindowContext.h" />
-    <ClInclude Include="include\Core\Windowing\WindowSettings.h" />
+    <ClInclude Include="include\Engine\Core\Entry\AppContext.h" />
+    <ClInclude Include="include\Engine\Core\Entry\Application.h" />
+    <ClInclude Include="include\Engine\Core\Entry\EntryPoint.h" />
+    <ClInclude Include="include\Engine\Core\Events\Event.h" />
+    <ClInclude Include="include\Engine\Core\Events\EventManager.h" />
+    <ClInclude Include="include\Engine\Core\Events\InputEvents.h" />
+    <ClInclude Include="include\Engine\Core\Common\pearl_pch.h" />
+    <ClInclude Include="include\Engine\Core\Events\ResourceEvents.h" />
+    <ClInclude Include="include\Engine\Core\Events\WindowEvents.h" />
+    <ClInclude Include="include\Engine\Core\Filesystem\ConfigFile.h" />
+    <ClInclude Include="include\Engine\Core\Filesystem\DataStream.h" />
+    <ClInclude Include="include\Engine\Core\Filesystem\FileStream.h" />
+    <ClInclude Include="include\Engine\Core\Filesystem\FileSystem.h" />
+    <ClInclude Include="include\Engine\Core\Filesystem\MemoryStream.h" />
+    <ClInclude Include="include\Engine\Core\Filesystem\StandardFileStream.h" />
+    <ClInclude Include="include\Engine\Core\Input\InputManager.h" />
+    <ClInclude Include="include\Engine\Core\Input\PrKeyState.h" />
+    <ClInclude Include="include\Engine\Core\Input\PrMouseButton.h" />
+    <ClInclude Include="include\Engine\Core\Math\Math.h" />
+    <ClInclude Include="include\Engine\Core\Resources\Resource.h" />
+    <ClInclude Include="include\Engine\Core\Resources\ResourceManager.h" />
+    <ClInclude Include="include\Engine\Core\Utils\Logger.h" />
+    <ClInclude Include="include\Engine\Core\Utils\Clock.h" />
+    <ClInclude Include="include\Engine\Core\Windowing\GLWindow.h" />
+    <ClInclude Include="include\Engine\Core\Input\PrKey.h" />
+    <ClInclude Include="include\Engine\Core\Windowing\Window.h" />
+    <ClInclude Include="include\Engine\Core\Windowing\WindowContext.h" />
+    <ClInclude Include="include\Engine\Core\Windowing\WindowSettings.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Entry\AppContext.cpp" />
-    <ClCompile Include="src\Entry\Application.cpp" />
-    <ClCompile Include="src\Events\EventManager.cpp" />
-    <ClCompile Include="src\Filesystem\ConfigFile.cpp" />
-    <ClCompile Include="src\Filesystem\FileStream.cpp" />
-    <ClCompile Include="src\Filesystem\Filesystem.cpp" />
-    <ClCompile Include="src\Filesystem\MemoryStream.cpp" />
-    <ClCompile Include="src\Filesystem\StandardFileStream.cpp" />
-    <ClCompile Include="src\Input\InputManager.cpp" />
-    <ClCompile Include="src\Resources\Resource.cpp" />
-    <ClCompile Include="src\Resources\ResourceManager.cpp" />
-    <ClCompile Include="src\Utils\Clock.cpp" />
-    <ClCompile Include="src\Utils\Logger.cpp" />
-    <ClCompile Include="src\Common\pearl_pch.cpp">
+    <ClCompile Include="src\Core\Entry\AppContext.cpp" />
+    <ClCompile Include="src\Core\Entry\Application.cpp" />
+    <ClCompile Include="src\Core\Events\EventManager.cpp" />
+    <ClCompile Include="src\Core\Filesystem\ConfigFile.cpp" />
+    <ClCompile Include="src\Core\Filesystem\FileStream.cpp" />
+    <ClCompile Include="src\Core\Filesystem\Filesystem.cpp" />
+    <ClCompile Include="src\Core\Filesystem\MemoryStream.cpp" />
+    <ClCompile Include="src\Core\Filesystem\StandardFileStream.cpp" />
+    <ClCompile Include="src\Core\Input\InputManager.cpp" />
+    <ClCompile Include="src\Core\Resources\Resource.cpp" />
+    <ClCompile Include="src\Core\Resources\ResourceManager.cpp" />
+    <ClCompile Include="src\Core\Utils\Clock.cpp" />
+    <ClCompile Include="src\Core\Utils\Logger.cpp" />
+    <ClCompile Include="src\Core\Common\pearl_pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Core/Common/pearl_pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="src\Windowing\GLWindow.cpp" />
+    <ClCompile Include="src\Core\Windowing\GLWindow.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -68,6 +68,7 @@
     <ProjectGuid>{4dafc13e-5ad2-4bbc-a0a4-55706bcecc7f}</ProjectGuid>
     <RootNamespace>Core</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Engine</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -99,13 +100,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>../../Bin/$(Configuration)/$(ProjectName)/</OutDir>
     <IntDir>../../Bin-int/$(Configuration)/$(ProjectName)/</IntDir>
-    <TargetName>Core</TargetName>
+    <TargetName>PearlEngine</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>../../Bin/$(Configuration)/$(ProjectName)/</OutDir>
     <IntDir>../../Bin-int/$(Configuration)/$(ProjectName)/</IntDir>
-    <TargetName>Core</TargetName>
+    <TargetName>PearlEngine</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -114,7 +115,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/glm/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/glm/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>
@@ -140,7 +141,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/glm/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/glm/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>
