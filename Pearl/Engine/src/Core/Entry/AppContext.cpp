@@ -6,6 +6,8 @@
 #include"Core/Filesystem/FileSystem.h"
 #include"Core/Filesystem/ConfigFile.h"
 
+#include"Renderer/OpenGL/GLContext.h"
+
 PrCore::Entry::AppContext::AppContext()
 {
 	PrCore::Utils::Logger::Init();
@@ -42,7 +44,10 @@ PrCore::Entry::AppContext::AppContext()
 	}
 
 	m_window = new PrCore::Windowing::GLWindow(windowSettings);
-	
+
+	m_rendererContext = new PrRenderer::OpenGL::GLContext();
+	m_rendererContext->Init();
+
 	m_input = new PrCore::Input::InputManager();
 }
 

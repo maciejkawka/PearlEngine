@@ -11,8 +11,5 @@ namespace PrRenderer::OpenGL {
 		~GLContext() {}
 
 		void Init() override;
-
-	private:
-
 	};
 }

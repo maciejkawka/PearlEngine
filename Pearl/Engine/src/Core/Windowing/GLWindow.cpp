@@ -95,6 +95,7 @@ GLWindow::GLWindow(const WindowSettings& p_settings) :
 	s_windowsCount++;
 	glfwSetWindowUserPointer(m_window, &m_settings);
 	BindCallbacks();
+	glfwMakeContextCurrent(m_window);
 }
 
 GLWindow::~GLWindow()
