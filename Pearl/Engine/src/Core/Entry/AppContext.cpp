@@ -48,6 +48,9 @@ PrCore::Entry::AppContext::AppContext()
 	m_rendererContext = new PrRenderer::OpenGL::GLContext();
 	m_rendererContext->Init();
 
+	m_renderer = new PrRenderer::Core::Renderer();
+	m_renderer->Test();
+
 	m_input = new PrCore::Input::InputManager();
 }
 

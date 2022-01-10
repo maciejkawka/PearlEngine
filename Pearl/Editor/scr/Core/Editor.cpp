@@ -37,6 +37,8 @@ void Editor::OnFrame(float p_deltaTime)
 	//Show FPS
 	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::LEFT_SHIFT))
 		PRLOG_INFO("{0}", 1/p_deltaTime);
+
+	m_appContext->m_renderer->Draw();
 }
 
 void Editor::PostFrame()

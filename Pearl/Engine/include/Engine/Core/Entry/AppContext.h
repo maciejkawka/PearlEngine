@@ -3,6 +3,7 @@
 #include"Core/Input/InputManager.h"
 
 #include"Renderer/Core/Context.h"
+#include"Renderer/Core/Renderer.h"
 
 #include<memory>
 
@@ -17,6 +18,7 @@ namespace PrCore::Entry {
 
 		PrCore::Windowing::GLWindow* m_window;
 		PrRenderer::Core::Context* m_rendererContext;
+		PrRenderer::Core::Renderer* m_renderer;
 		PrCore::Input::InputManager* m_input;
 	};
 }
