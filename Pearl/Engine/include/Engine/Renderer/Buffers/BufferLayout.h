@@ -52,7 +52,7 @@ namespace PrRenderer::Buffers {
 
 		BufferElement() = default;
 
-		BufferElement(ShaderDataType p_type, const std::string& p_name, bool p_normalized = false)
+		BufferElement(const std::string& p_name, ShaderDataType p_type, bool p_normalized = false)
 			: name(p_name), type(p_type), size(ShaderDataTypeSize(p_type)), offset(0), normalized(p_normalized)
 		{
 		}

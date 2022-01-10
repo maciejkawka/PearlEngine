@@ -147,6 +147,7 @@
     <ClInclude Include="include\Engine\Renderer\Buffers\BufferLayout.h">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -200,5 +201,6 @@
     <ClCompile Include="src\Renderer\OpenGL\Renderer.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\GLVertexBuffer.cpp" />
   </ItemGroup>
 </Project>

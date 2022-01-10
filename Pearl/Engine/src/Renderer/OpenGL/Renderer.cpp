@@ -1,6 +1,8 @@
 #include"Core/Common/pearl_pch.h"
 
 #include"Renderer/Core/Renderer.h"
+#include"Renderer/OpenGL/GLVertexBuffer.h"
+
 #include"glad/glad.h"
 
 using namespace PrRenderer::Core;
@@ -28,11 +30,14 @@ void Renderer::Test()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+	Buffers::BufferLayout layout = {
+		{ "Vertex", Buffers::ShaderDataType::Float3},
+		{"Colour" , Buffers::ShaderDataType::Float4}
+	};
 
-	unsigned int vbo;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertecies), vertecies, GL_STATIC_DRAW);
+	Buffers::VertexBuffer* vertexBuffer = new OpenGL::GLVertexBuffer(vertecies, sizeof(vertecies));
+	vertexBuffer->SetBufferLayout(layout);
+	vertexBuffer->Bind();
 
 	const char* vertexShaderSource = "#version 330 core\n"
 		"layout (location = 0) in vec3 aPos;\n"
@@ -61,7 +66,7 @@ void Renderer::Test()
 		"out vec4 FragColor;\n"
 		"void main()\n"
 		"{\n"
-		"FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
+		"FragColor = vec4(1.0f, 0.0f, 1.0f, 1.0f);\n"
 		"}\0";
 
 	

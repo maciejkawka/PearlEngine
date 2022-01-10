@@ -13,7 +13,7 @@ namespace PrRenderer::Buffers{
 
 		virtual void SetData(void* p_data, size_t p_size) = 0;
 
-		virtual void SetBufferLayout(const BufferLayout& p_bufferLayout) = 0;
+		inline void SetBufferLayout(const BufferLayout& p_bufferLayout) { m_bufferLayout = p_bufferLayout; }
 		inline virtual const BufferLayout GetBufferLayout() const { return m_bufferLayout; }
 
 		inline size_t GetSize() { return m_size; }
