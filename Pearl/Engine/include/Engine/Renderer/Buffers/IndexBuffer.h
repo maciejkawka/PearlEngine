@@ -10,7 +10,7 @@ namespace PrRenderer::Buffers {
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
 
-		virtual void SetIndecies(void* p_indecies, size_t p_size) = 0;
+		virtual void SetIndeces(void* p_indeces, size_t p_size) = 0;
 
 		inline size_t GetSize() { return m_size; }
 		inline RendererID GetID() { return m_bufferID; }

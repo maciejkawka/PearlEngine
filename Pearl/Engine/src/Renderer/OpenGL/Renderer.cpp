@@ -2,6 +2,8 @@
 
 #include"Renderer/Core/Renderer.h"
 #include"Renderer/OpenGL/GLVertexBuffer.h"
+#include"Renderer/OpenGL/GLIndexBuffer.h"
+#include"Renderer/OpenGL/GLVertexArray.h"
 
 #include"glad/glad.h"
 
@@ -10,40 +12,39 @@ using namespace PrRenderer::Core;
 void Renderer::Test()
 {
 	float vertecies[] = {
-		 0.5f,  0.5f, 0.0f,  // top right
-		 0.5f, -0.5f, 0.0f,  // bottom right
-		-0.5f, -0.5f, 0.0f,  // bottom left
-		-0.5f,  0.5f, 0.0f   // top left 
+		 0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f,  // top right
+		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // bottom right
+		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f,// bottom left
+		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f  // top left 
 	};
 	unsigned int indices[] = {  // note that we start from 0!
 		0, 1, 3,   // first triangle
 		1, 2, 3    // second triangle
 	};
 
+	vertexArray = std::make_shared<OpenGL::GLVertexArray>();
 
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	IndexBufferPtr indexBuffer = std::make_shared<OpenGL::GLIndexBuffer>(indices, 6);
+	vertexArray->SetIndexBuffer(indexBuffer);
 
-	glGenBuffers(1, &ebo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	Buffers::BufferLayout layout = {
 		{ "Vertex", Buffers::ShaderDataType::Float3},
-		{"Colour" , Buffers::ShaderDataType::Float4}
+		{ "Colour", Buffers::ShaderDataType::Float3}
 	};
 
-	Buffers::VertexBuffer* vertexBuffer = new OpenGL::GLVertexBuffer(vertecies, sizeof(vertecies));
+	VertexBufferPtr vertexBuffer = std::make_shared<OpenGL::GLVertexBuffer>(vertecies, sizeof(vertecies));
 	vertexBuffer->SetBufferLayout(layout);
-	vertexBuffer->Bind();
 
+	vertexArray->SetVertexBuffer(vertexBuffer);
 	const char* vertexShaderSource = "#version 330 core\n"
 		"layout (location = 0) in vec3 aPos;\n"
+		"layout (location = 1) in vec3 aCol;\n"
+		"out vec3 vertexCol;\n"
 		"void main()\n"
 		"{\n"
 		"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+		"   vertexCol = aCol;\n"
 		"}\0";
 
 	unsigned int vertexShader;
@@ -64,9 +65,10 @@ void Renderer::Test()
 
 	const char* fragmentShaderSource = "#version 330 core\n"
 		"out vec4 FragColor;\n"
+		"in  vec3 vertexCol;\n"
 		"void main()\n"
 		"{\n"
-		"FragColor = vec4(1.0f, 0.0f, 1.0f, 1.0f);\n"
+		"FragColor = vec4(vertexCol,1.0);\n"
 		"}\0";
 
 	
@@ -94,11 +96,6 @@ void Renderer::Test()
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
-
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-	glEnableVertexAttribArray(0);
 }
 
 void Renderer::Draw()
@@ -107,6 +104,6 @@ void Renderer::Draw()
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
 	glUseProgram(shaderProgram);
-	glBindVertexArray(vao);
+	vertexArray->Bind();
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

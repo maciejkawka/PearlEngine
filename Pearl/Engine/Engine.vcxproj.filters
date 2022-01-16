@@ -148,6 +148,8 @@
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexBuffer.h" />
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLIndexBuffer.h" />
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexArray.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -202,5 +204,7 @@
       <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL\GLVertexBuffer.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\GLIndexBuffer.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\GLVertexArray.cpp" />
   </ItemGroup>
 </Project>

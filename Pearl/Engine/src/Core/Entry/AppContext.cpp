@@ -33,7 +33,6 @@ PrCore::Entry::AppContext::AppContext()
 	PrCore::Windowing::WindowSettings windowSettings;
 	if (contexConfig.isValid())
 	{
-		
 		windowSettings.title = contexConfig.GetSetting<std::string>("title");
 		windowSettings.height = contexConfig.GetSetting("height");
 		windowSettings.width = contexConfig.GetSetting("width");
@@ -59,6 +58,8 @@ PrCore::Entry::AppContext::~AppContext()
 	PRLOG_INFO("Deleting AppContext");
 	
 	delete m_input;
+	delete m_renderer;
+	delete m_rendererContext;
 	delete m_window;
 	PrCore::Windowing::GLWindow::TerminateDevice();
 	PrCore::Events::EventManager::Terminate();

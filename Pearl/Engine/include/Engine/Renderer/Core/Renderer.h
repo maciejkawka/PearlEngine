@@ -1,4 +1,5 @@
 #pragma once
+#include"Renderer/Core/Defines.h"
 
 namespace PrRenderer::Core {
 
@@ -11,8 +12,7 @@ namespace PrRenderer::Core {
 		void Draw();
 
 	private:
-		unsigned int vao;
-		unsigned int ebo;
 		unsigned int shaderProgram;
+		VertexArrayPtr vertexArray;
 	};
 }
