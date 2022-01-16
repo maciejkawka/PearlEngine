@@ -34,6 +34,15 @@
     <Filter Include="Renderer">
       <UniqueIdentifier>{6416e477-50e2-4844-8277-e925a5e21df4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderer\OpenGL">
+      <UniqueIdentifier>{ddd0f239-dad4-447e-bfb1-f5511fc36cc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Core">
+      <UniqueIdentifier>{fe754d9e-dfdb-4dd6-9985-aed79f9449e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Buffers">
+      <UniqueIdentifier>{0b2b77d0-9ab6-4ba8-a654-e4c4b24d854f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Engine\Core\Entry\AppContext.h">
@@ -120,36 +129,42 @@
     <ClInclude Include="include\Engine\Core\Math\Math.h">
       <Filter>Core\Math</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Buffers\VertexBuffer.h">
-      <Filter>Renderer</Filter>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLContext.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLIndexBuffer.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexArray.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexBuffer.h">
+      <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Core\Context.h">
-      <Filter>Renderer</Filter>
+      <Filter>Renderer\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Core\ContextSettings.h">
-      <Filter>Renderer</Filter>
+      <Filter>Renderer\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Core\Defines.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLContext.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Buffers\IndexBuffer.h">
-      <Filter>Renderer</Filter>
+      <Filter>Renderer\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Core\Renderer.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Buffers\VertexArray.h">
-      <Filter>Renderer</Filter>
+      <Filter>Renderer\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Buffers\BufferLayout.h">
-      <Filter>Renderer</Filter>
+      <Filter>Renderer\Buffers</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexBuffer.h" />
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLIndexBuffer.h" />
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexArray.h" />
+    <ClInclude Include="include\Engine\Renderer\Buffers\IndexBuffer.h">
+      <Filter>Renderer\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Buffers\VertexArray.h">
+      <Filter>Renderer\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Buffers\VertexBuffer.h">
+      <Filter>Renderer\Buffers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -198,13 +213,19 @@
       <Filter>Core\Resources</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL\GLContext.cpp">
-      <Filter>Renderer</Filter>
+      <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\GLIndexBuffer.cpp">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\GLVertexArray.cpp">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\GLVertexBuffer.cpp">
+      <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL\Renderer.cpp">
-      <Filter>Renderer</Filter>
+      <Filter>Renderer\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLVertexBuffer.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL\GLIndexBuffer.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL\GLVertexArray.cpp" />
   </ItemGroup>
 </Project>
