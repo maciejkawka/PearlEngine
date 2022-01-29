@@ -3,6 +3,9 @@
 #include"Engine/Core/Utils/Logger.h"
 #include"Engine/Core/Events/EventManager.h"
 
+#include"Renderer/Resources/ShaderManager.h"
+#include"Renderer/Resources/Shader.h"
+
 using namespace PrEditor::Core;
 using namespace PrCore::Events;
 
@@ -38,11 +41,30 @@ void Editor::OnFrame(float p_deltaTime)
 	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::LEFT_SHIFT))
 		PRLOG_INFO("{0}", 1/p_deltaTime);
 
-	m_appContext->m_renderer->Draw();
+
+	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::K))
+	{
+		PrRenderer::Resources::ShaderPtr shader = std::static_pointer_cast<PrRenderer::Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("BasicShader.txt"));
+		shader->Bind();
+	}
+
+	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::L))
+	{
+		PrRenderer::Resources::ShaderPtr shader = std::static_pointer_cast<PrRenderer::Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("BasicShader.txt"));
+		shader->Unbind();
+		PrRenderer::Resources::ShaderManager::GetInstance().Unload("BasicShader.txt");
+	}
+
+	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
+		m_shouldClose = true;	
+	
+	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::SPACE))
+		PRLOG_INFO("{0} bytes",PrRenderer::Resources::ShaderManager::GetInstance().GetMemoryUsage());
 }
 
 void Editor::PostFrame()
 {
+	m_appContext->m_renderer->Draw();
 	m_appContext->m_window->SwapBuffers();
 	m_appContext->m_input->ResetFlags();
 	

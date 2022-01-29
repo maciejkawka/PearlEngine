@@ -58,11 +58,12 @@ ResourcePtr ResourceManager::Load(const std::string& p_name)
 		return ResourcePtr();
 
 	ResourcePtr resource = ResourceByName(p_name);
-	if (resource->IsLoaded())
-		return resource;
 
 	if (!resource)
 		resource = CreateResource(p_name);
+
+	if (resource->IsLoaded())
+		return resource;
 
 	resource->Load();
 
@@ -175,13 +176,13 @@ ResourcePtr ResourceManager::GetResource(const std::string& p_name)
 void ResourceManager::OnResourceLoaded(PrCore::Events::EventPtr p_event)
 {
 	auto event = std::static_pointer_cast<PrCore::Events::ResourceLoadedEvent>(p_event);
-	PRLOG_INFO("Resource {0} loaded", event->m_ID);
+	PRLOG_INFO("Resource ID {0} Name {1} loaded", event->m_ID, event->m_name);
 }
 
 void ResourceManager::OnResourceUnloaded(PrCore::Events::EventPtr p_event)
 {
 	auto event = std::static_pointer_cast<PrCore::Events::ResourceUnloadedEvent>(p_event);
-	PRLOG_INFO("Resource {0} loaded", event->m_ID);
+	PRLOG_INFO("Resource ID {0} Name {1} unloaded", event->m_ID, event->m_name);
 }
 
 ResourceID ResourceManager::ResNameToID(const std::string& p_name)
@@ -196,7 +197,11 @@ std::string ResourceManager::ResIDToName(ResourceID p_ID)
 
 ResourcePtr ResourceManager::ResourceByName(const std::string& p_name)
 {
-	return m_resourceName.find(p_name)->second;
+	auto resource = m_resourceName.find(p_name);
+
+	if (resource == m_resourceName.end())
+		return nullptr;
+	return resource->second;
 }
 
 ResourcePtr ResourceManager::ResourceByID(ResourceID p_ID)

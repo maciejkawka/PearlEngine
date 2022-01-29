@@ -5,6 +5,9 @@
 #include"Renderer/OpenGL/GLIndexBuffer.h"
 #include"Renderer/OpenGL/GLVertexArray.h"
 
+#include"Renderer/Resources/ShaderManager.h"
+#include"Renderer/Resources/Shader.h"
+
 #include"glad/glad.h"
 
 using namespace PrRenderer::Core;
@@ -37,73 +40,17 @@ void Renderer::Test()
 	vertexBuffer->SetBufferLayout(layout);
 
 	vertexArray->SetVertexBuffer(vertexBuffer);
-	const char* vertexShaderSource = "#version 330 core\n"
-		"layout (location = 0) in vec3 aPos;\n"
-		"layout (location = 1) in vec3 aCol;\n"
-		"out vec3 vertexCol;\n"
-		"void main()\n"
-		"{\n"
-		"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-		"   vertexCol = aCol;\n"
-		"}\0";
 
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-
-	int  success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	const char* fragmentShaderSource = "#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"in  vec3 vertexCol;\n"
-		"void main()\n"
-		"{\n"
-		"FragColor = vec4(vertexCol,1.0);\n"
-		"}\0";
-
-	
-	unsigned int fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	shaderProgram = glCreateProgram();
-
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	glUseProgram(shaderProgram);
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	Resources::ShaderPtr shader = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("BasicShader.txt"));
+	shader->Bind();
 }
+
 
 void Renderer::Draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
-	glUseProgram(shaderProgram);
 	vertexArray->Bind();
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

@@ -7,7 +7,7 @@
 
 using namespace PrCore::Resources;
 
-Resource::Resource(const std::string& p_name, ResourceManager* p_creator, ResourceID p_ID) :
+Resources::Resources(const std::string& p_name, ResourceManager* p_creator, ResourceID p_ID) :
 	m_name(p_name),
 	m_creator(p_creator),
 	m_ID(p_ID),
@@ -15,7 +15,7 @@ Resource::Resource(const std::string& p_name, ResourceManager* p_creator, Resour
 	m_size(0)
 {}
 
-void Resource::Load()
+void Resources::Load()
 {
 	if (IsLoaded())
 		return;
@@ -35,7 +35,7 @@ void Resource::Load()
 		m_state = ResourceStatus::Corrupted;
 }
 
-void Resource::Unload()
+void Resources::Unload()
 {
 	m_state = ResourceStatus::Unloading;
 
@@ -51,21 +51,21 @@ void Resource::Unload()
 		m_state = ResourceStatus::Corrupted;
 }
 
-void Resource::FireUnloadedEvent()
+void Resources::FireUnloadedEvent()
 {
 	PrCore::Events::EventPtr event = 
 		std::make_shared<PrCore::Events::ResourceUnloadedEvent>(m_name, m_size, m_ID);
 	PrCore::Events::EventManager::GetInstance().QueueEvent(event);
 }
 
-void Resource::FireLoadedEvent()
+void Resources::FireLoadedEvent()
 {
 	PrCore::Events::EventPtr event =
 		std::make_shared<PrCore::Events::ResourceLoadedEvent>(m_name, m_size, m_ID);
 	PrCore::Events::EventManager::GetInstance().QueueEvent(event);
 }
 
-void Resource::FireCorruptedEvent()
+void Resources::FireCorruptedEvent()
 {
 	PrCore::Events::EventPtr event =
 		std::make_shared<PrCore::Events::ResourceCorruptedEvent>(m_name, m_size, m_ID);

@@ -7,6 +7,7 @@
 #include"Core/Filesystem/ConfigFile.h"
 
 #include"Renderer/OpenGL/GLContext.h"
+#include"Renderer/Resources/ShaderManager.h"
 
 PrCore::Entry::AppContext::AppContext()
 {
@@ -16,6 +17,8 @@ PrCore::Entry::AppContext::AppContext()
 	//Init Engine Subsystems
 	PrCore::Filesystem::FileSystem::Init();
 	PrCore::Events::EventManager::Init();
+
+	PrRenderer::Resources::ShaderManager::GetInstance();
 
 	PrCore::Filesystem::ConfigFile contexConfig("graphic.cfg");	
 	PrCore::Windowing::WindowContext context;
@@ -62,6 +65,7 @@ PrCore::Entry::AppContext::~AppContext()
 	delete m_rendererContext;
 	delete m_window;
 	PrCore::Windowing::GLWindow::TerminateDevice();
+	PrRenderer::Resources::ShaderManager::Terminate();
 	PrCore::Events::EventManager::Terminate();
 	PrCore::Filesystem::FileSystem::Terminate();
 }

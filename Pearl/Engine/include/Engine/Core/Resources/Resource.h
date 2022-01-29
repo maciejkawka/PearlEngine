@@ -17,10 +17,10 @@ namespace PrCore::Resources {
 		Corrupted
 	};
 
-	class Resource {
+	class Resources {
 	public:
-		Resource(const std::string& p_name, ResourceManager* p_creator, ResourceID p_ID);
-		virtual ~Resource() {}
+		Resources(const std::string& p_name, ResourceManager* p_creator, ResourceID p_ID);
+		virtual ~Resources() {}
 
 		void Load();
 		void Unload();
@@ -61,5 +61,5 @@ namespace PrCore::Resources {
 		ResourceStatus m_state;
 	};
 
-	typedef std::shared_ptr<Resource> ResourcePtr;
+	typedef std::shared_ptr<Resources> ResourcePtr;
 }

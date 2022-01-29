@@ -165,6 +165,10 @@
     <ClInclude Include="include\Engine\Renderer\Buffers\VertexBuffer.h">
       <Filter>Renderer\Buffers</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Resources\Shader.h" />
+    <ClInclude Include="include\Engine\Renderer\Resources\Uniform.h" />
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLShader.h" />
+    <ClInclude Include="include\Engine\Renderer\Resources\ShaderManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -227,5 +231,7 @@
     <ClCompile Include="src\Renderer\OpenGL\Renderer.cpp">
       <Filter>Renderer\Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\GLShader.cpp" />
+    <ClCompile Include="src\Renderer\Resources\ShaderManager.cpp" />
   </ItemGroup>
 </Project>
