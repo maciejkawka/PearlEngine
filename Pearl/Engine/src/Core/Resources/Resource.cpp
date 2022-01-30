@@ -46,6 +46,7 @@ void Resources::Unload()
 		FireUnloadedEvent();
 		m_state = ResourceStatus::Unloaded;
 		PostUnloadImpl();
+		CalculateSize();
 	}
 	else
 		m_state = ResourceStatus::Corrupted;

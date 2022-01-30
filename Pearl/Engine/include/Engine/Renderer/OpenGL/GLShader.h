@@ -22,13 +22,13 @@ namespace PrRenderer::OpenGL {
 		void SetUniformVec3(const std::string& p_name, const PrCore::Math::vec3& p_value) override;
 		void SetUniformVec2(const std::string& p_name, const PrCore::Math::vec2& p_value) override;
 
-		void GetUniformFloat(const std::string& p_name) override;
-		void GetUniformInt(const std::string& p_name) override;
-		void GetUniformMat4(const std::string& p_name) override;
-		void GetUniformMat3(const std::string& p_name) override;
-		void GetUniformVec4(const std::string& p_name) override;
-		void GetUniformVec3(const std::string& p_name) override;
-		void GetUniformVec2(const std::string& p_name) override;
+		float GetUniformFloat(const std::string& p_name) override;
+		int GetUniformInt(const std::string& p_name) override;
+		PrCore::Math::mat4 GetUniformMat4(const std::string& p_name) override;
+		PrCore::Math::mat3 GetUniformMat3(const std::string& p_name) override;
+		PrCore::Math::vec4 GetUniformVec4(const std::string& p_name) override;
+		PrCore::Math::vec3 GetUniformVec3(const std::string& p_name) override;
+		PrCore::Math::vec2 GetUniformVec2(const std::string& p_name) override;
 		
 		
 
@@ -45,6 +45,7 @@ namespace PrRenderer::OpenGL {
 
 		bool Compile();
 		void ScanUniforms();
+		size_t GetUniformLocation(const std::string& p_name);
 
 		std::string m_vertexShader;
 		std::string m_fragmentShader;

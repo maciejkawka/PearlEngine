@@ -3,7 +3,7 @@
 
 namespace PrRenderer::Resources {
 
-	enum UniformType {
+	enum class UniformType {
 		Int,
 		Float,
 		Float_Vec2,
@@ -13,7 +13,8 @@ namespace PrRenderer::Resources {
 		Float_Mat3,
 		Texture2D,
 		Texture3D,
-		Cubemap
+		Cubemap,
+		None
 	};
 
 	struct Uniform {

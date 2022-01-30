@@ -5,6 +5,7 @@
 #include"Core/Filesystem/FileSystem.h"
 #include"Core/Filesystem/FileStream.h"
 
+#include<any>
 #include"glad/glad.h"
 
 using namespace PrRenderer::OpenGL;
@@ -29,58 +30,107 @@ void PrRenderer::OpenGL::GLShader::Unbind()
 
 void PrRenderer::OpenGL::GLShader::SetUniformFloat(const std::string& p_name, float p_value)
 {
+	auto location = GetUniformLocation(p_name);
+	glUniform1f(location, p_value);
 }
 
 void PrRenderer::OpenGL::GLShader::SetUniformInt(const std::string& p_name, int p_value)
 {
+	auto location = GetUniformLocation(p_name);
+	glUniform1i(location, p_value);
 }
 
 void PrRenderer::OpenGL::GLShader::SetUniformMat4(const std::string& p_name, const PrCore::Math::mat4& p_value)
 {
+	auto location = GetUniformLocation(p_name);
+	glUniformMatrix4fv(location, 1, GL_TRUE, &p_value[0].x);
 }
 
 void PrRenderer::OpenGL::GLShader::SetUniformMat3(const std::string& p_name, const PrCore::Math::mat3 p_value)
 {
+	auto location = GetUniformLocation(p_name);
+	glUniformMatrix3fv(location, 1, GL_TRUE, &p_value[0].x);
 }
 
 void PrRenderer::OpenGL::GLShader::SetUniformVec4(const std::string& p_name, const PrCore::Math::vec4& p_value)
 {
+	auto location = GetUniformLocation(p_name);
+	glUniform4f(location, p_value.x, p_value.y, p_value.z, p_value.w);
 }
 
 void PrRenderer::OpenGL::GLShader::SetUniformVec3(const std::string& p_name, const PrCore::Math::vec3& p_value)
 {
+	auto location = GetUniformLocation(p_name);
+	glUniform3f(location, p_value.x, p_value.y, p_value.z);
 }
 
 void PrRenderer::OpenGL::GLShader::SetUniformVec2(const std::string& p_name, const PrCore::Math::vec2& p_value)
 {
+	auto location = GetUniformLocation(p_name);
+	glUniform2f(location, p_value.x, p_value.y);
 }
 
-void PrRenderer::OpenGL::GLShader::GetUniformFloat(const std::string& p_name)
+float PrRenderer::OpenGL::GLShader::GetUniformFloat(const std::string& p_name)
 {
+	GLfloat value;
+	auto location = GetUniformLocation(p_name);
+	glGetUniformfv(m_ID, location, &value);
+
+	return (float)value;
 }
 
-void PrRenderer::OpenGL::GLShader::GetUniformInt(const std::string& p_name)
+int PrRenderer::OpenGL::GLShader::GetUniformInt(const std::string& p_name)
 {
+	GLint value;
+	auto location = GetUniformLocation(p_name);
+	glGetUniformiv(m_ID, location, &value);
+
+	return (int)value;
 }
 
-void PrRenderer::OpenGL::GLShader::GetUniformMat4(const std::string& p_name)
+PrCore::Math::mat4 PrRenderer::OpenGL::GLShader::GetUniformMat4(const std::string& p_name)
 {
+	GLint value[16];
+	auto location = GetUniformLocation(p_name);
+	glGetUniformiv(m_ID, location, value);
+
+	return PrCore::Math::make_mat4(value);
 }
 
-void PrRenderer::OpenGL::GLShader::GetUniformMat3(const std::string& p_name)
+PrCore::Math::mat3 PrRenderer::OpenGL::GLShader::GetUniformMat3(const std::string& p_name)
 {
+	GLint value[12];
+	auto location = GetUniformLocation(p_name);
+	glGetUniformiv(m_ID, location, value);
+
+	return PrCore::Math::make_mat3(value);
 }
 
-void PrRenderer::OpenGL::GLShader::GetUniformVec4(const std::string& p_name)
+PrCore::Math::vec4 PrRenderer::OpenGL::GLShader::GetUniformVec4(const std::string& p_name)
 {
+	GLint value[4];
+	auto location = GetUniformLocation(p_name);
+	glGetUniformiv(m_ID, location, value);
+
+	return PrCore::Math::make_vec4(value);
 }
 
-void PrRenderer::OpenGL::GLShader::GetUniformVec3(const std::string& p_name)
+PrCore::Math::vec3 PrRenderer::OpenGL::GLShader::GetUniformVec3(const std::string& p_name)
 {
+	GLint value[3];
+	auto location = GetUniformLocation(p_name);
+	glGetUniformiv(m_ID, location, value);
+
+	return PrCore::Math::make_vec3(value);
 }
 
-void PrRenderer::OpenGL::GLShader::GetUniformVec2(const std::string& p_name)
+PrCore::Math::vec2 PrRenderer::OpenGL::GLShader::GetUniformVec2(const std::string& p_name)
 {
+	GLint value[2];
+	auto location = GetUniformLocation(p_name);
+	glGetUniformiv(m_ID, location, value);
+
+	return PrCore::Math::make_vec2(value);
 }
 
 bool PrRenderer::OpenGL::GLShader::Compile()
@@ -136,10 +186,105 @@ bool PrRenderer::OpenGL::GLShader::Compile()
 
 void PrRenderer::OpenGL::GLShader::ScanUniforms()
 {
+	m_uniformLocation.clear();
+	m_uniforms.clear();
+
+	GLint uniformNumber = 0;
+	glGetProgramiv(m_ID, GL_ACTIVE_UNIFORMS, &uniformNumber);
+
+	GLint uniformSize;
+	GLenum uniformType;
+	GLint uniformLength;
+	std::string uniformName;
+	GLint maxNameSize = 128;
+
+	for (int i = 0; i < uniformNumber; i++)
+	{
+		glGetActiveUniform(m_ID, i, maxNameSize, &uniformLength, &uniformSize, &uniformType, &uniformName[0]);
+
+		PrRenderer::Resources::UniformType prUniformType = PrRenderer::Resources::UniformType::None;
+		std::any uniformValue;
+
+		switch (uniformType)
+		{
+		case GL_INT:
+		{
+			prUniformType = PrRenderer::Resources::UniformType::Int;
+			uniformValue = std::make_any<int>(GetUniformInt(uniformName));
+		}
+		break;
+		case GL_FLOAT:
+		{
+			prUniformType = PrRenderer::Resources::UniformType::Float;
+			uniformValue = std::make_any<float>(GetUniformInt(uniformName));
+		}
+		break;
+		case GL_FLOAT_VEC2:
+		{
+			prUniformType = PrRenderer::Resources::UniformType::Float_Vec2;
+			uniformValue = std::make_any<PrCore::Math::vec2>(GetUniformInt(uniformName));
+		}
+		break;
+		case GL_FLOAT_VEC3:
+		{
+			prUniformType = PrRenderer::Resources::UniformType::Float_Vec3;
+			uniformValue = std::make_any<PrCore::Math::vec3>(GetUniformInt(uniformName));
+		}
+		break;
+		case GL_FLOAT_VEC4:
+		{
+			prUniformType = PrRenderer::Resources::UniformType::Float_Vec4;
+			uniformValue = std::make_any<PrCore::Math::vec4>(GetUniformInt(uniformName));
+		}
+		break;
+		case GL_FLOAT_MAT4:
+		{
+			prUniformType = PrRenderer::Resources::UniformType::Float_Mat4;
+			uniformValue = std::make_any<PrCore::Math::mat4>(GetUniformInt(uniformName));
+		}
+		break;
+		case GL_FLOAT_MAT3:
+		{
+			prUniformType = PrRenderer::Resources::UniformType::Float_Mat3;
+			uniformValue = std::make_any<PrCore::Math::mat3>(GetUniformInt(uniformName));
+		}
+		break;
+		default:
+		{
+			PRLOG_INFO("Renderer Shader name:{0} Uniform: {1} is not supported", m_name, uniformName);
+			continue;
+			break;
+		}
+
+		//TODO
+		//Add Texures
+		}
+
+		PrRenderer::Resources::Uniform uniform{
+			uniformName,
+			prUniformType,
+			GetUniformLocation(uniformName),
+			uniformValue
+		};
+
+		m_uniforms.push_back(uniform);
+	}
+}
+
+size_t PrRenderer::OpenGL::GLShader::GetUniformLocation(const std::string& p_name)
+{
+	auto location = m_uniformLocation.find(p_name);
+	if (location != m_uniformLocation.end())
+		return location->second;
+
+	auto glLocation = glGetUniformLocation(m_ID, p_name.c_str());
+	m_uniformLocation[p_name] = glLocation;
+	return glLocation;
 }
 
 void GLShader::PreLoadImpl()
 {
+	//Load from file
 	std::string dir = SHADER_DIR;
 	dir += ("/" + m_name);
 
@@ -181,6 +326,12 @@ bool PrRenderer::OpenGL::GLShader::UnloadImpl()
 {
 	glDeleteProgram(m_ID);
 	m_ID = 0;
+
+	m_uniformLocation.clear();
+	m_uniforms.clear();
+	m_vertexShader.clear();
+	m_fragmentShader.clear();
+
 	return true;
 }
 
@@ -191,9 +342,9 @@ void PrRenderer::OpenGL::GLShader::PostUnloadImpl()
 void PrRenderer::OpenGL::GLShader::CalculateSize()
 {
 	m_size =
-		sizeof(m_vertexShader) +
-		sizeof(m_fragmentShader) +
-		sizeof(m_uniforms) +
-		sizeof(m_uniformLocation)+
-		sizeof(m_name);
+		sizeof(m_vertexShader) + sizeof(char) * m_vertexShader.length() +
+		sizeof(m_fragmentShader) + sizeof(char) * m_fragmentShader.length() +
+		sizeof(m_uniforms) + m_uniformLocation.size() * sizeof(decltype(m_uniforms)::value_type) +
+		sizeof(m_uniformLocation) + m_uniformLocation.size() * (sizeof(decltype(m_uniformLocation)::key_type) + sizeof(decltype(m_uniformLocation)::mapped_type)) +
+		sizeof(m_name) + sizeof(char) * m_name.length();
 }

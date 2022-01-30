@@ -4,6 +4,7 @@
 #define GLM_FORCE_INLINE
 #include"glm/glm.hpp"
 #include"glm/gtc/quaternion.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 namespace PrCore {
 	namespace Math = glm;

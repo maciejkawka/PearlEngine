@@ -44,15 +44,15 @@ void Editor::OnFrame(float p_deltaTime)
 
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::K))
 	{
-		PrRenderer::Resources::ShaderPtr shader = std::static_pointer_cast<PrRenderer::Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("BasicShader.txt"));
+		PrRenderer::Resources::ShaderPtr shader = std::static_pointer_cast<PrRenderer::Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("SinColour1.shader"));
 		shader->Bind();
 	}
 
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::L))
 	{
-		PrRenderer::Resources::ShaderPtr shader = std::static_pointer_cast<PrRenderer::Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("BasicShader.txt"));
-		shader->Unbind();
-		PrRenderer::Resources::ShaderManager::GetInstance().Unload("BasicShader.txt");
+		PrRenderer::Resources::ShaderPtr shader = std::static_pointer_cast<PrRenderer::Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("BasicShader.shader"));
+		shader->Bind();
+		
 	}
 
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::ESCAPE))

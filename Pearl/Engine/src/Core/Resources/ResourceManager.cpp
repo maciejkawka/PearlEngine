@@ -65,8 +65,8 @@ ResourcePtr ResourceManager::Load(const std::string& p_name)
 	if (resource->IsLoaded())
 		return resource;
 
+	m_memoryUsage -= resource->GetSize();
 	resource->Load();
-
 	m_memoryUsage += resource->GetSize();
 
 	m_LRU.UpdateLRU(resource->GetID());
@@ -91,6 +91,7 @@ void ResourceManager::Unload(const std::string& p_name)
 	{
 		m_memoryUsage -= resource->GetSize();
 		resource->Unload();
+		m_memoryUsage += resource->GetSize();
 		m_LRU.RemoveResource(resource->GetID());
 	}
 }

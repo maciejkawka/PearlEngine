@@ -38,20 +38,20 @@ namespace PrRenderer::Resources {
 		virtual void SetUniformVec3(const std::string& p_name, const PrCore::Math::vec3& p_value) = 0;
 		virtual void SetUniformVec2(const std::string& p_name, const PrCore::Math::vec2& p_value) = 0;
 
-		virtual void GetUniformFloat(const std::string& p_name) = 0;
-		virtual void GetUniformInt(const std::string& p_name) = 0;
-		virtual void GetUniformMat4(const std::string& p_name) = 0;
-		virtual void GetUniformMat3(const std::string& p_name) = 0;
-		virtual void GetUniformVec4(const std::string& p_name) = 0;
-		virtual void GetUniformVec3(const std::string& p_name) = 0;
-		virtual void GetUniformVec2(const std::string& p_name) = 0;
+		virtual float GetUniformFloat(const std::string& p_name) = 0;
+		virtual int GetUniformInt(const std::string& p_name) = 0;
+		virtual PrCore::Math::mat4 GetUniformMat4(const std::string& p_name) = 0;
+		virtual PrCore::Math::mat3 GetUniformMat3(const std::string& p_name) = 0;
+		virtual PrCore::Math::vec4 GetUniformVec4(const std::string& p_name) = 0;
+		virtual PrCore::Math::vec3 GetUniformVec3(const std::string& p_name) = 0;
+		virtual PrCore::Math::vec2 GetUniformVec2(const std::string& p_name) = 0;
 
 	protected:
 		std::string m_name;
 		RendererID m_ID;
 
 		std::vector<Uniform> m_uniforms;
-		std::map<int, size_t> m_uniformLocation;
+		std::map<std::string, size_t> m_uniformLocation;
 	};
 
 	typedef std::shared_ptr<Shader> ShaderPtr;

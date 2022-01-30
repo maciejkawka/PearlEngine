@@ -43,6 +43,9 @@
     <Filter Include="Renderer\Buffers">
       <UniqueIdentifier>{0b2b77d0-9ab6-4ba8-a654-e4c4b24d854f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderer\Resources">
+      <UniqueIdentifier>{90d14c87-0d9c-46f4-acd4-3d695bed182b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Engine\Core\Entry\AppContext.h">
@@ -165,10 +168,18 @@
     <ClInclude Include="include\Engine\Renderer\Buffers\VertexBuffer.h">
       <Filter>Renderer\Buffers</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\Shader.h" />
-    <ClInclude Include="include\Engine\Renderer\Resources\Uniform.h" />
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLShader.h" />
-    <ClInclude Include="include\Engine\Renderer\Resources\ShaderManager.h" />
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLShader.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Resources\Shader.h">
+      <Filter>Renderer\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Resources\Uniform.h">
+      <Filter>Renderer\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Resources\ShaderManager.h">
+      <Filter>Renderer\Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -231,7 +242,11 @@
     <ClCompile Include="src\Renderer\OpenGL\Renderer.cpp">
       <Filter>Renderer\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLShader.cpp" />
-    <ClCompile Include="src\Renderer\Resources\ShaderManager.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\GLShader.cpp">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Resources\ShaderManager.cpp">
+      <Filter>Renderer\Resources</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

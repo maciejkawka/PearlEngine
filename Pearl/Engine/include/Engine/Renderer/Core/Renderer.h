@@ -1,6 +1,7 @@
 #pragma once
 #include"Renderer/Core/Defines.h"
 
+#include"Core/Utils/Clock.h"
 namespace PrRenderer::Core {
 
 	class Renderer {
@@ -14,5 +15,6 @@ namespace PrRenderer::Core {
 	private:
 		unsigned int shaderProgram;
 		VertexArrayPtr vertexArray;
+		PrCore::Utils::Clock m_clock;
 	};
 }

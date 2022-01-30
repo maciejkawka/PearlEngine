@@ -41,7 +41,8 @@ void Renderer::Test()
 
 	vertexArray->SetVertexBuffer(vertexBuffer);
 
-	Resources::ShaderPtr shader = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("BasicShader.txt"));
+	Resources::ShaderPtr shader = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("SinColour1.shader"));
+	Resources::ShaderPtr shader1 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("BasicShader.shader"));
 	shader->Bind();
 }
 
@@ -51,6 +52,16 @@ void Renderer::Draw()
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
+	Resources::ShaderPtr shader = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("SinColour1.shader"));
+	auto sinR = PrCore::Math::sin(m_clock.GetRealTime()*2) * 0.5f + 1.0f;
+	auto sinG = PrCore::Math::sin(m_clock.GetRealTime()*2 + 2.0f) * 0.5f + 1.0f;
+	auto sinB = PrCore::Math::sin(m_clock.GetRealTime()*2 + 4.0f) * 0.5f + 1.0f;
+	shader->SetUniformFloat("sinColR", sinR);
+	shader->SetUniformFloat("sinColG", sinG);
+	shader->SetUniformFloat("sinColB", sinB);
+
+	auto test = shader->GetUniformFloat("sinColR");
 	vertexArray->Bind();
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	m_clock.Tick();
 }
