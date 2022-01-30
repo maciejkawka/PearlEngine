@@ -67,6 +67,7 @@ namespace PrCore::Resources {
 		ResourcePtr ResourceByID(ResourceID p_ID);
 
 		void MemoryCheck();
+		void UpdateMemoryUsage();
 
 		ResourcePtr CreateResource(const std::string& p_name);
 		virtual Resources* CreateImpl(const std::string& p_name) = 0;

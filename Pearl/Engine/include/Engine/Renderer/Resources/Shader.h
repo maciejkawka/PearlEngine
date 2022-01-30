@@ -1,3 +1,4 @@
+#pragma once
 #include"Core/Resources/Resource.h"
 #include"Core/Math/Math.h"
 
@@ -7,6 +8,7 @@
 #include<vector>
 #include<map>
 #include<string>
+#include<memory>
 
 namespace PrRenderer::Resources {
 

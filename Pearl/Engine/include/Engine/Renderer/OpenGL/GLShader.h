@@ -1,3 +1,4 @@
+#pragma once
 #include"Core/Common/pearl_pch.h"
 
 #include"Renderer/Resources/Shader.h"

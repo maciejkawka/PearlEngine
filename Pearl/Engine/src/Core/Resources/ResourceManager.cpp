@@ -65,9 +65,8 @@ ResourcePtr ResourceManager::Load(const std::string& p_name)
 	if (resource->IsLoaded())
 		return resource;
 
-	m_memoryUsage -= resource->GetSize();
 	resource->Load();
-	m_memoryUsage += resource->GetSize();
+	UpdateMemoryUsage();
 
 	m_LRU.UpdateLRU(resource->GetID());
 	MemoryCheck();
@@ -89,9 +88,8 @@ void ResourceManager::Unload(const std::string& p_name)
 	ResourcePtr resource = ResourceByName(p_name);
 	if (resource != nullptr && resource->IsLoaded())
 	{
-		m_memoryUsage -= resource->GetSize();
 		resource->Unload();
-		m_memoryUsage += resource->GetSize();
+		UpdateMemoryUsage();
 		m_LRU.RemoveResource(resource->GetID());
 	}
 }
@@ -102,11 +100,11 @@ void ResourceManager::UnloadAll()
 	{
 		if (resource->IsLoaded())
 		{
-			m_memoryUsage -= resource->GetSize();
 			resource->Unload();
 		}
 	}
 
+	UpdateMemoryUsage();
 	m_LRU.Clear();
 }
 
@@ -221,6 +219,15 @@ void ResourceManager::MemoryCheck()
 			Unload(ResIDToName(resourceID));
 		}
 	}
+}
+
+void PrCore::Resources::ResourceManager::UpdateMemoryUsage()
+{
+	size_t actualMemoryUsage = 0;
+	for (auto rsource : m_resources)
+		actualMemoryUsage += rsource->GetSize();
+
+	m_memoryUsage = actualMemoryUsage;
 }
 
 void ResourceManager::LRU::UpdateLRU(ResourceID p_ID)
