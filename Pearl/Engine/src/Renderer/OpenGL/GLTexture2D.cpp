@@ -7,7 +7,6 @@
 #include"stb/stb_image.h"
 
 #include"Core/Filesystem/FileSystem.h"
-#include"Core/Resources/ResourceManager.h"
 
 using namespace PrRenderer::OpenGL;
 
@@ -84,7 +83,8 @@ bool GLTexture2D::LoadImpl()
 		stbi_image_free(rawImage);
 	else
 		m_rawData = rawImage;
-
+	
+	glBindTexture(GL_TEXTURE_2D, 0);
 	return true;
 }
 
