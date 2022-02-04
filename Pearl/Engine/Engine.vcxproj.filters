@@ -189,6 +189,12 @@
     <ClInclude Include="include\Engine\Renderer\Resources\Texture2D.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLTexture2D.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Resources\TextureManager.h">
+      <Filter>Renderer\Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -259,6 +265,12 @@
     </ClCompile>
     <ClCompile Include="src\Renderer\Core\Color.cpp">
       <Filter>Renderer\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\GLTexture2D.cpp">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Resources\TextureManager.cpp">
+      <Filter>Renderer\Resources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -8,6 +8,7 @@ namespace PrCore::Filesystem {
 #define ROOT_DIR "C:/Users/Maciej/Current Projects/GitHub/PearlEngine/PearlEngine/Resources"
 #define CONFIG_DIR "Config"
 #define SHADER_DIR "Shader"
+#define TEXTURE_DIR "Texture"
 
 	//TODO Implement Commented Functions
 	class FileSystem {

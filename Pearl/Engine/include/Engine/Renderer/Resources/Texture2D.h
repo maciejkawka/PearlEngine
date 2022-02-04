@@ -9,6 +9,9 @@ namespace PrRenderer::Resources {
 	
 	class Texture2D : public Texture {
 	public:
+		Texture2D(const std::string& p_name, PrCore::Resources::ResourceManager* p_creator, PrCore::Resources::ResourceID p_ID) :
+			Texture(p_name, p_creator, p_ID)
+		{}
 
 		//To implement in future
 		//void SetPixel(unsigned int p_u, unsigned int p_v);
@@ -17,4 +20,6 @@ namespace PrRenderer::Resources {
 		//void SetPixels(const Core::Color p_colorArray[]);
 		//const Core::Color* GetPixels();
 	};
+
+	typedef std::shared_ptr<Texture2D> Texture2DPtr;
 }

@@ -4,6 +4,7 @@
 #include"Engine/Core/Events/EventManager.h"
 
 #include"Renderer/Resources/ShaderManager.h"
+#include"Renderer/Resources/TextureManager.h"
 #include"Renderer/Resources/Shader.h"
 
 using namespace PrEditor::Core;
@@ -44,7 +45,7 @@ void Editor::OnFrame(float p_deltaTime)
 
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::K))
 	{
-		PrRenderer::Resources::ShaderPtr shader = std::static_pointer_cast<PrRenderer::Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("SinColour1.shader"));
+		PrRenderer::Resources::ShaderPtr shader = std::static_pointer_cast<PrRenderer::Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("TextureShader.shader"));
 		shader->Bind();
 	}
 
@@ -52,14 +53,13 @@ void Editor::OnFrame(float p_deltaTime)
 	{
 		PrRenderer::Resources::ShaderPtr shader = std::static_pointer_cast<PrRenderer::Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("BasicShader.shader"));
 		shader->Bind();
-		
 	}
 
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
 		m_shouldClose = true;	
 	
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::SPACE))
-		PRLOG_INFO("{0} bytes",PrRenderer::Resources::ShaderManager::GetInstance().GetMemoryUsage());
+		PRLOG_INFO("{0} bytes",PrRenderer::Resources::TextureManager::GetInstance().GetMemoryUsage());
 }
 
 void Editor::PostFrame()

@@ -51,12 +51,14 @@
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLContext.h" />
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLIndexBuffer.h" />
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLShader.h" />
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLTexture2D.h" />
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexArray.h" />
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexBuffer.h" />
     <ClInclude Include="include\Engine\Renderer\Resources\Shader.h" />
     <ClInclude Include="include\Engine\Renderer\Resources\ShaderManager.h" />
     <ClInclude Include="include\Engine\Renderer\Resources\Texture.h" />
     <ClInclude Include="include\Engine\Renderer\Resources\Texture2D.h" />
+    <ClInclude Include="include\Engine\Renderer\Resources\TextureManager.h" />
     <ClInclude Include="include\Engine\Renderer\Resources\Uniform.h" />
   </ItemGroup>
   <ItemGroup>
@@ -84,10 +86,12 @@
     <ClCompile Include="src\Renderer\OpenGL\GLContext.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\GLIndexBuffer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\GLShader.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\GLTexture2D.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\GLVertexArray.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\GLVertexBuffer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\Renderer.cpp" />
     <ClCompile Include="src\Renderer\Resources\ShaderManager.cpp" />
+    <ClCompile Include="src\Renderer\Resources\TextureManager.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -142,7 +146,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/glad/include;../../Dependencies/glm/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/stb/include;../../Dependencies/glad/include;../../Dependencies/glm/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>
@@ -168,7 +172,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/glm/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/stb/include;../../Dependencies/glad/include;../../Dependencies/glm/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>

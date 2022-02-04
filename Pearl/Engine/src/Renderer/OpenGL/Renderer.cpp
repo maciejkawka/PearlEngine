@@ -6,7 +6,9 @@
 #include"Renderer/OpenGL/GLVertexArray.h"
 
 #include"Renderer/Resources/ShaderManager.h"
+#include"Renderer/Resources/TextureManager.h"
 #include"Renderer/Resources/Shader.h"
+#include"Renderer/Resources/Texture2D.h"
 
 #include"glad/glad.h"
 
@@ -15,10 +17,10 @@ using namespace PrRenderer::Core;
 void Renderer::Test()
 {
 	float vertecies[] = {
-		 0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f,  // top right
-		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // bottom right
-		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f,// bottom left
-		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f  // top left 
+		 0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, // top right
+		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,  // bottom right
+		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,// bottom left
+		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left 
 	};
 	unsigned int indices[] = {  // note that we start from 0!
 		0, 1, 3,   // first triangle
@@ -33,7 +35,8 @@ void Renderer::Test()
 
 	Buffers::BufferLayout layout = {
 		{ "Vertex", Buffers::ShaderDataType::Float3},
-		{ "Colour", Buffers::ShaderDataType::Float3}
+		{ "Colour", Buffers::ShaderDataType::Float3},
+		{ "UVs", Buffers::ShaderDataType::Float2}
 	};
 
 	VertexBufferPtr vertexBuffer = std::make_shared<OpenGL::GLVertexBuffer>(vertecies, sizeof(vertecies));
@@ -41,9 +44,14 @@ void Renderer::Test()
 
 	vertexArray->SetVertexBuffer(vertexBuffer);
 
-	Resources::ShaderPtr shader = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("SinColour1.shader"));
-	Resources::ShaderPtr shader1 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("BasicShader.shader"));
+	Resources::ShaderPtr shader = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("TextureShader.shader"));
+	Resources::ShaderPtr shader2 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("SinColour1.shader"));
+	Resources::ShaderPtr shader3 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("BasicShader.shader"));
 	shader->Bind();
+
+	Resources::Texture2DPtr texture = std::static_pointer_cast<Resources::Texture2D>(PrRenderer::Resources::TextureManager::GetInstance().Load("IMG_6572.jpg"));
+	texture->Bind();
+	shader->SetUniformInt("u_tex", 0);
 }
 
 
@@ -52,15 +60,11 @@ void Renderer::Draw()
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
-	Resources::ShaderPtr shader = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("SinColour1.shader"));
+	Resources::ShaderPtr shader = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("TextureShader.shader"));
 	auto sinR = PrCore::Math::sin(m_clock.GetRealTime()*2) * 0.5f + 1.0f;
 	auto sinG = PrCore::Math::sin(m_clock.GetRealTime()*2 + 2.0f) * 0.5f + 1.0f;
 	auto sinB = PrCore::Math::sin(m_clock.GetRealTime()*2 + 4.0f) * 0.5f + 1.0f;
-	shader->SetUniformFloat("sinColR", sinR);
-	shader->SetUniformFloat("sinColG", sinG);
-	shader->SetUniformFloat("sinColB", sinB);
-
-	auto test = shader->GetUniformFloat("sinColR");
+	
 	vertexArray->Bind();
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	m_clock.Tick();

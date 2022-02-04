@@ -168,7 +168,8 @@ bool PrRenderer::OpenGL::GLShader::Compile()
 	if (!success)
 	{
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		PRLOG_ERROR("Renderer: FragmentShader " + m_name + " Error: " + infoLog);
+		std::string error(infoLog);
+		PRLOG_ERROR("Renderer: FragmentShader " + m_name + " Error: " + error);
 		return false;
 	}
 
@@ -249,15 +250,18 @@ void PrRenderer::OpenGL::GLShader::ScanUniforms()
 			uniformValue = std::make_any<PrCore::Math::mat3>(GetUniformInt(uniformName));
 		}
 		break;
+		case GL_SAMPLER_2D:
+		{
+			prUniformType = PrRenderer::Resources::UniformType::Texture2D;
+			uniformValue = std::make_any<PrCore::Math::mat3>(GetUniformInt(uniformName));
+		}
+		break;
 		default:
 		{
-			PRLOG_INFO("Renderer Shader name:{0} Uniform: {1} is not supported", m_name, uniformName);
+			PRLOG_INFO("Renderer Shader name:{0} Uniform {1} is not supported", m_name, uniformName);
 			continue;
 			break;
 		}
-
-		//TODO
-		//Add Texures
 		}
 
 		PrRenderer::Resources::Uniform uniform{
@@ -278,6 +282,10 @@ size_t PrRenderer::OpenGL::GLShader::GetUniformLocation(const std::string& p_nam
 		return location->second;
 
 	auto glLocation = glGetUniformLocation(m_ID, p_name.c_str());
+	if (glLocation == -1)
+	{
+		return MAXSIZE_T;
+	}
 	m_uniformLocation[p_name] = glLocation;
 	return glLocation;
 }
