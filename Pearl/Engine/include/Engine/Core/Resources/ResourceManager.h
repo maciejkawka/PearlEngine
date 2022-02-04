@@ -71,7 +71,7 @@ namespace PrCore::Resources {
 
 		ResourcePtr CreateResource(const std::string& p_name);
 		virtual Resources* CreateImpl(const std::string& p_name) = 0;
-		virtual void DeleteImpl(ResourcePtr& p_resource) {}
+		virtual void DeleteImpl(ResourcePtr& p_resource);
 
 		void FireCacheMiss(CacheMiss p_cacheMiss);
 

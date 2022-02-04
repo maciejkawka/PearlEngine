@@ -56,7 +56,6 @@ namespace PrCore::Input {
 		
 		static double s_mouseXPos;
 		static double s_mouseYPos;
-		//Vector2 m_mousePos;
 		static double s_mouseScroll;
 
 		static bool s_anyPressed;

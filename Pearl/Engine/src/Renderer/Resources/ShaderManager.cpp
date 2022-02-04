@@ -18,11 +18,6 @@ Resources* ShaderManager::CreateImpl(const std::string& p_name)
 	return static_cast<OpenGL::GLShader*>(new OpenGL::GLShader(p_name, this, NextResourceID()));
 }
 
-void ShaderManager::DeleteImpl(ResourcePtr& p_resource)
-{
-	p_resource.reset();
-}
-
 ShaderManager& PrRenderer::Resources::ShaderManager::GetInstance()
 {
 	if (m_instance == nullptr)

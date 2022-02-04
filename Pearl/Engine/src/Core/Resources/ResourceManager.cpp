@@ -46,6 +46,11 @@ ResourcePtr ResourceManager::CreateResource(const std::string& p_name)
 	return resource;
 }
 
+void ResourceManager::DeleteImpl(ResourcePtr& p_resource)
+{
+	p_resource.reset();
+}
+
 void ResourceManager::FireCacheMiss(CacheMiss p_cacheMiss)
 {
 	PrCore::Events::EventPtr event = std::make_shared<PrCore::Events::CacheMissEvent>(p_cacheMiss);
