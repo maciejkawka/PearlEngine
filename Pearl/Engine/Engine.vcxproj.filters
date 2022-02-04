@@ -180,6 +180,15 @@
     <ClInclude Include="include\Engine\Renderer\Resources\ShaderManager.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Core\Color.h">
+      <Filter>Renderer\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Resources\Texture.h">
+      <Filter>Renderer\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Resources\Texture2D.h">
+      <Filter>Renderer\Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -247,6 +256,9 @@
     </ClCompile>
     <ClCompile Include="src\Renderer\Resources\ShaderManager.cpp">
       <Filter>Renderer\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Core\Color.cpp">
+      <Filter>Renderer\Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
