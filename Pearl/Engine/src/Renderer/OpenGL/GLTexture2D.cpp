@@ -241,6 +241,18 @@ unsigned int PrRenderer::OpenGL::TextureFilterToGL(PrRenderer::Resources::Textur
 	case Resources::TextureFiltering::Nearest:
 		return GL_NEAREST;
 		break;
+	case Resources::TextureFiltering::LinearMipMapLinear:
+		return GL_LINEAR_MIPMAP_LINEAR;
+		break;
+	case Resources::TextureFiltering::LinearMipmapNearest:
+		return GL_LINEAR_MIPMAP_NEAREST;
+		break;
+	case Resources::TextureFiltering::NearestMipmapLinear:
+		return GL_NEAREST_MIPMAP_LINEAR;
+		break;
+	case Resources::TextureFiltering::NearestMipmapNearest:
+		return GL_NEAREST_MIPMAP_NEAREST;
+		break;
 	default:
 		return GL_LINEAR; //If not recognise return default
 		break;

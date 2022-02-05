@@ -17,10 +17,10 @@ using namespace PrRenderer::Core;
 void Renderer::Test()
 {
 	float vertecies[] = {
-		 0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, // top right
-		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,  // bottom right
-		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,// bottom left
-		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left 
+		 0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.5f, 1.5f, // top right
+		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.5f, 0.5f,  // bottom right
+		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.5f, 0.5f,// bottom left
+		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.5f  // top left 
 	};
 	unsigned int indices[] = {  // note that we start from 0!
 		0, 1, 3,   // first triangle
@@ -49,7 +49,7 @@ void Renderer::Test()
 	Resources::ShaderPtr shader3 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("BasicShader.shader"));
 	shader->Bind();
 
-	Resources::Texture2DPtr texture = std::static_pointer_cast<Resources::Texture2D>(PrRenderer::Resources::TextureManager::GetInstance().Load("IMG_6572.jpg"));
+	Resources::Texture2DPtr texture = std::static_pointer_cast<Resources::Texture2D>(PrRenderer::Resources::TextureManager::GetInstance().Load("wall.jpg"));
 	texture->Bind();
 	shader->SetUniformInt("u_tex", 0);
 }
