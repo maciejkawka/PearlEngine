@@ -196,96 +196,77 @@ void PrRenderer::OpenGL::GLShader::ScanUniforms()
 	GLint uniformSize;
 	GLenum uniformType;
 	GLint uniformLength;
+	GLint maxNameSize = 64;
 	std::string uniformName;
-	GLint maxNameSize = 128;
 
 	for (int i = 0; i < uniformNumber; i++)
 	{
+		uniformName.clear();
+		uniformName.resize(maxNameSize);
 		glGetActiveUniform(m_ID, i, maxNameSize, &uniformLength, &uniformSize, &uniformType, &uniformName[0]);
 
 		PrRenderer::Resources::UniformType prUniformType = PrRenderer::Resources::UniformType::None;
-		std::any uniformValue;
 
 		switch (uniformType)
 		{
-		case GL_INT:
-		{
-			prUniformType = PrRenderer::Resources::UniformType::Int;
-			uniformValue = std::make_any<int>(GetUniformInt(uniformName));
-		}
-		break;
-		case GL_FLOAT:
-		{
-			prUniformType = PrRenderer::Resources::UniformType::Float;
-			uniformValue = std::make_any<float>(GetUniformInt(uniformName));
-		}
-		break;
-		case GL_FLOAT_VEC2:
-		{
-			prUniformType = PrRenderer::Resources::UniformType::Float_Vec2;
-			uniformValue = std::make_any<PrCore::Math::vec2>(GetUniformInt(uniformName));
-		}
-		break;
-		case GL_FLOAT_VEC3:
-		{
-			prUniformType = PrRenderer::Resources::UniformType::Float_Vec3;
-			uniformValue = std::make_any<PrCore::Math::vec3>(GetUniformInt(uniformName));
-		}
-		break;
-		case GL_FLOAT_VEC4:
-		{
-			prUniformType = PrRenderer::Resources::UniformType::Float_Vec4;
-			uniformValue = std::make_any<PrCore::Math::vec4>(GetUniformInt(uniformName));
-		}
-		break;
-		case GL_FLOAT_MAT4:
-		{
-			prUniformType = PrRenderer::Resources::UniformType::Float_Mat4;
-			uniformValue = std::make_any<PrCore::Math::mat4>(GetUniformInt(uniformName));
-		}
-		break;
-		case GL_FLOAT_MAT3:
-		{
-			prUniformType = PrRenderer::Resources::UniformType::Float_Mat3;
-			uniformValue = std::make_any<PrCore::Math::mat3>(GetUniformInt(uniformName));
-		}
-		break;
-		case GL_SAMPLER_2D:
-		{
-			prUniformType = PrRenderer::Resources::UniformType::Texture2D;
-			uniformValue = std::make_any<PrCore::Math::mat3>(GetUniformInt(uniformName));
-		}
-		break;
-		default:
-		{
-			PRLOG_INFO("Renderer Shader name:{0} Uniform {1} is not supported", m_name, uniformName);
-			continue;
-			break;
-		}
+			case GL_INT:
+				prUniformType = PrRenderer::Resources::UniformType::Int;
+				break;
+			case GL_FLOAT:
+				prUniformType = PrRenderer::Resources::UniformType::Float;
+				break;
+			case GL_FLOAT_VEC2:
+				prUniformType = PrRenderer::Resources::UniformType::Float_Vec2;
+				break;
+			case GL_FLOAT_VEC3:
+				prUniformType = PrRenderer::Resources::UniformType::Float_Vec3;
+				break;
+			case GL_FLOAT_VEC4:
+				prUniformType = PrRenderer::Resources::UniformType::Float_Vec4;
+				break;
+			case GL_FLOAT_MAT4:
+				prUniformType = PrRenderer::Resources::UniformType::Float_Mat4;
+				break;
+			case GL_FLOAT_MAT3:
+				prUniformType = PrRenderer::Resources::UniformType::Float_Mat3;
+				break;
+			case GL_SAMPLER_2D:
+				prUniformType = PrRenderer::Resources::UniformType::Texture2D;
+				break;
+			case GL_SAMPLER_3D:
+				prUniformType = PrRenderer::Resources::UniformType::Texture3D;
+				break;
+			case GL_TEXTURE_CUBE_MAP:
+				prUniformType = PrRenderer::Resources::UniformType::Cubemap;
+				break;
+			default:
+			{
+				PRLOG_INFO("Renderer Shader name:{0} Uniform {1} is not supported", m_name, uniformName);
+				continue;
+				break;
+			}
 		}
 
 		PrRenderer::Resources::Uniform uniform{
 			uniformName,
 			prUniformType,
-			GetUniformLocation(uniformName),
-			uniformValue
+			GetUniformLocation(uniformName)
 		};
 
 		m_uniforms.push_back(uniform);
 	}
 }
 
-size_t PrRenderer::OpenGL::GLShader::GetUniformLocation(const std::string& p_name)
+int PrRenderer::OpenGL::GLShader::GetUniformLocation(const std::string& p_name)
 {
+	//Due to different string size sometimes there can be more than one key with the same value
+	//to fix in future
 	auto location = m_uniformLocation.find(p_name);
 	if (location != m_uniformLocation.end())
 		return location->second;
 
 	auto glLocation = glGetUniformLocation(m_ID, p_name.c_str());
-	if (glLocation == -1)
-	{
-		return MAXSIZE_T;
-	}
+
 	m_uniformLocation[p_name] = glLocation;
 	return glLocation;
 }

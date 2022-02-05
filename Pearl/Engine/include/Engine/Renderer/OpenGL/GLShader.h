@@ -46,7 +46,7 @@ namespace PrRenderer::OpenGL {
 
 		bool Compile();
 		void ScanUniforms();
-		size_t GetUniformLocation(const std::string& p_name);
+		int GetUniformLocation(const std::string& p_name);
 
 		std::string m_vertexShader;
 		std::string m_fragmentShader;

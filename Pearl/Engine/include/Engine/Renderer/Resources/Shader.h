@@ -6,7 +6,7 @@
 #include"Renderer/Core/Defines.h"
 
 #include<vector>
-#include<map>
+#include<unordered_map>
 #include<string>
 #include<memory>
 
@@ -53,7 +53,7 @@ namespace PrRenderer::Resources {
 		RendererID m_ID;
 
 		std::vector<Uniform> m_uniforms;
-		std::map<std::string, size_t> m_uniformLocation;
+		std::unordered_map<std::string, int> m_uniformLocation;
 	};
 
 	typedef std::shared_ptr<Shader> ShaderPtr;
