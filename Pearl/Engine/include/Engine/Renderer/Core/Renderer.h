@@ -8,6 +8,7 @@ namespace PrRenderer::Core {
 	public:
 
 		Renderer(){}
+		~Renderer();
 
 		void Test();
 		void Draw();

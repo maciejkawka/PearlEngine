@@ -5,3 +5,8 @@
 #Binaries
 Bin/
 Bin-int/
+
+
+#Resources
+Resources/*
+!Resources/Shader
