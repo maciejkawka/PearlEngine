@@ -45,8 +45,8 @@ namespace PrRenderer::Resources {
 			m_format(TextureFormat::None),
 			m_minFiltering(TextureFiltering::Linear),
 			m_magFiltering(TextureFiltering::Linear),
-			m_wrapU(TextureWrapMode::Clamp),
-			m_wrapV(TextureWrapMode::Clamp),
+			m_wrapU(TextureWrapMode::Repeat),
+			m_wrapV(TextureWrapMode::Repeat),
 			m_rawData(nullptr)
 		{}
 

@@ -43,6 +43,7 @@
     <ClInclude Include="include\Engine\Renderer\Buffers\IndexBuffer.h" />
     <ClInclude Include="include\Engine\Renderer\Buffers\VertexArray.h" />
     <ClInclude Include="include\Engine\Renderer\Buffers\VertexBuffer.h" />
+    <ClInclude Include="include\Engine\Renderer\Core\Camera.h" />
     <ClInclude Include="include\Engine\Renderer\Core\Color.h" />
     <ClInclude Include="include\Engine\Renderer\Core\Context.h" />
     <ClInclude Include="include\Engine\Renderer\Core\ContextSettings.h" />
@@ -82,6 +83,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Core/Common/pearl_pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="src\Core\Windowing\GLWindow.cpp" />
+    <ClCompile Include="src\Renderer\Core\Camera.cpp" />
     <ClCompile Include="src\Renderer\Core\Color.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\GLContext.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\GLIndexBuffer.cpp" />

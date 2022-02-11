@@ -1,6 +1,7 @@
 #include"Core/Common/pearl_pch.h"
 
 #include"Renderer/Core/Renderer.h"
+#include"Renderer/Core/Camera.h"
 #include"Renderer/OpenGL/GLVertexBuffer.h"
 #include"Renderer/OpenGL/GLIndexBuffer.h"
 #include"Renderer/OpenGL/GLVertexArray.h"
@@ -47,11 +48,16 @@ void Renderer::Test()
 	Resources::ShaderPtr shader = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("TextureShader.shader"));
 	Resources::ShaderPtr shader2 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("SinColour1.shader"));
 	Resources::ShaderPtr shader3 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("BasicShader.shader"));
-	shader->Bind();
+	Resources::ShaderPtr shader4 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("CameraShader.shader"));
+	shader4->Bind();
 
-	Resources::Texture2DPtr texture = std::static_pointer_cast<Resources::Texture2D>(PrRenderer::Resources::TextureManager::GetInstance().Load("wall.jpg"));
+	Resources::Texture2DPtr texture = std::static_pointer_cast<Resources::Texture2D>(PrRenderer::Resources::TextureManager::GetInstance().Load("IMG_6572.jpg"));
 	texture->Bind();
 	shader->SetUniformInt("u_tex", 0);
+
+	auto camera = new PrRenderer::Core::Camera(PrRenderer::Core::CameraType::Perspective);
+	camera->SetSize(1.0f);
+	PrRenderer::Core::Camera::SetMainCamera(camera);
 }
 
 
@@ -60,11 +66,21 @@ void Renderer::Draw()
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
-	Resources::ShaderPtr shader = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("TextureShader.shader"));
+	Resources::ShaderPtr shader = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("CameraShader.shader"));
 	auto sinR = PrCore::Math::sin(m_clock.GetRealTime()*2) * 0.5f + 1.0f;
 	auto sinG = PrCore::Math::sin(m_clock.GetRealTime()*2 + 2.0f) * 0.5f + 1.0f;
 	auto sinB = PrCore::Math::sin(m_clock.GetRealTime()*2 + 4.0f) * 0.5f + 1.0f;
 	
+	auto roll = m_clock.GetRealTime()* 1.0f;
+	auto positionZ = PrCore::Math::sin(m_clock.GetRealTime()/2) * 15.0f + 18.0f;
+	auto camera = PrRenderer::Core::Camera::GetMainCamera();
+	camera->SetPosition({0,0,positionZ });
+	camera->SetRotation({ 0,0,roll });
+	camera->RecalculateMatrices();
+	auto& MVP = camera->GetCameraMatrix();
+
+	shader->SetUniformMat4("u_MVP", MVP);
+
 	vertexArray->Bind();
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	m_clock.Tick();

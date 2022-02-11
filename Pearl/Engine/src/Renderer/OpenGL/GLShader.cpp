@@ -43,13 +43,13 @@ void PrRenderer::OpenGL::GLShader::SetUniformInt(const std::string& p_name, int 
 void PrRenderer::OpenGL::GLShader::SetUniformMat4(const std::string& p_name, const PrCore::Math::mat4& p_value)
 {
 	auto location = GetUniformLocation(p_name);
-	glUniformMatrix4fv(location, 1, GL_TRUE, &p_value[0].x);
+	glUniformMatrix4fv(location, 1, GL_FALSE, &p_value[0].x);
 }
 
 void PrRenderer::OpenGL::GLShader::SetUniformMat3(const std::string& p_name, const PrCore::Math::mat3 p_value)
 {
 	auto location = GetUniformLocation(p_name);
-	glUniformMatrix3fv(location, 1, GL_TRUE, &p_value[0].x);
+	glUniformMatrix3fv(location, 1, GL_FALSE, &p_value[0].x);
 }
 
 void PrRenderer::OpenGL::GLShader::SetUniformVec4(const std::string& p_name, const PrCore::Math::vec4& p_value)

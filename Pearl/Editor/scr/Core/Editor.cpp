@@ -45,7 +45,7 @@ void Editor::OnFrame(float p_deltaTime)
 
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::K))
 	{
-		PrRenderer::Resources::ShaderPtr shader = std::static_pointer_cast<PrRenderer::Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("TextureShader.shader"));
+		PrRenderer::Resources::ShaderPtr shader = std::static_pointer_cast<PrRenderer::Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("CameraShader.shader"));
 		shader->Bind();
 	}
 
