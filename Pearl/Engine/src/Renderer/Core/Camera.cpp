@@ -52,10 +52,10 @@ void Camera::RecalculateMatrices()
 	auto yaw = Math::rotate(Math::mat4(1), m_rotation.y, Math::vec3(0, 1, 0));
 	auto roll = Math::rotate(Math::mat4(1), m_rotation.z, Math::vec3(0, 0, 1));
 
-	auto rotationMatrix = pitch * yaw * roll;
+	auto rotationMatrix = yaw * pitch * roll;
 	auto translationMatrix = Math::translate(Math::mat4(1), m_position);
 
-	m_viewMatrix = Math::inverse(rotationMatrix * translationMatrix);
+	m_viewMatrix = Math::inverse(translationMatrix * rotationMatrix);
 
 	m_cameraMatrix = m_projectionMatrix * m_viewMatrix;
 }

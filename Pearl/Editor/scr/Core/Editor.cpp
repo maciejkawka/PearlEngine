@@ -13,12 +13,15 @@ using namespace PrCore::Events;
 Editor::Editor()
 {
 	m_appContext = new EditorContext();
+	m_basicCamera = new Components::BasicCamera(PrRenderer::Core::CameraType::Perspective);
 }
 
 Editor::~Editor()
 {
+	delete m_basicCamera;
 	delete m_appContext;
 }
+
 void Editor::PreFrame()
 {
 	m_appContext->m_window->PollEvents();
@@ -55,11 +58,11 @@ void Editor::OnFrame(float p_deltaTime)
 		shader->Bind();
 	}
 
+
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
-		m_shouldClose = true;	
-	
-	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::SPACE))
-		PRLOG_INFO("{0} bytes",PrRenderer::Resources::TextureManager::GetInstance().GetMemoryUsage());
+		m_shouldClose = true;
+
+	m_basicCamera->Update(p_deltaTime);
 }
 
 void Editor::PostFrame()

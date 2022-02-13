@@ -5,6 +5,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{1a7ac779-9937-4185-9b89-b9c62ba24e81}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scr\Core\Editor.cpp">
@@ -13,7 +16,12 @@
     <ClCompile Include="scr\Core\EditorContext.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="scr\EditorApp.cpp" />
+    <ClCompile Include="scr\Components\BasicCamera.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="scr\EditorApp.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Editor\Core\Editor.h">
@@ -21,6 +29,9 @@
     </ClInclude>
     <ClInclude Include="include\Editor\Core\EditorContext.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Editor\Components\BasicCamera.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

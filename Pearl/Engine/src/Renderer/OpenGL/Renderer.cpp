@@ -93,7 +93,7 @@ void Renderer::Test()
 	Resources::ShaderPtr shader4 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("CameraShader.shader"));
 	shader4->Bind();
 
-	Resources::Texture2DPtr texture = std::static_pointer_cast<Resources::Texture2D>(PrRenderer::Resources::TextureManager::GetInstance().Load("KacperDebug.jpg"));
+	Resources::Texture2DPtr texture = std::static_pointer_cast<Resources::Texture2D>(PrRenderer::Resources::TextureManager::GetInstance().Load("brick.jpg"));
 	texture->Bind();
 	shader->SetUniformInt("u_tex", 0);
 
@@ -116,16 +116,20 @@ void Renderer::Draw()
 	
 	auto roll = m_clock.GetRealTime()* 1.0f;
 	auto positionZ = PrCore::Math::sin(m_clock.GetRealTime()/2) * 8.0f + 10.0f;
+	//camera->SetRotation({ 0,roll,roll });
+	
 	auto camera = PrRenderer::Core::Camera::GetMainCamera();
-	camera->SetPosition({ 0,0,positionZ });
-	camera->SetRotation({ 0,roll,roll });
 	camera->RecalculateMatrices();
-	auto& MVP = camera->GetCameraMatrix();
+	auto MVP = camera->GetCameraMatrix();
 
 	shader->SetUniformMat4("u_MVP", MVP);
 
 	vertexArray->Bind();
 	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	MVP = MVP * PrCore::Math::translate(PrCore::Math::mat4(1.0f), PrCore::Math::vec3(2, 0, 0));
+	shader->SetUniformMat4("u_MVP", MVP);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	m_clock.Tick();
 }

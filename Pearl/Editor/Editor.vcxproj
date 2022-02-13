@@ -92,11 +92,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="scr\Components\BasicCamera.cpp" />
     <ClCompile Include="scr\EditorApp.cpp" />
     <ClCompile Include="scr\Core\Editor.cpp" />
     <ClCompile Include="scr\Core\EditorContext.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Editor\Components\BasicCamera.h" />
     <ClInclude Include="include\Editor\Core\Editor.h" />
     <ClInclude Include="include\Editor\Core\EditorContext.h" />
   </ItemGroup>
