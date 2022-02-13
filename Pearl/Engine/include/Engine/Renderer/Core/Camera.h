@@ -46,7 +46,7 @@ namespace PrRenderer::Core {
 		inline const PrCore::Math::mat4& GetViewMatrix() { return m_viewMatrix; }
 		inline const PrCore::Math::mat4& GetCameraMatrix() { return m_cameraMatrix; }
 
-		void RecalculateMatrices();
+		const PrCore::Math::mat4& RecalculateMatrices();
 
 		//Culling in future
 

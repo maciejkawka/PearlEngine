@@ -40,13 +40,12 @@ Camera::Camera(CameraType p_cameraType) :
 {}
 
 
-void Camera::RecalculateMatrices()
+const PrCore::Math::mat4& Camera::RecalculateMatrices()
 {
 	if (m_type == CameraType::Perspective)
 		m_projectionMatrix = Math::perspective(m_FOV, m_ratio, m_near, m_far);
 	else if (m_type == CameraType::Ortographic)
 		m_projectionMatrix = Math::ortho(-m_ratio * m_size, m_ratio * m_size, -m_size, m_size, m_near, m_far);
-
 
 	auto pitch = Math::rotate(Math::mat4(1), m_rotation.x, Math::vec3(1, 0, 0));
 	auto yaw = Math::rotate(Math::mat4(1), m_rotation.y, Math::vec3(0, 1, 0));
@@ -56,6 +55,7 @@ void Camera::RecalculateMatrices()
 	auto translationMatrix = Math::translate(Math::mat4(1), m_position);
 
 	m_viewMatrix = Math::inverse(translationMatrix * rotationMatrix);
-
 	m_cameraMatrix = m_projectionMatrix * m_viewMatrix;
+
+	return m_cameraMatrix;
 }

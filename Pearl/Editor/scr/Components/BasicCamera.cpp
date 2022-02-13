@@ -12,7 +12,8 @@ BasicCamera::BasicCamera(PrRenderer::Core::CameraType p_cameraType):
 	m_rotationSpeed(5.0f),
 	m_movementSpeed(3.0f),
 	m_fastSpeed(10.0f),
-	m_normalSpeed(m_movementSpeed)
+	m_normalSpeed(m_movementSpeed),
+	m_camera(nullptr)
 {	
 	m_camera = new PrRenderer::Core::Camera(p_cameraType);
 	m_camera->SetPosition({ 0,0,4 });
@@ -24,7 +25,8 @@ BasicCamera::BasicCamera():
 	m_rotationSpeed(5.0f),
 	m_movementSpeed(3.0f),
 	m_fastSpeed(10.0f),
-	m_normalSpeed(m_movementSpeed)
+	m_normalSpeed(m_movementSpeed),
+	m_camera(nullptr)
 {
 	m_camera = new PrRenderer::Core::Camera();
 	m_camera->SetPosition({ 0,0,4 });

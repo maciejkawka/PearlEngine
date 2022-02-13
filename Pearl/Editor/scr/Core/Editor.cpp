@@ -29,6 +29,7 @@ void Editor::PreFrame()
 
 void Editor::OnFrame(float p_deltaTime)
 {
+	//Show Mouse Pos
 	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::LEFT_CONTROL))
 	{
 		auto mousePos = PrCore::Input::InputManager::GetMousePosition();
@@ -38,27 +39,25 @@ void Editor::OnFrame(float p_deltaTime)
 		PRLOG_INFO("Mouse Pos x: {0}, y: {1}", xPos, yPos);
 	}
 
-	if (PrCore::Input::InputManager::IsAnyKeyPressed())
-		PRLOG_INFO("ANY PRESSED");
-
 	//Show FPS
-	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::LEFT_SHIFT))
+	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::F1))
 		PRLOG_INFO("{0}", 1/p_deltaTime);
 
-
+	//Change Shader
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::K))
 	{
 		PrRenderer::Resources::ShaderPtr shader = std::static_pointer_cast<PrRenderer::Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("CameraShader.shader"));
 		shader->Bind();
 	}
 
+	//Change Shader
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::L))
 	{
 		PrRenderer::Resources::ShaderPtr shader = std::static_pointer_cast<PrRenderer::Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("BasicShader.shader"));
 		shader->Bind();
 	}
 
-
+	//Exit
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
 		m_shouldClose = true;
 

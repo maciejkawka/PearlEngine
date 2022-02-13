@@ -17,7 +17,6 @@ using namespace PrRenderer::Core;
 
 PrRenderer::Core::Renderer::~Renderer()
 {
-	delete PrRenderer::Core::Camera::GetMainCamera();
 }
 
 void Renderer::Test()
@@ -91,15 +90,6 @@ void Renderer::Test()
 	Resources::ShaderPtr shader2 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("SinColour1.shader"));
 	Resources::ShaderPtr shader3 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("BasicShader.shader"));
 	Resources::ShaderPtr shader4 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("CameraShader.shader"));
-	shader4->Bind();
-
-	Resources::Texture2DPtr texture = std::static_pointer_cast<Resources::Texture2D>(PrRenderer::Resources::TextureManager::GetInstance().Load("brick.jpg"));
-	texture->Bind();
-	shader->SetUniformInt("u_tex", 0);
-
-	auto camera = new PrRenderer::Core::Camera(PrRenderer::Core::CameraType::Perspective);
-	camera->SetSize(1.0f);
-	PrRenderer::Core::Camera::SetMainCamera(camera);
 }
 
 
@@ -110,26 +100,40 @@ void Renderer::Draw()
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
 	Resources::ShaderPtr shader = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("CameraShader.shader"));
-	auto sinR = PrCore::Math::sin(m_clock.GetRealTime()*2) * 0.5f + 1.0f;
-	auto sinG = PrCore::Math::sin(m_clock.GetRealTime()*2 + 2.0f) * 0.5f + 1.0f;
-	auto sinB = PrCore::Math::sin(m_clock.GetRealTime()*2 + 4.0f) * 0.5f + 1.0f;
-	
-	auto roll = m_clock.GetRealTime()* 1.0f;
-	auto positionZ = PrCore::Math::sin(m_clock.GetRealTime()/2) * 8.0f + 10.0f;
-	//camera->SetRotation({ 0,roll,roll });
-	
-	auto camera = PrRenderer::Core::Camera::GetMainCamera();
-	camera->RecalculateMatrices();
-	auto MVP = camera->GetCameraMatrix();
+	shader->SetUniformInt("u_tex", 0);
+	shader->Bind();
 
-	shader->SetUniformMat4("u_MVP", MVP);
+	auto camera = PrRenderer::Core::Camera::GetMainCamera();
+	auto& MVP = camera->RecalculateMatrices();
 
 	vertexArray->Bind();
-	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
 
-	MVP = MVP * PrCore::Math::translate(PrCore::Math::mat4(1.0f), PrCore::Math::vec3(2, 0, 0));
-	shader->SetUniformMat4("u_MVP", MVP);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	for (int x = -10; x < 10; x += 5)
+	{
+		for (int y = -10; y < 10; y += 2)
+		{
+
+			for (int z = -10; z < 10; z += 10)
+			{
+
+				if (y%4 == 0)
+				{
+					Resources::Texture2DPtr texture = std::static_pointer_cast<Resources::Texture2D>(PrRenderer::Resources::TextureManager::GetInstance().Load("brick.jpg"));
+					texture->Bind();
+				}
+				else
+				{
+					Resources::Texture2DPtr texture = std::static_pointer_cast<Resources::Texture2D>(PrRenderer::Resources::TextureManager::GetInstance().Load("wall.jpg"));
+					texture->Bind();
+				}
+
+				auto newMVP = MVP * PrCore::Math::translate(PrCore::Math::mat4(1.0f), PrCore::Math::vec3(x, y, z));
+				shader->SetUniformMat4("u_MVP", newMVP);
+				glDrawArrays(GL_TRIANGLES, 0, 36);
+			}
+		}
+	}
+
 	m_clock.Tick();
 }
