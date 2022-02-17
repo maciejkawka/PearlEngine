@@ -29,7 +29,7 @@ namespace PrRenderer::Core {
 		inline void SetNear(float p_near) { m_near = p_near; }
 		inline void SetFOV(float p_FOV) { m_FOV = p_FOV; }
 		inline void SetRatio(float p_ratio) { m_ratio = p_ratio; }
-		inline void SetSize(float p_size) { p_size = p_size; }
+		inline void SetSize(float p_size) { m_size = p_size; }
 
 		inline CameraType GetType() { return m_type; }
 		inline const PrCore::Math::vec3& GetPosition() { return m_position; }

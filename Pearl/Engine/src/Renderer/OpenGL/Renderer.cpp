@@ -90,6 +90,7 @@ void Renderer::Test()
 	Resources::ShaderPtr shader2 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("SinColour1.shader"));
 	Resources::ShaderPtr shader3 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("BasicShader.shader"));
 	Resources::ShaderPtr shader4 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("CameraShader.shader"));
+	shader4->Bind();
 }
 
 
@@ -101,7 +102,6 @@ void Renderer::Draw()
 
 	Resources::ShaderPtr shader = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("CameraShader.shader"));
 	shader->SetUniformInt("u_tex", 0);
-	shader->Bind();
 
 	auto camera = PrRenderer::Core::Camera::GetMainCamera();
 	auto& MVP = camera->RecalculateMatrices();

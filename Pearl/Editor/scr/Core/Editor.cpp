@@ -14,6 +14,7 @@ Editor::Editor()
 {
 	m_appContext = new EditorContext();
 	m_basicCamera = new Components::BasicCamera(PrRenderer::Core::CameraType::Perspective);
+	m_basicCamera->GetCamera()->SetSize(5.0f);
 }
 
 Editor::~Editor()
@@ -41,7 +42,7 @@ void Editor::OnFrame(float p_deltaTime)
 
 	//Show FPS
 	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::F1))
-		PRLOG_INFO("{0}", 1/p_deltaTime);
+		PRLOG_INFO("{0}", (int)(1/p_deltaTime));
 
 	//Change Shader
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::K))
@@ -57,9 +58,17 @@ void Editor::OnFrame(float p_deltaTime)
 		shader->Bind();
 	}
 
+	//Camera Settings
+	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::O))
+		PrRenderer::Core::Camera::GetMainCamera()->SetType(PrRenderer::Core::CameraType::Ortographic);
+
+	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::P))
+		PrRenderer::Core::Camera::GetMainCamera()->SetType(PrRenderer::Core::CameraType::Perspective);
+
 	//Exit
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
 		m_shouldClose = true;
+
 
 	m_basicCamera->Update(p_deltaTime);
 }
