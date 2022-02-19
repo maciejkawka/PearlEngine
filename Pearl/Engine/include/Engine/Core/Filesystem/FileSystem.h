@@ -9,6 +9,7 @@ namespace PrCore::Filesystem {
 #define CONFIG_DIR "Config"
 #define SHADER_DIR "Shader"
 #define TEXTURE_DIR "Texture"
+#define MATERIAL_DIR "Material"
 
 	//TODO Implement Commented Functions
 	class FileSystem {

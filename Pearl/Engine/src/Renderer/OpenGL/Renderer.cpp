@@ -8,6 +8,8 @@
 
 #include"Renderer/Resources/ShaderManager.h"
 #include"Renderer/Resources/TextureManager.h"
+#include"Renderer/Resources/MaterialManager.h"
+#include"Renderer/Resources/Material.h"
 #include"Renderer/Resources/Shader.h"
 #include"Renderer/Resources/Texture2D.h"
 
@@ -91,6 +93,8 @@ void Renderer::Test()
 	Resources::ShaderPtr shader3 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("BasicShader.shader"));
 	Resources::ShaderPtr shader4 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("CameraShader.shader"));
 	shader4->Bind();
+
+	Resources::MaterialPtr material = std::static_pointer_cast<Resources::Material>(PrRenderer::Resources::MaterialManager::GetInstance().Load("testMaterial.mat"));
 }
 
 

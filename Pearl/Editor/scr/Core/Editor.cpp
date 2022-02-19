@@ -5,6 +5,7 @@
 
 #include"Renderer/Resources/ShaderManager.h"
 #include"Renderer/Resources/TextureManager.h"
+#include"Renderer/Resources/MaterialManager.h"
 #include"Renderer/Resources/Shader.h"
 
 using namespace PrEditor::Core;
@@ -65,10 +66,15 @@ void Editor::OnFrame(float p_deltaTime)
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::P))
 		PrRenderer::Core::Camera::GetMainCamera()->SetType(PrRenderer::Core::CameraType::Perspective);
 
+
+	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::G))
+		PrRenderer::Resources::MaterialManager::GetInstance().Unload("testMaterial.mat");
+	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::H))
+		PrRenderer::Resources::MaterialManager::GetInstance().Load("testMaterial.mat");
+
 	//Exit
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
 		m_shouldClose = true;
-
 
 	m_basicCamera->Update(p_deltaTime);
 }

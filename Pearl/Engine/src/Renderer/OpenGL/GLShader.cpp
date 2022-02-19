@@ -4,6 +4,7 @@
 
 #include"Core/Filesystem/FileSystem.h"
 #include"Core/Filesystem/FileStream.h"
+#include"Core/Utils/StringUtils.h"
 
 #include<any>
 #include"glad/glad.h"
@@ -246,6 +247,8 @@ void PrRenderer::OpenGL::GLShader::ScanUniforms()
 				break;
 			}
 		}
+
+		PrCore::Utils::StringUtils::ResizeToFitContains(uniformName);
 
 		PrRenderer::Resources::Uniform uniform{
 			uniformName,

@@ -32,8 +32,10 @@
     <ClInclude Include="include\Engine\Core\Math\Math.h" />
     <ClInclude Include="include\Engine\Core\Resources\Resource.h" />
     <ClInclude Include="include\Engine\Core\Resources\ResourceManager.h" />
+    <ClInclude Include="include\Engine\Core\Utils\JSONParser.h" />
     <ClInclude Include="include\Engine\Core\Utils\Logger.h" />
     <ClInclude Include="include\Engine\Core\Utils\Clock.h" />
+    <ClInclude Include="include\Engine\Core\Utils\StringUtils.h" />
     <ClInclude Include="include\Engine\Core\Windowing\GLWindow.h" />
     <ClInclude Include="include\Engine\Core\Input\PrKey.h" />
     <ClInclude Include="include\Engine\Core\Windowing\Window.h" />
@@ -55,6 +57,8 @@
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLTexture2D.h" />
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexArray.h" />
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexBuffer.h" />
+    <ClInclude Include="include\Engine\Renderer\Resources\Material.h" />
+    <ClInclude Include="include\Engine\Renderer\Resources\MaterialManager.h" />
     <ClInclude Include="include\Engine\Renderer\Resources\Shader.h" />
     <ClInclude Include="include\Engine\Renderer\Resources\ShaderManager.h" />
     <ClInclude Include="include\Engine\Renderer\Resources\Texture.h" />
@@ -75,6 +79,7 @@
     <ClCompile Include="src\Core\Resources\Resource.cpp" />
     <ClCompile Include="src\Core\Resources\ResourceManager.cpp" />
     <ClCompile Include="src\Core\Utils\Clock.cpp" />
+    <ClCompile Include="src\Core\Utils\JSONParser.cpp" />
     <ClCompile Include="src\Core\Utils\Logger.cpp" />
     <ClCompile Include="src\Core\Common\pearl_pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -82,6 +87,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Core/Common/pearl_pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="src\Core\Utils\StringUtils.cpp" />
     <ClCompile Include="src\Core\Windowing\GLWindow.cpp" />
     <ClCompile Include="src\Renderer\Core\Camera.cpp" />
     <ClCompile Include="src\Renderer\Core\Color.cpp" />
@@ -92,6 +98,8 @@
     <ClCompile Include="src\Renderer\OpenGL\GLVertexArray.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\GLVertexBuffer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\Renderer.cpp" />
+    <ClCompile Include="src\Renderer\Resources\Material.cpp" />
+    <ClCompile Include="src\Renderer\Resources\MaterialManager.cpp" />
     <ClCompile Include="src\Renderer\Resources\ShaderManager.cpp" />
     <ClCompile Include="src\Renderer\Resources\TextureManager.cpp" />
   </ItemGroup>
