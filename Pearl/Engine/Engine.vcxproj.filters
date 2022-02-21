@@ -204,8 +204,12 @@
     <ClInclude Include="include\Engine\Renderer\Resources\MaterialManager.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Core\Utils\JSONParser.h" />
-    <ClInclude Include="include\Engine\Core\Utils\StringUtils.h" />
+    <ClInclude Include="include\Engine\Core\Utils\JSONParser.h">
+      <Filter>Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Utils\StringUtils.h">
+      <Filter>Core\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -292,7 +296,11 @@
     <ClCompile Include="src\Renderer\Resources\MaterialManager.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Utils\JSONParser.cpp" />
-    <ClCompile Include="src\Core\Utils\StringUtils.cpp" />
+    <ClCompile Include="src\Core\Utils\JSONParser.cpp">
+      <Filter>Core\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Utils\StringUtils.cpp">
+      <Filter>Core\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

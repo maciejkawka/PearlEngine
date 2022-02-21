@@ -94,7 +94,9 @@ void Renderer::Test()
 	Resources::ShaderPtr shader4 = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load("CameraShader.shader"));
 	shader4->Bind();
 
-	Resources::MaterialPtr material = std::static_pointer_cast<Resources::Material>(PrRenderer::Resources::MaterialManager::GetInstance().Load("testMaterial.mat"));
+	Resources::MaterialPtr material = std::static_pointer_cast<Resources::Material>(PrRenderer::Resources::MaterialManager::GetInstance().Load("standardMaterial.mat"));
+	Resources::Texture2DPtr texture = std::static_pointer_cast<Resources::Texture2D>(PrRenderer::Resources::TextureManager::GetInstance().Load("brick.jpg"));
+	//material->SetTexture("mainTex" , texture);
 }
 
 
@@ -104,15 +106,15 @@ void Renderer::Draw()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
-	Resources::ShaderPtr shader = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("CameraShader.shader"));
-	shader->SetUniformInt("u_tex", 0);
+	//Resources::ShaderPtr shader = std::static_pointer_cast<Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("CameraShader.shader"));
+	//shader->SetUniformInt("u_tex", 0);
 
 	auto camera = PrRenderer::Core::Camera::GetMainCamera();
 	auto& MVP = camera->RecalculateMatrices();
 
 	vertexArray->Bind();
 
-
+	Resources::MaterialPtr material = std::static_pointer_cast<Resources::Material>(PrRenderer::Resources::MaterialManager::GetInstance().GetResource("standardMaterial.mat"));
 	for (int x = -10; x < 10; x += 5)
 	{
 		for (int y = -10; y < 10; y += 2)
@@ -124,16 +126,20 @@ void Renderer::Draw()
 				if (y%4 == 0)
 				{
 					Resources::Texture2DPtr texture = std::static_pointer_cast<Resources::Texture2D>(PrRenderer::Resources::TextureManager::GetInstance().Load("brick.jpg"));
-					texture->Bind();
+					//texture->Bind();
+					material->SetTexture("mainTex", texture);
 				}
 				else
 				{
 					Resources::Texture2DPtr texture = std::static_pointer_cast<Resources::Texture2D>(PrRenderer::Resources::TextureManager::GetInstance().Load("wall.jpg"));
-					texture->Bind();
+					//texture->Bind();
+					material->SetTexture("mainTex", texture);
 				}
 
 				auto newMVP = MVP * PrCore::Math::translate(PrCore::Math::mat4(1.0f), PrCore::Math::vec3(x, y, z));
-				shader->SetUniformMat4("u_MVP", newMVP);
+				material->SetProperty("MVP", newMVP);
+				material->Bind();
+				//shader->SetUniformMat4("u_MVP", newMVP);
 				glDrawArrays(GL_TRIANGLES, 0, 36);
 			}
 		}

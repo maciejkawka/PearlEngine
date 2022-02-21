@@ -11,6 +11,8 @@
 #include"Core/Utils/JSONParser.h"
 
 #include<vector>
+#include<map>
+#include<optional>
 
 namespace PrRenderer::Resources {
 
@@ -23,7 +25,7 @@ namespace PrRenderer::Resources {
 		std::string name;
 		TexturePtr resource;
 		PrCore::Math::vec2 offset;
-		PrCore::Math::vec3 scale;
+		PrCore::Math::vec2 scale;
 	};
 
 	class Material : public PrCore::Resources::Resources {
@@ -32,10 +34,10 @@ namespace PrRenderer::Resources {
 		//Material(const Material& p_material) {}
 		//Material(ShaderPtr p_shader) {}
 
-		~Material() {}
+		~Material();
 
-		inline void SetColor(const Core::Color& p_color) { m_color = p_color; }
-		inline const Core::Color& GetColor() { return m_color; }
+		inline void SetColor(const Core::Color& p_color) { if(m_color) *m_color = p_color; }
+		inline const Core::Color& GetColor() { return m_color ? *m_color : Core::Color::White; }
 
 		inline void SetShader(ShaderPtr p_shader) { m_shader = p_shader; }
 		inline ShaderPtr GetShader() { return m_shader; }
@@ -47,33 +49,27 @@ namespace PrRenderer::Resources {
 		inline void SetRenderType(RenderType p_renderType) { m_renderType = p_renderType; }
 		inline RenderType GetRenderType() { return m_renderType; }
 
-		//void Bind();
-		//void Unbind();
+		void Bind();
+		void Unbind();
 
-		//void SetTexture(const std::string& p_name, TexturePtr p_texture);
-		//TexturePtr GetTexture(const std::string& p_name);
+		void SetTexture(const std::string& p_name, TexturePtr p_texture);
+		TexturePtr GetTexture(const std::string& p_name);
 
-		//void SetTexScale(const std::string& p_name, const PrCore::Math::vec2& p_value);
-		//void SetTexOffset(const std::string& p_name, const PrCore::Math::vec2& p_value);
+		void SetTexScale(const std::string& p_name, const PrCore::Math::vec2& p_value);
+		void SetTexOffset(const std::string& p_name, const PrCore::Math::vec2& p_value);
 
-		//PrCore::Math::vec2 GetTexScale(const std::string& p_name);
-		//PrCore::Math::vec2 GetTexOffset(const std::string& p_name);
+		PrCore::Math::vec2 GetTexScale(const std::string& p_name);
+		PrCore::Math::vec2 GetTexOffset(const std::string& p_name);
 
-		//bool HasProperty(const std::string& p_name);
+		bool HasProperty(const std::string& p_name);
 
 		//Templated
-		//template<typename T>
-		//void SetProperty(const std::string& m_name, const T& p_value)
-		//{
+		template<typename T>
+		void SetProperty(const std::string& p_name, const T& p_value);
 
-		//}
+		template<typename T>
+		const T& GetProperty(const std::string& p_name);
 
-		////Templated
-		//template<typename T>
-		//const T& GetProperty(const std::string& p_name)
-		//{
-
-		//}
 
 	protected:
 
@@ -91,9 +87,9 @@ namespace PrRenderer::Resources {
 		PrCore::Utils::JSON::json ReadFile();
 
 		ShaderPtr m_shader;
-		std::vector<TextureData> m_textures;
-		std::vector<Uniform> m_unforms;
-		Core::Color m_color;
+		std::map<std::string, TextureData> m_textures;
+		std::map<std::string, Uniform> m_unforms;
+		Core::Color* m_color;
 		RenderType m_renderType;
 		size_t m_renderOrder;
 
@@ -101,4 +97,40 @@ namespace PrRenderer::Resources {
 	};
 
 	typedef std::shared_ptr<Material> MaterialPtr;
+	
+	
+	//Templated Implementation
+	template<typename T>
+	inline void Material::SetProperty(const std::string& p_name, const T& p_value)
+	{	
+		auto find = m_unforms.find(p_name);
+		if (find != m_unforms.end())
+			find->second.value = std::make_any<T>(p_value);
+		else
+		{
+			PRLOG_WARN("Renderer: Material {0} does not have property {1}", m_name, p_name);
+		}
+	}
+
+	template<typename T>
+	inline const T& Material::GetProperty(const std::string& p_name)
+	{
+
+		auto find = m_unforms.find(p_name);
+		if (find != m_unforms.end())
+		{
+			try 
+			{
+				T returnValue = std::any_cast<T>(find->second.value);
+				return returnValue;
+			}
+			catch (const std::bad_any_cast& e)
+			{
+				PRLOG_ERROR("Renderer: Material {0} {1}", p_name, e.what());
+			}
+		}
+
+		PRLOG_WARN("Renderer: Material {0} no such property \"{1}\"", m_name, p_name);
+		return T();
+	}
 }

@@ -256,7 +256,7 @@ void PrRenderer::OpenGL::GLShader::ScanUniforms()
 			GetUniformLocation(uniformName)
 		};
 
-		m_uniforms.push_back(uniform);
+		m_uniforms[uniform.name] = uniform;
 	}
 }
 

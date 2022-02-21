@@ -6,6 +6,7 @@
 #include"Renderer/Core/Defines.h"
 
 #include<vector>
+#include<map>
 #include<unordered_map>
 #include<string>
 #include<memory>
@@ -30,7 +31,7 @@ namespace PrRenderer::Resources {
 		inline RendererID GetID() { return m_ID; }
 
 		inline size_t GetUniformsCount() { return m_uniforms.size(); }
-		inline const std::vector<Uniform>& GetAllUniforms() { return m_uniforms; }
+		inline const std::map<std::string, Uniform>& GetAllUniforms() { return m_uniforms; }
 
 		virtual void SetUniformFloat(const std::string& p_name, float p_value) = 0;
 		virtual void SetUniformInt(const std::string& p_name, int p_value) = 0;
@@ -52,7 +53,7 @@ namespace PrRenderer::Resources {
 		std::string m_name;
 		RendererID m_ID;
 
-		std::vector<Uniform> m_uniforms;
+		std::map<std::string, Uniform> m_uniforms;
 		std::unordered_map<std::string, int> m_uniformLocation;
 	};
 

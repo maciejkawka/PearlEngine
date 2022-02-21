@@ -68,7 +68,7 @@ void Editor::OnFrame(float p_deltaTime)
 
 
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::G))
-		PrRenderer::Resources::MaterialManager::GetInstance().Unload("testMaterial.mat");
+		PrRenderer::Resources::MaterialManager::GetInstance().Unload("standardMaterial.mat");
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::H))
 		PrRenderer::Resources::MaterialManager::GetInstance().Load("testMaterial.mat");
 
