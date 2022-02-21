@@ -19,6 +19,7 @@ namespace PrEditor::Core {
 
 	private:
 		Components::BasicCamera* m_basicCamera;
+		PrCore::Math::vec2 m_scale;
 	};
 
 }

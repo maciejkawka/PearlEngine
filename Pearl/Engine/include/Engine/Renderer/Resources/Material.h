@@ -21,13 +21,6 @@ namespace PrRenderer::Resources {
 		Transparent
 	};
 
-	struct TextureData {
-		std::string name;
-		TexturePtr resource;
-		PrCore::Math::vec2 offset;
-		PrCore::Math::vec2 scale;
-	};
-
 	class Material : public PrCore::Resources::Resources {
 	public:
 		Material(const std::string& p_name, PrCore::Resources::ResourceManager* p_creator, PrCore::Resources::ResourceID p_ID);
@@ -36,8 +29,8 @@ namespace PrRenderer::Resources {
 
 		~Material();
 
-		inline void SetColor(const Core::Color& p_color) { if(m_color) *m_color = p_color; }
-		inline const Core::Color& GetColor() { return m_color ? *m_color : Core::Color::White; }
+		/*inline void SetColor(const Core::Color& p_color) { if(m_color) *m_color = p_color; }
+		inline const Core::Color& GetColor() { return m_color ? *m_color : Core::Color::White; }*/
 
 		inline void SetShader(ShaderPtr p_shader) { m_shader = p_shader; }
 		inline ShaderPtr GetShader() { return m_shader; }
@@ -83,13 +76,13 @@ namespace PrRenderer::Resources {
 
 		virtual void CalculateSize() override;
 
-		bool PopulateMaterial(PrCore::Utils::JSON::json& p_json);
+		bool PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json);
+
 		PrCore::Utils::JSON::json ReadFile();
 
 		ShaderPtr m_shader;
-		std::map<std::string, TextureData> m_textures;
-		std::map<std::string, Uniform> m_unforms;
-		Core::Color* m_color;
+		std::map<std::string, TexturePtr> m_textures;
+		std::map<std::string, Uniform> m_uniforms;
 		RenderType m_renderType;
 		size_t m_renderOrder;
 
@@ -103,8 +96,8 @@ namespace PrRenderer::Resources {
 	template<typename T>
 	inline void Material::SetProperty(const std::string& p_name, const T& p_value)
 	{	
-		auto find = m_unforms.find(p_name);
-		if (find != m_unforms.end())
+		auto find = m_uniforms.find(p_name);
+		if (find != m_uniforms.end())
 			find->second.value = std::make_any<T>(p_value);
 		else
 		{
@@ -116,8 +109,8 @@ namespace PrRenderer::Resources {
 	inline const T& Material::GetProperty(const std::string& p_name)
 	{
 
-		auto find = m_unforms.find(p_name);
-		if (find != m_unforms.end())
+		auto find = m_uniforms.find(p_name);
+		if (find != m_uniforms.end())
 		{
 			try 
 			{

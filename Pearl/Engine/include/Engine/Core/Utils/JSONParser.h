@@ -5,8 +5,7 @@
 #include"json/json.hpp"
 
 namespace PrCore {
-	namespace Utils
-	{
+	namespace Utils {
 		namespace JSON = nlohmann;
 	}
 }

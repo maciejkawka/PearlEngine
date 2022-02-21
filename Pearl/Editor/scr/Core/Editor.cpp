@@ -7,6 +7,7 @@
 #include"Renderer/Resources/TextureManager.h"
 #include"Renderer/Resources/MaterialManager.h"
 #include"Renderer/Resources/Shader.h"
+#include"Renderer/Resources/Material.h"
 
 using namespace PrEditor::Core;
 using namespace PrCore::Events;
@@ -16,6 +17,7 @@ Editor::Editor()
 	m_appContext = new EditorContext();
 	m_basicCamera = new Components::BasicCamera(PrRenderer::Core::CameraType::Perspective);
 	m_basicCamera->GetCamera()->SetSize(5.0f);
+	m_scale = PrCore::Math::vec2(1, 1);
 }
 
 Editor::~Editor()
@@ -66,12 +68,30 @@ void Editor::OnFrame(float p_deltaTime)
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::P))
 		PrRenderer::Core::Camera::GetMainCamera()->SetType(PrRenderer::Core::CameraType::Perspective);
 
+	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::H))
+	{
+		auto material = std::static_pointer_cast<PrRenderer::Resources::Material>(PrRenderer::Resources::MaterialManager::GetInstance().GetResource("standardMaterial.mat"));
+		m_scale -= 0.05f;
+		if (m_scale.x <= 0.05f)
+			m_scale = PrCore::Math::vec2(0.05f, 0.05f);
 
-	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::G))
-		PrRenderer::Resources::MaterialManager::GetInstance().Unload("standardMaterial.mat");
-	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::H))
-		PrRenderer::Resources::MaterialManager::GetInstance().Load("testMaterial.mat");
+		material->SetTexScale("mainTex", m_scale);
+	
+	}
+	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::G))
+	{
+		auto material = std::static_pointer_cast<PrRenderer::Resources::Material>(PrRenderer::Resources::MaterialManager::GetInstance().GetResource("standardMaterial.mat"));
+		m_scale += 0.05f;
+		material->SetTexScale("mainTex", m_scale);
 
+	}
+
+	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::R))
+	{
+		auto material = std::static_pointer_cast<PrRenderer::Resources::Material>(PrRenderer::Resources::MaterialManager::GetInstance().GetResource("standardMaterial.mat"));
+		std::string matrix = "MVP";
+		auto returnValue = material->GetProperty<float>(matrix);
+	}
 	//Exit
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
 		m_shouldClose = true;
