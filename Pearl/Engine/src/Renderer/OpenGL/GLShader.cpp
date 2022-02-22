@@ -206,30 +206,40 @@ void PrRenderer::OpenGL::GLShader::ScanUniforms()
 		uniformName.resize(maxNameSize);
 		glGetActiveUniform(m_ID, i, maxNameSize, &uniformLength, &uniformSize, &uniformType, &uniformName[0]);
 
+		PrCore::Utils::StringUtils::ResizeToFitContains(uniformName);
+
 		PrRenderer::Resources::UniformType prUniformType = PrRenderer::Resources::UniformType::None;
+		std::any uniformValue;
 
 		switch (uniformType)
 		{
 			case GL_INT:
 				prUniformType = PrRenderer::Resources::UniformType::Int;
+				uniformValue = std::make_any<int>(GetUniformInt(uniformName));
 				break;
 			case GL_FLOAT:
 				prUniformType = PrRenderer::Resources::UniformType::Float;
+				uniformValue = std::make_any<float>(GetUniformFloat(uniformName));
 				break;
 			case GL_FLOAT_VEC2:
 				prUniformType = PrRenderer::Resources::UniformType::Float_Vec2;
+				uniformValue = std::make_any<PrCore::Math::vec2>(GetUniformVec2(uniformName));
 				break;
 			case GL_FLOAT_VEC3:
 				prUniformType = PrRenderer::Resources::UniformType::Float_Vec3;
+				uniformValue = std::make_any<PrCore::Math::vec3>(GetUniformVec3(uniformName));
 				break;
 			case GL_FLOAT_VEC4:
 				prUniformType = PrRenderer::Resources::UniformType::Float_Vec4;
+				uniformValue = std::make_any<PrCore::Math::vec4>(GetUniformVec4(uniformName));
 				break;
 			case GL_FLOAT_MAT4:
 				prUniformType = PrRenderer::Resources::UniformType::Float_Mat4;
+				uniformValue = std::make_any<PrCore::Math::mat4>(GetUniformMat4(uniformName));
 				break;
 			case GL_FLOAT_MAT3:
 				prUniformType = PrRenderer::Resources::UniformType::Float_Mat3;
+				uniformValue = std::make_any<PrCore::Math::mat3>(GetUniformMat3(uniformName));
 				break;
 			case GL_SAMPLER_2D:
 				prUniformType = PrRenderer::Resources::UniformType::Texture2D;
@@ -248,15 +258,12 @@ void PrRenderer::OpenGL::GLShader::ScanUniforms()
 			}
 		}
 
-		PrCore::Utils::StringUtils::ResizeToFitContains(uniformName);
-
 		PrRenderer::Resources::Uniform uniform{
-			uniformName,
 			prUniformType,
-			GetUniformLocation(uniformName)
+			uniformValue
 		};
 
-		m_uniforms[uniform.name] = uniform;
+		m_uniforms[uniformName] = uniform;
 	}
 }
 

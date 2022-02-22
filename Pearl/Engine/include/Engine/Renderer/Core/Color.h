@@ -17,12 +17,16 @@ namespace PrRenderer::Core {
 			PrCore::Math::vec4(p_r, p_g, p_b, 1.0f)
 		{}
 
-		static Color Red;
-		static Color Green;
-		static Color Blue;
-		static Color Black;
-		static Color White;
-		static Color Magenta;
+		Color(const PrCore::Math::vec4& p_vec4):
+			PrCore::Math::vec4(p_vec4.r, p_vec4.g, p_vec4.b, p_vec4.a)
+		{}
+
+		static const Color Red;
+		static const Color Green;
+		static const Color Blue;
+		static const Color Black;
+		static const Color White;
+		static const Color Magenta;
 
 		//Add more functions in future
 	};

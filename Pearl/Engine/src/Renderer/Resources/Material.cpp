@@ -6,6 +6,7 @@
 
 #include"Core/Filesystem/FileSystem.h"
 
+//Const Pearl engine shader uniforms 
 #define TEXOFFSET_UNIFORM "_offset"
 #define TEXSCALE_UNIFORM "_scale"
 #define COLOR_UNIFORM "_color"
@@ -23,7 +24,28 @@ Material::~Material()
 {
 }
 
-void PrRenderer::Resources::Material::Bind()
+void Material::SetColor(const PrRenderer::Core::Color& p_color)
+{
+	auto find = m_uniforms.find(COLOR_UNIFORM);
+	if (find != m_uniforms.end())
+		find->second.value = std::make_any<PrCore::Math::vec4>(p_color);
+}
+
+const PrRenderer::Core::Color& Material::GetColor()
+{
+	auto find = m_uniforms.find(COLOR_UNIFORM);
+
+	if (find != m_uniforms.end())
+	{
+		auto vec4 = std::any_cast<PrCore::Math::vec4>(find->second.value);
+		return PrRenderer::Core::Color(vec4);
+	}
+
+	PRLOG_WARN("Renderer: Material {0}, missing uniform {1}", m_name, COLOR_UNIFORM);
+	return PrRenderer::Core::Color();
+}
+
+void Material::Bind()
 {
 	//Bind shader
 	m_shader->Bind();
@@ -85,6 +107,7 @@ TexturePtr Material::GetTexture(const std::string& p_name)
 	if (find != m_textures.end())
 		return find->second;
 
+	PRLOG_WARN("Renderer: Material {0}, missing texture {1}", m_name, p_name);
 	return TexturePtr();
 }
 
@@ -109,6 +132,7 @@ PrCore::Math::vec2 Material::GetTexScale(const std::string& p_name)
 	if (find != m_uniforms.end())
 		return std::any_cast<PrCore::Math::vec2>(find->second.value);
 
+	PRLOG_WARN("Renderer: Material {0}, missing uniform {1}", m_name, p_name);
 	return PrCore::Math::vec2();
 }
 
@@ -119,6 +143,7 @@ PrCore::Math::vec2 Material::GetTexOffset(const std::string& p_name)
 	if (find != m_uniforms.end())
 		return std::any_cast<PrCore::Math::vec2>(find->second.value);
 
+	PRLOG_WARN("Renderer: Material {0}, missing uniform {1}", m_name, p_name);
 	return PrCore::Math::vec2();
 }
 
@@ -400,7 +425,7 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 		case UniformType::Texture3D:
 			break;
 		default:
-			PRLOG_WARN("Renderer: Material {0} Uniform {1} type not supported", m_name, uniform.name);
+			PRLOG_WARN("Renderer: Material {0} Uniform {1} type not supported", m_name, uniformName);
 			break;
 		}
 	}

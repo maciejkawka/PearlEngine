@@ -90,13 +90,24 @@ void Editor::OnFrame(float p_deltaTime)
 	{
 		auto material = std::static_pointer_cast<PrRenderer::Resources::Material>(PrRenderer::Resources::MaterialManager::GetInstance().GetResource("standardMaterial.mat"));
 		std::string matrix = "MVP";
-		auto returnValue = material->GetProperty<float>(matrix);
+		auto& returnValue = material->GetProperty<PrCore::Math::mat4>(matrix);
 	}
+
 	//Exit
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
 		m_shouldClose = true;
 
 	m_basicCamera->Update(p_deltaTime);
+
+	auto material = std::static_pointer_cast<PrRenderer::Resources::Material>(PrRenderer::Resources::MaterialManager::GetInstance().GetResource("standardMaterial.mat"));
+	auto color = material->GetColor();
+
+	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::C))
+		material->SetColor(PrRenderer::Core::Color::Red);
+	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::V))
+		material->SetColor(PrRenderer::Core::Color::Green);
+	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::B))
+		material->SetColor(PrRenderer::Core::Color::White);
 }
 
 void Editor::PostFrame()

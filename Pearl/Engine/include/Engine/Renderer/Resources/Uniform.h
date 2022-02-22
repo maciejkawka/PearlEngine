@@ -19,9 +19,7 @@ namespace PrRenderer::Resources {
 	};
 
 	struct Uniform {
-		std::string		name;
 		UniformType		type;
-		unsigned int	location;
 		std::any		value;
 	};
 }
