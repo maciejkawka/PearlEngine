@@ -19,6 +19,8 @@ namespace PrCore::Resources {
 
 	class Resources {
 	public:
+		Resources() = delete;
+		Resources(const std::string& p_name);
 		Resources(const std::string& p_name, ResourceID p_ID);
 		virtual ~Resources() = default;
 

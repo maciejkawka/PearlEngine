@@ -20,8 +20,35 @@ Material::Material(const std::string& p_name, PrCore::Resources::ResourceID p_ID
 	m_renderOrder(0.f)
 {}
 
-Material::~Material()
+Material::Material(ShaderPtr p_shader):
+	Resources("Material_"+ p_shader->GetName())
+{	
+	m_shader = p_shader;
+	m_uniforms = m_shader->GetAllUniforms();
+
+	m_renderType = RenderType::Opaque;
+	m_renderOrder = 0;
+
+	for (auto& unformPair : m_uniforms)
+	{
+		auto& uniformName = unformPair.first;
+		auto& uniform = unformPair.second;
+
+		if (uniform.type == UniformType::Texture2D)
+			m_textures[uniformName] = TexturePtr();
+	}
+}
+
+Material::Material(const Material& p_material):
+	Resources("Material_" + p_material.m_shader->GetName())
 {
+	m_shader = p_material.m_shader;
+	m_uniforms = p_material.m_uniforms;
+
+	m_renderType = RenderType::Opaque;
+	m_renderOrder = 0;
+
+	m_textures = p_material.m_textures;
 }
 
 void Material::SetColor(const PrRenderer::Core::Color& p_color)
@@ -450,3 +477,5 @@ PrCore::Utils::JSON::json Material::ReadFile()
 
 	return JSON::json::parse(dataVector);
 }
+
+

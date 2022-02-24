@@ -7,6 +7,13 @@
 
 using namespace PrCore::Resources;
 
+PrCore::Resources::Resources::Resources(const std::string& p_name):
+	m_name(p_name),
+	m_ID(UINT_MAX),
+	m_size(0),
+	m_state(ResourceStatus::Loaded)
+{}
+
 Resources::Resources(const std::string& p_name, ResourceID p_ID) :
 	m_name(p_name),
 	m_ID(p_ID),
@@ -16,6 +23,9 @@ Resources::Resources(const std::string& p_name, ResourceID p_ID) :
 
 void Resources::Load()
 {
+	if (m_ID == UINT_MAX)
+		return;
+
 	if (IsLoaded())
 		return;
 
@@ -36,6 +46,9 @@ void Resources::Load()
 
 void Resources::Unload()
 {
+	if (m_ID == UINT_MAX)
+		return;
+
 	m_state = ResourceStatus::Unloading;
 
 	PreUnloadImpl();

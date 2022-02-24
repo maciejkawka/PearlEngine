@@ -1,6 +1,5 @@
 #pragma once
 #include"Core/Resources/Resource.h"
-#include"Core/Math/Math.h"
 
 #include"Renderer/Core/Defines.h"
 #include"Renderer/Core/Color.h"
@@ -9,6 +8,8 @@
 #include"Renderer/Resources/Texture.h"
 
 #include"Core/Utils/JSONParser.h"
+#include"Core/Math/Math.h"
+#include"Core/Utils/Logger.h"
 
 #include<vector>
 #include<map>
@@ -23,11 +24,12 @@ namespace PrRenderer::Resources {
 
 	class Material : public PrCore::Resources::Resources {
 	public:
+		Material() = delete;
 		Material(const std::string& p_name, PrCore::Resources::ResourceID p_ID);
-		//Material(const Material& p_material) {}
-		//Material(ShaderPtr p_shader) {}
+		Material(ShaderPtr p_shader);
+		Material(const Material& p_material);
 
-		~Material();
+		~Material() = default;
 
 		void SetColor(const PrRenderer::Core::Color& p_color);
 		const PrRenderer::Core::Color& GetColor();
@@ -63,9 +65,7 @@ namespace PrRenderer::Resources {
 		template<typename T>
 		const T& GetProperty(const std::string& p_name);
 
-
 	protected:
-
 		virtual void PreLoadImpl() override;
 		virtual bool LoadImpl() override;
 		virtual void PostLoadImpl() override;

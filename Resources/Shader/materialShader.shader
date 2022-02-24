@@ -7,8 +7,8 @@ layout (location = 2) in vec2 aUV1;
 
 uniform mat4 MVP;
 
-uniform vec2 mainTex_scale;
-uniform vec2 mainTex_offset;
+uniform vec2 mainTex_scale = vec2(1,1);
+uniform vec2 mainTex_offset = vec2(0, 0);
 
 uniform vec2 normalTex_scale;
 uniform vec2 normalTex_offset;
