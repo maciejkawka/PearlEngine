@@ -8,7 +8,7 @@ namespace PrRenderer::OpenGL {
 
 	class GLShader : public Resources::Shader {
 	public:
-		GLShader(const std::string& p_name, PrCore::Resources::ResourceManager* p_creator, PrCore::Resources::ResourceID p_ID);
+		GLShader(const std::string& p_name, PrCore::Resources::ResourceID p_ID);
 
 		~GLShader();
 

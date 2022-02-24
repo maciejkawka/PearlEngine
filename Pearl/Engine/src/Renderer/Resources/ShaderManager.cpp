@@ -15,7 +15,7 @@ ShaderManager::ShaderManager()
 
 Resources* ShaderManager::CreateImpl(const std::string& p_name)
 {
-	return static_cast<OpenGL::GLShader*>(new OpenGL::GLShader(p_name, this, NextResourceID()));
+	return static_cast<OpenGL::GLShader*>(new OpenGL::GLShader(p_name, NextResourceID()));
 }
 
 ShaderManager& PrRenderer::Resources::ShaderManager::GetInstance()

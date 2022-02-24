@@ -23,7 +23,7 @@ namespace PrRenderer::Resources {
 
 	class Material : public PrCore::Resources::Resources {
 	public:
-		Material(const std::string& p_name, PrCore::Resources::ResourceManager* p_creator, PrCore::Resources::ResourceID p_ID);
+		Material(const std::string& p_name, PrCore::Resources::ResourceID p_ID);
 		//Material(const Material& p_material) {}
 		//Material(ShaderPtr p_shader) {}
 

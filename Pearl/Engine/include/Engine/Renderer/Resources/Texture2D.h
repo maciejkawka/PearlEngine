@@ -9,8 +9,8 @@ namespace PrRenderer::Resources {
 	
 	class Texture2D : public Texture {
 	public:
-		Texture2D(const std::string& p_name, PrCore::Resources::ResourceManager* p_creator, PrCore::Resources::ResourceID p_ID) :
-			Texture(p_name, p_creator, p_ID)
+		Texture2D(const std::string& p_name, PrCore::Resources::ResourceID p_ID) :
+			Texture(p_name, p_ID)
 		{}
 
 		//To implement in future

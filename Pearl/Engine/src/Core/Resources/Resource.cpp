@@ -7,9 +7,8 @@
 
 using namespace PrCore::Resources;
 
-Resources::Resources(const std::string& p_name, ResourceManager* p_creator, ResourceID p_ID) :
+Resources::Resources(const std::string& p_name, ResourceID p_ID) :
 	m_name(p_name),
-	m_creator(p_creator),
 	m_ID(p_ID),
 	m_state(ResourceStatus::Unloaded),
 	m_size(0)

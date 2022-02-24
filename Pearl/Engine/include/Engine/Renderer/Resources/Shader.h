@@ -16,8 +16,8 @@ namespace PrRenderer::Resources {
 	class Shader : public PrCore::Resources::Resources {
 	public:
 
-		Shader(const std::string& p_name, PrCore::Resources::ResourceManager* p_creator, PrCore::Resources::ResourceID p_ID) :
-			Resources(p_name, p_creator, p_ID),
+		Shader(const std::string& p_name, PrCore::Resources::ResourceID p_ID) :
+			Resources(p_name, p_ID),
 			m_name(p_name),
 			m_ID(0)
 		{}

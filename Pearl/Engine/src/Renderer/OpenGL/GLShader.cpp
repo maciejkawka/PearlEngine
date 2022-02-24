@@ -12,8 +12,8 @@
 using namespace PrRenderer::OpenGL;
 using namespace PrCore::Filesystem;
 
-GLShader::GLShader(const std::string& p_name, PrCore::Resources::ResourceManager* p_creator, PrCore::Resources::ResourceID p_ID):
-	Shader(p_name, p_creator, p_ID)
+GLShader::GLShader(const std::string& p_name, PrCore::Resources::ResourceID p_ID):
+	Shader(p_name, p_ID)
 {}
 
 GLShader::~GLShader()

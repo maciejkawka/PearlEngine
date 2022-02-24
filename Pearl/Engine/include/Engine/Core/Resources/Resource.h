@@ -19,8 +19,8 @@ namespace PrCore::Resources {
 
 	class Resources {
 	public:
-		Resources(const std::string& p_name, ResourceManager* p_creator, ResourceID p_ID);
-		virtual ~Resources() {}
+		Resources(const std::string& p_name, ResourceID p_ID);
+		virtual ~Resources() = default;
 
 		void Load();
 		void Unload();
@@ -57,7 +57,6 @@ namespace PrCore::Resources {
 		std::string m_name;
 		ResourceID m_ID;
 		ResourceSize m_size;
-		ResourceManager* m_creator;
 		ResourceStatus m_state;
 	};
 

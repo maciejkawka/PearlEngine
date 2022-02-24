@@ -15,7 +15,7 @@ MaterialManager::MaterialManager()
 
 Resources* MaterialManager::CreateImpl(const std::string& p_name)
 {
-	return static_cast<Resources::Material*>(new Resources::Material(p_name, this, NextResourceID()));
+	return static_cast<Resources::Material*>(new Resources::Material(p_name, NextResourceID()));
 }
 
 MaterialManager& PrRenderer::Resources::MaterialManager::GetInstance()

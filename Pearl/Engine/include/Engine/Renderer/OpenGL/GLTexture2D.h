@@ -5,8 +5,8 @@ namespace PrRenderer::OpenGL {
 
 	class GLTexture2D : public PrRenderer::Resources::Texture2D {
 	public:
-		GLTexture2D(const std::string& p_name, PrCore::Resources::ResourceManager* p_creator, PrCore::Resources::ResourceID p_ID) :
-			Texture2D(p_name, p_creator, p_ID)
+		GLTexture2D(const std::string& p_name, PrCore::Resources::ResourceID p_ID) :
+			Texture2D(p_name, p_ID)
 		{}
 
 		void Bind(unsigned int p_slot = 0) override;

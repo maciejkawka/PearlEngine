@@ -14,8 +14,8 @@
 using namespace PrRenderer::Resources;
 using namespace PrCore::Utils;
 
-Material::Material(const std::string& p_name, PrCore::Resources::ResourceManager* p_creator, PrCore::Resources::ResourceID p_ID):
-	Resources(p_name, p_creator, p_ID),
+Material::Material(const std::string& p_name, PrCore::Resources::ResourceID p_ID):
+	Resources(p_name, p_ID),
 	m_renderType(RenderType::Opaque),
 	m_renderOrder(0.f)
 {}
