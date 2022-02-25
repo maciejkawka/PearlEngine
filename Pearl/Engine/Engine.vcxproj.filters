@@ -210,6 +210,12 @@
     <ClInclude Include="include\Engine\Core\Utils\StringUtils.h">
       <Filter>Core\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Resources\Mesh.h">
+      <Filter>Renderer\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLMesh.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -301,6 +307,12 @@
     </ClCompile>
     <ClCompile Include="src\Core\Utils\StringUtils.cpp">
       <Filter>Core\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Resources\Mesh.cpp">
+      <Filter>Renderer\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\GLMesh.cpp">
+      <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
