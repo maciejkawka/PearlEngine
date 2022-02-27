@@ -10,6 +10,7 @@ namespace PrCore::Filesystem {
 #define SHADER_DIR "Shader"
 #define TEXTURE_DIR "Texture"
 #define MATERIAL_DIR "Material"
+#define MESH_DIR "Mesh"
 
 	//TODO Implement Commented Functions
 	class FileSystem {

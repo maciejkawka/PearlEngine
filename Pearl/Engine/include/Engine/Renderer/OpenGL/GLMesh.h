@@ -27,6 +27,9 @@ namespace PrRenderer::OpenGL {
 
 		virtual void CalculateSize() override;
 
-		void UpdateMeshBuffers();
+		bool ValidateBuffers();
+		void UpdateBuffers();
+		bool PopulateOBJ();
+
 	};
 }

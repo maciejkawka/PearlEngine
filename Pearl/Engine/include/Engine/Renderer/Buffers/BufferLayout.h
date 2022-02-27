@@ -92,11 +92,13 @@ namespace PrRenderer::Buffers {
 		}
 
 		inline size_t GetStride() const { return m_stride; }
+		inline size_t GetFloatStride() const { return m_stride / 4; }
 		inline const std::vector<BufferElement>& GetElements() const { return m_elements; }
 
 		inline std::vector<BufferElement>::iterator Begin() { return m_elements.begin(); }
 		inline std::vector<BufferElement>::iterator End() { return m_elements.end(); }
 
+		inline void AddElementBuffer(const BufferElement& p_elementBuffer) { m_elements.push_back(p_elementBuffer); CalculateLayout(); }
 	private:
 		void CalculateLayout()
 		{

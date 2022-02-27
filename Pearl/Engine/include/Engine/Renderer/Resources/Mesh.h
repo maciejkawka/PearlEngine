@@ -9,7 +9,7 @@ namespace PrRenderer::Resources {
 
 	class Mesh : public PrCore::Resources::Resources {
 
-		typedef std::array<std::shared_ptr<float[]>, 8> UVArray;
+		typedef std::array<std::vector<PrCore::Math::vec2>, 8> UVArray;
 
 	public:
 		Mesh(const std::string& p_name, PrCore::Resources::ResourceID p_ID) :
@@ -29,39 +29,41 @@ namespace PrRenderer::Resources {
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
 
-		inline std::shared_ptr<float[]> GetVertices() { return m_vertices; }
+		inline std::vector<PrCore::Math::vec3> GetVertices() { return m_vertices; }
 		inline unsigned int GetVerticesCount() { return m_verticesCount; }
 
-		inline std::shared_ptr<float[]> GetIndices() { return m_indices; }
-		inline unsigned int GetIndicesCount() { return m_indicesCount; }
+		inline std::vector<unsigned int> GetIndices() { return m_indices; }
+		inline size_t GetIndicesCount() { return m_indicesCount; }
 
-		inline std::shared_ptr<float[]> GetColors() { return m_colors; }
-		inline std::shared_ptr<float[]> GetNormals() { return m_normals; }
-		inline std::shared_ptr<float[]> GetTangents() { return m_tangents; }
+		inline std::vector<PrRenderer::Core::Color> GetColors() { return m_colors; }
+		inline std::vector<PrCore::Math::vec3> GetNormals() { return m_normals; }
+		inline std::vector<PrCore::Math::vec3> GetTangents() { return m_tangents; }
 
-		void SetVertices(std::shared_ptr<float[]> p_vertices, unsigned int p_count);
-		void SetIndices(std::shared_ptr<float[]> p_indices, unsigned int p_count);
-		void SetColors(std::shared_ptr<float[]> p_colors, unsigned int p_count);
-		void SetNormals(std::shared_ptr<float[]> p_normals, unsigned int p_count);
-		void SetTangents(std::shared_ptr<float[]> p_tangents, unsigned int p_count);
+		void SetVertices(const std::vector<PrCore::Math::vec3>& p_vertices);
+		void SetIndices(const std::vector<unsigned int>& p_indices);
+		void SetColors(const std::vector<PrRenderer::Core::Color>& p_colors);
+		void SetNormals(const std::vector<PrCore::Math::vec3>& p_normals);
+		void SetTangents(const std::vector<PrCore::Math::vec3>& p_tangents);
 
-		void SetUVs(unsigned int p_UVSet, std::shared_ptr<float[]> p_UVs, unsigned int p_count);
+		void SetUVs(unsigned int p_UVSet, const std::vector<PrCore::Math::vec2>& p_UVs);
 
-	private:		
-		std::shared_ptr<float[]>	m_indices;
-		unsigned int				m_indicesCount;
+	protected:	
+		std::vector<unsigned int>				m_indices;
+		size_t									m_indicesCount;
 
-		std::shared_ptr<float[]>	m_vertices;
-		unsigned int				m_verticesCount;
-		std::shared_ptr<float[]>	m_colors;
-		std::shared_ptr<float[]>	m_normals;
-		std::shared_ptr<float[]>	m_tangents;
+		std::vector<PrCore::Math::vec3>		m_vertices;
+		size_t									m_verticesCount;
+		std::vector<PrRenderer::Core::Color>	m_colors;
+		std::vector<PrCore::Math::vec3>		m_normals;
+		std::vector<PrCore::Math::vec3>		m_tangents; //NOT USED YET
 
 		UVArray m_UVs;
-		const unsigned int m_maxUVs = 8;
+		size_t m_maxUVs = 8;
 
 		bool m_stateChanged;
 
 		std::unique_ptr<Buffers::VertexArray> m_VA;
 	};
+
+	typedef std::shared_ptr<Mesh> MeshPtr;
 }

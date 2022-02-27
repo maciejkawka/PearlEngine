@@ -36,5 +36,5 @@ void GLVertexBuffer::Unbind()
 void GLVertexBuffer::SetData(void* p_data, size_t p_size)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_bufferID);
-	glBufferData(GL_ARRAY_BUFFER, p_size, p_data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, p_size * sizeof(float), p_data, GL_STATIC_DRAW);
 }

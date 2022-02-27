@@ -3,25 +3,25 @@
 
 using namespace PrRenderer::Resources;
 
-void Mesh::SetVertices(std::shared_ptr<float[]> p_vertices, unsigned int p_count)
+void Mesh::SetVertices(const std::vector<PrCore::Math::vec3>& p_vertices)
 {
 	m_vertices = p_vertices;
-	m_verticesCount = p_count;
+	m_verticesCount = p_vertices.size();
 
 	m_stateChanged = true;
 }
 
-void Mesh::SetIndices(std::shared_ptr<float[]> p_indices, unsigned int p_count)
+void Mesh::SetIndices(const std::vector<unsigned int>& p_indices)
 {
 	m_indices = p_indices;
-	m_indicesCount = p_count;
+	m_indicesCount = p_indices.size();
 
 	m_stateChanged = true;
 }
 
-void Mesh::SetColors(std::shared_ptr<float[]> p_colors, unsigned int p_count)
+void Mesh::SetColors(const std::vector<PrRenderer::Core::Color>& p_colors)
 {
-	if (p_count != m_verticesCount)
+	if (p_colors.size() != m_verticesCount)
 	{
 		PRLOG_WARN("Renderer: Mesh {0} wrong colors length", m_name);
 		return;
@@ -31,9 +31,9 @@ void Mesh::SetColors(std::shared_ptr<float[]> p_colors, unsigned int p_count)
 	m_stateChanged = true;
 }
 
-void Mesh::SetNormals(std::shared_ptr<float[]> p_normals, unsigned int p_count)
+void Mesh::SetNormals(const std::vector<PrCore::Math::vec3>& p_normals)
 {
-	if (p_count != m_verticesCount)
+	if (p_normals.size() != m_verticesCount)
 	{
 		PRLOG_WARN("Renderer: Mesh {0} wrong normals length", m_name);
 		return;
@@ -43,9 +43,9 @@ void Mesh::SetNormals(std::shared_ptr<float[]> p_normals, unsigned int p_count)
 	m_stateChanged = true;
 }
 
-void Mesh::SetTangents(std::shared_ptr<float[]> p_tangents, unsigned int p_count)
+void Mesh::SetTangents(const std::vector<PrCore::Math::vec3>& p_tangents)
 {
-	if (p_count != m_verticesCount)
+	if (p_tangents.size() != m_verticesCount)
 	{
 		PRLOG_WARN("Renderer: Mesh {0} wrong tangents length", m_name);
 		return;
@@ -55,7 +55,7 @@ void Mesh::SetTangents(std::shared_ptr<float[]> p_tangents, unsigned int p_count
 	m_stateChanged = true;
 }
 
-void Mesh::SetUVs(unsigned int p_UVSet, std::shared_ptr<float[]> p_UVs, unsigned int p_count)
+void Mesh::SetUVs(unsigned int p_UVSet, const std::vector<PrCore::Math::vec2>& p_UVs)
 {
 	if (p_UVSet > m_maxUVs)
 	{
@@ -63,7 +63,7 @@ void Mesh::SetUVs(unsigned int p_UVSet, std::shared_ptr<float[]> p_UVs, unsigned
 		return;
 	}
 
-	if (p_count != m_verticesCount)
+	if (p_UVs.size() != m_verticesCount)
 	{
 		PRLOG_WARN("Renderer: Mesh {0} wrong UVs length", m_name);
 		return;
