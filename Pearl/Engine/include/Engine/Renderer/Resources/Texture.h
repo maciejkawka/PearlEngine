@@ -12,6 +12,7 @@ namespace PrRenderer::Resources {
 		RGB8,
 		RGBA8,
 		Alpha8,
+		Depth24Stencil8,
 		None
 	};
 

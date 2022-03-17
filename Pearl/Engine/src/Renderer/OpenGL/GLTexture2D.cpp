@@ -194,6 +194,9 @@ unsigned int PrRenderer::OpenGL::TextureFormatToGL(Resources::TextureFormat p_fo
 {
 	switch (p_format)
 	{
+	case Resources::TextureFormat::R8:
+		return GL_RED;
+		break;
 	case Resources::TextureFormat::RGB8:
 		return GL_RGB;
 		break;
@@ -205,6 +208,9 @@ unsigned int PrRenderer::OpenGL::TextureFormatToGL(Resources::TextureFormat p_fo
 		break;
 	case Resources::TextureFormat::GrayAlpha8:
 		return GL_RG;
+		break;
+	case Resources::TextureFormat::Depth24Stencil8:
+		return GL_DEPTH24_STENCIL8;
 		break;
 	default:
 		return 0;
