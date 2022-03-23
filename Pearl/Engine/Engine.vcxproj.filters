@@ -219,12 +219,14 @@
     <ClInclude Include="include\Engine\Renderer\Resources\MeshManager.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLUtils.h" />
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLFramebuffer.h">
       <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Buffers\Framebuffer.h">
       <Filter>Renderer\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLDefines.h">
+      <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -328,6 +330,9 @@
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL\GLFramebuffer.cpp">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\GLDefines.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
   </ItemGroup>

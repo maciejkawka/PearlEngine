@@ -1,8 +1,10 @@
 #include"Core/Common/pearl_pch.h"
 
 #include"Renderer/OpenGL/GLTexture2D.h"
+#include"Renderer/OpenGL/GLDefines.h"
 
 #include"glad/glad.h"
+
 #define STB_IMAGE_IMPLEMENTATION //Dirty as fuck :/
 #include"stb/stb_image.h"
 
@@ -127,18 +129,16 @@ void GLTexture2D::CalculateSize()
 	{
 		switch (m_format)
 		{
-		case PrRenderer::Resources::TextureFormat::Alpha8:
 		case PrRenderer::Resources::TextureFormat::R8:
 			m_size += m_width * m_height * 8;
 			break;
-		case PrRenderer::Resources::TextureFormat::GrayAlpha8:
-		case PrRenderer::Resources::TextureFormat::RG8:
+		case PrRenderer::Resources::TextureFormat::RG16:
 			m_size += m_width * m_height * 2 * 8;
 			break;
-		case PrRenderer::Resources::TextureFormat::RGB8:
+		case PrRenderer::Resources::TextureFormat::RGB24:
 			m_size += m_width * m_height * 3 * 8;
 			break;
-		case PrRenderer::Resources::TextureFormat::RGBA8:
+		case PrRenderer::Resources::TextureFormat::RGBA32:
 			m_size += m_width * m_height * 4 * 8;
 			break;
 		default:
@@ -168,16 +168,16 @@ unsigned char* GLTexture2D::ReadRawData()
 	switch (channelsNumber)
 	{
 	case 1:
-		m_format = PrRenderer::Resources::TextureFormat::Gray8;
+		m_format = PrRenderer::Resources::TextureFormat::R8;
 		break;
 	case 2:
-		m_format = PrRenderer::Resources::TextureFormat::GrayAlpha8;
+		m_format = PrRenderer::Resources::TextureFormat::RG16;
 		break;
 	case 3:
-		m_format = PrRenderer::Resources::TextureFormat::RGB8;
+		m_format = PrRenderer::Resources::TextureFormat::RGB24;
 		break;
 	case 4:
-		m_format = PrRenderer::Resources::TextureFormat::RGBA8;
+		m_format = PrRenderer::Resources::TextureFormat::RGBA32;
 		break;
 	default:
 		PRLOG_WARN("Cannot specify texture {} channel format", m_name);
@@ -190,77 +190,4 @@ unsigned char* GLTexture2D::ReadRawData()
 	return data;
 }
 
-unsigned int PrRenderer::OpenGL::TextureFormatToGL(Resources::TextureFormat p_format)
-{
-	switch (p_format)
-	{
-	case Resources::TextureFormat::R8:
-		return GL_RED;
-		break;
-	case Resources::TextureFormat::RGB8:
-		return GL_RGB;
-		break;
-	case Resources::TextureFormat::RGBA8:
-		return GL_RGBA;
-		break;
-	case Resources::TextureFormat::Alpha8:
-		return GL_DEPTH_COMPONENT;
-		break;
-	case Resources::TextureFormat::GrayAlpha8:
-		return GL_RG;
-		break;
-	case Resources::TextureFormat::Depth24Stencil8:
-		return GL_DEPTH24_STENCIL8;
-		break;
-	default:
-		return 0;
-		break;
-	}
-}
 
-unsigned int PrRenderer::OpenGL::TextureWrapToGL(PrRenderer::Resources::TextureWrapMode p_wrap)
-{
-	switch (p_wrap)
-	{
-	case Resources::TextureWrapMode::Clamp:
-		return GL_CLAMP_TO_EDGE;
-		break;
-	case Resources::TextureWrapMode::Repeat:
-		return GL_REPEAT;
-		break;
-	case Resources::TextureWrapMode::Mirror:
-		return GL_MIRRORED_REPEAT;
-		break;
-	default:
-		return GL_REPEAT; //If not recognise return default
-		break;
-	}
-}
-
-unsigned int PrRenderer::OpenGL::TextureFilterToGL(PrRenderer::Resources::TextureFiltering p_filter)
-{
-	switch (p_filter)
-	{
-	case Resources::TextureFiltering::Linear:
-		return GL_LINEAR;
-		break;
-	case Resources::TextureFiltering::Nearest:
-		return GL_NEAREST;
-		break;
-	case Resources::TextureFiltering::LinearMipMapLinear:
-		return GL_LINEAR_MIPMAP_LINEAR;
-		break;
-	case Resources::TextureFiltering::LinearMipmapNearest:
-		return GL_LINEAR_MIPMAP_NEAREST;
-		break;
-	case Resources::TextureFiltering::NearestMipmapLinear:
-		return GL_NEAREST_MIPMAP_LINEAR;
-		break;
-	case Resources::TextureFiltering::NearestMipmapNearest:
-		return GL_NEAREST_MIPMAP_NEAREST;
-		break;
-	default:
-		return GL_LINEAR; //If not recognise return default
-		break;
-	}
-}

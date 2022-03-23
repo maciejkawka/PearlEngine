@@ -34,10 +34,4 @@ namespace PrRenderer::OpenGL {
 
 		unsigned char* ReadRawData();
 	};
-
-	//Move somewhere in future
-	unsigned int TextureFormatToGL(PrRenderer::Resources::TextureFormat p_format);
-	unsigned int TextureWrapToGL(PrRenderer::Resources::TextureWrapMode p_wrap);
-	unsigned int TextureFilterToGL(PrRenderer::Resources::TextureFiltering p_filter);
-
 }

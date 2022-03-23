@@ -5,14 +5,18 @@
 namespace PrRenderer::Resources {
 
 	enum class TextureFormat {
-		Gray8,
-		GrayAlpha8,
 		R8,
-		RG8,
-		RGB8,
-		RGBA8,
-		Alpha8,
+		RG16,
+		RGB24,
+		RGBA32,
+
+		//Stencil and Depth
+		Depth16,
+		Depth24,
+		Depth32,
+		Depth32Stencil8,
 		Depth24Stencil8,
+		Stencil8,
 		None
 	};
 

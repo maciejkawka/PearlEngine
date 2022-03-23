@@ -21,7 +21,7 @@ namespace PrRenderer::Buffers {
 			wrapModeV(p_wrapModeV)
 		{}
 
-		Resources::TextureFormat format = Resources::TextureFormat::RGBA8;
+		Resources::TextureFormat format = Resources::TextureFormat::RGBA32;
 		Resources::TextureFiltering filteringMin = Resources::TextureFiltering::Linear;
 		Resources::TextureFiltering filteringMag = Resources::TextureFiltering::Linear;
 		Resources::TextureWrapMode wrapModeU = Resources::TextureWrapMode::Clamp;

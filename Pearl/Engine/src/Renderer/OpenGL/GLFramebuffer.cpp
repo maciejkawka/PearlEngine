@@ -2,6 +2,7 @@
 
 #include"Renderer/OpenGL/GLFramebuffer.h"
 #include"Renderer/OpenGL/GLTexture2D.h"
+#include"Renderer/OpenGL/GLDefines.h"
 
 #include"glad/glad.h"
 
@@ -45,6 +46,11 @@ void GLFramebuffer::Resize(size_t width, size_t height)
 
 void PrRenderer::OpenGL::GLFramebuffer::ClearAttachmentColor(unsigned int p_attachment, int p_value)
 {
+	if(p_attachment < m_colorTextureIDs.size());
+
+	auto format = TextureFormatToGL(m_colorTextureAttachments[p_attachment].format);
+	glClearTexImage(m_colorTextureIDs[p_attachment], 0,
+		format, GL_INT, &p_value);
 }
 
 void PrRenderer::OpenGL::GLFramebuffer::UpdateFamebuffer()
@@ -89,7 +95,7 @@ void GLFramebuffer::UpdateColorTextures()
 		
 		glBindTexture(GL_TEXTURE_2D, textureID);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, TextureFormatToGL(attachment.format), m_settings.width, m_settings.height,
+		glTexImage2D(GL_TEXTURE_2D, 0, TextureFormatToInternalGL(attachment.format), m_settings.width, m_settings.height,
 				0, TextureFormatToGL(attachment.format), GL_UNSIGNED_INT, NULL);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, TextureWrapToGL(attachment.wrapModeU));
@@ -115,7 +121,7 @@ void GLFramebuffer::UpdateDepthTexture()
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_depthTextureID);
 	glBindTexture(GL_TEXTURE_2D, m_depthTextureID);
-	glTexStorage2D(GL_TEXTURE_2D, 1, TextureFormatToGL(attachment.format), m_settings.width, m_settings.height);
+	glTexStorage2D(GL_TEXTURE_2D, 1, TextureFormatToInternalGL(attachment.format), m_settings.width, m_settings.height);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, TextureWrapToGL(attachment.wrapModeU));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, TextureWrapToGL(attachment.wrapModeV));
@@ -129,7 +135,13 @@ void GLFramebuffer::UpdateDepthTexture()
 	case Resources::TextureFormat::Depth24Stencil8:
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depthTextureID, 0);
 		break;
-
+	case Resources::TextureFormat::Depth16:
+	case Resources::TextureFormat::Depth24:
+	case Resources::TextureFormat::Depth32:
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTextureID, 0);
+		break;
+	case Resources::TextureFormat::Stencil8:
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depthTextureID, 0);
 	default:
 		PRLOG_ERROR("Framebuffer ID:{0} wrong depth format", m_ID);
 		break;
