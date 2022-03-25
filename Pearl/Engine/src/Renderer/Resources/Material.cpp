@@ -466,12 +466,12 @@ PrCore::Utils::JSON::json Material::ReadFile()
 	if (file == nullptr)
 		return nullptr;
 
-	char* data = new char[file->GetSize()];
+	char* data = new char[file->GetVertexNumber()];
 	file->Read(data);
 
 	std::vector<uint8_t> dataVector;
 
-	for (auto i = 0; i < file->GetSize(); i++)
+	for (auto i = 0; i < file->GetVertexNumber(); i++)
 		dataVector.push_back(*(data + i));
 	delete[] data;
 

@@ -1,7 +1,7 @@
 #include"Core/Common/pearl_pch.h"
 
 #include"Renderer/OpenGL/GLTexture2D.h"
-#include"Renderer/OpenGL/GLDefines.h"
+#include"Renderer/OpenGL/GLUtils.h"
 
 #include"glad/glad.h"
 

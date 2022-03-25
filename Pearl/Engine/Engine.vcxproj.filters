@@ -34,9 +34,6 @@
     <Filter Include="Renderer">
       <UniqueIdentifier>{6416e477-50e2-4844-8277-e925a5e21df4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Renderer\OpenGL">
-      <UniqueIdentifier>{ddd0f239-dad4-447e-bfb1-f5511fc36cc7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Renderer\Core">
       <UniqueIdentifier>{fe754d9e-dfdb-4dd6-9985-aed79f9449e2}</UniqueIdentifier>
     </Filter>
@@ -45,6 +42,9 @@
     </Filter>
     <Filter Include="Renderer\Resources">
       <UniqueIdentifier>{90d14c87-0d9c-46f4-acd4-3d695bed182b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\OpenGL">
+      <UniqueIdentifier>{f7fdb851-6ed5-4523-a6bc-dde6d0220a8d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -132,18 +132,6 @@
     <ClInclude Include="include\Engine\Core\Math\Math.h">
       <Filter>Core\Math</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLContext.h">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLIndexBuffer.h">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexArray.h">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexBuffer.h">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Core\Context.h">
       <Filter>Renderer\Core</Filter>
     </ClInclude>
@@ -168,9 +156,6 @@
     <ClInclude Include="include\Engine\Renderer\Buffers\VertexBuffer.h">
       <Filter>Renderer\Buffers</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLShader.h">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Resources\Shader.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
@@ -188,9 +173,6 @@
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Resources\Texture2D.h">
       <Filter>Renderer\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLTexture2D.h">
-      <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Resources\TextureManager.h">
       <Filter>Renderer\Resources</Filter>
@@ -213,19 +195,46 @@
     <ClInclude Include="include\Engine\Renderer\Resources\Mesh.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLMesh.h">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Resources\MeshManager.h">
       <Filter>Renderer\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLFramebuffer.h">
-      <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Buffers\Framebuffer.h">
       <Filter>Renderer\Buffers</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLDefines.h">
+    <ClInclude Include="include\Engine\Renderer\Core\RendererAPI.h">
+      <Filter>Renderer\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Core\LowRenderer.h">
+      <Filter>Renderer\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLContext.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLFramebuffer.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLIndexBuffer.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLMesh.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLRenderer.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLShader.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLTexture2D.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLUtils.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexArray.h">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexBuffer.h">
       <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
@@ -275,32 +284,14 @@
     <ClCompile Include="src\Core\Resources\ResourceManager.cpp">
       <Filter>Core\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLContext.cpp">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLIndexBuffer.cpp">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLVertexArray.cpp">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLVertexBuffer.cpp">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL\Renderer.cpp">
       <Filter>Renderer\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLShader.cpp">
-      <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Resources\ShaderManager.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Core\Color.cpp">
       <Filter>Renderer\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLTexture2D.cpp">
-      <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Resources\TextureManager.cpp">
       <Filter>Renderer\Resources</Filter>
@@ -323,16 +314,40 @@
     <ClCompile Include="src\Renderer\Resources\Mesh.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLMesh.cpp">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\Resources\MeshManager.cpp">
       <Filter>Renderer\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Core\LowRenderer.cpp">
+      <Filter>Renderer\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\GLContext.cpp">
+      <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL\GLFramebuffer.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLDefines.cpp">
+    <ClCompile Include="src\Renderer\OpenGL\GLIndexBuffer.cpp">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\GLMesh.cpp">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\GLRenderer.cpp">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\GLShader.cpp">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\GLTexture2D.cpp">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\GLUtils.cpp">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\GLVertexArray.cpp">
+      <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL\GLVertexBuffer.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,6 +1,7 @@
 #pragma once
 #include"Core/Common/pearl_pch.h"
 
+#include"Renderer/Core/LowRenderer.h"
 #include"Renderer/OpenGL/GLContext.h"
 #include"Core/Utils/Logger.h"
 
@@ -11,6 +12,11 @@ using namespace PrRenderer::OpenGL;
 
 GLContext::GLContext(const Core::ContextSettings& p_contextSettings)
 {
+}
+
+GLContext::~GLContext()
+{
+    Core::LowRenderer::Terminate();
 }
 
 void GLContext::Init()
@@ -28,4 +34,6 @@ void GLContext::Init()
     
         m_isActive = true;
     }
+
+    Core::LowRenderer::Init(Core::GraphicsAPI::OpenGL);
 }

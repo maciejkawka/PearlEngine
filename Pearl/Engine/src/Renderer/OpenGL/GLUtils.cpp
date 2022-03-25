@@ -1,6 +1,6 @@
 #include"Core/Common/pearl_pch.h"
 
-#include"Renderer/OpenGL/GLDefines.h"
+#include"Renderer/OpenGL/GLUtils.h"
 
 #include"glad/glad.h"
 
@@ -127,4 +127,66 @@ unsigned int PrRenderer::OpenGL::TextureFilterToGL(PrRenderer::Resources::Textur
 		return GL_LINEAR; //If not recognise return default
 		break;
 	}
+}
+
+unsigned int PrRenderer::OpenGL::PrimitiveToGL(Core::Primitives p_primitives)
+{
+	switch (p_primitives)
+	{
+	case PrRenderer::Core::Primitives::Points:
+		return GL_POINTS;
+		break;
+	case PrRenderer::Core::Primitives::LineStrip:
+		return GL_LINE_STRIP;
+		break;
+	case PrRenderer::Core::Primitives::TriangleStrip:
+		return GL_TRIANGLE_STRIP;
+		break;
+	case PrRenderer::Core::Primitives::Triangles:
+		return GL_TRIANGLES;
+		break;
+	default:
+		break;
+	}
+}
+
+unsigned int PrRenderer::OpenGL::ComparaisonToGL(Core::ComparaisonAlgorithm p_algorythm)
+{
+	switch (p_algorythm)
+	{
+	case PrRenderer::Core::ComparaisonAlgorithm::Never:
+		return GL_NEVER;
+		break;
+	case PrRenderer::Core::ComparaisonAlgorithm::Less:
+		return GL_LESS;
+		break;
+	case PrRenderer::Core::ComparaisonAlgorithm::Equal:
+		return GL_EQUAL;
+		break;
+	case PrRenderer::Core::ComparaisonAlgorithm::LessEqual:
+		return GL_LEQUAL;
+		break;
+	case PrRenderer::Core::ComparaisonAlgorithm::Greater:
+		return GL_GREATER;
+		break;
+	case PrRenderer::Core::ComparaisonAlgorithm::NotEqual:
+		return GL_NOTEQUAL;
+		break;
+	case PrRenderer::Core::ComparaisonAlgorithm::GreaterEqual:
+		return GL_GEQUAL;
+		break;
+	case PrRenderer::Core::ComparaisonAlgorithm::Always:
+		return GL_ALWAYS;
+		break;
+	default:
+		break;
+	}
+}
+
+unsigned int PrRenderer::OpenGL::BoolToGL(bool p_bool)
+{
+	if (p_bool)
+		return GL_TRUE;
+	else
+		return GL_FALSE;
 }

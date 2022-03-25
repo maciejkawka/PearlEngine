@@ -1,0 +1,74 @@
+#include"Core/Common/pearl_pch.h"
+
+#include "Renderer/OpenGL/GLRenderer.h"
+#include"Renderer/Buffers/VertexArray.h"
+#include"Renderer/Buffers/IndexBuffer.h"
+#include"Renderer/Buffers/VertexBuffer.h"
+#include"Renderer/OpenGL/GLUtils.h"
+
+#include"glad/glad.h"
+
+using namespace PrRenderer::OpenGL;
+
+void GLRenderer::Clear(Core::ClearFlag p_flag)
+{
+	int mask = 0;
+
+	if (p_flag & Core::ClearFlag::ColorBuffer)
+		mask |= GL_COLOR_BUFFER_BIT;
+	if (p_flag & Core::ClearFlag::DepthBuffer)
+		mask |= GL_DEPTH_BUFFER_BIT;
+	if (p_flag & Core::ClearFlag::StencilBuffer)
+		mask |= GL_STENCIL_BUFFER_BIT;
+
+	glClear(mask);
+}
+
+void GLRenderer::ClearColor(float p_r, float p_g, float p_b, float p_a)
+{
+	glClearColor(p_r, p_g, p_b, p_a);
+}
+
+void GLRenderer::ClearColor(Core::Color& p_color)
+{
+	glClearColor(p_color.r, p_color.g, p_color.b, p_color.a);
+}
+
+void GLRenderer::SetViewport(int p_width, int p_height, int p_x, int p_y)
+{
+	glViewport(p_x, p_y, p_width, p_height);
+}
+
+void PrRenderer::OpenGL::GLRenderer::EnableDepth(bool p_enable)
+{
+	// Enable/Disable Writing and Testing
+	if (p_enable)
+		glEnable(GL_DEPTH_TEST);
+	else
+		glDisable(GL_DEPTH_TEST);
+}
+
+void GLRenderer::SetDepthTest(bool p_enable)
+{
+	// Enable/Disable testking only
+	glDepthMask(BoolToGL(p_enable));
+}
+
+void GLRenderer::SetDepthAlgorythm(Core::ComparaisonAlgorithm p_algorythm)
+{
+	glDepthFunc(ComparaisonToGL(p_algorythm));
+}
+
+void GLRenderer::Draw(PrRenderer::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives)
+{
+	auto indices = p_vertexArray->GetIndexBuffer();
+	if (indices == nullptr)
+		glDrawArrays(PrimitiveToGL(p_primitives), 0, p_vertexArray->GetVertexBuffers()[0]->GetVertexNumber());
+	else
+		glDrawElements(PrimitiveToGL(p_primitives), indices->GetVertexNumber(), GL_UNSIGNED_INT, 0);
+}
+
+void PrRenderer::OpenGL::GLRenderer::DrawArray(PrRenderer::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives)
+{
+	glDrawArrays(PrimitiveToGL(p_primitives), 0, p_vertexArray->GetVertexNumber());
+}

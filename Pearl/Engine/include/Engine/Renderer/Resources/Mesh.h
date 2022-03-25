@@ -29,6 +29,8 @@ namespace PrRenderer::Resources {
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
 
+		inline std::shared_ptr<Buffers::VertexArray> GetVertexArray() { return m_VA; }
+
 		inline std::vector<PrCore::Math::vec3> GetVertices() { return m_vertices; }
 		inline unsigned int GetVerticesCount() { return m_verticesCount; }
 
@@ -62,7 +64,7 @@ namespace PrRenderer::Resources {
 
 		bool m_stateChanged;
 
-		std::unique_ptr<Buffers::VertexArray> m_VA;
+		std::shared_ptr<Buffers::VertexArray> m_VA;
 	};
 
 	typedef std::shared_ptr<Mesh> MeshPtr;

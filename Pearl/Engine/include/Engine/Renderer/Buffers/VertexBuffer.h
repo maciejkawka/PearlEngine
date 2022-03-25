@@ -16,6 +16,7 @@ namespace PrRenderer::Buffers{
 		inline void SetBufferLayout(const BufferLayout& p_bufferLayout) { m_bufferLayout = p_bufferLayout; }
 		inline virtual const BufferLayout GetBufferLayout() const { return m_bufferLayout; }
 
+		inline size_t GetVertexNumber() { return m_size/ m_bufferLayout.GetFloatStride(); }
 		inline size_t GetSize() { return m_size; }
 		inline RendererID GetID() { return m_bufferID; }
 
