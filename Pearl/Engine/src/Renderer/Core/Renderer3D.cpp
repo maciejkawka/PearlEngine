@@ -20,7 +20,7 @@ void Renderer3D::Begin()
 {
 	Core::LowRenderer::EnableDepth(true);
 	Core::LowRenderer::Clear(Core::ClearFlag::ColorBuffer | Core::ClearFlag::DepthBuffer);
-	LowRenderer::ClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+	LowRenderer::ClearColor(0.1f, 0.1f, 0.8f, 1.0f);
 }
 
 void PrRenderer::Core::Renderer3D::DrawMeshNow(Resources::MeshPtr p_mesh, PrCore::Math::vec3 p_position, PrCore::Math::quat p_rotation, PrCore::Math::vec3 p_scale, Resources::MaterialPtr p_material)
