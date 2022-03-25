@@ -65,7 +65,7 @@ void GLRenderer::Draw(PrRenderer::VertexArrayPtr p_vertexArray, Core::Primitives
 	if (indices == nullptr)
 		glDrawArrays(PrimitiveToGL(p_primitives), 0, p_vertexArray->GetVertexBuffers()[0]->GetVertexNumber());
 	else
-		glDrawElements(PrimitiveToGL(p_primitives), indices->GetVertexNumber(), GL_UNSIGNED_INT, 0);
+		glDrawElements(PrimitiveToGL(p_primitives), indices->GetSize(), GL_UNSIGNED_INT, 0);
 }
 
 void PrRenderer::OpenGL::GLRenderer::DrawArray(PrRenderer::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives)
