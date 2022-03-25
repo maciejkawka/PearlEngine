@@ -2,7 +2,7 @@
 #include<any>
 #include<vector>
 #include"Renderer/Core/Defines.h"
-#include"Renderer/Resources/Texture.h"
+#include"Renderer/Resources/Texture2D.h"
 
 namespace PrRenderer::Buffers {
 
@@ -62,9 +62,10 @@ namespace PrRenderer::Buffers {
 		virtual void Resize(size_t width, size_t height) = 0;
 		virtual void ClearAttachmentColor(unsigned int p_attachment, int p_value) = 0;
 		
+		virtual Resources::TexturePtr GetTextureID(unsigned int p_index = 0) = 0;
+		
 		inline const FramebufferSettings& GetSettings() const { return m_settings; }
 		inline RendererID GetID() { return m_ID; }
-		inline RendererID GetTextureID(unsigned int p_index = 0) { return m_colorTextureIDs[p_index]; }
 
 	protected:
 		RendererID m_ID;

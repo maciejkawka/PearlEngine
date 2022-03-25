@@ -12,6 +12,15 @@
 
 using namespace PrRenderer::OpenGL;
 
+GLTexture2D::GLTexture2D(RendererID p_rendererID, size_t p_width, size_t p_height, PrRenderer::Resources::TextureFormat p_format)
+{
+	m_ID = p_rendererID;
+	m_width = p_width;
+	m_height = p_height;
+
+	m_format = p_format;
+}
+
 void GLTexture2D::Bind(unsigned int p_slot)
 {
 	glActiveTexture(GL_TEXTURE0 + p_slot);

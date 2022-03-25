@@ -53,6 +53,17 @@ void PrRenderer::OpenGL::GLFramebuffer::ClearAttachmentColor(unsigned int p_atta
 		format, GL_INT, &p_value);
 }
 
+PrRenderer::Resources::TexturePtr GLFramebuffer::GetTextureID(unsigned int p_index)
+{
+	if (p_index >= m_colorTextureAttachments.size())
+		return PrRenderer::Resources::TexturePtr();
+
+	if (m_colorTextures[p_index] == nullptr)
+		GenerateTexture(p_index);
+
+	return m_colorTextures[p_index];
+}
+
 void PrRenderer::OpenGL::GLFramebuffer::UpdateFamebuffer()
 {
 	if (m_ID)
@@ -113,6 +124,8 @@ void GLFramebuffer::UpdateColorTextures()
 	for (int i = 0; i < m_colorTextureAttachments.size(); i++)
 		attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
 	glDrawBuffers(attachments.size(), attachments.data());
+
+	m_colorTextures.resize(m_colorTextureAttachments.size());
 }
 
 void GLFramebuffer::UpdateDepthTexture()
@@ -146,4 +159,18 @@ void GLFramebuffer::UpdateDepthTexture()
 		PRLOG_ERROR("Framebuffer ID:{0} wrong depth format", m_ID);
 		break;
 	}
+}
+
+void GLFramebuffer::GenerateTexture(unsigned int p_index)
+{
+	const auto& textureSettings = m_colorTextureAttachments[p_index];
+	auto texture = std::make_shared<OpenGL::GLTexture2D>(m_colorTextureIDs[p_index], m_settings.width, m_settings.height, textureSettings.format);
+
+	texture->SetMagFiltering(textureSettings.filteringMag);
+	texture->SetMinFiltering(textureSettings.filteringMin);
+
+	texture->SetWrapModeU(textureSettings.wrapModeU);
+	texture->SetWrapModeV(textureSettings.wrapModeV);
+
+	m_colorTextures[p_index] = texture;
 }

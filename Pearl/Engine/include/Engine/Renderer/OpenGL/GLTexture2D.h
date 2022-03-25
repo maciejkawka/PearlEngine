@@ -9,6 +9,8 @@ namespace PrRenderer::OpenGL {
 			Texture2D(p_name, p_ID)
 		{}
 
+		GLTexture2D(RendererID p_rendererID, size_t p_width, size_t p_height, PrRenderer::Resources::TextureFormat p_format);
+
 		void Bind(unsigned int p_slot = 0) override;
 		void Unbind() override;
 

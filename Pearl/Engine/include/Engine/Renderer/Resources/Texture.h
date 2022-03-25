@@ -39,7 +39,21 @@ namespace PrRenderer::Resources {
 
 	class Texture : public PrCore::Resources::Resources{
 	public:
-		Texture() = default;
+		Texture() :
+			Resources("Texture"),
+			m_ID(0),
+			m_height(0),
+			m_width(0),
+			m_readable(false),
+			m_mipmap(false),
+			m_format(TextureFormat::None),
+			m_minFiltering(TextureFiltering::Linear),
+			m_magFiltering(TextureFiltering::Linear),
+			m_wrapU(TextureWrapMode::Repeat),
+			m_wrapV(TextureWrapMode::Repeat),
+			m_rawData(nullptr)
+		{}
+
 		Texture(const std::string& p_name, PrCore::Resources::ResourceID p_ID) :
 			Resources(p_name, p_ID),
 			m_ID(0),
