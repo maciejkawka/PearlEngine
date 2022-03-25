@@ -15,24 +15,32 @@ using namespace PrCore::Events;
 Editor::Editor()
 {
 	m_appContext = new EditorContext();
+	m_testFeatures = new Components::TestFeatures(m_appContext->m_renderer3D);
 	m_basicCamera = new Components::BasicCamera(PrRenderer::Core::CameraType::Perspective);
 	m_basicCamera->GetCamera()->SetSize(5.0f);
-	m_scale = PrCore::Math::vec2(1, 1);
 }
 
 Editor::~Editor()
 {
 	delete m_basicCamera;
 	delete m_appContext;
+	delete m_testFeatures;
 }
 
 void Editor::PreFrame()
 {
 	m_appContext->m_window->PollEvents();
+	m_appContext->m_renderer3D->Begin();
 }
 
 void Editor::OnFrame(float p_deltaTime)
 {
+	m_basicCamera->Update(p_deltaTime);
+
+	//Exit
+	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
+		m_shouldClose = true;
+
 	//Show Mouse Pos
 	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::LEFT_CONTROL))
 	{
@@ -45,21 +53,7 @@ void Editor::OnFrame(float p_deltaTime)
 
 	//Show FPS
 	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::F1))
-		PRLOG_INFO("{0}", (int)(1/p_deltaTime));
-
-	//Change Shader
-	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::K))
-	{
-		PrRenderer::Resources::ShaderPtr shader = std::static_pointer_cast<PrRenderer::Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("CameraShader.shader"));
-		shader->Bind();
-	}
-
-	//Change Shader
-	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::L))
-	{
-		PrRenderer::Resources::ShaderPtr shader = std::static_pointer_cast<PrRenderer::Resources::Shader>(PrRenderer::Resources::ShaderManager::GetInstance().GetResource("BasicShader.shader"));
-		shader->Bind();
-	}
+		PRLOG_INFO("{0}", (int)(1 / p_deltaTime));
 
 	//Camera Settings
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::O))
@@ -68,51 +62,12 @@ void Editor::OnFrame(float p_deltaTime)
 	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::P))
 		PrRenderer::Core::Camera::GetMainCamera()->SetType(PrRenderer::Core::CameraType::Perspective);
 
-	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::H))
-	{
-		auto material = std::static_pointer_cast<PrRenderer::Resources::Material>(PrRenderer::Resources::MaterialManager::GetInstance().GetResource("standardMaterial.mat"));
-		m_scale -= 0.05f;
-		if (m_scale.x <= 0.05f)
-			m_scale = PrCore::Math::vec2(0.05f, 0.05f);
-
-		material->SetTexScale("mainTex", m_scale);
-	
-	}
-	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::G))
-	{
-		auto material = std::static_pointer_cast<PrRenderer::Resources::Material>(PrRenderer::Resources::MaterialManager::GetInstance().GetResource("standardMaterial.mat"));
-		m_scale += 0.05f;
-		material->SetTexScale("mainTex", m_scale);
-
-	}
-
-	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::R))
-	{
-		auto material = std::static_pointer_cast<PrRenderer::Resources::Material>(PrRenderer::Resources::MaterialManager::GetInstance().GetResource("standardMaterial.mat"));
-		std::string matrix = "MVP";
-		auto& returnValue = material->GetProperty<PrCore::Math::mat4>(matrix);
-	}
-
-	//Exit
-	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
-		m_shouldClose = true;
-
-	m_basicCamera->Update(p_deltaTime);
-
-	auto material = std::static_pointer_cast<PrRenderer::Resources::Material>(PrRenderer::Resources::MaterialManager::GetInstance().GetResource("standardMaterial.mat"));
-	auto color = material->GetColor();
-
-	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::C))
-		material->SetColor(PrRenderer::Core::Color::Red);
-	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::V))
-		material->SetColor(PrRenderer::Core::Color::Green);
-	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::B))
-		material->SetColor(PrRenderer::Core::Color::White);
+	m_testFeatures->Update(p_deltaTime);
 }
 
 void Editor::PostFrame()
 {
-	m_appContext->m_renderer->Draw();
+	m_appContext->m_renderer3D->Flush();
 	m_appContext->m_window->SwapBuffers();
 	m_appContext->m_input->ResetFlags();
 	

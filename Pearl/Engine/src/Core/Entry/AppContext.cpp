@@ -56,8 +56,7 @@ PrCore::Entry::AppContext::AppContext()
 	m_rendererContext = new PrRenderer::OpenGL::GLContext();
 	m_rendererContext->Init();
 
-	m_renderer = new PrRenderer::Core::Renderer();
-	m_renderer->Test();
+	m_renderer3D = new PrRenderer::Core::Renderer3D();
 
 	m_input = new PrCore::Input::InputManager();
 }
@@ -67,7 +66,7 @@ PrCore::Entry::AppContext::~AppContext()
 	PRLOG_INFO("Deleting AppContext");
 	
 	delete m_input;
-	delete m_renderer;
+	delete m_renderer3D;
 	delete m_rendererContext;
 	delete m_window;
 	PrCore::Windowing::GLWindow::TerminateDevice();

@@ -22,6 +22,9 @@
     <ClCompile Include="scr\EditorApp.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="scr\Components\TestFeatures.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Editor\Core\Editor.h">
@@ -31,6 +34,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Editor\Components\BasicCamera.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Editor\Components\TestFeatures.h">
       <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>

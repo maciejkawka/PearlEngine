@@ -237,6 +237,9 @@
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexBuffer.h">
       <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Core\Renderer3D.h">
+      <Filter>Renderer\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -349,6 +352,9 @@
     </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL\GLVertexBuffer.cpp">
       <Filter>Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Core\Renderer3D.cpp">
+      <Filter>Renderer\Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

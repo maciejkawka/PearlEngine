@@ -3,6 +3,7 @@
 #include"Engine/Core/Events/Event.h"
 
 #include"Editor/Components/BasicCamera.h"
+#include"Editor/Components/TestFeatures.h"
 
 namespace PrEditor::Core {
 
@@ -19,7 +20,7 @@ namespace PrEditor::Core {
 
 	private:
 		Components::BasicCamera* m_basicCamera;
-		PrCore::Math::vec2 m_scale;
+		Components::TestFeatures* m_testFeatures;
 	};
 
 }
