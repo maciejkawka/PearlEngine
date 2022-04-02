@@ -19,59 +19,101 @@ GLShader::GLShader(const std::string& p_name, PrCore::Resources::ResourceID p_ID
 GLShader::~GLShader()
 {}
 
-void PrRenderer::OpenGL::GLShader::Bind()
+void GLShader::Bind()
 {
 	glUseProgram(m_ID);
 }
 
-void PrRenderer::OpenGL::GLShader::Unbind()
+void GLShader::Unbind()
 {
 	glUseProgram(0);
 }
 
-void PrRenderer::OpenGL::GLShader::SetUniformFloat(const std::string& p_name, float p_value)
+void GLShader::SetUniformFloat(const std::string& p_name, float p_value)
 {
 	auto location = GetUniformLocation(p_name);
 	glUniform1f(location, p_value);
 }
 
-void PrRenderer::OpenGL::GLShader::SetUniformInt(const std::string& p_name, int p_value)
+void GLShader::SetUniformInt(const std::string& p_name, int p_value)
 {
 	auto location = GetUniformLocation(p_name);
 	glUniform1i(location, p_value);
 }
 
-void PrRenderer::OpenGL::GLShader::SetUniformMat4(const std::string& p_name, const PrCore::Math::mat4& p_value)
+void GLShader::SetUniformMat4(const std::string& p_name, const PrCore::Math::mat4& p_value)
 {
 	auto location = GetUniformLocation(p_name);
 	glUniformMatrix4fv(location, 1, GL_FALSE, &p_value[0].x);
 }
 
-void PrRenderer::OpenGL::GLShader::SetUniformMat3(const std::string& p_name, const PrCore::Math::mat3 p_value)
+void GLShader::SetUniformMat3(const std::string& p_name, const PrCore::Math::mat3 p_value)
 {
 	auto location = GetUniformLocation(p_name);
 	glUniformMatrix3fv(location, 1, GL_FALSE, &p_value[0].x);
 }
 
-void PrRenderer::OpenGL::GLShader::SetUniformVec4(const std::string& p_name, const PrCore::Math::vec4& p_value)
+void GLShader::SetUniformVec4(const std::string& p_name, const PrCore::Math::vec4& p_value)
 {
 	auto location = GetUniformLocation(p_name);
 	glUniform4f(location, p_value.x, p_value.y, p_value.z, p_value.w);
 }
 
-void PrRenderer::OpenGL::GLShader::SetUniformVec3(const std::string& p_name, const PrCore::Math::vec3& p_value)
+void GLShader::SetUniformVec3(const std::string& p_name, const PrCore::Math::vec3& p_value)
 {
 	auto location = GetUniformLocation(p_name);
 	glUniform3f(location, p_value.x, p_value.y, p_value.z);
 }
 
-void PrRenderer::OpenGL::GLShader::SetUniformVec2(const std::string& p_name, const PrCore::Math::vec2& p_value)
+void GLShader::SetUniformVec2(const std::string& p_name, const PrCore::Math::vec2& p_value)
 {
 	auto location = GetUniformLocation(p_name);
 	glUniform2f(location, p_value.x, p_value.y);
 }
 
-float PrRenderer::OpenGL::GLShader::GetUniformFloat(const std::string& p_name)
+void GLShader::SetUniformFloatArray(const std::string& p_name, float* p_value, unsigned int p_count)
+{
+	auto location = GetUniformLocation(p_name);
+	glUniform1fv(location, p_count, p_value);
+}
+
+void GLShader::SetUniformIntArray(const std::string& p_name, int* p_value, unsigned int p_count)
+{
+	auto location = GetUniformLocation(p_name);
+	glUniform1iv(location, p_count, p_value);
+}
+
+void GLShader::SetUniformMat4Array(const std::string& p_name, const PrCore::Math::mat4* p_value, unsigned int p_count)
+{
+	auto location = GetUniformLocation(p_name);
+	glUniformMatrix4fv(location, p_count, GL_FALSE, &p_value[0][0].x);
+}
+
+void GLShader::SetUniformMat3Array(const std::string& p_name, const PrCore::Math::mat3* p_value, unsigned int p_count)
+{
+	auto location = GetUniformLocation(p_name);
+	glUniformMatrix3fv(location, p_count, GL_FALSE, &p_value[0][0].x);
+}
+
+void GLShader::SetUniformVec4Array(const std::string& p_name, const PrCore::Math::vec4* p_value, unsigned int p_count)
+{
+	auto location = GetUniformLocation(p_name);
+	glUniform4fv(location, p_count, &p_value->x);
+}
+
+void GLShader::SetUniformVec3Array(const std::string& p_name, const PrCore::Math::vec3* p_value, unsigned int p_count)
+{
+	auto location = GetUniformLocation(p_name);
+	glUniform3fv(location, p_count, &p_value->x);
+}
+
+void GLShader::SetUniformVec2Array(const std::string& p_name, const PrCore::Math::vec2* p_value, unsigned int p_count)
+{
+	auto location = GetUniformLocation(p_name);
+	glUniform2fv(location, p_count, &p_value->x);
+}
+
+float GLShader::GetUniformFloat(const std::string& p_name)
 {
 	GLfloat value;
 	auto location = GetUniformLocation(p_name);
@@ -80,7 +122,7 @@ float PrRenderer::OpenGL::GLShader::GetUniformFloat(const std::string& p_name)
 	return (float)value;
 }
 
-int PrRenderer::OpenGL::GLShader::GetUniformInt(const std::string& p_name)
+int GLShader::GetUniformInt(const std::string& p_name)
 {
 	GLint value;
 	auto location = GetUniformLocation(p_name);
@@ -89,7 +131,7 @@ int PrRenderer::OpenGL::GLShader::GetUniformInt(const std::string& p_name)
 	return (int)value;
 }
 
-PrCore::Math::mat4 PrRenderer::OpenGL::GLShader::GetUniformMat4(const std::string& p_name)
+PrCore::Math::mat4 GLShader::GetUniformMat4(const std::string& p_name)
 {
 	GLint value[16];
 	auto location = GetUniformLocation(p_name);
@@ -98,7 +140,7 @@ PrCore::Math::mat4 PrRenderer::OpenGL::GLShader::GetUniformMat4(const std::strin
 	return PrCore::Math::make_mat4(value);
 }
 
-PrCore::Math::mat3 PrRenderer::OpenGL::GLShader::GetUniformMat3(const std::string& p_name)
+PrCore::Math::mat3 GLShader::GetUniformMat3(const std::string& p_name)
 {
 	GLint value[12];
 	auto location = GetUniformLocation(p_name);
@@ -107,7 +149,7 @@ PrCore::Math::mat3 PrRenderer::OpenGL::GLShader::GetUniformMat3(const std::strin
 	return PrCore::Math::make_mat3(value);
 }
 
-PrCore::Math::vec4 PrRenderer::OpenGL::GLShader::GetUniformVec4(const std::string& p_name)
+PrCore::Math::vec4 GLShader::GetUniformVec4(const std::string& p_name)
 {
 	GLint value[4];
 	auto location = GetUniformLocation(p_name);
@@ -116,7 +158,7 @@ PrCore::Math::vec4 PrRenderer::OpenGL::GLShader::GetUniformVec4(const std::strin
 	return PrCore::Math::make_vec4(value);
 }
 
-PrCore::Math::vec3 PrRenderer::OpenGL::GLShader::GetUniformVec3(const std::string& p_name)
+PrCore::Math::vec3 GLShader::GetUniformVec3(const std::string& p_name)
 {
 	GLint value[3];
 	auto location = GetUniformLocation(p_name);
@@ -125,7 +167,7 @@ PrCore::Math::vec3 PrRenderer::OpenGL::GLShader::GetUniformVec3(const std::strin
 	return PrCore::Math::make_vec3(value);
 }
 
-PrCore::Math::vec2 PrRenderer::OpenGL::GLShader::GetUniformVec2(const std::string& p_name)
+PrCore::Math::vec2 GLShader::GetUniformVec2(const std::string& p_name)
 {
 	GLint value[2];
 	auto location = GetUniformLocation(p_name);
@@ -134,7 +176,7 @@ PrCore::Math::vec2 PrRenderer::OpenGL::GLShader::GetUniformVec2(const std::strin
 	return PrCore::Math::make_vec2(value);
 }
 
-bool PrRenderer::OpenGL::GLShader::Compile()
+bool GLShader::Compile()
 {
 	if (m_ID != 0)
 		return true;
@@ -186,7 +228,7 @@ bool PrRenderer::OpenGL::GLShader::Compile()
 	return true;
 }
 
-void PrRenderer::OpenGL::GLShader::ScanUniforms()
+void GLShader::ScanUniforms()
 {
 	m_uniformLocation.clear();
 	m_uniforms.clear();
@@ -214,32 +256,67 @@ void PrRenderer::OpenGL::GLShader::ScanUniforms()
 		switch (uniformType)
 		{
 			case GL_INT:
-				prUniformType = PrRenderer::Resources::UniformType::Int;
-				uniformValue = std::make_any<int>(GetUniformInt(uniformName));
+				if (uniformSize == 1)
+				{
+					prUniformType = PrRenderer::Resources::UniformType::Int;
+					uniformValue = std::make_any<int>(GetUniformInt(uniformName));
+				}
+				else
+					prUniformType = PrRenderer::Resources::UniformType::Int_Array;
 				break;
 			case GL_FLOAT:
-				prUniformType = PrRenderer::Resources::UniformType::Float;
-				uniformValue = std::make_any<float>(GetUniformFloat(uniformName));
+				if (uniformSize == 1)
+				{
+					prUniformType = PrRenderer::Resources::UniformType::Float;
+					uniformValue = std::make_any<float>(GetUniformFloat(uniformName));
+				}
+				else
+					prUniformType = PrRenderer::Resources::UniformType::Float_Array;
 				break;
 			case GL_FLOAT_VEC2:
-				prUniformType = PrRenderer::Resources::UniformType::Float_Vec2;
-				uniformValue = std::make_any<PrCore::Math::vec2>(GetUniformVec2(uniformName));
+				if (uniformSize == 1)
+				{
+					prUniformType = PrRenderer::Resources::UniformType::Float_Vec2;
+					uniformValue = std::make_any<PrCore::Math::vec2>(GetUniformVec2(uniformName));
+				}
+				else
+					prUniformType = PrRenderer::Resources::UniformType::Float_Vec2_Array;
 				break;
 			case GL_FLOAT_VEC3:
-				prUniformType = PrRenderer::Resources::UniformType::Float_Vec3;
-				uniformValue = std::make_any<PrCore::Math::vec3>(GetUniformVec3(uniformName));
+				if (uniformSize == 1)
+				{
+					prUniformType = PrRenderer::Resources::UniformType::Float_Vec3;
+					uniformValue = std::make_any<PrCore::Math::vec3>(GetUniformVec3(uniformName));
+				}
+				else
+					prUniformType = PrRenderer::Resources::UniformType::Float_Vec3_Array;
 				break;
 			case GL_FLOAT_VEC4:
-				prUniformType = PrRenderer::Resources::UniformType::Float_Vec4;
-				uniformValue = std::make_any<PrCore::Math::vec4>(GetUniformVec4(uniformName));
+				if (uniformSize == 1)
+				{
+					prUniformType = PrRenderer::Resources::UniformType::Float_Vec4;
+					uniformValue = std::make_any<PrCore::Math::vec4>(GetUniformVec4(uniformName));
+				}
+				else
+					prUniformType = PrRenderer::Resources::UniformType::Float_Vec4_Array;
 				break;
 			case GL_FLOAT_MAT4:
-				prUniformType = PrRenderer::Resources::UniformType::Float_Mat4;
-				uniformValue = std::make_any<PrCore::Math::mat4>(GetUniformMat4(uniformName));
+				if (uniformSize == 1)
+				{
+					prUniformType = PrRenderer::Resources::UniformType::Float_Mat4;
+					uniformValue = std::make_any<PrCore::Math::mat4>(GetUniformMat4(uniformName));
+				}
+				else
+					prUniformType = PrRenderer::Resources::UniformType::Float_Mat4_Array;
 				break;
 			case GL_FLOAT_MAT3:
-				prUniformType = PrRenderer::Resources::UniformType::Float_Mat3;
-				uniformValue = std::make_any<PrCore::Math::mat3>(GetUniformMat3(uniformName));
+				if (uniformSize == 1)
+				{
+					prUniformType = PrRenderer::Resources::UniformType::Float_Mat3;
+					uniformValue = std::make_any<PrCore::Math::mat3>(GetUniformMat3(uniformName));
+				}
+				else
+					prUniformType = PrRenderer::Resources::UniformType::Float_Mat3_Array;
 				break;
 			case GL_SAMPLER_2D:
 				prUniformType = PrRenderer::Resources::UniformType::Texture2D;
@@ -260,6 +337,7 @@ void PrRenderer::OpenGL::GLShader::ScanUniforms()
 
 		PrRenderer::Resources::Uniform uniform{
 			prUniformType,
+			uniformSize,
 			uniformValue
 		};
 
@@ -267,7 +345,7 @@ void PrRenderer::OpenGL::GLShader::ScanUniforms()
 	}
 }
 
-int PrRenderer::OpenGL::GLShader::GetUniformLocation(const std::string& p_name)
+int GLShader::GetUniformLocation(const std::string& p_name)
 {
 	//Due to different string size sometimes there can be more than one key with the same value
 	//to fix in future
@@ -311,17 +389,17 @@ bool GLShader::LoadImpl()
 	return result;
 }
 
-void PrRenderer::OpenGL::GLShader::PostLoadImpl()
+void GLShader::PostLoadImpl()
 {
 	ScanUniforms();
 }
 
-void PrRenderer::OpenGL::GLShader::PreUnloadImpl()
+void GLShader::PreUnloadImpl()
 {
 
 }
 
-bool PrRenderer::OpenGL::GLShader::UnloadImpl()
+bool GLShader::UnloadImpl()
 {
 	glDeleteProgram(m_ID);
 	m_ID = 0;
@@ -334,11 +412,11 @@ bool PrRenderer::OpenGL::GLShader::UnloadImpl()
 	return true;
 }
 
-void PrRenderer::OpenGL::GLShader::PostUnloadImpl()
+void GLShader::PostUnloadImpl()
 {
 }
 
-void PrRenderer::OpenGL::GLShader::CalculateSize()
+void GLShader::CalculateSize()
 {
 	m_size =
 		sizeof(m_vertexShader) + sizeof(char) * m_vertexShader.length() +

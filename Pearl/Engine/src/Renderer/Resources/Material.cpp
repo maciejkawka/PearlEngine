@@ -80,7 +80,11 @@ void Material::Bind()
 	//Bind Textures
 	int texSlot = 0;
 	for (auto& texture : m_textures)
-		texture.second->Bind(texSlot++);
+	{
+		texture.second->Bind(texSlot);
+		m_shader->SetUniformInt(texture.first, texSlot);
+		texSlot++;
+	}
 
 	//Bind Properties
 	for (auto& uniform : m_uniforms)
@@ -93,23 +97,47 @@ void Material::Bind()
 
 		switch (uniformValue.type)
 		{
+		case UniformType::Int:
+			m_shader->SetUniformInt(uniformName, std::any_cast<int>(uniformValue.value));
+			break;
+		case UniformType::Int_Array:
+			m_shader->SetUniformIntArray(uniformName, std::any_cast<std::vector<int>>(uniformValue.value).data(), uniformValue.size);
+			break;
 		case UniformType::Float:
 			m_shader->SetUniformFloat(uniformName, std::any_cast<float>(uniformValue.value));
+			break;
+		case UniformType::Float_Array:
+			m_shader->SetUniformFloatArray(uniformName, std::any_cast<std::vector<float>>(uniformValue.value).data(), uniformValue.size);
 			break;
 		case UniformType::Float_Vec2:
 			m_shader->SetUniformVec2(uniformName, std::any_cast<PrCore::Math::vec2>(uniformValue.value));
 			break;
+		case UniformType::Float_Vec2_Array:
+			m_shader->SetUniformVec2Array(uniformName, std::any_cast<std::vector<PrCore::Math::vec2>>(uniformValue.value).data(), uniformValue.size);
+			break;
 		case UniformType::Float_Vec3:
 			m_shader->SetUniformVec3(uniformName, std::any_cast<PrCore::Math::vec3>(uniformValue.value));
+			break;
+		case UniformType::Float_Vec3_Array:
+			m_shader->SetUniformVec3Array(uniformName, std::any_cast<std::vector<PrCore::Math::vec3>>(uniformValue.value).data(), uniformValue.size);
 			break;
 		case UniformType::Float_Vec4:
 			m_shader->SetUniformVec4(uniformName, std::any_cast<PrCore::Math::vec4>(uniformValue.value));
 			break;
+		case UniformType::Float_Vec4_Array:
+			m_shader->SetUniformVec4Array(uniformName, std::any_cast<std::vector<PrCore::Math::vec4>>(uniformValue.value).data(), uniformValue.size);
+			break;
 		case UniformType::Float_Mat3:
 			m_shader->SetUniformMat3(uniformName, std::any_cast<PrCore::Math::mat3>(uniformValue.value));
 			break;
+		case UniformType::Float_Mat3_Array:
+			m_shader->SetUniformMat3Array(uniformName, std::any_cast<std::vector<PrCore::Math::mat3>>(uniformValue.value).data(), uniformValue.size);
+			break;
 		case UniformType::Float_Mat4:
 			m_shader->SetUniformMat4(uniformName, std::any_cast<PrCore::Math::mat4>(uniformValue.value));
+			break;
+		case UniformType::Float_Mat4_Array:
+			m_shader->SetUniformMat4Array(uniformName, std::any_cast<std::vector<PrCore::Math::mat4>>(uniformValue.value).data(), uniformValue.size);
 			break;
 		}
 	}
@@ -118,6 +146,9 @@ void Material::Bind()
 void PrRenderer::Resources::Material::Unbind()
 {
 	m_shader->Unbind();
+
+	for (auto& texture : m_textures)
+		texture.second->Unbind();
 }
 
 void Material::SetTexture(const std::string& p_name, TexturePtr p_texture)

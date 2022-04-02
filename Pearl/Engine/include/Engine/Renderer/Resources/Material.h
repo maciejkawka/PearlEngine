@@ -63,6 +63,9 @@ namespace PrRenderer::Resources {
 		void SetProperty(const std::string& p_name, const T& p_value);
 
 		template<typename T>
+		void SetPropertyArray(const std::string& p_name, const T* p_value, unsigned int p_count);
+
+		template<typename T>
 		const T& GetProperty(const std::string& p_name);
 
 	protected:
@@ -98,7 +101,38 @@ namespace PrRenderer::Resources {
 	{	
 		auto find = m_uniforms.find(p_name);
 		if (find != m_uniforms.end())
+		{
+			if (find->second.size != 1)
+			{
+				PRLOG_WARN("Renderer: Material {0} property {1} is an array", m_name, p_name);
+				return;
+			}
+
 			find->second.value = std::make_any<T>(p_value);
+		}
+		else
+		{
+			PRLOG_WARN("Renderer: Material {0} does not have property {1}", m_name, p_name);
+		}
+	}
+
+	template<typename T>
+	inline void Material::SetPropertyArray(const std::string& p_name, const T const* p_value, unsigned int p_count)
+	{
+		auto find = m_uniforms.find(p_name);
+		if (find != m_uniforms.end())
+		{
+			if (find->second.size == 1)
+			{
+				PRLOG_WARN("Renderer: Material {0} property {1} is not an array", m_name, p_name);
+				return;
+			}
+
+			std::vector<T> tempVector(find->second.size);
+			for (int i = 0; i < p_count; i++)
+				tempVector[i] = p_value[i];
+			find->second.value = std::make_any<std::vector<T>>(tempVector);
+		}
 		else
 		{
 			PRLOG_WARN("Renderer: Material {0} does not have property {1}", m_name, p_name);

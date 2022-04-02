@@ -14,5 +14,6 @@ namespace PrEditor::Components {
 
 	private:
 		PrRenderer::Core::Renderer3D* m_renderer3D;
+		float dir = 0.0f;
 	};
 }
