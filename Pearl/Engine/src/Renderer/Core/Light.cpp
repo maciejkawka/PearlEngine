@@ -65,24 +65,20 @@ PrCore::Math::mat4 Light::GetPackedMatrix() const
 {
 	PrCore::Math::mat4 mat;
 
-	//Calculate Direction (Angles ot normal vector)
-	auto rotationQuat = PrCore::Math::quat(PrCore::Math::vec3(PrCore::Math::radians(m_direction.x), PrCore::Math::radians(m_direction.y), PrCore::Math::radians(m_direction.z)));
-	auto rotationDir = PrCore::Math::vec3(0, 0, 1) * rotationQuat;
-
 	mat[0][0] = m_position.x;
 	mat[0][1] = m_position.y;
 	mat[0][2] = m_position.z;
 	mat[0][3] = (float)m_type;
 
-	mat[1][0] = rotationDir.x;
-	mat[1][1] = rotationDir.y;
-	mat[1][2] = rotationDir.z;
-	mat[1][3] = m_innerCone;
+	mat[1][0] = m_direction.x;
+	mat[1][1] = m_direction.y;
+	mat[1][2] = m_direction.z;
+	mat[1][3] = PrCore::Math::cos(PrCore::Math::radians(m_innerCone));
 
 	mat[2][0] = m_color.x;
 	mat[2][1] = m_color.y;
 	mat[2][2] = m_color.z;
-	mat[2][3] = m_outterCone;
+	mat[2][3] = PrCore::Math::cos(PrCore::Math::radians(m_outterCone));
 
 	mat[3][0] = m_quadraticAttenuation;
 	mat[3][1] = m_linearAttenuation;

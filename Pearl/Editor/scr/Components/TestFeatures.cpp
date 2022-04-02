@@ -32,31 +32,37 @@ void TestFeatures::Update(float p_deltaTime)
 	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::RIGHT))
 		dir += 1.0f;
 
+	//Calculate Direction (Angles ot normal vector)
+	auto rotationQuat = PrCore::Math::quat(PrCore::Math::vec3(PrCore::Math::radians(dir), PrCore::Math::radians(0.0f), PrCore::Math::radians(0.0f)));
+	auto rotationDir = PrCore::Math::vec3(0, 0, 1) * rotationQuat;
 
-	PrRenderer::Core::Light light(PrRenderer::Core::LightType::Directional);
-	light.SetPosition({ 5,5,0 });
-	light.SetColor({ 1,1,1 });
-	light.SetDirection({dir,0.0f,0.0f});
-	light.SetAttenuation(0.0075f, 0.045f, 1.0);
-	light.SetRange(100.0f);
-	m_renderer3D->AddLight(light);
+	//PrRenderer::Core::Light light(PrRenderer::Core::LightType::Directional);
+	//light.SetPosition({ 5,5,0 });
+	//light.SetColor({ 1,1,1 });
+	//light.SetDirection({dir,0.0f,0.0f});
+	//light.SetAttenuation(0.0075f, 0.045f, 1.0);
+	//light.SetRange(100.0f);
+	//m_renderer3D->AddLight(light);
 
-	PrRenderer::Core::Light light1(PrRenderer::Core::LightType::Point);
-	light1.SetPosition({ 50,5,0 });
-	light1.SetAttenuation(0.0075f, 0.045f, 1.0);
-	light1.SetRange(100.0f);
-	m_renderer3D->AddLight(light1);
+	//PrRenderer::Core::Light light1(PrRenderer::Core::LightType::Point);
+	//light1.SetPosition({ 50,5,0 });
+	//light1.SetAttenuation(0.0075f, 0.045f, 1.0);
+	//light1.SetRange(100.0f);
+	//m_renderer3D->AddLight(light1);
 
-	PrRenderer::Core::Light light2(PrRenderer::Core::LightType::Point);
-	light2.SetPosition({ 50,5,50 });
-	light2.SetAttenuation(0.0075f, 0.045f, 1.0);
-	light2.SetRange(100.0f);
-	m_renderer3D->AddLight(light2);
+	//PrRenderer::Core::Light light2(PrRenderer::Core::LightType::Point);
+	//light2.SetPosition({ 50,5,50 });
+	//light2.SetAttenuation(0.0075f, 0.045f, 1.0);
+	//light2.SetRange(100.0f);
+	//m_renderer3D->AddLight(light2);
 
-	PrRenderer::Core::Light light3(PrRenderer::Core::LightType::Point);
-	light3.SetPosition({ 50,5,-50 });
+	PrRenderer::Core::Light light3(PrRenderer::Core::LightType::Spot);
+	light3.SetPosition({ 0,5,-0 });
 	light3.SetAttenuation(0.0075f, 0.045f, 1.0);
+	light3.SetDirection(rotationDir);
 	light3.SetRange(100.0f);
+	light3.SetInnerCone(5.0);
+	light3.SetOutterCone(10.0);
 	m_renderer3D->AddLight(light3);
 
 

@@ -64,22 +64,6 @@ vec3 SpotLightCalc(mat4 light, vec3 viewDir);
 
 void main()
 {
-    //vec3 ambient = 0.1 * texture(mainTex, IN.uv0).rgb;
-
-    //vec3 lightDir = normalize(lightPos - IN.pos);
-    //float diff = max(dot(IN.normals, lightDir), 0.0);
-    //vec3 diffuse = lightColor * diff * texture(mainTex, IN.uv0).rgb;
-
-    //vec3 viewDir = normalize(camPos - IN.pos);
-    //vec3 reflectDir = reflect(-lightDir, IN.normals);
-    //float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64.0);
-    //vec3 specular = lightColor * spec * texture(specularTex, IN.uv0).rgb;
-
-    //float distance = length(lightPos - IN.pos);
-    //float attenuation = 1.0 - clamp(distance / lightRadius, 0.0, 1.0);
-    //
-    //vec3 result = ambient + diffuse * attenuation + specular * attenuation;
-
     vec3 result = PhongModel();
     FragColor = vec4(result,1.0);
 } 
@@ -131,23 +115,23 @@ vec3 SpotLightCalc(mat4 light, vec3 viewDir)
     vec3 lightDir = normalize(light[0].xyz - IN.pos);
 
     //diffuse
-    float diff = max(dot(IN.normals, light[1].xyz), 0.0);
+    float diff = max(dot(IN.normals, lightDir), 0.0);
 
     //specular
-    vec3 reflectDir = reflect(-light[1].xyz, IN.normals);
-    float spec = pow(max(dot(viewDir, reflectDir),0.0), shininess);
+    vec3 reflectDir = reflect(-lightDir, IN.normals);
+    float spec = pow(max(dot(viewDir, reflectDir),0.0), 64.0);
 
     //attenuation
     float distance = length(light[0].xyz - IN.pos);
     float attenuation = 1.0 / (light[3].z + light[3].y * distance + light[3].x * (distance * distance));  
 
-    float theta = dot(lightDir, normalize(light[1].xyz));
+    float theta = dot(lightDir, normalize(-light[1].xyz));
     float epsilon = light[1].w - light[2].w;
     float intensity = clamp((theta - light[2].w) / epsilon, 0.0, 1.0);
 
     //combine result
-    vec3 diffuse = light[2].xyz * diff * vec3(texture(mainTex, IN.uv0));
-    vec3 specular = light[2].xyz * spec * vec3(texture(specularTex, IN.uv0));
+    vec3 diffuse = light[2].xyz * diff * texture(mainTex, IN.uv0).rgb;
+    vec3 specular = light[2].xyz * spec * texture(specularTex, IN.uv0).rgb;
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
 
@@ -171,8 +155,8 @@ vec3 PhongModel()
         if(type == 1)
             returnLight += PointLightCalc(light, viewDir);
 
-       // if(type ==3)
-           // returnLight += SpotLightCalc(light, viewDir);
+        if(type == 2)
+            returnLight += SpotLightCalc(light, viewDir);
     }
 
     return returnLight;

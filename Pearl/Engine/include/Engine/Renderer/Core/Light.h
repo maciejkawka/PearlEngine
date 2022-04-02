@@ -31,7 +31,7 @@ namespace PrRenderer::Core {
 		inline void SetRange(float p_range) { m_range = p_range; }
 
 		inline void SetInnerCone(float p_inner) { m_innerCone = p_inner; }
-		inline void SetoutterCone(float p_outter) { m_outterCone = p_outter; }
+		inline void SetOutterCone(float p_outter) { m_outterCone = p_outter; }
 
 		inline LightType GetType() { return m_type; }
 		inline PrCore::Math::vec3 GetPosition() { return m_position; }
