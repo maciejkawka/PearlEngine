@@ -26,9 +26,9 @@ void Renderer3D::Begin()
 
 void Renderer3D::AddLight(const Light& p_light)
 {
-	if (m_lightData.size() == 4)
+	if (m_lightData.size() == MAX_LIGHTNUM)
 	{
-		PRLOG_WARN("Renderer supports 4 lights only");
+		PRLOG_WARN("Renderer supports {0} lights only", MAX_LIGHTNUM);
 		return;
 	}
 

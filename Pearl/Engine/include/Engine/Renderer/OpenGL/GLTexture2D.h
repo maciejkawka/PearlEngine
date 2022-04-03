@@ -12,7 +12,7 @@ namespace PrRenderer::OpenGL {
 		GLTexture2D(RendererID p_rendererID, size_t p_width, size_t p_height, PrRenderer::Resources::TextureFormat p_format);
 
 		void Bind(unsigned int p_slot = 0) override;
-		void Unbind() override;
+		void Unbind(unsigned int p_slot = 0) override;
 
 		//To implent in future
 		virtual void IsMipMapped(bool p_mipmap) override;

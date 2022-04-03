@@ -110,6 +110,98 @@ void GLMesh::PostUnloadImpl()
 {
 }
 
+std::vector<PrCore::Math::vec3> GLMesh::CalculateTangents()
+{
+    std::vector<PrCore::Math::vec3> tangents(m_verticesCount);
+
+    if (m_vertices.empty())
+        return tangents;
+
+    for (int i = 0; i < m_indicesCount; i += 3)
+    {
+        auto tangentA = PrCore::Math::normalize(GenerateTangent(i, i + 1, i + 2));
+        auto tangentB = PrCore::Math::normalize(GenerateTangent(i + 1, i + 2, i));
+        auto tangentC = PrCore::Math::normalize(GenerateTangent(i + 2, i, i + 1));
+
+        tangents[m_indices[i + 0]] = tangentA;
+        tangents[m_indices[i + 1]] = tangentB;
+        tangents[m_indices[i + 2]] = tangentC;
+    }
+
+    return tangents;
+}
+
+std::vector<PrCore::Math::vec3> GLMesh::CalculateNormals()
+{
+    std::vector<PrCore::Math::vec3> normals(m_verticesCount);
+
+    if (m_vertices.empty())
+        return normals;
+
+    for (int i = 0; i < m_indicesCount; i+=3)
+    {
+        auto A = m_vertices[m_indices[i + 0]];
+        auto B = m_vertices[m_indices[i + 1]];
+        auto C = m_vertices[m_indices[i + 2]];
+
+        auto AC = C - A;
+        auto AB = B - A;
+
+        auto BA = A - B;
+        auto BC = C - B;
+
+        auto CA = A - C;
+        auto CB = B - C;
+
+        auto Anormal = PrCore::Math::normalize(PrCore::Math::cross(AB, AC));
+        auto Bnormal = PrCore::Math::normalize(PrCore::Math::cross(BC, BA));
+        auto Cnormal = PrCore::Math::normalize(PrCore::Math::cross(CA, CB));
+
+        normals[m_indices[i + 0]] = Anormal;
+        normals[m_indices[i + 1]] = Bnormal;
+        normals[m_indices[i + 2]] = Cnormal;
+    }
+
+    for (int i = 0; i < m_verticesCount; i++)
+    {
+       // if (normals[i] != m_normals[i])
+            //PRLOG_DEBUG("DUPAAAA");
+    }
+    return normals;
+}
+
+PrCore::Math::vec3 GLMesh::GenerateTangent(int a, int b, int c)
+{
+    auto A = m_vertices[m_indices[a]];
+    auto B = m_vertices[m_indices[b]];
+    auto C = m_vertices[m_indices[c]];
+
+    auto Auv = m_UVs[0][m_indices[a]];
+    auto Buv = m_UVs[0][m_indices[b]];
+    auto Cuv = m_UVs[0][m_indices[c]];
+
+    auto AC = C - A;
+    auto AB = B - A;
+
+    auto ACuv = Cuv - Auv;
+    auto ABuv = Buv - Auv;
+
+
+    PrCore::Math::mat2 texMatrix(ABuv, ACuv);
+    texMatrix = PrCore::Math::inverse(texMatrix);
+
+    PrCore::Math::vec3 tangent;
+    PrCore::Math::vec3 bitangent;
+    PrCore::Math::vec3 normal;
+    
+    tangent = AB * texMatrix[0].x + AC * texMatrix[0].y;
+    bitangent = AB * texMatrix[1].x + AC * texMatrix[1].y;
+
+    normal = PrCore::Math::cross(AB, AC);
+
+    return tangent;
+}
+
 void GLMesh::CalculateSize()
 {
     m_size = sizeof(m_indicesCount) + sizeof(unsigned int) * m_indices.size() +
@@ -154,13 +246,20 @@ void GLMesh::UpdateBuffers()
     
     bufferLayout.AddElementBuffer({ "Vertex", Buffers::ShaderDataType::Float3 });
     
-    if (!m_normals.empty())
-        bufferLayout.AddElementBuffer({ "Normals", Buffers::ShaderDataType::Float3 });
+    if (m_normals.empty())
+        m_normals = CalculateNormals();
+    if (m_tangents.empty())
+        m_tangents = CalculateTangents();
+
+    bufferLayout.AddElementBuffer({ "Normals", Buffers::ShaderDataType::Float3 });
    
+    bufferLayout.AddElementBuffer({ "Tangents", Buffers::ShaderDataType::Float3 });
+    
     for (int i = 0; i < m_maxUVs; i++)
         if (!m_UVs[i].empty())
             bufferLayout.AddElementBuffer({ ("UV" + std::to_string(i)), Buffers::ShaderDataType::Float2 });
    
+
     if (!m_colors.empty())
         bufferLayout.AddElementBuffer({ "Color", Buffers::ShaderDataType::Float4 });
     //Tangents in future
@@ -182,6 +281,13 @@ void GLMesh::UpdateBuffers()
             bufferVector.push_back(m_normals[i].z);
         }
 
+        if (!m_tangents.empty())
+        {
+            bufferVector.push_back(m_tangents[i].x);
+            bufferVector.push_back(m_tangents[i].y);
+            bufferVector.push_back(m_tangents[i].z);
+        }
+
         for (int j = 0; j < m_maxUVs; j++)
         {
             if (!m_UVs[j].empty())
@@ -199,8 +305,6 @@ void GLMesh::UpdateBuffers()
             bufferVector.push_back(m_colors[i].b);
             bufferVector.push_back(m_colors[i].a);
         }
-
-        //Tangents in future
     }
 
     //Pass Vertices to GPU
@@ -276,14 +380,15 @@ bool PrRenderer::OpenGL::GLMesh::PopulateOBJ()
                 vert.normal = normal;
             }
 
+            PrRenderer::Core::Color color(PrRenderer::Core::Color::White);
             if (!attrib.colors.empty())
             {
-                PrRenderer::Core::Color color(PrRenderer::Core::Color::White);
                 color.r = attrib.colors[3 * index.vertex_index + 0];
                 color.g = attrib.colors[3 * index.vertex_index + 1];
                 color.b = attrib.colors[3 * index.vertex_index + 2];
-                vert.color = color;
             }
+            vert.color = color;
+            
 
             //Tangents in future
 

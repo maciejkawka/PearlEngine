@@ -70,7 +70,7 @@ namespace PrRenderer::Resources {
 		{}
 
 		virtual void Bind(unsigned int p_slot = 0) = 0;
-		virtual void Unbind() = 0;
+		virtual void Unbind(unsigned int p_slot = 0) = 0;
 
 		inline virtual void IsMipMapped(bool p_mipmap) { m_mipmap = p_mipmap; }
 		inline virtual void IsReadable(bool p_readable) { m_readable = p_readable; }

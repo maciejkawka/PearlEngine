@@ -17,8 +17,8 @@ TestFeatures::TestFeatures(PrRenderer::Core::Renderer3D* p_renderer3D) :
 	auto cubeMaterial = std::static_pointer_cast<PrRenderer::Resources::Material>(PrRenderer::Resources::MaterialManager::GetInstance().Load("cubeMaterialNew.mat"));
 	auto lightMaterial = std::static_pointer_cast<PrRenderer::Resources::Material>(PrRenderer::Resources::MaterialManager::GetInstance().Load("lightMaterial.mat"));
 	auto groundMaterial = std::static_pointer_cast<PrRenderer::Resources::Material>(PrRenderer::Resources::MaterialManager::GetInstance().Load("groundMaterial.mat"));
-	auto zomby = std::static_pointer_cast<PrRenderer::Resources::Mesh>(PrRenderer::Resources::MeshManager::GetInstance().Load("Zoombie.obj"));
 	auto cube = std::static_pointer_cast<PrRenderer::Resources::Mesh>(PrRenderer::Resources::MeshManager::GetInstance().Load("cube.obj"));
+	auto zomby = std::static_pointer_cast<PrRenderer::Resources::Mesh>(PrRenderer::Resources::MeshManager::GetInstance().Load("Zoombie.obj"));
 	auto ground = std::static_pointer_cast<PrRenderer::Resources::Mesh>(PrRenderer::Resources::MeshManager::GetInstance().Load("groundplane.obj"));
 }
 
@@ -44,17 +44,18 @@ void TestFeatures::Update(float p_deltaTime)
 	//light.SetRange(100.0f);
 	//m_renderer3D->AddLight(light);
 
-	//PrRenderer::Core::Light light1(PrRenderer::Core::LightType::Point);
-	//light1.SetPosition({ 50,5,0 });
-	//light1.SetAttenuation(0.0075f, 0.045f, 1.0);
-	//light1.SetRange(100.0f);
-	//m_renderer3D->AddLight(light1);
+	PrRenderer::Core::Light light1(PrRenderer::Core::LightType::Point);
+	light1.SetPosition({ 0,5,0 });
+	light1.SetAttenuation(0.0075f, 0.045f, 1.0);
+	light1.SetRange(100.0f);
+	m_renderer3D->AddLight(light1);
 
-	//PrRenderer::Core::Light light2(PrRenderer::Core::LightType::Point);
-	//light2.SetPosition({ 50,5,50 });
-	//light2.SetAttenuation(0.0075f, 0.045f, 1.0);
-	//light2.SetRange(100.0f);
-	//m_renderer3D->AddLight(light2);
+	PrRenderer::Core::Light light2(PrRenderer::Core::LightType::Point);
+	light2.SetPosition({ 50,5,50 });
+	light2.SetAttenuation(0.0075f, 0.045f, 1.0);
+	light2.SetRange(100.0f);
+	light2.SetColor(PrRenderer::Core::Color::Red);
+	m_renderer3D->AddLight(light2);
 
 	PrRenderer::Core::Light light3(PrRenderer::Core::LightType::Spot);
 	light3.SetPosition({ 0,5,-0 });
@@ -74,6 +75,8 @@ void TestFeatures::Update(float p_deltaTime)
 	auto cube = std::static_pointer_cast<PrRenderer::Resources::Mesh>(PrRenderer::Resources::MeshManager::GetInstance().GetResource("cube.obj"));
 	auto ground = std::static_pointer_cast<PrRenderer::Resources::Mesh>(PrRenderer::Resources::MeshManager::GetInstance().GetResource("groundplane.obj"));
 
+	m_renderer3D->DrawMeshNow(ground, PrCore::Math::vec3(0), PrCore::Math::vec3(0), PrCore::Math::vec3(1), groundMaterial);
+
 	for (int i = 0; i < 10; i++)
 	{
 		for (int j = 0; j < 10; j++)
@@ -83,7 +86,7 @@ void TestFeatures::Update(float p_deltaTime)
 		}
 	}
 
-	m_renderer3D->DrawMeshNow(ground, PrCore::Math::vec3(0), PrCore::Math::vec3(0), PrCore::Math::vec3(1), groundMaterial);
+
 
 
 	//if(PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::UP))
@@ -102,5 +105,5 @@ void TestFeatures::Update(float p_deltaTime)
 
 
 
-	m_renderer3D->DrawMeshNow(cube, { 5,5,0 }, PrCore::Math::vec3(), PrCore::Math::vec3(0.5), lightMaterial);
+	//m_renderer3D->DrawMeshNow(cube, { 5,5,0 }, PrCore::Math::vec3(), PrCore::Math::vec3(0.5), lightMaterial);
 }

@@ -147,8 +147,10 @@ void PrRenderer::Resources::Material::Unbind()
 {
 	m_shader->Unbind();
 
+	unsigned int texSlot = 0;
 	for (auto& texture : m_textures)
-		texture.second->Unbind();
+		texture.second->Unbind(texSlot++);
+	
 }
 
 void Material::SetTexture(const std::string& p_name, TexturePtr p_texture)
