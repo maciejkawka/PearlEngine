@@ -64,6 +64,20 @@ void GLMesh::Unbind()
     m_VA->Unbind();
 }
 
+void GLMesh::RecalculateNormals()
+{
+    m_normals.clear();
+
+    m_normals = CalculateNormals();
+}
+
+void GLMesh::RecalculateTangents()
+{
+    m_tangents.clear();
+
+    m_tangents = CalculateTangents();
+}
+
 void GLMesh::PreLoadImpl()
 {
 }
@@ -110,9 +124,9 @@ void GLMesh::PostUnloadImpl()
 {
 }
 
-std::vector<PrCore::Math::vec3> GLMesh::CalculateTangents()
+std::vector<PrCore::Math::vec4> GLMesh::CalculateTangents()
 {
-    std::vector<PrCore::Math::vec3> tangents(m_verticesCount);
+    std::vector<PrCore::Math::vec4> tangents(m_verticesCount);
 
     if (m_vertices.empty())
         return tangents;
@@ -162,15 +176,10 @@ std::vector<PrCore::Math::vec3> GLMesh::CalculateNormals()
         normals[m_indices[i + 2]] = Cnormal;
     }
 
-    for (int i = 0; i < m_verticesCount; i++)
-    {
-       // if (normals[i] != m_normals[i])
-            //PRLOG_DEBUG("DUPAAAA");
-    }
     return normals;
 }
 
-PrCore::Math::vec3 GLMesh::GenerateTangent(int a, int b, int c)
+PrCore::Math::vec4 GLMesh::GenerateTangent(int a, int b, int c)
 {
     auto A = m_vertices[m_indices[a]];
     auto B = m_vertices[m_indices[b]];
@@ -198,8 +207,13 @@ PrCore::Math::vec3 GLMesh::GenerateTangent(int a, int b, int c)
     bitangent = AB * texMatrix[1].x + AC * texMatrix[1].y;
 
     normal = PrCore::Math::cross(AB, AC);
+    auto biCross = PrCore::Math::cross(tangent, normal);
 
-    return tangent;
+    float handedness = 1.0f;
+    if (PrCore::Math::dot(biCross, bitangent) < 0.0f)
+        handedness = -1.0f;
+
+    return PrCore::Math::vec4(tangent, handedness);
 }
 
 void GLMesh::CalculateSize()
@@ -244,25 +258,27 @@ void GLMesh::UpdateBuffers()
     vertexBuffer.reset(new GLVertexBuffer());
     indexBuffer.reset(new GLIndexBuffer());
     
+    //Vertex
     bufferLayout.AddElementBuffer({ "Vertex", Buffers::ShaderDataType::Float3 });
     
+    //Normals
     if (m_normals.empty())
-        m_normals = CalculateNormals();
+        m_normals = CalculateNormals(); 
+    bufferLayout.AddElementBuffer({ "Normals", Buffers::ShaderDataType::Float3 });
+
+    //Tangents
     if (m_tangents.empty())
         m_tangents = CalculateTangents();
-
-    bufferLayout.AddElementBuffer({ "Normals", Buffers::ShaderDataType::Float3 });
-   
-    bufferLayout.AddElementBuffer({ "Tangents", Buffers::ShaderDataType::Float3 });
+    bufferLayout.AddElementBuffer({ "Tangents", Buffers::ShaderDataType::Float4 });
     
+    //UVs
     for (int i = 0; i < m_maxUVs; i++)
         if (!m_UVs[i].empty())
             bufferLayout.AddElementBuffer({ ("UV" + std::to_string(i)), Buffers::ShaderDataType::Float2 });
    
-
+    //Colors
     if (!m_colors.empty())
         bufferLayout.AddElementBuffer({ "Color", Buffers::ShaderDataType::Float4 });
-    //Tangents in future
 
     //Create VertexBuffer
     size_t bufferSize = bufferLayout.GetFloatStride() * m_verticesCount;
@@ -286,6 +302,7 @@ void GLMesh::UpdateBuffers()
             bufferVector.push_back(m_tangents[i].x);
             bufferVector.push_back(m_tangents[i].y);
             bufferVector.push_back(m_tangents[i].z);
+            bufferVector.push_back(m_tangents[i].w);
         }
 
         for (int j = 0; j < m_maxUVs; j++)
@@ -347,10 +364,13 @@ bool PrRenderer::OpenGL::GLMesh::PopulateOBJ()
 
     for (const auto& shape : shapes)
     {
-        if (shape.mesh.num_face_vertices.size() == 3)
+        for (const auto& face : shape.mesh.num_face_vertices)
         {
-            PRLOG_ERROR("Renderer: PearlEngine supports only triangle mesh error in mesh {0}", m_name);
-            return false;
+            if (face != 3)
+            {
+                PRLOG_ERROR("Renderer: PearlEngine supports only triangle mesh error in mesh {0}", m_name);
+                return false;
+            }
         }
 
         for (const auto& index : shape.mesh.indices)
@@ -388,10 +408,6 @@ bool PrRenderer::OpenGL::GLMesh::PopulateOBJ()
                 color.b = attrib.colors[3 * index.vertex_index + 2];
             }
             vert.color = color;
-            
-
-            //Tangents in future
-
 
             if (vertexMap.find(vert) == vertexMap.end())
             {

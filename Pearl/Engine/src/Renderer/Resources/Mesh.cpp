@@ -43,7 +43,7 @@ void Mesh::SetNormals(const std::vector<PrCore::Math::vec3>& p_normals)
 	m_stateChanged = true;
 }
 
-void Mesh::SetTangents(const std::vector<PrCore::Math::vec3>& p_tangents)
+void Mesh::SetTangents(const std::vector<PrCore::Math::vec4>& p_tangents)
 {
 	if (p_tangents.size() != m_verticesCount)
 	{

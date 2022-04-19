@@ -16,6 +16,9 @@ namespace PrRenderer::OpenGL {
 		void Bind() override;
 		void Unbind() override;
 
+		void RecalculateNormals() override;
+		void RecalculateTangents() override;
+
 	private:
 		void PreLoadImpl() override;
 		bool LoadImpl() override;
@@ -25,9 +28,9 @@ namespace PrRenderer::OpenGL {
 		bool UnloadImpl() override;
 		void PostUnloadImpl() override;
 
-		std::vector<PrCore::Math::vec3> CalculateTangents();
+		std::vector<PrCore::Math::vec4> CalculateTangents();
 		std::vector<PrCore::Math::vec3> CalculateNormals();
-		PrCore::Math::vec3 GenerateTangent(int a, int b, int c);
+		PrCore::Math::vec4 GenerateTangent(int a, int b, int c);
 		virtual void CalculateSize() override;
 		bool ValidateBuffers();
 		void UpdateBuffers();

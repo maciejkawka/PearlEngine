@@ -39,32 +39,35 @@ namespace PrRenderer::Resources {
 
 		inline std::vector<PrRenderer::Core::Color> GetColors() { return m_colors; }
 		inline std::vector<PrCore::Math::vec3> GetNormals() { return m_normals; }
-		inline std::vector<PrCore::Math::vec3> GetTangents() { return m_tangents; }
+		inline std::vector<PrCore::Math::vec4> GetTangents() { return m_tangents; }
 
 		void SetVertices(const std::vector<PrCore::Math::vec3>& p_vertices);
 		void SetIndices(const std::vector<unsigned int>& p_indices);
 		void SetColors(const std::vector<PrRenderer::Core::Color>& p_colors);
 		void SetNormals(const std::vector<PrCore::Math::vec3>& p_normals);
-		void SetTangents(const std::vector<PrCore::Math::vec3>& p_tangents);
+		void SetTangents(const std::vector<PrCore::Math::vec4>& p_tangents);
 
 		void SetUVs(unsigned int p_UVSet, const std::vector<PrCore::Math::vec2>& p_UVs);
 
+		virtual void RecalculateNormals() = 0;
+		virtual void RecalculateTangents() = 0;
+		
 	protected:	
 		std::vector<unsigned int>				m_indices;
 		size_t									m_indicesCount;
 
-		std::vector<PrCore::Math::vec3>		m_vertices;
+		std::vector<PrCore::Math::vec3>			m_vertices;
 		size_t									m_verticesCount;
 		std::vector<PrRenderer::Core::Color>	m_colors;
-		std::vector<PrCore::Math::vec3>		m_normals;
-		std::vector<PrCore::Math::vec3>		m_tangents; //NOT USED YET
+		std::vector<PrCore::Math::vec3>			m_normals;
+		std::vector<PrCore::Math::vec4>			m_tangents;
 
-		UVArray m_UVs;
-		size_t m_maxUVs = 8;
+		UVArray									m_UVs;
+		size_t									m_maxUVs = 8;
 
-		bool m_stateChanged;
+		bool									m_stateChanged;
 
-		std::shared_ptr<Buffers::VertexArray> m_VA;
+		std::shared_ptr<Buffers::VertexArray>	m_VA;
 	};
 
 	typedef std::shared_ptr<Mesh> MeshPtr;
