@@ -3,7 +3,7 @@
 #version 450 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormals;
-layout (location = 2) in vec3 aTangents;
+layout (location = 2) in vec4 aTangents;
 layout (location = 3) in vec2 aUV0;
 
 uniform mat4 VPMatrix;
@@ -27,7 +27,7 @@ void main()
     OUT.normals = normalize(normalMat * normalize(aNormals)); 
     OUT.tangents = normalize(normalMat * normalize(aTangents.xyz));
     OUT.uv0 = aUV0 * mainTex_scale + mainTex_offset;
-    OUT.bitangents = cross(OUT.tangents, OUT.normals);
+    OUT.bitangents = cross(OUT.tangents, OUT.normals) * aTangents.w;
 
     vec4 worldPos = (modelMatrix * vec4(aPos, 1.0));
     OUT.pos = worldPos.xyz;
@@ -61,9 +61,9 @@ uniform mat4 lightMat[4];
 uniform int lightNumber = 0;
 uniform vec3 camPos;
 
-bool useMainTex = true;
-bool useNormalTex = true;
-bool useSpecularTex = true;
+uniform bool usemainTex = false;
+uniform bool usenormalTex = false;
+uniform bool usespecularTex = false;
 
 vec3 PhongModel();
 vec3 DirLightCalc(mat4 light, vec3 viewDir, vec3 normalMap);
@@ -72,13 +72,6 @@ vec3 SpotLightCalc(mat4 light, vec3 viewDir, vec3 normalMap);
 
 void main()
 {
-    if(length(texture(mainTex, IN.uv0).rgb) == 0)
-        useMainTex = false;
-    if(length(texture(specularTex, IN.uv0).rgb) == 0)
-        useSpecularTex = false;   
-    if(length(texture(normalTex, IN.uv0).rgb) == 0)
-        useNormalTex = false;
-
     vec3 result = PhongModel();
     FragColor = vec4(result,1.0);
 } 
@@ -94,7 +87,7 @@ vec3 DirLightCalc(mat4 light, vec3 viewDir, vec3 normalMap)
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64);
 
     vec3 specularMap = vec3(1,1,1);
-    if(useSpecularTex)
+    if(usespecularTex)
         specularMap = texture(specularTex, IN.uv0).rgb;
 
     // combine results
@@ -122,7 +115,7 @@ vec3 PointLightCalc(mat4 light, vec3 viewDir, vec3 normalMap)
     float attenuation = 1.0 / (light[3].z + light[3].y * distance + light[3].x * (distance * distance));  
 
     vec3 specularMap = vec3(1,1,1);
-    if(useSpecularTex)
+    if(usespecularTex)
         specularMap = texture(specularTex, IN.uv0).rgb;
 
     //combine result
@@ -154,7 +147,7 @@ vec3 SpotLightCalc(mat4 light, vec3 viewDir, vec3 normalMap)
     float intensity = clamp((theta - light[2].w) / epsilon, 0.0, 1.0);
 
     vec3 specularMap = vec3(1,1,1);
-    if(useSpecularTex)
+    if(usespecularTex)
         specularMap = texture(specularTex, IN.uv0).rgb;
 
     //combine result
@@ -169,7 +162,7 @@ vec3 SpotLightCalc(mat4 light, vec3 viewDir, vec3 normalMap)
 vec3 PhongModel()
 {
     vec3 normalMap = IN.normals;
-    if(useNormalTex == true)
+    if(usenormalTex == true)
     {
         mat3 TBN = mat3(normalize(IN.tangents), normalize(IN.bitangents), normalize(IN.normals));
         normalMap = texture(normalTex, IN.uv0).rgb;

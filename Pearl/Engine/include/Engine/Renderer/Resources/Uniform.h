@@ -19,6 +19,7 @@ namespace PrRenderer::Resources {
 		Float_Mat4_Array,
 		Float_Mat3,
 		Float_Mat3_Array,
+		Bool,
 		Texture2D,
 		Texture3D,
 		Cubemap,

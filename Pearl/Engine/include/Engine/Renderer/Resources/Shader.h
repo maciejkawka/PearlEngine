@@ -35,6 +35,7 @@ namespace PrRenderer::Resources {
 
 		virtual void SetUniformFloat(const std::string& p_name, float p_value) = 0;
 		virtual void SetUniformInt(const std::string& p_name, int p_value) = 0;
+		virtual void SetUniformBool(const std::string& p_name, bool p_value) = 0;
 		virtual void SetUniformMat4(const std::string& p_name, const PrCore::Math::mat4& p_value) = 0;
 		virtual void SetUniformMat3(const std::string& p_name, const PrCore::Math::mat3 p_value) = 0;
 		virtual void SetUniformVec4(const std::string& p_name, const PrCore::Math::vec4& p_value) = 0;
@@ -51,6 +52,7 @@ namespace PrRenderer::Resources {
 
 		virtual float GetUniformFloat(const std::string& p_name) = 0;
 		virtual int GetUniformInt(const std::string& p_name) = 0;
+		virtual bool GetUniformBool(const std::string& p_name) = 0;
 		virtual PrCore::Math::mat4 GetUniformMat4(const std::string& p_name) = 0;
 		virtual PrCore::Math::mat3 GetUniformMat3(const std::string& p_name) = 0;
 		virtual PrCore::Math::vec4 GetUniformVec4(const std::string& p_name) = 0;

@@ -17,6 +17,7 @@ namespace PrRenderer::OpenGL {
 
 		void SetUniformFloat(const std::string& p_name, float p_value) override;
 		void SetUniformInt(const std::string& p_name, int p_value) override;
+		void SetUniformBool(const std::string& p_name, bool p_value) override;
 		void SetUniformMat4(const std::string& p_name, const PrCore::Math::mat4& p_value) override;
 		void SetUniformMat3(const std::string& p_name, const PrCore::Math::mat3 p_value) override;
 		void SetUniformVec4(const std::string& p_name, const PrCore::Math::vec4& p_value) override;
@@ -33,6 +34,7 @@ namespace PrRenderer::OpenGL {
 
 		float GetUniformFloat(const std::string& p_name) override;
 		int GetUniformInt(const std::string& p_name) override;
+		bool GetUniformBool(const std::string& p_name) override;
 		PrCore::Math::mat4 GetUniformMat4(const std::string& p_name) override;
 		PrCore::Math::mat3 GetUniformMat3(const std::string& p_name) override;
 		PrCore::Math::vec4 GetUniformVec4(const std::string& p_name) override;

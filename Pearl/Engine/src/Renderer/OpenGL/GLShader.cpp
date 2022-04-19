@@ -41,6 +41,12 @@ void GLShader::SetUniformInt(const std::string& p_name, int p_value)
 	glUniform1i(location, p_value);
 }
 
+void GLShader::SetUniformBool(const std::string& p_name, bool p_value)
+{
+	auto location = GetUniformLocation(p_name);
+	glUniform1i(location, p_value);
+}
+
 void GLShader::SetUniformMat4(const std::string& p_name, const PrCore::Math::mat4& p_value)
 {
 	auto location = GetUniformLocation(p_name);
@@ -129,6 +135,15 @@ int GLShader::GetUniformInt(const std::string& p_name)
 	glGetUniformiv(m_ID, location, &value);
 
 	return (int)value;
+}
+
+bool GLShader::GetUniformBool(const std::string& p_name)
+{
+	GLint value;
+	auto location = GetUniformLocation(p_name);
+	glGetUniformiv(m_ID, location, &value);
+
+	return (bool)value;
 }
 
 PrCore::Math::mat4 GLShader::GetUniformMat4(const std::string& p_name)
@@ -263,6 +278,11 @@ void GLShader::ScanUniforms()
 				}
 				else
 					prUniformType = PrRenderer::Resources::UniformType::Int_Array;
+				break;
+			case GL_BOOL:
+				prUniformType = PrRenderer::Resources::UniformType::Bool;
+				uniformValue = std::make_any<bool>(GetUniformInt(uniformName));
+				
 				break;
 			case GL_FLOAT:
 				if (uniformSize == 1)

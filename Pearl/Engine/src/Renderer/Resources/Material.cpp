@@ -84,6 +84,10 @@ void Material::Bind()
 		texture.second->Bind(texSlot);
 		m_shader->SetUniformInt(texture.first, texSlot);
 		texSlot++;
+
+		//Set Texture Usage Flag
+		if(HasProperty("use" + texture.first))
+			SetProperty("use" + texture.first, true);
 	}
 
 	//Bind Properties
@@ -99,6 +103,9 @@ void Material::Bind()
 		{
 		case UniformType::Int:
 			m_shader->SetUniformInt(uniformName, std::any_cast<int>(uniformValue.value));
+			break;
+		case UniformType::Bool:
+			m_shader->SetUniformBool(uniformName, std::any_cast<bool>(uniformValue.value));
 			break;
 		case UniformType::Int_Array:
 			m_shader->SetUniformIntArray(uniformName, std::any_cast<std::vector<int>>(uniformValue.value).data(), uniformValue.size);
@@ -156,8 +163,16 @@ void PrRenderer::Resources::Material::Unbind()
 void Material::SetTexture(const std::string& p_name, TexturePtr p_texture)
 {
 	auto find = m_textures.find(p_name);
-	if(find != m_textures.end())
+	if (find != m_textures.end())
+	{
 		find->second = p_texture;
+
+		if (p_texture != nullptr)
+			SetProperty("use" + p_name, true);
+		else
+			SetProperty("use" + p_name, false);
+	}
+
 }
 
 TexturePtr Material::GetTexture(const std::string& p_name)
@@ -300,8 +315,25 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				}
 			}
 
-			if (!uniformExist)
-				PRLOG_WARN("Renderer: Material {0} uniform {1} does not exist", m_name, uniformName);
+			break;
+		}
+		case UniformType::Bool:
+		{
+			auto uniformExist = false;
+			auto intProperties = p_json.find("boolproperties");
+			if (intProperties != p_json.end())
+			{
+				auto& value = intProperties.value();
+				for (auto& property : value.items())
+				{
+					if (property.value()["name"] == uniformName)
+					{
+						uniform.value = std::make_any<int>(property.value()["value"]);
+						uniformExist = true;
+					}
+				}
+			}
+
 			break;
 		}
 		case UniformType::Float:
@@ -321,8 +353,6 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				}
 			}
 
-			if (!uniformExist)
-				PRLOG_WARN("Renderer: Material {0} uniform {1} does not exist", m_name, uniformName);
 			break;
 		}
 		case UniformType::Float_Vec2:
@@ -362,8 +392,6 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				}
 			}
 
-			if (!uniformExist)
-				PRLOG_WARN("Renderer: Material {0} uniform {1} does not exist", m_name, uniformName);
 			break;
 		}
 		case UniformType::Float_Vec3:
@@ -383,8 +411,6 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				}
 			}
 
-			if (!uniformExist)
-				PRLOG_WARN("Renderer: Material {0} uniform {1} does not exist", m_name, uniformName);
 			break;
 		}
 		case UniformType::Float_Vec4:
@@ -410,8 +436,6 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				uniformExist = true;
 			}
 
-			if (!uniformExist)
-				PRLOG_WARN("Renderer: Material {0} uniform {1} does not exist", m_name, uniformName);
 			break;
 		}
 		case UniformType::Float_Mat3:
@@ -431,8 +455,6 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				}
 			}
 
-			if (!uniformExist)
-				PRLOG_WARN("Renderer: Material {0} uniform {1} does not exist", m_name, uniformName);
 			break;
 		}
 		case UniformType::Float_Mat4:
@@ -452,8 +474,6 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				}
 			}
 
-			if (!uniformExist)
-				PRLOG_WARN("Renderer: Material {0} uniform {1} does not exist", m_name, uniformName);
 			break;
 		}
 		case UniformType::Texture2D:
@@ -477,8 +497,6 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				}
 			}
 
-			if (!uniformExist)
-				PRLOG_WARN("Renderer: Material {0} texture {1} does not exist", m_name, uniformName);
 			break;
 		}
 		case UniformType::Cubemap:
