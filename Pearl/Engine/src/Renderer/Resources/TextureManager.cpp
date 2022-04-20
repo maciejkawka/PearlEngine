@@ -5,22 +5,6 @@
 
 using namespace PrRenderer::Resources;
 
-TextureManager* TextureManager::m_instance = nullptr;
-
-TextureManager& PrRenderer::Resources::TextureManager::GetInstance()
-{
-	if (m_instance == nullptr)
-		m_instance = new TextureManager();
-
-	return *m_instance;
-}
-
-void TextureManager::Terminate()
-{
-	if (m_instance)
-		delete m_instance;
-}
-
 PrCore::Resources::Resource* TextureManager::CreateImpl(const std::string& p_name)
 {
 	return static_cast<OpenGL::GLTexture2D*>(new OpenGL::GLTexture2D(p_name, NextResourceHandle()));

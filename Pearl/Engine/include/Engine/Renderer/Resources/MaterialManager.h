@@ -5,16 +5,9 @@ namespace PrRenderer::Resources {
 
 	class MaterialManager : public PrCore::Resources::ResourceManager {
 	public:
-		static MaterialManager& GetInstance();
-		static void Terminate();
+		MaterialManager();
 
 	protected:
 		PrCore::Resources::Resource* CreateImpl(const std::string& p_name) override;
-
-	private:
-		MaterialManager();
-
-
-		static MaterialManager* m_instance;
 	};
 }

@@ -243,6 +243,9 @@
     <ClInclude Include="include\Engine\Renderer\Core\Light.h">
       <Filter>Renderer\Core</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\Resources\ResourceLoader.h">
+      <Filter>Core\Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -361,6 +364,9 @@
     </ClCompile>
     <ClCompile Include="src\Renderer\Core\Light.cpp">
       <Filter>Renderer\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Resources\ResourceLoader.cpp">
+      <Filter>Core\Resources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

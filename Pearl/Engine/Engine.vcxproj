@@ -31,6 +31,7 @@
     <ClInclude Include="include\Engine\Core\Input\PrMouseButton.h" />
     <ClInclude Include="include\Engine\Core\Math\Math.h" />
     <ClInclude Include="include\Engine\Core\Resources\Resource.h" />
+    <ClInclude Include="include\Engine\Core\Resources\ResourceLoader.h" />
     <ClInclude Include="include\Engine\Core\Resources\ResourceManager.h" />
     <ClInclude Include="include\Engine\Core\Utils\JSONParser.h" />
     <ClInclude Include="include\Engine\Core\Utils\Logger.h" />
@@ -88,6 +89,7 @@
     <ClCompile Include="src\Core\Filesystem\StandardFileStream.cpp" />
     <ClCompile Include="src\Core\Input\InputManager.cpp" />
     <ClCompile Include="src\Core\Resources\Resource.cpp" />
+    <ClCompile Include="src\Core\Resources\ResourceLoader.cpp" />
     <ClCompile Include="src\Core\Resources\ResourceManager.cpp" />
     <ClCompile Include="src\Core\Utils\Clock.cpp" />
     <ClCompile Include="src\Core\Utils\JSONParser.cpp" />

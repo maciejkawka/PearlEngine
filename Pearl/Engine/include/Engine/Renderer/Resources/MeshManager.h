@@ -5,16 +5,9 @@ namespace PrRenderer::Resources {
 
 	class MeshManager : public PrCore::Resources::ResourceManager {
 	public:
-		static MeshManager& GetInstance();
-		static void Terminate();
+		MeshManager();
 
 	protected:
 		PrCore::Resources::Resource* CreateImpl(const std::string& p_name) override;
-
-	private:
-		MeshManager();
-
-
-		static MeshManager* s_instance;
 	};
 }

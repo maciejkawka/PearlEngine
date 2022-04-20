@@ -1,6 +1,7 @@
 #include"Core/Common/pearl_pch.h"
 
 #include"Renderer/Resources/Material.h"
+#include"Core/Resources/ResourceLoader.h"
 #include"Renderer/Resources/ShaderManager.h"
 #include"Renderer/Resources/TextureManager.h"
 
@@ -279,7 +280,7 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 	}
 
 	std::string shader = p_json["shader"];
-	m_shader = std::static_pointer_cast<Shader>(PrRenderer::Resources::ShaderManager::GetInstance().Load(shader));
+	m_shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Shader>(shader);
 	if (m_shader == nullptr)
 	{
 		PRLOG_ERROR("Renderer: Material {0}, shader {1} cannot be find", m_name, shader);
@@ -490,7 +491,7 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 						auto textureName = texture.value()["texName"];
 						auto texturePath = texture.value()["texPath"];
 
-						auto textureResource = std::static_pointer_cast<Texture>(PrRenderer::Resources::TextureManager::GetInstance().Load(texturePath));
+						auto textureResource = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Texture>(texturePath);
 						m_textures[textureName] = textureResource;
 						uniformExist = true;
 					}
