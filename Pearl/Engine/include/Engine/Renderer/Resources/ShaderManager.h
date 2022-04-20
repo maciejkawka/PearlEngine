@@ -9,7 +9,7 @@ namespace PrRenderer::Resources {
 		static void Terminate();
 
 	protected:
-		PrCore::Resources::Resources* CreateImpl(const std::string& p_name) override;
+		PrCore::Resources::Resource* CreateImpl(const std::string& p_name) override;
 
 	private:
 		ShaderManager();

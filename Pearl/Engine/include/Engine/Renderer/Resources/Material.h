@@ -22,12 +22,14 @@ namespace PrRenderer::Resources {
 		Transparent
 	};
 
-	class Material : public PrCore::Resources::Resources {
+	class Material : public PrCore::Resources::Resource {
 	public:
 		Material() = delete;
-		Material(const std::string& p_name, PrCore::Resources::ResourceID p_ID);
 		Material(ShaderPtr p_shader);
 		Material(const Material& p_material);
+
+		//Constructor for managed resource
+		Material(const std::string& p_name, PrCore::Resources::ResourceHandle p_ID);
 
 		~Material() = default;
 

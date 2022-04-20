@@ -5,11 +5,14 @@ namespace PrRenderer::OpenGL {
 
 	class GLTexture2D : public PrRenderer::Resources::Texture2D {
 	public:
-		GLTexture2D(const std::string& p_name, PrCore::Resources::ResourceID p_ID) :
-			Texture2D(p_name, p_ID)
-		{}
+		GLTexture2D() = default;
 
 		GLTexture2D(RendererID p_rendererID, size_t p_width, size_t p_height, PrRenderer::Resources::TextureFormat p_format);
+
+		//Constructor for managed resource
+		GLTexture2D(const std::string& p_name, PrCore::Resources::ResourceHandle p_handle) :
+			Texture2D(p_name, p_handle)
+		{}
 
 		void Bind(unsigned int p_slot = 0) override;
 		void Unbind(unsigned int p_slot = 0) override;

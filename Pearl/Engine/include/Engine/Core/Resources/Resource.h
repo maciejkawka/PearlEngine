@@ -6,7 +6,7 @@ namespace PrCore::Resources {
 
 	class ResourceManager;
 
-	typedef unsigned int ResourceID;
+	typedef unsigned int ResourceHandle;
 	typedef size_t ResourceSize;
 
 	enum class ResourceStatus {
@@ -14,32 +14,39 @@ namespace PrCore::Resources {
 		Loaded,
 		Unloading,
 		Unloaded,
-		Corrupted
+		Corrupted,
+		Unmanaged
 	};
 
-	class Resources {
+	class Resource {
 	public:
-		Resources() = delete;
-		Resources(const std::string& p_name);
-		Resources(const std::string& p_name, ResourceID p_ID);
-		virtual ~Resources() = default;
+		Resource() = delete;
+
+		//Constructor for unmanaged Resource
+		Resource(const std::string& p_name);
+
+		//Constructor for managed Resource
+		Resource(const std::string& p_name, ResourceHandle p_ID);
+
+		virtual ~Resource() = default;
 
 		void Load();
 		void Unload();
 
-		inline ResourceSize GetSize() { return m_size; }
-		inline std::string GetName() { return m_name; }
-		inline ResourceID GetID() { return m_ID; }
+		inline ResourceSize GetSize() const { return m_size; }
+		inline std::string GetName() const { return m_name; }
+		inline ResourceHandle GetHandle() const { return m_handle; }
 
-		inline ResourceStatus GetStatus() { return m_state; }
+		inline ResourceStatus GetStatus() const { return m_state; }
 
-		inline bool IsLoading() { return m_state == ResourceStatus::Loading; }
-		inline bool IsLoaded() { return m_state == ResourceStatus::Loaded; }
+		inline bool IsLoading() const { return m_state == ResourceStatus::Loading; }
+		inline bool IsLoaded() const { return m_state == ResourceStatus::Loaded; }
 
-		inline bool IsUnloading() { return m_state == ResourceStatus::Unloading; }
-		inline bool IsUnloaded() { return m_state == ResourceStatus::Unloaded; }
+		inline bool IsUnloading() const { return m_state == ResourceStatus::Unloading; }
+		inline bool IsUnloaded() const { return m_state == ResourceStatus::Unloaded; }
 
-		inline bool IsCorrupted() { return m_state == ResourceStatus::Corrupted; }
+		inline bool IsCorrupted() const { return m_state == ResourceStatus::Corrupted; }
+		inline bool IsManaged() const { return m_state != ResourceStatus::Unmanaged; }
 
 	protected:
 		void FireUnloadedEvent();
@@ -57,10 +64,10 @@ namespace PrCore::Resources {
 		virtual void CalculateSize() = 0;
 
 		std::string m_name;
-		ResourceID m_ID;
+		ResourceHandle m_handle;
 		ResourceSize m_size;
 		ResourceStatus m_state;
 	};
 
-	typedef std::shared_ptr<Resources> ResourcePtr;
+	typedef std::shared_ptr<Resource> ResourcePtr;
 }

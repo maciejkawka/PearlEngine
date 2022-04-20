@@ -7,24 +7,26 @@
 
 namespace PrRenderer::Resources {
 
-	class Mesh : public PrCore::Resources::Resources {
+	class Mesh : public PrCore::Resources::Resource {
 
 		typedef std::array<std::vector<PrCore::Math::vec2>, 8> UVArray;
 
 	public:
-		Mesh(const std::string& p_name, PrCore::Resources::ResourceID p_ID) :
-			Resources(p_name, p_ID),
+		Mesh() :
+			Resource("Mesh"),
+			m_indicesCount(0),
+			m_verticesCount(0),
+			m_stateChanged(false)
+		{}
+
+		//Constructor for managed resource
+		Mesh(const std::string& p_name, PrCore::Resources::ResourceHandle p_handle) :
+			Resource(p_name, p_handle),
 			m_indicesCount(0),
 			m_verticesCount(0),
 			m_stateChanged(false)
 		{}
 		
-		Mesh() :
-			Resources("Mesh"),
-			m_indicesCount(0),
-			m_verticesCount(0),
-			m_stateChanged(false)
-		{}
 
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
@@ -32,7 +34,7 @@ namespace PrRenderer::Resources {
 		inline std::shared_ptr<Buffers::VertexArray> GetVertexArray() { return m_VA; }
 
 		inline std::vector<PrCore::Math::vec3> GetVertices() { return m_vertices; }
-		inline unsigned int GetVerticesCount() { return m_verticesCount; }
+		inline size_t GetVerticesCount() { return m_verticesCount; }
 
 		inline std::vector<unsigned int> GetIndices() { return m_indices; }
 		inline size_t GetIndicesCount() { return m_indicesCount; }

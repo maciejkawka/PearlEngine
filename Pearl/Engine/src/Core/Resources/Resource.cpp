@@ -7,23 +7,23 @@
 
 using namespace PrCore::Resources;
 
-PrCore::Resources::Resources::Resources(const std::string& p_name):
+PrCore::Resources::Resource::Resource(const std::string& p_name):
 	m_name(p_name),
-	m_ID(UINT_MAX),
+	m_handle(UINT_MAX),
 	m_size(0),
-	m_state(ResourceStatus::Loaded)
+	m_state(ResourceStatus::Unmanaged)
 {}
 
-Resources::Resources(const std::string& p_name, ResourceID p_ID) :
+Resource::Resource(const std::string& p_name, ResourceHandle p_ID) :
 	m_name(p_name),
-	m_ID(p_ID),
+	m_handle(p_ID),
 	m_state(ResourceStatus::Unloaded),
 	m_size(0)
 {}
 
-void Resources::Load()
+void Resource::Load()
 {
-	if (m_ID == UINT_MAX)
+	if (m_state == ResourceStatus::Unmanaged)
 		return;
 
 	if (IsLoaded())
@@ -44,9 +44,9 @@ void Resources::Load()
 		m_state = ResourceStatus::Corrupted;
 }
 
-void Resources::Unload()
+void Resource::Unload()
 {
-	if (m_ID == UINT_MAX)
+	if (m_state == ResourceStatus::Unmanaged)
 		return;
 
 	m_state = ResourceStatus::Unloading;
@@ -64,23 +64,23 @@ void Resources::Unload()
 		m_state = ResourceStatus::Corrupted;
 }
 
-void Resources::FireUnloadedEvent()
+void Resource::FireUnloadedEvent()
 {
 	PrCore::Events::EventPtr event = 
-		std::make_shared<PrCore::Events::ResourceUnloadedEvent>(m_name, m_size, m_ID);
+		std::make_shared<PrCore::Events::ResourceUnloadedEvent>(m_name, m_size, m_handle);
 	PrCore::Events::EventManager::GetInstance().QueueEvent(event);
 }
 
-void Resources::FireLoadedEvent()
+void Resource::FireLoadedEvent()
 {
 	PrCore::Events::EventPtr event =
-		std::make_shared<PrCore::Events::ResourceLoadedEvent>(m_name, m_size, m_ID);
+		std::make_shared<PrCore::Events::ResourceLoadedEvent>(m_name, m_size, m_handle);
 	PrCore::Events::EventManager::GetInstance().QueueEvent(event);
 }
 
-void Resources::FireCorruptedEvent()
+void Resource::FireCorruptedEvent()
 {
 	PrCore::Events::EventPtr event =
-		std::make_shared<PrCore::Events::ResourceCorruptedEvent>(m_name, m_size, m_ID);
+		std::make_shared<PrCore::Events::ResourceCorruptedEvent>(m_name, m_size, m_handle);
 	PrCore::Events::EventManager::GetInstance().QueueEvent(event);
 }

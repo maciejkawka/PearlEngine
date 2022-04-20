@@ -10,8 +10,10 @@ namespace PrRenderer::Resources {
 	class Texture2D : public Texture {
 	public:
 		Texture2D() = default;
-		Texture2D(const std::string& p_name, PrCore::Resources::ResourceID p_ID) :
-			Texture(p_name, p_ID)
+
+		//Constructor for managed resource
+		Texture2D(const std::string& p_name, PrCore::Resources::ResourceHandle p_handle) :
+			Texture(p_name, p_handle)
 		{}
 
 		//To implement in future

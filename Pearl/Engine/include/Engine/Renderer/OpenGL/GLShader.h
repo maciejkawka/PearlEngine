@@ -8,9 +8,13 @@ namespace PrRenderer::OpenGL {
 
 	class GLShader : public Resources::Shader {
 	public:
-		GLShader(const std::string& p_name, PrCore::Resources::ResourceID p_ID);
+		GLShader() = delete;
+		GLShader(Shader&) = delete;
+		GLShader(Shader&&) = delete;
 
-		~GLShader();
+		//Constructor for managed resource
+		GLShader(const std::string& p_name, PrCore::Resources::ResourceHandle p_handle);
+
 
 		void Bind() override;
 		void Unbind() override;

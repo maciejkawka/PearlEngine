@@ -14,14 +14,14 @@
 using namespace PrRenderer::Resources;
 using namespace PrCore::Utils;
 
-Material::Material(const std::string& p_name, PrCore::Resources::ResourceID p_ID):
-	Resources(p_name, p_ID),
+Material::Material(const std::string& p_name, PrCore::Resources::ResourceHandle p_ID):
+	Resource(p_name, p_ID),
 	m_renderType(RenderType::Opaque),
 	m_renderOrder(0.f)
 {}
 
 Material::Material(ShaderPtr p_shader):
-	Resources("Material_"+ p_shader->GetName())
+	Resource("Material_"+ p_shader->GetName())
 {	
 	m_shader = p_shader;
 	m_uniforms = m_shader->GetAllUniforms();
@@ -40,7 +40,7 @@ Material::Material(ShaderPtr p_shader):
 }
 
 Material::Material(const Material& p_material):
-	Resources("Material_" + p_material.m_shader->GetName())
+	Resource("Material_" + p_material.m_shader->GetName())
 {
 	m_shader = p_material.m_shader;
 	m_uniforms = p_material.m_uniforms;

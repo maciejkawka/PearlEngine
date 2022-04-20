@@ -13,12 +13,15 @@
 
 namespace PrRenderer::Resources {
 
-	class Shader : public PrCore::Resources::Resources {
+	class Shader : public PrCore::Resources::Resource {
 	public:
+		Shader() = delete;
+		Shader(Shader&) = delete;
+		Shader(Shader&&) = delete;
 
-		Shader(const std::string& p_name, PrCore::Resources::ResourceID p_ID) :
-			Resources(p_name, p_ID),
-			m_name(p_name),
+		//Constructor for managed resource 
+		Shader(const std::string& p_name, PrCore::Resources::ResourceHandle p_ID) :
+			Resource(p_name, p_ID),
 			m_ID(0)
 		{}
 
@@ -27,7 +30,6 @@ namespace PrRenderer::Resources {
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
 
-		inline std::string GetName() { return m_name; }
 		inline RendererID GetID() { return m_ID; }
 
 		inline size_t GetUniformsCount() { return m_uniforms.size(); }
@@ -60,7 +62,6 @@ namespace PrRenderer::Resources {
 		virtual PrCore::Math::vec2 GetUniformVec2(const std::string& p_name) = 0;
 
 	protected:
-		std::string m_name;
 		RendererID m_ID;
 
 		std::map<std::string, Uniform> m_uniforms;

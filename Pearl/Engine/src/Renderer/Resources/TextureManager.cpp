@@ -21,9 +21,9 @@ void TextureManager::Terminate()
 		delete m_instance;
 }
 
-PrCore::Resources::Resources* TextureManager::CreateImpl(const std::string& p_name)
+PrCore::Resources::Resource* TextureManager::CreateImpl(const std::string& p_name)
 {
-	return static_cast<OpenGL::GLTexture2D*>(new OpenGL::GLTexture2D(p_name, NextResourceID()));
+	return static_cast<OpenGL::GLTexture2D*>(new OpenGL::GLTexture2D(p_name, NextResourceHandle()));
 }
 
 TextureManager::TextureManager()

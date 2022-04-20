@@ -22,16 +22,16 @@ namespace PrCore::Resources {
 			LRU() {}
 			~LRU() {}
 
-			void UpdateLRU(ResourceID p_ID);
-			void RemoveResource(ResourceID p_ID);
-			ResourceID PopLeastUsed();
+			void UpdateLRU(ResourceHandle p_ID);
+			void RemoveResource(ResourceHandle p_ID);
+			ResourceHandle PopLeastUsed();
 
 			void Clear();
 			bool IsEmpty();
 
 		private:
-			std::list<ResourceID> m_LRU;
-			std::unordered_map<ResourceID, std::list<ResourceID>::iterator> m_lruMap;
+			std::list<ResourceHandle> m_LRU;
+			std::unordered_map<ResourceHandle, std::list<ResourceHandle>::iterator> m_lruMap;
 		};
 
 		typedef std::map<size_t, ResourcePtr> ResourceIDMap;
@@ -60,22 +60,22 @@ namespace PrCore::Resources {
 		void OnResourceUnloaded(PrCore::Events::EventPtr p_event);
 
 	protected:
-		ResourceID ResNameToID(const std::string& p_name);
-		std::string ResIDToName(ResourceID p_ID);
+		ResourceHandle ResNameToID(const std::string& p_name);
+		std::string ResIDToName(ResourceHandle p_ID);
 
 		ResourcePtr ResourceByName(const std::string& p_name);
-		ResourcePtr ResourceByID(ResourceID p_ID);
+		ResourcePtr ResourceByID(ResourceHandle p_ID);
 
 		void MemoryCheck();
 		void UpdateMemoryUsage();
 
 		ResourcePtr CreateResource(const std::string& p_name);
-		virtual Resources* CreateImpl(const std::string& p_name) = 0;
+		virtual Resource* CreateImpl(const std::string& p_name) = 0;
 		virtual void DeleteImpl(ResourcePtr& p_resource);
 
 		void FireCacheMiss(CacheMiss p_cacheMiss);
 
-		inline ResourceID NextResourceID() { return s_nextResourceID++; }
+		inline static ResourceHandle NextResourceHandle() { return s_nextResourceID++; }
 
 		ResourceIDMap m_resourceID;
 		ResourceNameMap m_resourceName;

@@ -5,12 +5,11 @@ namespace PrRenderer::OpenGL {
 
 	class GLMesh : public Resources::Mesh {
 	public:
-		GLMesh(const std::string& p_name, PrCore::Resources::ResourceID p_ID) :
-			Mesh(p_name, p_ID)
-		{}
+		GLMesh() = default;
 
-		GLMesh() :
-			Mesh()
+		//Constructor for managed resource
+		GLMesh(const std::string& p_name, PrCore::Resources::ResourceHandle p_handle) :
+			Mesh(p_name, p_handle)
 		{}
 
 		void Bind() override;

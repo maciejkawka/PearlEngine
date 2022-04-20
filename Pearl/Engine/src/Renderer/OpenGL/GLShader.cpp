@@ -12,11 +12,8 @@
 using namespace PrRenderer::OpenGL;
 using namespace PrCore::Filesystem;
 
-GLShader::GLShader(const std::string& p_name, PrCore::Resources::ResourceID p_ID):
-	Shader(p_name, p_ID)
-{}
-
-GLShader::~GLShader()
+GLShader::GLShader(const std::string& p_name, PrCore::Resources::ResourceHandle p_handle):
+	Shader(p_name, p_handle)
 {}
 
 void GLShader::Bind()

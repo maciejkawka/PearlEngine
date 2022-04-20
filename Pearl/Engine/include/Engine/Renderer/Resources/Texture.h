@@ -37,10 +37,10 @@ namespace PrRenderer::Resources {
 		None
 	};
 
-	class Texture : public PrCore::Resources::Resources{
+	class Texture : public PrCore::Resources::Resource{
 	public:
 		Texture() :
-			Resources("Texture"),
+			Resource("Texture"),
 			m_ID(0),
 			m_height(0),
 			m_width(0),
@@ -54,8 +54,9 @@ namespace PrRenderer::Resources {
 			m_rawData(nullptr)
 		{}
 
-		Texture(const std::string& p_name, PrCore::Resources::ResourceID p_ID) :
-			Resources(p_name, p_ID),
+		//Constructor for managed resource
+		Texture(const std::string& p_name, PrCore::Resources::ResourceHandle p_handle) :
+			Resource(p_name, p_handle),
 			m_ID(0),
 			m_height(0),
 			m_width(0),

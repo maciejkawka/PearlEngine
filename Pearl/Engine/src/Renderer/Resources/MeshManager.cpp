@@ -11,9 +11,9 @@ MeshManager::MeshManager()
 	PRLOG_INFO("Init Mesh Manager");
 }
 
-PrCore::Resources::Resources* MeshManager::CreateImpl(const std::string& p_name)
+PrCore::Resources::Resource* MeshManager::CreateImpl(const std::string& p_name)
 {
-	return static_cast<Resources::Mesh*>(new OpenGL::GLMesh(p_name, NextResourceID()));
+	return static_cast<Resources::Mesh*>(new OpenGL::GLMesh(p_name, NextResourceHandle()));
 }
 
 MeshManager& MeshManager::GetInstance()

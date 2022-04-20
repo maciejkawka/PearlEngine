@@ -39,7 +39,7 @@ ResourcePtr ResourceManager::CreateResource(const std::string& p_name)
 
 	auto resource = ResourcePtr(CreateImpl(p_name));
 
-	m_resourceID.emplace(resource->GetID(), resource);
+	m_resourceID.emplace(resource->GetHandle(), resource);
 	m_resourceName.emplace(p_name, resource);
 	m_resources.push_back(resource);
 
@@ -73,7 +73,7 @@ ResourcePtr ResourceManager::Load(const std::string& p_name)
 	resource->Load();
 	UpdateMemoryUsage();
 
-	m_LRU.UpdateLRU(resource->GetID());
+	m_LRU.UpdateLRU(resource->GetHandle());
 	MemoryCheck();
 
 	return resource;
@@ -95,7 +95,7 @@ void ResourceManager::Unload(const std::string& p_name)
 	{
 		resource->Unload();
 		UpdateMemoryUsage();
-		m_LRU.RemoveResource(resource->GetID());
+		m_LRU.RemoveResource(resource->GetHandle());
 	}
 }
 
@@ -127,7 +127,7 @@ void ResourceManager::Delete(const std::string& p_name)
 
 	DeleteImpl(resource);
 
-	m_resourceID.erase(resource->GetID());
+	m_resourceID.erase(resource->GetHandle());
 	m_resourceName.erase(p_name);
 	m_resources.remove(resource);
 }
@@ -173,7 +173,7 @@ ResourcePtr ResourceManager::GetResource(const std::string& p_name)
 	}
 
 
-	m_LRU.UpdateLRU(resource->GetID());
+	m_LRU.UpdateLRU(resource->GetHandle());
 	return resource;
 }
 
@@ -189,12 +189,12 @@ void ResourceManager::OnResourceUnloaded(PrCore::Events::EventPtr p_event)
 	PRLOG_INFO("Resource ID {0} Name {1} unloaded", event->m_ID, event->m_name);
 }
 
-ResourceID ResourceManager::ResNameToID(const std::string& p_name)
+ResourceHandle ResourceManager::ResNameToID(const std::string& p_name)
 {
-	return ResourceByName(p_name)->GetID();
+	return ResourceByName(p_name)->GetHandle();
 }
 
-std::string ResourceManager::ResIDToName(ResourceID p_ID)
+std::string ResourceManager::ResIDToName(ResourceHandle p_ID)
 {
 	return ResourceByID(p_ID)->GetName();
 }
@@ -208,7 +208,7 @@ ResourcePtr ResourceManager::ResourceByName(const std::string& p_name)
 	return resource->second;
 }
 
-ResourcePtr ResourceManager::ResourceByID(ResourceID p_ID)
+ResourcePtr ResourceManager::ResourceByID(ResourceHandle p_ID)
 {
 	return m_resourceID.find(p_ID)->second;
 }
@@ -235,7 +235,7 @@ void PrCore::Resources::ResourceManager::UpdateMemoryUsage()
 	m_memoryUsage = actualMemoryUsage;
 }
 
-void ResourceManager::LRU::UpdateLRU(ResourceID p_ID)
+void ResourceManager::LRU::UpdateLRU(ResourceHandle p_ID)
 {
 	auto findResource = m_lruMap.find(p_ID);
 	if (findResource == m_lruMap.end())
@@ -251,7 +251,7 @@ void ResourceManager::LRU::UpdateLRU(ResourceID p_ID)
 	}
 }
 
-void ResourceManager::LRU::RemoveResource(ResourceID p_ID)
+void ResourceManager::LRU::RemoveResource(ResourceHandle p_ID)
 {
 	auto findResource = m_lruMap.find(p_ID);
 	if (findResource == m_lruMap.end())
@@ -260,7 +260,7 @@ void ResourceManager::LRU::RemoveResource(ResourceID p_ID)
 	m_lruMap.erase(findResource);
 }
 
-ResourceID ResourceManager::LRU::PopLeastUsed()
+ResourceHandle ResourceManager::LRU::PopLeastUsed()
 {
 	if (m_LRU.empty())
 		return 0;
