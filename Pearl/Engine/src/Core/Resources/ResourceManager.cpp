@@ -15,11 +15,11 @@ ResourceManager::ResourceManager() :
 
 	using namespace PrCore::Events;
 	EventListener loadedListener;
-	loadedListener.connect<&ResourceManager::OnResourceLoaded>(this);
+	loadedListener.connect<&ResourceManager::OnResourceLoaded>();
 	EventManager::GetInstance().AddListener(loadedListener, ResourceLoadedEvent::s_type);
 
 	EventListener unloadedListener;
-	unloadedListener.connect<&ResourceManager::OnResourceUnloaded>(this);
+	unloadedListener.connect<&ResourceManager::OnResourceUnloaded>();
 	EventManager::GetInstance().AddListener(unloadedListener, ResourceUnloadedEvent::s_type);
 }
 
@@ -180,13 +180,13 @@ ResourcePtr ResourceManager::GetResource(const std::string& p_name)
 void ResourceManager::OnResourceLoaded(PrCore::Events::EventPtr p_event)
 {
 	auto event = std::static_pointer_cast<PrCore::Events::ResourceLoadedEvent>(p_event);
-	PRLOG_INFO("Resource ID {0} Name {1} loaded", event->m_ID, event->m_name);
+	PRLOG_INFO("Resource handle {0} Name {1} loaded", event->m_ID, event->m_name);
 }
 
 void ResourceManager::OnResourceUnloaded(PrCore::Events::EventPtr p_event)
 {
 	auto event = std::static_pointer_cast<PrCore::Events::ResourceUnloadedEvent>(p_event);
-	PRLOG_INFO("Resource ID {0} Name {1} unloaded", event->m_ID, event->m_name);
+	PRLOG_INFO("Resource handle {0} Name {1} unloaded", event->m_ID, event->m_name);
 }
 
 ResourceHandle ResourceManager::ResNameToID(const std::string& p_name)
