@@ -3,8 +3,7 @@
 #include<memory>
 #include<string>
 
-namespace PrRenderer::Resources
-{
+namespace PrRenderer::Resources {
 	class MaterialManager;
 	class MeshManager;
 	class TextureManager;
@@ -12,6 +11,8 @@ namespace PrRenderer::Resources
 }
 
 namespace PrCore::Resources {
+
+	class ResourceManager;
 
 	class ResourceLoader {
 	public:
@@ -21,30 +22,28 @@ namespace PrCore::Resources {
 		template<class T>
 		std::shared_ptr<T> LoadResource(const std::string& p_name);
 
-		/*template<class T>
+		template<class T>
 		void UnloadResource(const std::string& p_name);
 		
-		template<class T>
+		template<class T = int>
 		void UnloadAllResources();
-
-		void UnloadAllResources();*/
-
+		
 		template<class T>
 		std::shared_ptr<T> GetResource(const std::string& p_name);
 
-		/*template<class T>
+		template<class T>
 		void DeleteResource(const std::string& p_name);
 
-		template<class T>
+		template<class T = int>
 		void DeleteAllResources();
-
-		void DeleteAllResources();
-
+		
 		template<class T>
-		const ResourceManager* GetResourceManager();*/
+		const ResourceManager* GetResourceManager();
 
 	private:
 		ResourceLoader();
+		ResourceLoader(ResourceManager&) = delete;
+		ResourceLoader(ResourceManager&&) = delete;
 		~ResourceLoader();
 
 		PrRenderer::Resources::MaterialManager* m_materialManager;

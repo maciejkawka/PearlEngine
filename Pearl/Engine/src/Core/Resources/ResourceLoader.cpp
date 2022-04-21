@@ -69,6 +69,64 @@ template std::shared_ptr<PrRenderer::Resources::Texture> ResourceLoader::LoadRes
 template std::shared_ptr<PrRenderer::Resources::Texture2D> ResourceLoader::LoadResource<PrRenderer::Resources::Texture2D>(const std::string& p_name);
 template std::shared_ptr<PrRenderer::Resources::Shader> ResourceLoader::LoadResource<PrRenderer::Resources::Shader>(const std::string& p_name);
 
+
+template<class T>
+void ResourceLoader::UnloadResource(const std::string& p_name)
+{
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Material).hash_code())
+		m_materialManager->Unload(p_name);
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Mesh).hash_code())
+		m_meshManager->Unload(p_name);
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture).hash_code() ||
+		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code())
+		m_textureManager->Unload(p_name);
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Shader).hash_code())
+		m_shaderManager->Unload(p_name);
+}
+
+template void ResourceLoader::UnloadResource<PrRenderer::Resources::Material>(const std::string& p_name);
+template void ResourceLoader::UnloadResource<PrRenderer::Resources::Mesh>(const std::string& p_name);
+template void ResourceLoader::UnloadResource<PrRenderer::Resources::Texture>(const std::string& p_name);
+template void ResourceLoader::UnloadResource<PrRenderer::Resources::Texture2D>(const std::string& p_name);
+template void ResourceLoader::UnloadResource<PrRenderer::Resources::Shader>(const std::string& p_name);
+
+
+template<class T>
+void ResourceLoader::UnloadAllResources()
+{
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Material).hash_code())
+		m_materialManager->UnloadAll();
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Mesh).hash_code())
+		m_meshManager->UnloadAll();
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture).hash_code() ||
+		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code())
+		m_textureManager->UnloadAll();
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Shader).hash_code())
+		m_shaderManager->UnloadAll();
+
+	if (typeid(T).hash_code() == typeid(int).hash_code())
+	{
+		m_materialManager->UnloadAll();
+		m_meshManager->UnloadAll();
+		m_textureManager->UnloadAll();
+		m_shaderManager->UnloadAll();
+	}
+}
+
+template void ResourceLoader::UnloadAllResources<PrRenderer::Resources::Material>();
+template void ResourceLoader::UnloadAllResources<PrRenderer::Resources::Mesh>();
+template void ResourceLoader::UnloadAllResources<PrRenderer::Resources::Texture>();
+template void ResourceLoader::UnloadAllResources<PrRenderer::Resources::Texture2D>();
+template void ResourceLoader::UnloadAllResources<PrRenderer::Resources::Shader>();
+template void ResourceLoader::UnloadAllResources<int>();
+
+
 template<class T>
 std::shared_ptr<T> ResourceLoader::GetResource(const std::string& p_name)
 {
@@ -95,3 +153,83 @@ template std::shared_ptr<PrRenderer::Resources::Texture2D> ResourceLoader::GetRe
 template std::shared_ptr<PrRenderer::Resources::Shader> ResourceLoader::GetResource<PrRenderer::Resources::Shader>(const std::string& p_name);
 
 
+template<class T>
+void ResourceLoader::DeleteResource(const std::string& p_name)
+{
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Material).hash_code())
+		m_materialManager->Delete(p_name);
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Mesh).hash_code())
+		m_meshManager->Delete(p_name);
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture).hash_code() ||
+		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code())
+		m_textureManager->Delete(p_name);
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Shader).hash_code())
+		m_shaderManager->Delete(p_name);
+}
+
+template void ResourceLoader::DeleteResource<PrRenderer::Resources::Material>(const std::string& p_name);
+template void ResourceLoader::DeleteResource<PrRenderer::Resources::Mesh>(const std::string& p_name);
+template void ResourceLoader::DeleteResource<PrRenderer::Resources::Texture>(const std::string& p_name);
+template void ResourceLoader::DeleteResource<PrRenderer::Resources::Texture2D>(const std::string& p_name);
+template void ResourceLoader::DeleteResource<PrRenderer::Resources::Shader>(const std::string& p_name);
+
+
+template<class T>
+void ResourceLoader::DeleteAllResources()
+{
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Material).hash_code())
+		m_materialManager->DeleteAll();
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Mesh).hash_code())
+		m_meshManager->DeleteAll();
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture).hash_code() ||
+		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code())
+		m_textureManager->DeleteAll();
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Shader).hash_code())
+		m_shaderManager->DeleteAll();
+
+	if (typeid(T).hash_code() == typeid(int).hash_code())
+	{
+		m_materialManager->DeleteAll();
+		m_meshManager->DeleteAll();
+		m_textureManager->DeleteAll();
+		m_shaderManager->DeleteAll();
+	}
+}
+
+template void ResourceLoader::DeleteAllResources<PrRenderer::Resources::Material>();
+template void ResourceLoader::DeleteAllResources<PrRenderer::Resources::Mesh>();
+template void ResourceLoader::DeleteAllResources<PrRenderer::Resources::Texture>();
+template void ResourceLoader::DeleteAllResources<PrRenderer::Resources::Texture2D>();
+template void ResourceLoader::DeleteAllResources<PrRenderer::Resources::Shader>();
+template void ResourceLoader::DeleteAllResources<int>();
+
+template<class T>
+const ResourceManager* ResourceLoader::GetResourceManager()
+{
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Material).hash_code())
+		return m_materialManager;
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Mesh).hash_code())
+		return m_meshManager;
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture).hash_code() ||
+		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code())
+		return m_textureManager;
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Shader).hash_code())
+		return m_shaderManager;
+
+	return nullptr;
+}
+
+template const ResourceManager* ResourceLoader::GetResourceManager<PrRenderer::Resources::Material>();
+template const ResourceManager* ResourceLoader::GetResourceManager<PrRenderer::Resources::Mesh>();
+template const ResourceManager* ResourceLoader::GetResourceManager<PrRenderer::Resources::Texture>();
+template const ResourceManager* ResourceLoader::GetResourceManager<PrRenderer::Resources::Texture2D>();
+template const ResourceManager* ResourceLoader::GetResourceManager<PrRenderer::Resources::Shader>();

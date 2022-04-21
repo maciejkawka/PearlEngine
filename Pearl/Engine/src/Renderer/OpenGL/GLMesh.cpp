@@ -99,7 +99,7 @@ bool GLMesh::LoadImpl()
 
     if (!ValidateBuffers())
     {
-        PRLOG_ERROR("Renderer: Mesh {0} valid", m_name);
+        PRLOG_ERROR("Renderer: Mesh {0} invalid", m_name);
         return false;
 
     }
@@ -117,7 +117,22 @@ void GLMesh::PreUnloadImpl()
 
 bool GLMesh::UnloadImpl()
 {
-	return false;
+    m_indices.clear();
+    m_indicesCount = 0;
+
+    m_vertices.clear();
+    m_verticesCount = 0;
+
+    m_colors.clear();
+    m_normals.clear();
+    m_tangents.clear();
+
+    for(auto& uv : m_UVs)
+        uv.clear();
+
+    m_VA.reset();
+
+    return true;
 }
 
 void GLMesh::PostUnloadImpl()

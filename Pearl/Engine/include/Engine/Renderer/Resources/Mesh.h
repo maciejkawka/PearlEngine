@@ -5,6 +5,8 @@
 
 #include<array>
 
+#define MAX_UVs 8
+
 namespace PrRenderer::Resources {
 
 	class Mesh : public PrCore::Resources::Resource {
@@ -65,7 +67,7 @@ namespace PrRenderer::Resources {
 		std::vector<PrCore::Math::vec4>			m_tangents;
 
 		UVArray									m_UVs;
-		size_t									m_maxUVs = 8;
+		size_t									m_maxUVs = MAX_UVs;
 
 		bool									m_stateChanged;
 
