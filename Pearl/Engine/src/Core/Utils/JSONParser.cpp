@@ -4,7 +4,7 @@
 
 using namespace PrCore::Utils;
 
-const PrRenderer::Core::Color& JSONParser::ToColor(const JSON::json& p_json)
+PrRenderer::Core::Color JSONParser::ToColor(const JSON::json& p_json)
 {
 	return 	PrRenderer::Core::Color(p_json["r"],
 		p_json["g"],
@@ -12,22 +12,22 @@ const PrRenderer::Core::Color& JSONParser::ToColor(const JSON::json& p_json)
 		p_json["a"]);
 }
 
-const PrCore::Math::vec2& JSONParser::ToVec2(const JSON::json& p_json)
+PrCore::Math::vec2 JSONParser::ToVec2(const JSON::json& p_json)
 {
 	return PrCore::Math::vec2(p_json["x"], p_json["y"]);
 }
 
-const PrCore::Math::vec3& JSONParser::ToVec3(const JSON::json& p_json)
+PrCore::Math::vec3 JSONParser::ToVec3(const JSON::json& p_json)
 {
 	return PrCore::Math::vec3(p_json["x"], p_json["y"], p_json["z"]);
 }
 
-const PrCore::Math::vec4& JSONParser::ToVec4(const JSON::json& p_json)
+PrCore::Math::vec4 JSONParser::ToVec4(const JSON::json& p_json)
 {
 	return PrCore::Math::vec4(p_json["x"], p_json["y"], p_json["z"], p_json["w"]);
 }
 
-const PrCore::Math::mat4& JSONParser::ToMat4(const JSON::json& p_json)
+PrCore::Math::mat4 JSONParser::ToMat4(const JSON::json& p_json)
 {
 	return PrCore::Math::mat4(
 		(float)p_json["m0"], (float)p_json["m1"], (float)p_json["m2"], (float)p_json["m3"],
@@ -37,7 +37,7 @@ const PrCore::Math::mat4& JSONParser::ToMat4(const JSON::json& p_json)
 	);
 }
 
-const PrCore::Math::mat3& JSONParser::ToMat3(const JSON::json& p_json)
+PrCore::Math::mat3 JSONParser::ToMat3(const JSON::json& p_json)
 {
 	return PrCore::Math::mat3(
 		(float)p_json["m0"], (float)p_json["m1"], (float)p_json["m2"],
