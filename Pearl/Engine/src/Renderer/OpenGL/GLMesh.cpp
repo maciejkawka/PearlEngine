@@ -139,6 +139,10 @@ void GLMesh::PostUnloadImpl()
 {
 }
 
+void GLMesh::LoadDefault()
+{
+}
+
 std::vector<PrCore::Math::vec4> GLMesh::CalculateTangents()
 {
     std::vector<PrCore::Math::vec4> tangents(m_verticesCount);

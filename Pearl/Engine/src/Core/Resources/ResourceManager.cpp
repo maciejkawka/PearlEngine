@@ -21,6 +21,10 @@ ResourceManager::ResourceManager() :
 	EventListener unloadedListener;
 	unloadedListener.connect<&ResourceManager::OnResourceUnloaded>();
 	EventManager::GetInstance().AddListener(unloadedListener, ResourceUnloadedEvent::s_type);
+
+	EventListener corruptedListener;
+	corruptedListener.connect<&ResourceManager::OnResourceCorrupted>();
+	EventManager::GetInstance().AddListener(corruptedListener, ResourceCorruptedEvent::s_type);
 }
 
 ResourceManager::~ResourceManager()
@@ -187,6 +191,12 @@ void ResourceManager::OnResourceUnloaded(PrCore::Events::EventPtr p_event)
 {
 	auto event = std::static_pointer_cast<PrCore::Events::ResourceUnloadedEvent>(p_event);
 	PRLOG_INFO("Resource handle {0} Name {1} unloaded", event->m_ID, event->m_name);
+}
+
+void ResourceManager::OnResourceCorrupted(PrCore::Events::EventPtr p_event)
+{
+	auto event = std::static_pointer_cast<PrCore::Events::ResourceCorruptedEvent>(p_event);
+	PRLOG_ERROR("Resource handle {0} Name {1} corrupted", event->m_ID, event->m_name);
 }
 
 ResourceHandle ResourceManager::ResNameToID(const std::string& p_name)

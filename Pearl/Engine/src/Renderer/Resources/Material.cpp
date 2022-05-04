@@ -266,6 +266,10 @@ void Material::PostUnloadImpl()
 {
 }
 
+void Material::LoadDefault()
+{
+}
+
 void Material::CalculateSize()
 {
 }

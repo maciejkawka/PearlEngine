@@ -41,7 +41,11 @@ void Resource::Load()
 		CalculateSize();
 	}
 	else
+	{
+		FireCorruptedEvent();
 		m_state = ResourceStatus::Corrupted;
+		LoadDefault();
+	}
 }
 
 void Resource::Unload()

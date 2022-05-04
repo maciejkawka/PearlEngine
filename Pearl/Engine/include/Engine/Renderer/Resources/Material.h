@@ -71,15 +71,17 @@ namespace PrRenderer::Resources {
 		const T& GetProperty(const std::string& p_name);
 
 	protected:
-		virtual void PreLoadImpl() override;
-		virtual bool LoadImpl() override;
-		virtual void PostLoadImpl() override;
+		void PreLoadImpl() override;
+		bool LoadImpl() override;
+		void PostLoadImpl() override;
 
-		virtual void PreUnloadImpl() override;
-		virtual bool UnloadImpl() override;
-		virtual void PostUnloadImpl() override;
+		void PreUnloadImpl() override;
+		bool UnloadImpl() override;
+		void PostUnloadImpl() override;
 
-		virtual void CalculateSize() override;
+		void LoadDefault() override;
+
+		void CalculateSize() override;
 
 		bool PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json);
 

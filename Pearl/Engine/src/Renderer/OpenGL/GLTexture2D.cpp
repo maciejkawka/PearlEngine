@@ -122,6 +122,39 @@ void GLTexture2D::PostUnloadImpl()
 {
 }
 
+void GLTexture2D::LoadDefault()
+{
+	unsigned char* rawImage = new unsigned char[4];
+
+	//Pink color
+	rawImage[0] = 255;
+	rawImage[1] = 20;
+	rawImage[2] = 147;
+	rawImage[3] = 255;
+
+	unsigned int format = TextureFormatToGL(Resources::TextureFormat::RGB24);
+	int height = 1;
+	int width = 1;
+
+	glGenTextures(1, &m_ID);
+	glBindTexture(GL_TEXTURE_2D, m_ID);
+	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, rawImage);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, TextureWrapToGL(m_wrapU));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, TextureWrapToGL(m_wrapV));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, TextureFilterToGL(m_minFiltering));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, TextureFilterToGL(m_magFiltering));
+
+	if (m_mipmap)
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+	if (m_readable)
+		m_rawData = rawImage;
+	else
+		delete[] rawImage;
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void GLTexture2D::CalculateSize()
 {
 	m_size = sizeof(m_ID) +

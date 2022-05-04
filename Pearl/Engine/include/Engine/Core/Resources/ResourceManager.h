@@ -58,6 +58,7 @@ namespace PrCore::Resources {
 
 		static void OnResourceLoaded(PrCore::Events::EventPtr p_event);
 		static void OnResourceUnloaded(PrCore::Events::EventPtr p_event);
+		static void OnResourceCorrupted(PrCore::Events::EventPtr p_event);
 
 	protected:
 		ResourceHandle ResNameToID(const std::string& p_name);

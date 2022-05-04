@@ -56,6 +56,8 @@ namespace PrRenderer::OpenGL {
 		bool UnloadImpl() override;
 		void PostUnloadImpl() override;
 
+		void LoadDefault() override;
+
 		void CalculateSize() override;
 
 		bool Compile();

@@ -433,6 +433,10 @@ void GLShader::PostUnloadImpl()
 {
 }
 
+void GLShader::LoadDefault()
+{
+}
+
 void GLShader::CalculateSize()
 {
 	m_size =

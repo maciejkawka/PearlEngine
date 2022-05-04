@@ -27,6 +27,8 @@ namespace PrRenderer::OpenGL {
 		bool UnloadImpl() override;
 		void PostUnloadImpl() override;
 
+		void LoadDefault() override;
+
 		std::vector<PrCore::Math::vec4> CalculateTangents();
 		std::vector<PrCore::Math::vec3> CalculateNormals();
 		PrCore::Math::vec4 GenerateTangent(int a, int b, int c);
