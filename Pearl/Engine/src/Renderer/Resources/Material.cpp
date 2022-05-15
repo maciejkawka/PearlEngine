@@ -2,8 +2,7 @@
 
 #include"Renderer/Resources/Material.h"
 #include"Core/Resources/ResourceLoader.h"
-#include"Renderer/Resources/ShaderManager.h"
-#include"Renderer/Resources/TextureManager.h"
+
 
 #include"Core/Filesystem/FileSystem.h"
 
@@ -505,6 +504,21 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 			break;
 		}
 		case UniformType::Cubemap:
+		{
+			auto uniformExist = false;
+			auto cubemap = p_json.find("cubemap");
+			if (cubemap != p_json.end())
+			{
+				auto& value = cubemap.value();
+				auto cubemapName = value["texName"];
+				auto cubemapPath = value["texPath"];
+
+				auto textureResource = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Cubemap>(cubemapPath);
+				m_textures[cubemapName] = textureResource;
+				uniformExist = true;
+			}
+			break;
+		}
 		case UniformType::Texture3D:
 			break;
 		default:

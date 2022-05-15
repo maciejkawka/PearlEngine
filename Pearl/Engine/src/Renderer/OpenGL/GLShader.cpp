@@ -341,7 +341,7 @@ void GLShader::ScanUniforms()
 			case GL_SAMPLER_3D:
 				prUniformType = PrRenderer::Resources::UniformType::Texture3D;
 				break;
-			case GL_TEXTURE_CUBE_MAP:
+			case GL_SAMPLER_CUBE:
 				prUniformType = PrRenderer::Resources::UniformType::Cubemap;
 				break;
 			default:

@@ -5,6 +5,7 @@
 #include"Renderer/Core/Color.h"
 #include"Renderer/Resources/Uniform.h"
 #include"Renderer/Resources/Shader.h"
+#include"Renderer/Resources/Cubemap.h"
 #include"Renderer/Resources/Texture.h"
 
 #include"Core/Utils/JSONParser.h"

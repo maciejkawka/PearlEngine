@@ -5,11 +5,16 @@
 #include"Renderer/Core/Camera.h"
 
 #include"Core/Events/WindowEvents.h"
-#include"Core/Events/EventManager.h"
+#include"Core/Events/EventManager.h"  //Cannot debug with this line.
+#include"Core/Resources/ResourceLoader.h"
+
+#include"Renderer/Core/Defines.h"
+#include "Renderer/OpenGL/GLVertexBuffer.h"
+#include "Renderer/OpenGL/GLVertexArray.h"
 
 using namespace PrRenderer::Core;
 
-PrRenderer::Core::Renderer3D::Renderer3D()
+Renderer3D::Renderer3D()
 {
 	PrCore::Events::EventListener windowResizedListener;
 	windowResizedListener.connect<&Renderer3D::OnWindowResize>(this);
@@ -79,6 +84,9 @@ void PrRenderer::Core::Renderer3D::DrawMeshNow(Resources::MeshPtr p_mesh, PrCore
 
 void Renderer3D::Flush()
 {
+	if(m_cubemap)
+		DrawCubemap();
+
 	m_lightData.clear();
 }
 
@@ -89,4 +97,38 @@ void Renderer3D::OnWindowResize(PrCore::Events::EventPtr p_event)
 	auto height = windowResizeEvent->m_height;
 
 	LowRenderer::SetViewport(width, height);
+}
+
+void Renderer3D::DrawCubemap()
+{
+	//Temp solution
+	float quad[] = {
+			-1.0f, 1.0f, 0.0f,
+		   -1.0f, -1.0f, 0.0f,
+			1.0f, 1.0f, 0.0f,
+			1.0f, -1.0f, 0.0f
+	};
+
+	VertexArrayPtr VA = std::make_shared<OpenGL::GLVertexArray>();
+	VertexBufferPtr VB = std::make_shared<OpenGL::GLVertexBuffer>(quad, sizeof(quad));
+
+	PrRenderer::Buffers::BufferLayout buffer;
+	buffer.AddElementBuffer({ "Vertex", PrRenderer::Buffers::ShaderDataType::Float3 });
+
+	VB->SetBufferLayout(buffer);
+	VA->SetVertexBuffer(VB);
+	//
+
+	auto camera = PrRenderer::Core::Camera::GetMainCamera();
+	if (m_cubemap->HasProperty("view"))
+		m_cubemap->SetProperty("view", camera->GetViewMatrix());
+	if (m_cubemap->HasProperty("proj"))
+		m_cubemap->SetProperty("proj", camera->GetProjectionMatrix());
+
+	LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::LessEqual);
+	m_cubemap->Bind();
+	VA->Bind();
+	LowRenderer::Draw(VA, Primitives::TriangleStrip);
+	m_cubemap->Unbind();
+	LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::Less);
 }

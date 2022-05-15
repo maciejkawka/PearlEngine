@@ -147,10 +147,8 @@ void GLTexture2D::LoadDefault()
 	if (m_mipmap)
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-	if (m_readable)
-		m_rawData = rawImage;
-	else
-		delete[] rawImage;
+	delete[] rawImage;
+	m_readable = false;
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
