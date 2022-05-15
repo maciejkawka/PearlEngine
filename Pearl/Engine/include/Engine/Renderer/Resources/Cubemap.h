@@ -13,7 +13,13 @@ namespace PrRenderer::Resources{
 		Cubemap(std::string p_name, PrCore::Resources::ResourceHandle p_handle):
 			Texture(p_name, p_handle),
 		m_rawDataArray(nullptr)
-		{}
+		{
+			m_wrapU = Resources::TextureWrapMode::Clamp;
+			m_wrapV = Resources::TextureWrapMode::Clamp;
+			m_wrapR = Resources::TextureWrapMode::Clamp;
+			m_magFiltering = Resources::TextureFiltering::Linear;
+			m_minFiltering = Resources::TextureFiltering::Linear;
+		}
 
 		inline void SetFace(int p_index, const std::string& p_name) { m_facesNames[p_index] = p_name; }
 		inline void Faces(std::vector<std::string> p_names) { m_facesNames = p_names; }
@@ -29,8 +35,9 @@ namespace PrRenderer::Resources{
 		//const Core::Color* GetPixels();
 
 	protected:
-		std::vector<std::string> m_facesNames;
 		unsigned char** m_rawDataArray;
+		std::vector<std::string> m_facesNames;
+		TextureWrapMode m_wrapR;
 	};
 
 	typedef std::shared_ptr<Cubemap> CubemapPtr;

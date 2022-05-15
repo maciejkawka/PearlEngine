@@ -14,11 +14,6 @@ using namespace PrRenderer::OpenGL;
 GLCubemap::GLCubemap(std::string p_name, PrCore::Resources::ResourceHandle p_handle):
 	Cubemap(p_name, p_handle)
 {
-	m_wrapU = Resources::TextureWrapMode::Clamp;
-	m_wrapV = Resources::TextureWrapMode::Clamp;
-	m_wrapR = Resources::TextureWrapMode::Clamp;
-	m_magFiltering = Resources::TextureFiltering::Linear;
-	m_minFiltering = Resources::TextureFiltering::Linear;
 }
 
 void GLCubemap::Bind(unsigned int p_slot)

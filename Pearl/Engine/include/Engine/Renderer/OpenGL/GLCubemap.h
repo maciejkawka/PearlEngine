@@ -33,9 +33,6 @@ namespace PrRenderer::OpenGL {
 
 		unsigned char* ReadRawData(const std::string& p_name, bool p_first);
 		bool LoadTexturesNames();
-
-	protected:
-		Resources::TextureWrapMode m_wrapR;
 	};
 	
 }
