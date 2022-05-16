@@ -54,7 +54,6 @@
     <ClInclude Include="include\Engine\Renderer\Core\Defines.h" />
     <ClInclude Include="include\Engine\Renderer\Core\Light.h" />
     <ClInclude Include="include\Engine\Renderer\Core\LowRenderer.h" />
-    <ClInclude Include="include\Engine\Renderer\Core\Renderer.h" />
     <ClInclude Include="include\Engine\Renderer\Core\Renderer3D.h" />
     <ClInclude Include="include\Engine\Renderer\Core\RendererAPI.h" />
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLContext.h" />
@@ -120,7 +119,6 @@
     <ClCompile Include="src\Renderer\OpenGL\GLTexture2D.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\GLVertexArray.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\GLVertexBuffer.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL\Renderer.cpp" />
     <ClCompile Include="src\Renderer\Resources\Material.cpp" />
     <ClCompile Include="src\Renderer\Resources\MaterialManager.cpp" />
     <ClCompile Include="src\Renderer\Resources\Mesh.cpp" />

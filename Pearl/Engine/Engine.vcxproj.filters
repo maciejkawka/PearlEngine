@@ -141,9 +141,6 @@
     <ClInclude Include="include\Engine\Renderer\Core\Defines.h">
       <Filter>Renderer\Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Core\Renderer.h">
-      <Filter>Renderer\Core</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Buffers\BufferLayout.h">
       <Filter>Renderer\Buffers</Filter>
     </ClInclude>
@@ -298,9 +295,6 @@
     </ClCompile>
     <ClCompile Include="src\Core\Resources\ResourceManager.cpp">
       <Filter>Core\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\Renderer.cpp">
-      <Filter>Renderer\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Resources\ShaderManager.cpp">
       <Filter>Renderer\Resources</Filter>
