@@ -6,7 +6,7 @@ namespace PrRenderer::OpenGL {
 	
 	class GLRenderer : public Core::RendererAPI {
 	public:
-		GLRenderer() = default;
+		GLRenderer();
 		~GLRenderer() = default;
 
 		void Clear(Core::ClearFlag p_flag) override;

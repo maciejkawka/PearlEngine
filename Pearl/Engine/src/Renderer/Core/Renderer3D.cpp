@@ -9,8 +9,8 @@
 #include"Core/Resources/ResourceLoader.h"
 
 #include"Renderer/Core/Defines.h"
-#include "Renderer/OpenGL/GLVertexBuffer.h"
-#include "Renderer/OpenGL/GLVertexArray.h"
+#include "Renderer/Buffers/VertexBuffer.h"
+#include "Renderer/Buffers/VertexArray.h"
 
 using namespace PrRenderer::Core;
 
@@ -109,8 +109,8 @@ void Renderer3D::DrawCubemap()
 			1.0f, -1.0f, 0.0f
 	};
 
-	VertexArrayPtr VA = std::make_shared<OpenGL::GLVertexArray>();
-	VertexBufferPtr VB = std::make_shared<OpenGL::GLVertexBuffer>(quad, sizeof(quad));
+	VertexArrayPtr VA = Buffers::VertexArray::Create();
+	VertexBufferPtr VB = Buffers::VertexBuffer::Create(quad, sizeof(quad));
 
 	PrRenderer::Buffers::BufferLayout buffer;
 	buffer.AddElementBuffer({ "Vertex", PrRenderer::Buffers::ShaderDataType::Float3 });

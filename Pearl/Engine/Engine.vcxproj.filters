@@ -371,5 +371,17 @@
     <ClCompile Include="src\Renderer\OpenGL\GLCubemap.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\Buffers\VertexBuffer.cpp">
+      <Filter>Renderer\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Buffers\IndexBuffer.cpp">
+      <Filter>Renderer\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Buffers\VertexArray.cpp">
+      <Filter>Renderer\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Buffers\Framebuffer.cpp">
+      <Filter>Renderer\Buffers</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

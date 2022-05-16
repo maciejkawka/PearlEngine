@@ -19,6 +19,8 @@ namespace PrRenderer::Buffers {
 
 		inline RendererID GetID() { return m_bufferID; }
 
+		static VertexArrayPtr Create();
+
 	protected:
 		RendererID m_bufferID;
 		size_t m_vertexBufferIndex;

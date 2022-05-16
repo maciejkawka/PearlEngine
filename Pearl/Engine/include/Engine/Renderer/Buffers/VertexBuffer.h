@@ -20,6 +20,8 @@ namespace PrRenderer::Buffers{
 		inline size_t GetSize() { return m_size; }
 		inline RendererID GetID() { return m_bufferID; }
 
+		static VertexBufferPtr Create();
+		static VertexBufferPtr Create(void* p_data, size_t p_size);
 	protected:
 		RendererID m_bufferID;
 		BufferLayout m_bufferLayout;

@@ -67,6 +67,8 @@ namespace PrRenderer::Buffers {
 		inline const FramebufferSettings& GetSettings() const { return m_settings; }
 		inline RendererID GetID() { return m_ID; }
 
+		static FramebuffferPtr Create(const Buffers::FramebufferSettings& p_settings);
+
 	protected:
 		RendererID m_ID;
 		std::vector<RendererID> m_colorTextureIDs;
@@ -74,4 +76,6 @@ namespace PrRenderer::Buffers {
 
 		FramebufferSettings m_settings;
 	};
+
+	typedef std::shared_ptr<Buffers::Framebufffer> FramebuffferPtr;
 }

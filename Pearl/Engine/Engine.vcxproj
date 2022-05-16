@@ -103,6 +103,10 @@
     </ClCompile>
     <ClCompile Include="src\Core\Utils\StringUtils.cpp" />
     <ClCompile Include="src\Core\Windowing\GLWindow.cpp" />
+    <ClCompile Include="src\Renderer\Buffers\Framebuffer.cpp" />
+    <ClCompile Include="src\Renderer\Buffers\IndexBuffer.cpp" />
+    <ClCompile Include="src\Renderer\Buffers\VertexArray.cpp" />
+    <ClCompile Include="src\Renderer\Buffers\VertexBuffer.cpp" />
     <ClCompile Include="src\Renderer\Core\Camera.cpp" />
     <ClCompile Include="src\Renderer\Core\Color.cpp" />
     <ClCompile Include="src\Renderer\Core\Light.cpp" />

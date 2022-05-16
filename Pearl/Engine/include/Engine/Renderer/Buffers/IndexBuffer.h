@@ -15,6 +15,8 @@ namespace PrRenderer::Buffers {
 		inline size_t GetSize() { return m_size; }
 		inline RendererID GetID() { return m_bufferID; }
 
+		static IndexBufferPtr Create();
+
 	protected:
 		RendererID m_bufferID;
 		size_t m_size;

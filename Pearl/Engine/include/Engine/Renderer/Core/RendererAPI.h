@@ -16,7 +16,8 @@ namespace PrRenderer::Core {
 
 	enum class GraphicsAPI {
 		OpenGL,
-		DirectX
+		DirectX,
+		None
 	};
 
 	enum class Primitives {
@@ -56,5 +57,9 @@ namespace PrRenderer::Core {
 		virtual void Draw(PrRenderer::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles) = 0;
 		virtual void DrawArray(PrRenderer::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles) = 0;
 
+		inline static GraphicsAPI GetGraphicsAPI() { return m_graphicsAPI; }
+
+	protected:
+		inline static GraphicsAPI m_graphicsAPI = GraphicsAPI::None;
 	};
 }

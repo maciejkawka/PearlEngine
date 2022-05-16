@@ -10,6 +10,11 @@
 
 using namespace PrRenderer::OpenGL;
 
+GLRenderer::GLRenderer()
+{
+	RendererAPI::m_graphicsAPI = Core::GraphicsAPI::OpenGL;
+}
+
 void GLRenderer::Clear(Core::ClearFlag p_flag)
 {
 	int mask = 0;
