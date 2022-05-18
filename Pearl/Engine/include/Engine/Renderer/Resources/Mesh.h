@@ -1,13 +1,24 @@
 #pragma once
 #include"Core/Resources/Resource.h"
 
-#include"Renderer/Buffers//VertexArray.h"
+#include"Renderer/Core/Defines.h"
+#include"Renderer/Buffers/VertexArray.h"
 
 #include<array>
 
 #define MAX_UVs 8
 
 namespace PrRenderer::Resources {
+
+	enum PrimitiveType
+	{
+		Cube,
+		Sphere,
+		Capsule,
+		Cylinder,
+		Plane,
+		Quad
+	};
 
 	class Mesh : public PrCore::Resources::Resource {
 
@@ -55,8 +66,18 @@ namespace PrRenderer::Resources {
 
 		virtual void RecalculateNormals() = 0;
 		virtual void RecalculateTangents() = 0;
-		
-	protected:	
+
+		static MeshPtr Create();
+		static MeshPtr CreatePrimitive(PrimitiveType p_primitiveType);
+
+	protected:
+		virtual void UpdateBuffers() = 0;
+
+		std::vector<PrCore::Math::vec4> CalculateTangents();
+		std::vector<PrCore::Math::vec3> CalculateNormals();
+		PrCore::Math::vec4 GenerateTangent(int a, int b, int c);
+		bool ValidateBuffers();
+
 		std::vector<unsigned int>				m_indices;
 		size_t									m_indicesCount;
 
@@ -72,6 +93,14 @@ namespace PrRenderer::Resources {
 		bool									m_stateChanged;
 
 		std::shared_ptr<Buffers::VertexArray>	m_VA;
+
+	private:
+		static MeshPtr CreateCube();
+		static MeshPtr CreateSphere();
+		static MeshPtr CreateCapsule();
+		static MeshPtr CreateCylinder();
+		static MeshPtr CreatePlane();
+		static MeshPtr CreateQuad();
 	};
 
 	typedef std::shared_ptr<Mesh> MeshPtr;

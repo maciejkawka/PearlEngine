@@ -80,6 +80,7 @@ void PrRenderer::Core::Renderer3D::DrawMeshNow(Resources::MeshPtr p_mesh, PrCore
 
 	LowRenderer::Draw(p_mesh->GetVertexArray());
 	p_material->Unbind();
+	p_mesh->Unbind();
 }
 
 void Renderer3D::Flush()
@@ -101,24 +102,6 @@ void Renderer3D::OnWindowResize(PrCore::Events::EventPtr p_event)
 
 void Renderer3D::DrawCubemap()
 {
-	//Temp solution
-	float quad[] = {
-			-1.0f, 1.0f, 0.0f,
-		   -1.0f, -1.0f, 0.0f,
-			1.0f, 1.0f, 0.0f,
-			1.0f, -1.0f, 0.0f
-	};
-
-	VertexArrayPtr VA = Buffers::VertexArray::Create();
-	VertexBufferPtr VB = Buffers::VertexBuffer::Create(quad, sizeof(quad));
-
-	PrRenderer::Buffers::BufferLayout buffer;
-	buffer.AddElementBuffer({ "Vertex", PrRenderer::Buffers::ShaderDataType::Float3 });
-
-	VB->SetBufferLayout(buffer);
-	VA->SetVertexBuffer(VB);
-	//
-
 	auto camera = PrRenderer::Core::Camera::GetMainCamera();
 	if (m_cubemap->HasProperty("view"))
 		m_cubemap->SetProperty("view", camera->GetViewMatrix());
@@ -126,9 +109,13 @@ void Renderer3D::DrawCubemap()
 		m_cubemap->SetProperty("proj", camera->GetProjectionMatrix());
 
 	LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::LessEqual);
+
+	auto quad = Resources::Mesh::CreatePrimitive(Resources::Quad);
+
 	m_cubemap->Bind();
-	VA->Bind();
-	LowRenderer::Draw(VA, Primitives::TriangleStrip);
+	quad->Bind();
+	LowRenderer::Draw(quad->GetVertexArray(), Primitives::TriangleStrip);
+	quad->Unbind();
 	m_cubemap->Unbind();
 	LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::Less);
 }

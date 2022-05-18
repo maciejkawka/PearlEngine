@@ -127,6 +127,7 @@
     <ClCompile Include="src\Renderer\Resources\MaterialManager.cpp" />
     <ClCompile Include="src\Renderer\Resources\Mesh.cpp" />
     <ClCompile Include="src\Renderer\Resources\MeshManager.cpp" />
+    <ClCompile Include="src\Renderer\Resources\Mesh_Primitives.cpp" />
     <ClCompile Include="src\Renderer\Resources\ShaderManager.cpp" />
     <ClCompile Include="src\Renderer\Resources\TextureManager.cpp" />
   </ItemGroup>

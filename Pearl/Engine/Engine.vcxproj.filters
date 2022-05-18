@@ -383,5 +383,8 @@
     <ClCompile Include="src\Renderer\Buffers\Framebuffer.cpp">
       <Filter>Renderer\Buffers</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\Resources\Mesh_Primitives.cpp">
+      <Filter>Renderer\Resources</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

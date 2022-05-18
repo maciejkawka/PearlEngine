@@ -29,13 +29,9 @@ namespace PrRenderer::OpenGL {
 
 		void LoadDefault() override;
 
-		std::vector<PrCore::Math::vec4> CalculateTangents();
-		std::vector<PrCore::Math::vec3> CalculateNormals();
-		PrCore::Math::vec4 GenerateTangent(int a, int b, int c);
-		virtual void CalculateSize() override;
-		bool ValidateBuffers();
-		void UpdateBuffers();
+		void UpdateBuffers() override;
+		void CalculateSize() override;
+		
 		bool PopulateOBJ();
-
 	};
 }
