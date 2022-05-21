@@ -201,11 +201,11 @@ bool GLShader::Compile()
 	glCompileShader(vertexShader);
 
 	int  success;
-	char infoLog[512];
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
 
 	if (!success)
 	{
+		char infoLog[512];	
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
 		PRLOG_ERROR("Renderer: VertexShader " + m_name + " Error: " + infoLog);
 		return false;
@@ -222,9 +222,9 @@ bool GLShader::Compile()
 
 	if (!success)
 	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::string error(infoLog);
-		PRLOG_ERROR("Renderer: FragmentShader " + m_name + " Error: " + error);
+		char infoLog[512];
+		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+		PRLOG_ERROR("Renderer: FragmentShader " + m_name + " Error: " + infoLog);
 		return false;
 	}
 

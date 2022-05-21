@@ -20,6 +20,9 @@ Renderer3D::Renderer3D()
 	windowResizedListener.connect<&Renderer3D::OnWindowResize>(this);
 	PrCore::Events::EventManager::GetInstance().AddListener(windowResizedListener, PrCore::Events::WindowResizeEvent::s_type);
 	m_color = PrCore::Math::vec3(0.0f);
+
+
+	m_quad = Resources::Mesh::CreatePrimitive(Resources::Quad);
 }
 
 void Renderer3D::Begin()
@@ -110,12 +113,10 @@ void Renderer3D::DrawCubemap()
 
 	LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::LessEqual);
 
-	auto quad = Resources::Mesh::CreatePrimitive(Resources::Quad);
-
 	m_cubemap->Bind();
-	quad->Bind();
-	LowRenderer::Draw(quad->GetVertexArray(), Primitives::TriangleStrip);
-	quad->Unbind();
+	m_quad->Bind();
+	LowRenderer::Draw(m_quad->GetVertexArray(), Primitives::TriangleStrip);
+	m_quad->Unbind();
 	m_cubemap->Unbind();
 	LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::Less);
 }

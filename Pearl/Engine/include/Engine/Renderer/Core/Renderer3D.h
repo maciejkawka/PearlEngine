@@ -37,6 +37,8 @@ namespace PrRenderer::Core {
 
 		std::vector<PrCore::Math::mat4> m_lightData;
 		PrCore::Math::vec3 m_color;
+
+		PrRenderer::Resources::MeshPtr m_quad;
 	};
 
 }
