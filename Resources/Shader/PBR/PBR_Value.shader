@@ -44,13 +44,10 @@ in Vertex{
 const float PI = 3.14159265359;
 
 // material textures
-uniform sampler2D albedoMap;
-uniform sampler2D normalMap;
-uniform sampler2D metallicMap;
-uniform sampler2D roughnessMap;
-uniform sampler2D aoMap;
-
-uniform samplerCube irradianceMap;
+uniform vec3 albedo;
+uniform float metallic;
+uniform float roughness;
+uniform float ao;
 
 // lights
 uniform mat4 lightMat[4];
@@ -58,23 +55,6 @@ uniform int lightNumber = 0;
 uniform vec3 ambientColor;
 
 uniform vec3 camPos;
-
-vec3 getNormalFromMap()
-{
-    vec3 tangentNormal = texture(normalMap, IN.uv0).xyz * 2.0 - 1.0;
-
-    vec3 Q1  = dFdx(IN.pos);
-    vec3 Q2  = dFdy(IN.pos);
-    vec2 st1 = dFdx(IN.uv0);
-    vec2 st2 = dFdy(IN.uv0);
-
-    vec3 N   = normalize(IN.normals);
-    vec3 T  = normalize(Q1*st2.t - Q2*st1.t);
-    vec3 B  = -normalize(cross(N, T));
-    mat3 TBN = mat3(T, B, N);
-
-    return normalize(TBN * tangentNormal);
-}
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
@@ -119,20 +99,8 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 
 void main()
 {
-    vec3 albedo = texture(albedoMap, IN.uv0).rgb;
-    float metallic = texture(metallicMap, IN.uv0).r;
-    float roughness = texture(roughnessMap, IN.uv0).r;
-    float ao = texture(aoMap, IN.uv0).r;
-
-    //  vec3 albedo = vec3(1.0,0.0,0.0);    
-    //  float metallic = 0.4;
-    //  float roughness = 0.1;
-    //  float ao = 1.0;
-
-    vec3 N = getNormalFromMap();
+    vec3 N = IN.normals;
     vec3 V = normalize(camPos - IN.pos);
-    vec3 R = reflect(-V,N);
-
 
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
     // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
@@ -170,15 +138,10 @@ void main()
     }
 
 
-    //IR ambient
-    vec3 kS = fresnelSchlick(max(dot(N,V), 0.0), F0);
-    vec3 kD = 1.0-kS;
-    kD *= 1.0-metallic;
-    vec3 irradiance = texture(irradianceMap, N).rgb;
-    vec3 diffuse = irradiance * albedo;
-    vec3 ambient = (kD * diffuse) * ao;
-    
+    //Ambient temporaty to be replaced by a IBL
+    vec3 ambient = vec3(0.03) * albedo * ao;
     vec3 color = ambient + Lo;
+
 
     //gamma correction
     color = color/(color + vec3(1.0));
