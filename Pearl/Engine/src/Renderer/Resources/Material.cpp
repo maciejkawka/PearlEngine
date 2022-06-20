@@ -167,10 +167,10 @@ void Material::SetTexture(const std::string& p_name, TexturePtr p_texture)
 	{
 		find->second = p_texture;
 
-		if (p_texture != nullptr)
-			SetProperty("use" + p_name, true);
-		else
-			SetProperty("use" + p_name, false);
+		//if (p_texture != nullptr)
+		//	SetProperty("use" + p_name, true);
+		//else
+		//	SetProperty("use" + p_name, false);
 	}
 
 }

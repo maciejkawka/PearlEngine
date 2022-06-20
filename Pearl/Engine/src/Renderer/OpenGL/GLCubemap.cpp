@@ -313,7 +313,7 @@ bool GLCubemap::LoadHDR()
 {
 	//Load HDR texture and shader
 	auto texture = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Texture2D>(m_name);
-	auto shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Shader>("HDRToCubemap.shader");
+	auto shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Shader>("Cubemap/HDRToCubemap.shader");
 
 	//Create Framebuffer 
 	Buffers::FramebufferSettings fbSettings;

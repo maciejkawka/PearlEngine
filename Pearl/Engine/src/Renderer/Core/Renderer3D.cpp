@@ -11,6 +11,7 @@
 #include"Renderer/Core/Defines.h"
 #include "Renderer/Buffers/VertexBuffer.h"
 #include "Renderer/Buffers/VertexArray.h"
+#include "Renderer/Buffers/Framebuffer.h"
 
 using namespace PrRenderer::Core;
 
@@ -27,6 +28,9 @@ Renderer3D::Renderer3D()
 
 void Renderer3D::Begin()
 {
+	if (m_IRMap == nullptr)
+		GenerateIRMap();
+
 	Core::LowRenderer::EnableDepth(true);
 	Core::LowRenderer::Clear(Core::ClearFlag::ColorBuffer | Core::ClearFlag::DepthBuffer);
 	LowRenderer::ClearColor(0.1f, 0.1f, 0.8f, 1.0f);
@@ -119,4 +123,59 @@ void Renderer3D::DrawCubemap()
 	m_quad->Unbind();
 	m_cubemap->Unbind();
 	LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::Less);
+}
+
+void Renderer3D::GenerateIRMap()
+{
+	Buffers::FramebufferTexture texture;
+	texture.format = Resources::TextureFormat::RGB16F;
+	texture.cubeTexture = true;
+	
+	Buffers::FramebufferSettings settings;
+	settings.width = 32;
+	settings.height = 32;
+	settings.colorTextureAttachments = texture;
+
+	FramebuffferPtr framebuffer = Buffers::Framebufffer::Create(settings);
+
+	auto shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("IrradianceMap.shader");
+	auto cube = PrRenderer::Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
+	auto cubemap = m_cubemap->GetTexture("skybox");
+
+	PrCore::Math::mat4 captureProjection = PrCore::Math::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+	PrCore::Math::mat4 captureViews[] =
+	{
+		PrCore::Math::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		PrCore::Math::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		PrCore::Math::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
+		PrCore::Math::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
+		PrCore::Math::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		PrCore::Math::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+	};
+
+	shader->Bind();
+	shader->SetUniformInt("environmentMap", 0);
+	shader->SetUniformMat4("projection", captureProjection);
+	cubemap->Bind();
+	framebuffer->Bind();
+	cube->Bind();
+
+	for (int i = 0; i < 6; i++)
+	{
+		shader->SetUniformMat4("view", captureViews[i]);
+		framebuffer->SetLevelofTexture(0, i);
+		
+		PrRenderer::Core::LowRenderer::Clear(Core::ClearFlag::ColorBuffer | Core::ClearFlag::DepthBuffer);
+		Core::LowRenderer::Draw(cube->GetVertexArray());
+	}
+
+	m_IRMap = std::static_pointer_cast<Resources::Cubemap>(framebuffer->GetTexturePtr(0));
+
+	shader->Unbind();
+	cubemap->Unbind();
+	shader->Unbind();
+	cube->Unbind();
+	framebuffer->Unbind();
+
+	PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<Resources::Shader>("IrradianceMap.shader");
 }
