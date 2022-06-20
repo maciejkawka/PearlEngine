@@ -129,11 +129,11 @@ void ResourceManager::Delete(const std::string& p_name)
 	if (resource->IsLoaded())
 		Unload(p_name);
 
-	DeleteImpl(resource);
-
 	m_resourceID.erase(resource->GetHandle());
 	m_resourceName.erase(p_name);
 	m_resources.remove(resource);
+
+	DeleteImpl(resource);
 }
 
 void ResourceManager::DeleteAll()

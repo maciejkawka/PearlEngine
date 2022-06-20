@@ -27,6 +27,9 @@ namespace PrRenderer::Resources{
 		inline const std::vector<std::string>& GetFaces() { return m_facesNames; }
 		inline const std::string& GetFace(int p_index) { return m_facesNames[p_index]; }
 
+		virtual void SetWrapModeR(Resources::TextureWrapMode p_wrapR) = 0;
+		TextureWrapMode GetWrapModeR() { return m_wrapR; }
+
 		//To implement in future
 		//void SetPixel(unsigned int p_u, unsigned int p_v);
 		//Core::Color GetPixel(unsigned int p_u, unsigned int p_v) const;

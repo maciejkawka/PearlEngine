@@ -5,6 +5,7 @@
 #include"Renderer/Resources/MaterialManager.h"
 #include"Renderer/Resources/ShaderManager.h"
 #include"Renderer/Resources/TextureManager.h"
+#include"Renderer/Resources/CubemapManager.h"
 #include"Renderer/Resources/MeshManager.h"
 
 #include"Renderer/Resources/Material.h"
@@ -34,6 +35,7 @@ ResourceLoader::ResourceLoader()
 	m_materialManager = new PrRenderer::Resources::MaterialManager();
 	m_meshManager = new PrRenderer::Resources::MeshManager();
 	m_textureManager = new PrRenderer::Resources::TextureManager();
+	m_cubemapManager = new PrRenderer::Resources::CubemapManager();
 	m_shaderManager = new PrRenderer::Resources::ShaderManager();
 }
 
@@ -42,6 +44,7 @@ ResourceLoader::~ResourceLoader()
 	delete m_materialManager;
 	delete m_meshManager;
 	delete m_textureManager;
+	delete m_cubemapManager;
 	delete m_shaderManager;
 }
 
@@ -55,9 +58,11 @@ std::shared_ptr<T> ResourceLoader::LoadResource(const std::string& p_name)
 		return std::static_pointer_cast<T>(m_meshManager->Load(p_name));
 
 	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture).hash_code() ||
-		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code() ||
-		typeid(T).hash_code() == typeid(PrRenderer::Resources::Cubemap).hash_code())
+		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code())
 		return std::static_pointer_cast<T>(m_textureManager->Load(p_name));
+
+	if(typeid(T).hash_code() == typeid(PrRenderer::Resources::Cubemap).hash_code())
+		return std::static_pointer_cast<T>(m_cubemapManager->Load(p_name));
 
 	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Shader).hash_code())
 		return std::static_pointer_cast<T>(m_shaderManager->Load(p_name));
@@ -83,9 +88,11 @@ void ResourceLoader::UnloadResource(const std::string& p_name)
 		m_meshManager->Unload(p_name);
 
 	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture).hash_code() ||
-		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code() ||
-		typeid(T).hash_code() == typeid(PrRenderer::Resources::Cubemap).hash_code())
+		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code())
 		m_textureManager->Unload(p_name);
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Cubemap).hash_code())
+		m_cubemapManager->Unload(p_name);
 
 	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Shader).hash_code())
 		m_shaderManager->Unload(p_name);
@@ -109,9 +116,11 @@ void ResourceLoader::UnloadAllResources()
 		m_meshManager->UnloadAll();
 
 	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture).hash_code() ||
-		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code() ||
-		typeid(T).hash_code() == typeid(PrRenderer::Resources::Cubemap).hash_code())
+		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code())
 		m_textureManager->UnloadAll();
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Cubemap).hash_code())
+		m_cubemapManager->UnloadAll();
 
 	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Shader).hash_code())
 		m_shaderManager->UnloadAll();
@@ -144,9 +153,11 @@ std::shared_ptr<T> ResourceLoader::GetResource(const std::string& p_name)
 		return std::static_pointer_cast<T>(m_meshManager->GetResource(p_name));
 
 	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture).hash_code() ||
-		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code() ||
-		typeid(T).hash_code() == typeid(PrRenderer::Resources::Cubemap).hash_code())
+		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code())
 		return std::static_pointer_cast<T>(m_textureManager->GetResource(p_name));
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Cubemap).hash_code())
+		return std::static_pointer_cast<T>(m_cubemapManager->GetResource(p_name));
 
 	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Shader).hash_code())
 		return std::static_pointer_cast<T>(m_shaderManager->GetResource(p_name));
@@ -172,9 +183,11 @@ void ResourceLoader::DeleteResource(const std::string& p_name)
 		m_meshManager->Delete(p_name);
 
 	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture).hash_code() ||
-		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code() ||
-		typeid(T).hash_code() == typeid(PrRenderer::Resources::Cubemap).hash_code())
+		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code())
 		m_textureManager->Delete(p_name);
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Cubemap).hash_code())
+		m_cubemapManager->Delete(p_name);
 
 	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Shader).hash_code())
 		m_shaderManager->Delete(p_name);
@@ -198,9 +211,11 @@ void ResourceLoader::DeleteAllResources()
 		m_meshManager->DeleteAll();
 
 	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture).hash_code() ||
-		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code() ||
-		typeid(T).hash_code() == typeid(PrRenderer::Resources::Cubemap).hash_code())
+		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code())
 		m_textureManager->DeleteAll();
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Cubemap).hash_code())
+		m_cubemapManager->DeleteAll();
 
 	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Shader).hash_code())
 		m_shaderManager->DeleteAll();
@@ -232,9 +247,11 @@ const ResourceManager* ResourceLoader::GetResourceManager()
 		return m_meshManager;
 
 	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture).hash_code() ||
-		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code() ||
-		typeid(T).hash_code() == typeid(PrRenderer::Resources::Cubemap).hash_code())
+		typeid(T).hash_code() == typeid(PrRenderer::Resources::Texture2D).hash_code())
 		return m_textureManager;
+
+	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Cubemap).hash_code())
+		return m_cubemapManager;
 
 	if (typeid(T).hash_code() == typeid(PrRenderer::Resources::Shader).hash_code())
 		return m_shaderManager;

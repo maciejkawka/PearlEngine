@@ -9,6 +9,8 @@ namespace PrRenderer::Resources {
 		RG16,
 		RGB24,
 		RGBA32,
+		RGB16F,
+		RGBA16F,
 
 		//Stencil and Depth
 		Depth16,
@@ -81,6 +83,7 @@ namespace PrRenderer::Resources {
 		inline virtual void SetWrapModeU(TextureWrapMode p_wrapU) { m_wrapU = p_wrapU; }
 		inline virtual void SetWrapModeV(TextureWrapMode p_wrapV) { m_wrapV = p_wrapV; }
 
+		inline RendererID GetRendererID() { return m_ID; }
 		inline size_t GetHeight() { return m_height; }
 		inline size_t GetWidth() { return m_width; }
 		inline bool  IsReadable() { return m_readable; }

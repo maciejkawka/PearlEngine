@@ -249,6 +249,9 @@
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLCubemap.h">
       <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Resources\CubemapManager.h">
+      <Filter>Renderer\Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -384,6 +387,9 @@
       <Filter>Renderer\Buffers</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Resources\Mesh_Primitives.cpp">
+      <Filter>Renderer\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Resources\CubemapManager.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
   </ItemGroup>

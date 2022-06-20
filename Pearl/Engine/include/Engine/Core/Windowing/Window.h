@@ -22,11 +22,15 @@ namespace PrCore::Windowing {
 
 		virtual void SetIcon(std::string p_path) = 0;
 		
+		inline static Window& GetMainWindow() { return *s_mainWindow; }
 		//TODO
 		//virtual void SetCoursorMode() = 0;
 		//virtual GetCoursorMode() =0;
 
 		//Virtual void SetCoursorShape() = 0;
 		//virtual GetCoursorShape() =0;
+
+	protected:
+		inline static Window* s_mainWindow = nullptr;
 	};
 }

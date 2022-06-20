@@ -14,6 +14,8 @@ namespace PrRenderer::OpenGL {
 			Texture2D(p_name, p_handle)
 		{}
 
+		~GLTexture2D();
+
 		void Bind(unsigned int p_slot = 0) override;
 		void Unbind(unsigned int p_slot = 0) override;
 

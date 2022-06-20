@@ -17,9 +17,11 @@ unsigned int PrRenderer::OpenGL::TextureFormatToGL(Resources::TextureFormat p_fo
 		return GL_RG;
 		break;
 	case Resources::TextureFormat::RGB24:
+	case Resources::TextureFormat::RGB16F:
 		return GL_RGB;
 		break;
 	case Resources::TextureFormat::RGBA32:
+	case Resources::TextureFormat::RGBA16F:
 		return GL_RGBA;
 		break;
 	case Resources::TextureFormat::Depth16:
@@ -57,6 +59,12 @@ unsigned int PrRenderer::OpenGL::TextureFormatToInternalGL(Resources::TextureFor
 		break;
 	case Resources::TextureFormat::RGBA32:
 		return GL_RGBA8;
+		break;
+	case Resources::TextureFormat::RGB16F:
+		return GL_RGB16F;
+		break;
+	case Resources::TextureFormat::RGBA16F:
+		return GL_RGBA16F;
 		break;
 	case Resources::TextureFormat::Depth16:
 		return GL_DEPTH_COMPONENT16;
@@ -125,6 +133,32 @@ unsigned int PrRenderer::OpenGL::TextureFilterToGL(PrRenderer::Resources::Textur
 		break;
 	default:
 		return GL_LINEAR; //If not recognise return default
+		break;
+	}
+}
+
+unsigned int PrRenderer::OpenGL::TextureFormatToDataTypeGL(Resources::TextureFormat p_format)
+{
+	switch (p_format)
+	{
+	case Resources::TextureFormat::R8:
+	case Resources::TextureFormat::RG16:
+	case Resources::TextureFormat::RGB24:
+	case Resources::TextureFormat::RGBA32:
+	case Resources::TextureFormat::Depth16:
+	case Resources::TextureFormat::Depth24:
+	case Resources::TextureFormat::Depth32:
+	case Resources::TextureFormat::Depth24Stencil8:
+	case Resources::TextureFormat::Depth32Stencil8:
+	case Resources::TextureFormat::Stencil8:
+		return GL_UNSIGNED_BYTE;
+		break;
+	case Resources::TextureFormat::RGB16F:
+	case Resources::TextureFormat::RGBA16F:
+		return GL_FLOAT;
+		break;
+	default:
+		return 0;
 		break;
 	}
 }

@@ -21,6 +21,12 @@ GLTexture2D::GLTexture2D(RendererID p_rendererID, size_t p_width, size_t p_heigh
 	m_format = p_format;
 }
 
+PrRenderer::OpenGL::GLTexture2D::~GLTexture2D()
+{
+	if(m_ID != 0)
+		glDeleteTextures(1, &m_ID);
+}
+
 void GLTexture2D::Bind(unsigned int p_slot)
 {
 	glActiveTexture(GL_TEXTURE0 + p_slot);
@@ -114,6 +120,7 @@ bool PrRenderer::OpenGL::GLTexture2D::UnloadImpl()
 		stbi_image_free(m_rawData);
 
 	glDeleteTextures(1, &m_ID);
+	m_ID = 0;
 
 	return true;
 }
@@ -223,6 +230,23 @@ unsigned char* GLTexture2D::ReadRawData()
 	default:
 		PRLOG_WARN("Cannot specify texture {} channel format", m_name);
 		break;
+	}
+
+	//HDR files
+	if (m_name.find(".hdr") != m_name.npos)
+	{
+		switch (channelsNumber)
+		{
+		case 3:
+			m_format = PrRenderer::Resources::TextureFormat::RGB16F;
+			break;
+		case 4:
+			m_format = PrRenderer::Resources::TextureFormat::RGBA16F;
+			break;
+		default:
+			PRLOG_WARN("Cannot specify texture {} channel format", m_name);
+			break;
+		}
 	}
 
 	m_height = heigth;

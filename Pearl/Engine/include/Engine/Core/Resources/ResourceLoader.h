@@ -8,6 +8,7 @@ namespace PrRenderer::Resources {
 	class MeshManager;
 	class TextureManager;
 	class ShaderManager;
+	class CubemapManager;
 }
 
 namespace PrCore::Resources {
@@ -49,6 +50,7 @@ namespace PrCore::Resources {
 		PrRenderer::Resources::MaterialManager* m_materialManager;
 		PrRenderer::Resources::MeshManager* m_meshManager;
 		PrRenderer::Resources::TextureManager* m_textureManager;
+		PrRenderer::Resources::CubemapManager* m_cubemapManager;
 		PrRenderer::Resources::ShaderManager* m_shaderManager;
 
 		inline static ResourceLoader* s_instance = nullptr;;

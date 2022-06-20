@@ -1,19 +1,42 @@
 #include"Core/Common/pearl_pch.h"
 
 #include"Renderer/OpenGL/GLCubemap.h"
+#include"Renderer/OpenGL/GLFramebuffer.h"
 #include"Renderer/OpenGL/GLUtils.h"
+
+#include <Renderer/Resources/Texture2D.h>
+#include <Renderer/Resources/Shader.h>
+#include <Renderer/Resources/Mesh.h>
 
 #include"glad/glad.h"
 #include"stb/stb_image.h"
 
 #include"Core/Filesystem/FileSystem.h"
 #include"Core/Utils/JSONParser.h"
+#include <Core/Resources/ResourceLoader.h>
+#include <Renderer/Core/LowRenderer.h>
+
 
 using namespace PrRenderer::OpenGL;
+
+GLCubemap::GLCubemap(RendererID p_rendererID, size_t p_width, size_t p_height, PrRenderer::Resources::TextureFormat p_format)
+{
+	m_ID = p_rendererID;
+	m_width = p_width;
+	m_height = p_height;
+
+	m_format = p_format;
+}
 
 GLCubemap::GLCubemap(std::string p_name, PrCore::Resources::ResourceHandle p_handle):
 	Cubemap(p_name, p_handle)
 {
+}
+
+GLCubemap::~GLCubemap()
+{
+	if(m_ID != 0)
+		glDeleteTextures(1, &m_ID);
 }
 
 void GLCubemap::Bind(unsigned int p_slot)
@@ -56,47 +79,26 @@ void GLCubemap::SetWrapModeV(PrRenderer::Resources::TextureWrapMode p_wrapV)
 	m_wrapV = p_wrapV;
 }
 
+void GLCubemap::SetWrapModeR(PrRenderer::Resources::TextureWrapMode p_wrapR)
+{
+	//glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
+	//glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, TextureWrapToGL(p_wrapR));
+	//m_wrapR = p_wrapR;
+}
+
 void GLCubemap::PreLoadImpl()
 {
 }
 
 bool GLCubemap::LoadImpl()
 {
-	if(m_readable)
-		m_rawDataArray = new unsigned char* [6];
+	bool result = false;
+	if (m_name.find(".hdr") != m_name.npos)
+		result = LoadHDR();
+	else
+		result = LoadSixSided();
 
-	LoadTexturesNames();
-
-	glGenTextures(1, &m_ID);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
-
-	for(int i=0;i<6;i++)
-	{
-		unsigned char* rawImage = ReadRawData(m_facesNames[i], i == 0);
-		if (rawImage == nullptr)
-			return false;
-
-		unsigned int format = TextureFormatToGL(m_format);
-		unsigned int internalFormat = TextureFormatToInternalGL(m_format);
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, rawImage);
-
-		if (!m_readable)
-			stbi_image_free(rawImage);
-		else
-			m_rawDataArray[i] = rawImage;
-	}
-
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, TextureWrapToGL(m_wrapU));
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, TextureWrapToGL(m_wrapV));
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, TextureWrapToGL(m_wrapR));
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, TextureFilterToGL(m_minFiltering));
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, TextureFilterToGL(m_magFiltering));
-
-	if (m_mipmap)
-		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-	return true;
+	return result;
 }
 
 void GLCubemap::PostLoadImpl()
@@ -113,7 +115,7 @@ bool GLCubemap::UnloadImpl()
 		delete[] m_rawDataArray;
 
 	glDeleteTextures(1, &m_ID);
-
+	m_ID = 0;
 	return true;
 }
 
@@ -161,20 +163,6 @@ void GLCubemap::CalculateSize()
 
 unsigned char* GLCubemap::ReadRawData(const std::string& p_name, bool p_first)
 {
-	/*if (m_name == "Empty")
-	{
-		PRLOG_WARN("Cubamap {0} the face is not specify", m_name);
-		unsigned char* rawImage = new unsigned char[4];
-
-		//Pink color
-		rawImage[0] = 255;
-		rawImage[1] = 20;
-		rawImage[2] = 147;
-		rawImage[3] = 255;
-
-		return rawImage;
-	}*/
-
 	int width = 0;
 	int heigth = 0;
 	int channelsNumber = 0;
@@ -209,6 +197,23 @@ unsigned char* GLCubemap::ReadRawData(const std::string& p_name, bool p_first)
 	default:
 		PRLOG_WARN("Cannot specify texture {} channel format", m_name);
 		break;
+	}
+
+	//HDR files
+	if (m_name.find(".hdr") != m_name.npos)
+	{
+		switch (channelsNumber)
+		{
+		case 3:
+			m_format = PrRenderer::Resources::TextureFormat::RGB16F;
+			break;
+		case 4:
+			m_format = PrRenderer::Resources::TextureFormat::RGBA16F;
+			break;
+		default:
+			PRLOG_WARN("Cannot specify texture {} channel format", m_name);
+			break;
+		}
 	}
 
 	if (p_first)
@@ -263,4 +268,108 @@ bool GLCubemap::LoadTexturesNames()
 	m_facesNames.push_back(json["back"]);
 	
 
+}
+
+bool GLCubemap::LoadSixSided()
+{
+	if (m_readable)
+		m_rawDataArray = new unsigned char* [6];
+
+	LoadTexturesNames();
+
+	glGenTextures(1, &m_ID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
+
+	for (int i = 0; i < 6; i++)
+	{
+		unsigned char* rawImage = ReadRawData(m_facesNames[i], i == 0);
+		if (rawImage == nullptr)
+			return false;
+
+		unsigned int format = TextureFormatToGL(m_format);
+		unsigned int internalFormat = TextureFormatToInternalGL(m_format);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, rawImage);
+
+		if (!m_readable)
+			stbi_image_free(rawImage);
+		else
+			m_rawDataArray[i] = rawImage;
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, TextureWrapToGL(m_wrapU));
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, TextureWrapToGL(m_wrapV));
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, TextureWrapToGL(m_wrapR));
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, TextureFilterToGL(m_minFiltering));
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, TextureFilterToGL(m_magFiltering));
+
+	if (m_mipmap)
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	return true;
+}
+
+bool GLCubemap::LoadHDR()
+{
+	//Load HDR texture and shader
+	auto texture = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Texture2D>(m_name);
+	auto shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Shader>("HDRToCubemap.shader");
+
+	//Create Framebuffer 
+	Buffers::FramebufferSettings fbSettings;
+	fbSettings.height = texture->GetHeight();
+	fbSettings.width = texture->GetWidth();
+	fbSettings.depthStencilAttachment = { Resources::TextureFormat::Depth24 };
+	
+	Buffers::FramebufferTexture fbTex;
+	fbTex.cubeTexture = true;
+	fbTex.format = Resources::TextureFormat::RGB16F;
+	fbTex.filteringMag = Resources::TextureFiltering::Nearest;
+	fbTex.filteringMin = Resources::TextureFiltering::Nearest;
+	fbSettings.colorTextureAttachments.textures.push_back(fbTex);
+
+	auto framebuffer = Buffers::Framebufffer::Create(fbSettings);
+
+	//Convert HDR to cubemap
+	PrCore::Math::mat4 captureProjection = PrCore::Math::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+	PrCore::Math::mat4 captureViews[] =
+	{
+		PrCore::Math::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		PrCore::Math::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		PrCore::Math::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
+		PrCore::Math::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
+		PrCore::Math::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		PrCore::Math::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+	};
+
+	shader->Bind();
+	shader->SetUniformMat4("projection", captureProjection);
+	shader->SetUniformInt("equirectangularMap", 0);
+	texture->Bind(0);
+
+	framebuffer->Bind();
+
+	for (int i = 0; i < 6; i++)
+	{
+		framebuffer->SetLevelofTexture(0, i);
+		shader->SetUniformMat4("view", captureViews[i]);
+
+		PrRenderer::Core::LowRenderer::Clear(Core::ClearFlag::ColorBuffer | Core::ClearFlag::DepthBuffer);
+		auto cube = PrRenderer::Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
+		
+		cube->Bind();
+		PrRenderer::Core::LowRenderer::Draw(cube->GetVertexArray());
+	}
+
+	shader->Unbind();
+	texture->Unbind();
+	framebuffer->Unbind();
+
+	PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<PrRenderer::Resources::Texture2D>(m_name);
+	PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<PrRenderer::Resources::Shader>("HDRToCubemap.shader");
+
+	//Set cubemap
+	m_ID = framebuffer->GetTextureID();
+
+	return true;
 }
