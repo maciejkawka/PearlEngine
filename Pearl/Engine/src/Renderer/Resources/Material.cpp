@@ -506,16 +506,22 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 		case UniformType::Cubemap:
 		{
 			auto uniformExist = false;
-			auto cubemap = p_json.find("cubemap");
-			if (cubemap != p_json.end())
+			auto cubemaps = p_json.find("cubemap");
+			if (cubemaps != p_json.end())
 			{
-				auto& value = cubemap.value();
-				auto cubemapName = value["texName"];
-				auto cubemapPath = value["texPath"];
+				auto& value = cubemaps.value();
+				for (auto& cubemap : value.items())
+				{
+					if (cubemap.value()["texName"] == uniformName)
+					{
+						auto cubemapName = cubemap.value()["texName"];
+						auto cubemapPath = cubemap.value()["texPath"];
 
-				auto textureResource = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Cubemap>(cubemapPath);
-				m_textures[cubemapName] = textureResource;
-				uniformExist = true;
+						auto textureResource = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Cubemap>(cubemapPath);
+						m_textures[cubemapName] = textureResource;
+						uniformExist = true;
+					}
+				}
 			}
 			break;
 		}

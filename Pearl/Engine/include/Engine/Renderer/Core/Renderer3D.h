@@ -21,6 +21,8 @@ namespace PrRenderer::Core {
 		void AddCubemap(PrRenderer::Resources::MaterialPtr p_cubemap) { m_cubemap = p_cubemap; }
 		PrRenderer::Resources::MaterialPtr GetCubemap() { return m_cubemap; }
 		PrRenderer::Resources::CubemapPtr GetIRMap() { return m_IRMap; }
+		PrRenderer::Resources::CubemapPtr GetPrefiltered() { return m_prefilteredMap; }
+		PrRenderer::Resources::TexturePtr GetLUT() { return m_LUTMap; }
 		
 		void AddLight(const PrRenderer::Core::Light& p_light);
 		void SetAmbientLight(PrRenderer::Core::Color p_ambientColor);
@@ -35,9 +37,13 @@ namespace PrRenderer::Core {
 
 		void DrawCubemap();
 		void GenerateIRMap();
+		void GeneratePrefilterMap();
+		void GenerateLUTMap();
 
 		PrRenderer::Resources::MaterialPtr m_cubemap;
 		PrRenderer::Resources::CubemapPtr m_IRMap;
+		PrRenderer::Resources::CubemapPtr m_prefilteredMap;
+		PrRenderer::Resources::TexturePtr m_LUTMap;
 
 		std::vector<PrCore::Math::mat4> m_lightData;
 		PrCore::Math::vec3 m_color;
