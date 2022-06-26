@@ -324,10 +324,10 @@ bool GLCubemap::LoadHDR()
 
 	//Create Framebuffer 
 	Buffers::FramebufferSettings fbSettings;
-	fbSettings.globalHeight = texture->GetHeight();
+	fbSettings.globalHeight = texture->GetWidth();
 	fbSettings.globalWidth = texture->GetWidth();
 
-	fbSettings.depthStencilAttachment = { Resources::TextureFormat::Depth24 };
+	//fbSettings.depthStencilAttachment = { Resources::TextureFormat::Depth24 };
 	
 	Buffers::FramebufferTexture fbTex;
 	fbTex.cubeTexture = true;

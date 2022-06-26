@@ -50,7 +50,7 @@ void GLFramebuffer::SetAttachmentDetails(int p_attachment, int p_textureTarget, 
 		return;
 	}
 
-	if (!m_settings.mipMaped)
+	if (p_mipLevel > 0 && !m_settings.mipMaped)
 	{
 		p_mipLevel = 0;
 		PRLOG_WARN("Framebuffer {0}: framebuffr is not mipmaped", m_ID);
@@ -128,7 +128,8 @@ void GLFramebuffer::UpdateFamebuffer()
 	if(!m_settings.colorTextureAttachments.textures.empty())
 		UpdateColorTextures();
 
-	if (m_depthStencilTextureAttachment.format != Resources::TextureFormat::None)
+	m_depthStencilTextureAttachment = m_settings.depthStencilAttachment;
+	if (m_settings.depthStencilAttachment.format != Resources::TextureFormat::None)
 		UpdateDepthTexture();
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -153,7 +154,7 @@ void GLFramebuffer::UpdateColorTextures()
 	std::vector<GLenum> attachments;
 	for (int i = 0; i < m_colorTextureAttachments.size(); i++)
 		attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
-	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+	glDrawBuffers(attachments.size(), attachments.data());
 
 	m_colorTextures.resize(m_colorTextureAttachments.size());
 }
@@ -169,9 +170,6 @@ void GLFramebuffer::CreateCubemapAttachment(int p_attachmentIndex)
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 	m_colorTextureIDs.push_back(textureID);
 	m_trackedAttachments.insert(textureID);
-
-	if (m_settings.globalWidth != m_settings.globalHeight)
-		m_settings.globalHeight = m_settings.globalWidth;
 
 	//Use global size if the attachment does not have set
 	size_t width;
@@ -272,7 +270,7 @@ void GLFramebuffer::UpdateDepthTexture()
 		height = attachment.height;
 	}
 
-	glTexStorage2D(GL_TEXTURE_2D, 1, TextureFormatToInternalGL(attachment.format), width, width);
+	glTexStorage2D(GL_TEXTURE_2D, 1, TextureFormatToInternalGL(attachment.format), width, height);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, TextureWrapToGL(attachment.wrapModeU));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, TextureWrapToGL(attachment.wrapModeV));
