@@ -1,6 +1,7 @@
 #pragma once 
 #include"Renderer/Buffers/Framebuffer.h"
 
+#include<set>
 namespace PrRenderer::OpenGL {
 
 	class GLFramebuffer : public Buffers::Framebufffer {
@@ -10,12 +11,15 @@ namespace PrRenderer::OpenGL {
 
 		void Bind() override;
 		void Unbind() override;
-		void SetLevelofTexture(int p_attachment, int p_textureLevel) override;
+		void SetAttachmentDetails(int p_attachment, int p_textureTarget, int p_mipLevel = 0) override;
 
 		void Resize(size_t width, size_t height) override;
-		virtual void ClearAttachmentColor(unsigned int p_attachment, int p_value) override;
+		virtual void ClearAttachmentColor(unsigned int p_attachment, Core::Color p_color) override;
 
 		virtual Resources::TexturePtr GetTexturePtr(unsigned int p_index = 0) override;
+
+		//Unprotected function call only if you know what to do with the texture
+		//Texture has to be deleted manually
 		virtual RendererID GetTextureID(unsigned int p_index = 0) override;
 
 	private:
@@ -27,7 +31,10 @@ namespace PrRenderer::OpenGL {
 
 		void GenerateTexture(unsigned int p_index);
 
+		void DeleteTextures();
+
 		std::vector<Buffers::FramebufferTexture> m_colorTextureAttachments;
+		std::set<RendererID> m_trackedAttachments;
 		std::vector<PrRenderer::Resources::TexturePtr> m_colorTextures;
 		Buffers::FramebufferTexture m_depthStencilTextureAttachment;
 	};

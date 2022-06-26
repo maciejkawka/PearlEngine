@@ -19,6 +19,8 @@ namespace PrRenderer::OpenGL {
 		void Bind(unsigned int p_slot = 0) override;
 		void Unbind(unsigned int p_slot = 0) override;
 
+		void GenerateMipMaps() override;
+
 		//To implent in future
 		virtual void IsMipMapped(bool p_mipmap) override;
 		virtual void IsReadable(bool p_readable) override;

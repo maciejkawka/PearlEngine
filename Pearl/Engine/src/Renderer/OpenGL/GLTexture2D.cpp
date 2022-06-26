@@ -39,6 +39,13 @@ void GLTexture2D::Unbind(unsigned int p_slot)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void PrRenderer::OpenGL::GLTexture2D::GenerateMipMaps()
+{
+	glBindTexture(GL_TEXTURE_2D, m_ID);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void GLTexture2D::IsMipMapped(bool p_mipmap)
 {
 }

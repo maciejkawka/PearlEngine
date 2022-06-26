@@ -17,6 +17,8 @@ namespace PrRenderer::OpenGL {
 		void Bind(unsigned int p_slot = 0) override;
 		void Unbind(unsigned int p_slot = 0) override;
 		
+		void GenerateMipMaps() override;
+
 		virtual void SetMinFiltering(Resources::TextureFiltering p_minfiltering) override;
 		virtual void SetMagFiltering(Resources::TextureFiltering p_magfiltering) override;
 		virtual void SetWrapModeU(Resources::TextureWrapMode p_wrapU) override;

@@ -51,6 +51,13 @@ void GLCubemap::Unbind(unsigned int p_slot)
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
+void GLCubemap::GenerateMipMaps()
+{
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
 void GLCubemap::SetMinFiltering(PrRenderer::Resources::TextureFiltering p_minfiltering)
 {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
@@ -81,9 +88,9 @@ void GLCubemap::SetWrapModeV(PrRenderer::Resources::TextureWrapMode p_wrapV)
 
 void GLCubemap::SetWrapModeR(PrRenderer::Resources::TextureWrapMode p_wrapR)
 {
-	//glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
-	//glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, TextureWrapToGL(p_wrapR));
-	//m_wrapR = p_wrapR;
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, TextureWrapToGL(p_wrapR));
+	m_wrapR = p_wrapR;
 }
 
 void GLCubemap::PreLoadImpl()
@@ -317,8 +324,9 @@ bool GLCubemap::LoadHDR()
 
 	//Create Framebuffer 
 	Buffers::FramebufferSettings fbSettings;
-	fbSettings.height = texture->GetHeight();
-	fbSettings.width = texture->GetWidth();
+	fbSettings.globalHeight = texture->GetHeight();
+	fbSettings.globalWidth = texture->GetWidth();
+
 	fbSettings.depthStencilAttachment = { Resources::TextureFormat::Depth24 };
 	
 	Buffers::FramebufferTexture fbTex;
@@ -326,8 +334,9 @@ bool GLCubemap::LoadHDR()
 	fbTex.format = Resources::TextureFormat::RGB16F;
 	fbTex.filteringMag = Resources::TextureFiltering::Nearest;
 	fbTex.filteringMin = Resources::TextureFiltering::Nearest;
-	fbSettings.colorTextureAttachments.textures.push_back(fbTex);
 
+	fbSettings.colorTextureAttachments.textures.push_back(fbTex);
+	
 	auto framebuffer = Buffers::Framebufffer::Create(fbSettings);
 
 	//Convert HDR to cubemap
@@ -351,7 +360,7 @@ bool GLCubemap::LoadHDR()
 
 	for (int i = 0; i < 6; i++)
 	{
-		framebuffer->SetLevelofTexture(0, i);
+		framebuffer->SetAttachmentDetails(0, i);
 		shader->SetUniformMat4("view", captureViews[i]);
 
 		PrRenderer::Core::LowRenderer::Clear(Core::ClearFlag::ColorBuffer | Core::ClearFlag::DepthBuffer);
