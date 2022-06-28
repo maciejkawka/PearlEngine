@@ -15,6 +15,7 @@ GLVertexArray::GLVertexArray()
 
 GLVertexArray::~GLVertexArray()
 {
+	glBindVertexArray(0);
 	glDeleteBuffers(1, &m_bufferID);
 }
 

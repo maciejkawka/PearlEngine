@@ -331,7 +331,7 @@ bool GLCubemap::LoadHDR()
 	
 	Buffers::FramebufferTexture fbTex;
 	fbTex.cubeTexture = true;
-	fbTex.format = Resources::TextureFormat::RGB16F;
+	fbTex.format = Resources::TextureFormat::RGB24;
 	fbTex.filteringMag = Resources::TextureFiltering::Nearest;
 	fbTex.filteringMin = Resources::TextureFiltering::Nearest;
 
@@ -358,21 +358,22 @@ bool GLCubemap::LoadHDR()
 
 	framebuffer->Bind();
 
+	auto cube = PrRenderer::Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
+	cube->Bind();
 	for (int i = 0; i < 6; i++)
 	{
 		framebuffer->SetAttachmentDetails(0, i);
 		shader->SetUniformMat4("view", captureViews[i]);
 
 		PrRenderer::Core::LowRenderer::Clear(Core::ClearFlag::ColorBuffer | Core::ClearFlag::DepthBuffer);
-		auto cube = PrRenderer::Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
 		
-		cube->Bind();
 		PrRenderer::Core::LowRenderer::Draw(cube->GetVertexArray());
 	}
 
 	shader->Unbind();
 	texture->Unbind();
 	framebuffer->Unbind();
+	cube->Unbind();
 
 	PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<PrRenderer::Resources::Texture2D>(m_name);
 	PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<PrRenderer::Resources::Shader>("HDRToCubemap.shader");

@@ -35,7 +35,7 @@ void GLTexture2D::Bind(unsigned int p_slot)
 
 void GLTexture2D::Unbind(unsigned int p_slot)
 {
-	glActiveTexture(GL_TEXTURE0 + p_slot);
+	//glActiveTexture(GL_TEXTURE0 + p_slot);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 

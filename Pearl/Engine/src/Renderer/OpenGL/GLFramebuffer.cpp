@@ -21,6 +21,8 @@ GLFramebuffer::GLFramebuffer(const Buffers::FramebufferSettings& p_settings):
 GLFramebuffer::~GLFramebuffer()
 {
 	DeleteTextures();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDeleteFramebuffers(1, &m_ID);
 }
 
 void GLFramebuffer::Bind()

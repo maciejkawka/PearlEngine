@@ -21,6 +21,7 @@ GLVertexBuffer::GLVertexBuffer(void* p_data, size_t p_size)
 
 GLVertexBuffer::~GLVertexBuffer()
 {
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glDeleteBuffers(1, &m_bufferID);
 }
 
