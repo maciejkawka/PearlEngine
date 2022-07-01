@@ -61,7 +61,7 @@ namespace PrCore::Resources {
 		virtual bool UnloadImpl() = 0;
 		virtual void PostUnloadImpl() = 0;
 
-		virtual void LoadDefault() = 0;
+		virtual void LoadCorruptedResource() = 0;
 
 		virtual void CalculateSize() = 0;
 

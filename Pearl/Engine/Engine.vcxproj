@@ -124,6 +124,7 @@
     <ClCompile Include="src\Renderer\OpenGL\GLTexture2D.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\GLVertexArray.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\GLVertexBuffer.cpp" />
+    <ClCompile Include="src\Renderer\Resources\Cubemap.cpp" />
     <ClCompile Include="src\Renderer\Resources\CubemapManager.cpp" />
     <ClCompile Include="src\Renderer\Resources\Material.cpp" />
     <ClCompile Include="src\Renderer\Resources\MaterialManager.cpp" />
@@ -131,6 +132,8 @@
     <ClCompile Include="src\Renderer\Resources\MeshManager.cpp" />
     <ClCompile Include="src\Renderer\Resources\Mesh_Primitives.cpp" />
     <ClCompile Include="src\Renderer\Resources\ShaderManager.cpp" />
+    <ClCompile Include="src\Renderer\Resources\Texture.cpp" />
+    <ClCompile Include="src\Renderer\Resources\Texture2D.cpp" />
     <ClCompile Include="src\Renderer\Resources\TextureManager.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

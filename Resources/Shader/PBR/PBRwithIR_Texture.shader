@@ -9,8 +9,8 @@ layout (location = 3) in vec2 aUV0;
 uniform mat4 VPMatrix;
 uniform mat4 modelMatrix;
 
-uniform vec2 mainTex_scale = vec2(1,1);
-uniform vec2 mainTex_offset = vec2(0, 0);
+uniform vec2 albedoMap_scale = vec2(1,1);
+uniform vec2 albedoMap_offset = vec2(0, 0);
 
 out Vertex{
     vec3 pos;
@@ -30,7 +30,7 @@ void main()
     OUT.TBN = mat3(tangents, bitangents, normals);
 
     //UVs and pos calculations
-    OUT.uv0 = aUV0 * mainTex_scale + mainTex_offset;
+    OUT.uv0 = aUV0 * albedoMap_scale + albedoMap_offset;
     
     vec4 worldPos = (modelMatrix * vec4(aPos, 1.0));
     OUT.pos = worldPos.xyz; 

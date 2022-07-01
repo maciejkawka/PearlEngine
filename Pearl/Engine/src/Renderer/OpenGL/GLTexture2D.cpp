@@ -136,33 +136,31 @@ void GLTexture2D::PostUnloadImpl()
 {
 }
 
-void GLTexture2D::LoadDefault()
+void GLTexture2D::LoadUnitTexture(Core::Color p_unitColor)
 {
 	unsigned char* rawImage = new unsigned char[4];
 
 	//Pink color
-	rawImage[0] = 255;
-	rawImage[1] = 20;
-	rawImage[2] = 147;
-	rawImage[3] = 255;
+	rawImage[0] = p_unitColor.r;
+	rawImage[1] = p_unitColor.g;
+	rawImage[2] = p_unitColor.b;
+	rawImage[3] = p_unitColor.a;
 
-	unsigned int format = TextureFormatToGL(Resources::TextureFormat::RGB24);
-	int height = 1;
-	int width = 1;
+	m_format = Resources::TextureFormat::RGBA32;
+	m_height = 1;
+	m_width = 1;
+	m_readable = false;
+	m_mipmap = false;
 
 	glGenTextures(1, &m_ID);
 	glBindTexture(GL_TEXTURE_2D, m_ID);
-	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, rawImage);
+	glTexImage2D(GL_TEXTURE_2D, 0, TextureFormatToInternalGL(m_format), m_width, m_height, 0, TextureFormatToGL(m_format), TextureFormatToDataTypeGL(m_format), rawImage);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, TextureWrapToGL(m_wrapU));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, TextureWrapToGL(m_wrapV));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, TextureFilterToGL(m_minFiltering));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, TextureFilterToGL(m_magFiltering));
-
-	if (m_mipmap)
-		glGenerateMipmap(GL_TEXTURE_2D);
-
+	
 	delete[] rawImage;
-	m_readable = false;
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }

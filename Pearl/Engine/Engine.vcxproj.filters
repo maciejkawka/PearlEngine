@@ -392,5 +392,14 @@
     <ClCompile Include="src\Renderer\Resources\CubemapManager.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\Resources\Texture2D.cpp">
+      <Filter>Renderer\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Resources\Texture.cpp">
+      <Filter>Renderer\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Resources\Cubemap.cpp">
+      <Filter>Renderer\Resources</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

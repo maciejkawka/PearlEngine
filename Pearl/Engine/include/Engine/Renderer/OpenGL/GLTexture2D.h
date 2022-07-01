@@ -30,6 +30,9 @@ namespace PrRenderer::OpenGL {
 		virtual void SetWrapModeU(PrRenderer::Resources::TextureWrapMode p_wrapU) override;
 		virtual void SetWrapModeV(PrRenderer::Resources::TextureWrapMode p_wrapV) override;
 
+	protected:
+		void LoadUnitTexture(Core::Color p_unitColor) override;
+
 	private:
 		void PreLoadImpl() override;
 		bool LoadImpl() override;
@@ -38,8 +41,6 @@ namespace PrRenderer::OpenGL {
 		void PreUnloadImpl() override;
 		bool UnloadImpl() override;
 		void PostUnloadImpl() override;
-
-		void LoadDefault() override;
 
 		void CalculateSize() override;
 

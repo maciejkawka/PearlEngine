@@ -30,6 +30,10 @@ namespace PrRenderer::Resources{
 		virtual void SetWrapModeR(Resources::TextureWrapMode p_wrapR) = 0;
 		TextureWrapMode GetWrapModeR() { return m_wrapR; }
 
+		static TexturePtr GenerateBlackTexture();
+		static TexturePtr GenerateWhiteTexture();
+		static TexturePtr GenerateRedTexture();
+
 		//To implement in future
 		//void SetPixel(unsigned int p_u, unsigned int p_v);
 		//Core::Color GetPixel(unsigned int p_u, unsigned int p_v) const;
@@ -41,6 +45,9 @@ namespace PrRenderer::Resources{
 		unsigned char** m_rawDataArray;
 		std::vector<std::string> m_facesNames;
 		TextureWrapMode m_wrapR;
+
+	private:
+		static TexturePtr GenerateUnitTexture(PrRenderer::Core::Color p_color);
 	};
 
 	typedef std::shared_ptr<Cubemap> CubemapPtr;

@@ -139,7 +139,7 @@ void GLMesh::PostUnloadImpl()
 {
 }
 
-void GLMesh::LoadDefault()
+void GLMesh::LoadCorruptedResource()
 {
 }
 

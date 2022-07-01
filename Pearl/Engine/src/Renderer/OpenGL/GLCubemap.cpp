@@ -93,6 +93,39 @@ void GLCubemap::SetWrapModeR(PrRenderer::Resources::TextureWrapMode p_wrapR)
 	m_wrapR = p_wrapR;
 }
 
+void GLCubemap::LoadUnitTexture(Core::Color p_unitColor)
+{
+	unsigned char* rawImage = new unsigned char[4];
+
+	//Pink color
+	rawImage[0] = p_unitColor.r;
+	rawImage[1] = p_unitColor.g;
+	rawImage[2] = p_unitColor.b;
+	rawImage[3] = p_unitColor.a;
+
+	m_format = Resources::TextureFormat::RGBA32;
+	m_height = 1;
+	m_width = 1;
+	m_readable = false;
+	m_mipmap = false;
+
+	glGenTextures(1, &m_ID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
+	for (int i = 0; i < 6; i++)
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, TextureFormatToInternalGL(m_format), m_width, m_height, 0,
+			TextureFormatToGL(m_format), TextureFormatToDataTypeGL(m_format), rawImage);
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, TextureWrapToGL(m_wrapU));
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, TextureWrapToGL(m_wrapV));
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, TextureWrapToGL(m_wrapR));
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, TextureFilterToGL(m_minFiltering));
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, TextureFilterToGL(m_magFiltering));
+
+	delete[] rawImage;
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
 void GLCubemap::PreLoadImpl()
 {
 }
@@ -128,40 +161,6 @@ bool GLCubemap::UnloadImpl()
 
 void GLCubemap::PostUnloadImpl()
 {
-}
-
-void GLCubemap::LoadDefault()
-{
-	unsigned char* rawImage = new unsigned char[4];
-
-	//Pink color
-	rawImage[0] = 255;
-	rawImage[1] = 20;
-	rawImage[2] = 147;
-	rawImage[3] = 255;
-
-	unsigned int format = TextureFormatToGL(Resources::TextureFormat::RGB24);
-	unsigned int internalFormat = TextureFormatToInternalGL(Resources::TextureFormat::RGB24);
-	int height = 1;
-	int width = 1;
-
-	glGenTextures(1, &m_ID);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
-	for(int i=0;i<6;i++)
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, rawImage);
-
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, TextureWrapToGL(m_wrapU));
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, TextureWrapToGL(m_wrapV));
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, TextureFilterToGL(m_minFiltering));
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, TextureFilterToGL(m_magFiltering));
-
-	if (m_mipmap)
-		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-
-	delete[] rawImage;
-	m_readable = false;
-
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
 void GLCubemap::CalculateSize()

@@ -16,12 +16,20 @@ namespace PrRenderer::Resources {
 			Texture(p_name, p_handle)
 		{}
 
+		static TexturePtr GenerateBlackTexture();
+		static TexturePtr GenerateWhiteTexture();
+		static TexturePtr GenerateRedTexture();
+
 		//To implement in future
 		//void SetPixel(unsigned int p_u, unsigned int p_v);
 		//Core::Color GetPixel(unsigned int p_u, unsigned int p_v) const;
 
 		//void SetPixels(const Core::Color p_colorArray[]);
 		//const Core::Color* GetPixels();
+
+	private:
+		static TexturePtr GenerateUnitTexture(PrRenderer::Core::Color p_color);
+
 	};
 
 	typedef std::shared_ptr<Texture2D> Texture2DPtr;

@@ -2,7 +2,8 @@
 
 #include"Renderer/Resources/Material.h"
 #include"Core/Resources/ResourceLoader.h"
-
+#include"Renderer/Resources/Texture2D.h"
+#include"Renderer/Resources/Cubemap.h"
 
 #include"Core/Filesystem/FileSystem.h"
 
@@ -265,7 +266,7 @@ void Material::PostUnloadImpl()
 {
 }
 
-void Material::LoadDefault()
+void Material::LoadCorruptedResource()
 {
 }
 
@@ -299,12 +300,14 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 	{
 		const auto& uniformName = uniformPair.first;
 		auto& uniform = uniformPair.second;
-
+		
 		switch (uniform.type)
 		{
 		case UniformType::Int:
 		{
-			auto uniformExist = false;
+			//Set default value
+			uniform.value = std::make_any<int>(0);
+
 			auto intProperties = p_json.find("intproperties");
 			if (intProperties != p_json.end())
 			{
@@ -312,10 +315,7 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				for (auto& property : value.items())
 				{
 					if (property.value()["name"] == uniformName)
-					{
 						uniform.value = std::make_any<int>(property.value()["value"]);
-						uniformExist = true;
-					}
 				}
 			}
 
@@ -323,18 +323,17 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 		}
 		case UniformType::Bool:
 		{
-			auto uniformExist = false;
-			auto intProperties = p_json.find("boolproperties");
-			if (intProperties != p_json.end())
+			//Set default value
+			uniform.value = std::make_any<bool>(false);
+
+			auto boolProperies = p_json.find("boolproperties");
+			if (boolProperies != p_json.end())
 			{
-				auto& value = intProperties.value();
+				auto& value = boolProperies.value();
 				for (auto& property : value.items())
 				{
 					if (property.value()["name"] == uniformName)
-					{
 						uniform.value = std::make_any<int>(property.value()["value"]);
-						uniformExist = true;
-					}
 				}
 			}
 
@@ -342,7 +341,9 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 		}
 		case UniformType::Float:
 		{
-			auto uniformExist = false;
+			//Set default value
+			uniform.value = std::make_any<float>(0.0f);
+
 			auto floatProperties = p_json.find("floatproperties");
 			if (floatProperties != p_json.end())
 			{
@@ -350,10 +351,7 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				for (auto& property : value.items())
 				{
 					if (property.value()["name"] == uniformName)
-					{
 						uniform.value = std::make_any<float>(property.value()["value"]);
-						uniformExist = true;
-					}
 				}
 			}
 
@@ -361,7 +359,9 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 		}
 		case UniformType::Float_Vec2:
 		{
-			auto uniformExist = false;
+			//Set default value
+			uniform.value = std::make_any<PrCore::Math::vec2>(PrCore::Math::vec2(0.0f));
+
 			auto float2Properties = p_json.find("float2properties");
 			if (float2Properties != p_json.end())
 			{
@@ -369,30 +369,24 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				for (auto& property : value.items())
 				{
 					if (property.value()["name"] == uniformName)
-					{
 						uniform.value = std::make_any<PrCore::Math::vec2>(PrCore::Utils::JSONParser::ToVec2(property.value()["value"]));
-						uniformExist = true;
-					}
 				}
 			}
 
-			//Check if this is a texture property
+			//Check if this is a texture property temporary solution scale and offset works for all textures
 			auto textures = p_json.find("textures");
 			if (textures != p_json.end())
 			{
 				auto& value = textures.value();
 				for (auto& texture : value.items())
 				{
-					if ((std::string)texture.value()["texName"] + TEXOFFSET_UNIFORM == uniformName)
-					{
+					auto fieldName = (std::string)texture.value()["texName"];
+					if (fieldName + TEXOFFSET_UNIFORM == uniformName)
 						uniform.value = std::make_any<PrCore::Math::vec2>(PrCore::Utils::JSONParser::ToVec2(texture.value()["texOffset"]));
-						uniformExist = true;
-					}
-					else if ((std::string)texture.value()["texName"] + TEXSCALE_UNIFORM == uniformName)
-					{
+
+
+					else if (fieldName + TEXSCALE_UNIFORM == uniformName)
 						uniform.value = std::make_any<PrCore::Math::vec2>(PrCore::Utils::JSONParser::ToVec2(texture.value()["texScale"]));
-						uniformExist = true;
-					}
 				}
 			}
 
@@ -400,7 +394,9 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 		}
 		case UniformType::Float_Vec3:
 		{
-			auto uniformExist = false;
+			//Set default value
+			uniform.value = std::make_any<PrCore::Math::vec3>(PrCore::Math::vec3(0.0f));
+
 			auto float3Properties = p_json.find("float3properties");
 			if (float3Properties != p_json.end())
 			{
@@ -408,10 +404,7 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				for (auto& property : value.items())
 				{
 					if (property.value()["name"] == uniformName)
-					{
 						uniform.value = std::make_any<PrCore::Math::vec3>(PrCore::Utils::JSONParser::ToVec3(property.value()["value"]));
-						uniformExist = true;
-					}
 				}
 			}
 
@@ -419,7 +412,9 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 		}
 		case UniformType::Float_Vec4:
 		{
-			auto uniformExist = false;
+			//Set default value
+			uniform.value = std::make_any<PrCore::Math::vec4>(PrCore::Math::vec4(0.0f));
+
 			auto float4Properties = p_json.find("float4properties");
 			if (float4Properties != p_json.end())
 			{
@@ -427,24 +422,20 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				for (auto& property : value.items())
 				{
 					if (property.value()["name"] == uniformName)
-					{
 						uniform.value = std::make_any<PrCore::Math::vec4>(PrCore::Utils::JSONParser::ToVec4(property.value()["value"]));
-						uniformExist = true;
-					}
 				}
 			}
 
 			if (uniformName == COLOR_UNIFORM)
-			{
 				uniform.value = std::make_any<PrCore::Math::vec4>(PrCore::Utils::JSONParser::ToColor(p_json["color"]));
-				uniformExist = true;
-			}
 
 			break;
 		}
 		case UniformType::Float_Mat3:
 		{
-			auto uniformExist = false;
+			//Set default value
+			uniform.value = std::make_any<PrCore::Math::mat3>(PrCore::Math::mat3(0.0f));
+
 			auto mat3Properties = p_json.find("mat3properties");
 			if (mat3Properties != p_json.end())
 			{
@@ -452,10 +443,7 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				for (auto& property : value.items())
 				{
 					if (property.value()["name"] == uniformName)
-					{
 						uniform.value = std::make_any<PrCore::Math::mat3>(PrCore::Utils::JSONParser::ToMat3(property.value()["value"]));
-						uniformExist = true;
-					}
 				}
 			}
 
@@ -463,7 +451,9 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 		}
 		case UniformType::Float_Mat4:
 		{
-			auto uniformExist = false;
+			//Set default value
+			uniform.value = std::make_any<PrCore::Math::mat4>(PrCore::Math::mat4(0.0f));
+
 			auto mat4Properties = p_json.find("mat4properties");
 			if (mat4Properties != p_json.end())
 			{
@@ -471,10 +461,7 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				for (auto& property : value.items())
 				{
 					if (property.value()["name"] == uniformName)
-					{
 						uniform.value = std::make_any<PrCore::Math::mat4>(PrCore::Utils::JSONParser::ToMat4(property.value()["value"]));
-						uniformExist = true;
-					}
 				}
 			}
 
@@ -491,15 +478,19 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				{
 					if(texture.value()["texName"] == uniformName)
 					{
-						auto textureName = texture.value()["texName"];
 						auto texturePath = texture.value()["texPath"];
 
 						auto textureResource = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Texture>(texturePath);
-						m_textures[textureName] = textureResource;
-						uniformExist = true;
+						if(textureResource)
+						{
+							m_textures[uniformName] = textureResource;
+							uniformExist = true;
+						}
 					}
 				}
 			}
+			if (!uniformExist)
+				m_textures[uniformName] = Texture2D::GenerateBlackTexture();
 
 			break;
 		}
@@ -514,15 +505,20 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				{
 					if (cubemap.value()["texName"] == uniformName)
 					{
-						auto cubemapName = cubemap.value()["texName"];
 						auto cubemapPath = cubemap.value()["texPath"];
 
 						auto textureResource = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Cubemap>(cubemapPath);
-						m_textures[cubemapName] = textureResource;
-						uniformExist = true;
+						if(textureResource)
+						{
+							m_textures[uniformName] = textureResource;
+							uniformExist = true;
+						}
 					}
 				}
 			}
+			if (!uniformExist)
+				m_textures[uniformName] = Cubemap::GenerateBlackTexture();
+
 			break;
 		}
 		case UniformType::Texture3D:

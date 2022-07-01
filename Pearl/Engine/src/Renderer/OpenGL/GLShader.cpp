@@ -433,7 +433,7 @@ void GLShader::PostUnloadImpl()
 {
 }
 
-void GLShader::LoadDefault()
+void GLShader::LoadCorruptedResource()
 {
 }
 

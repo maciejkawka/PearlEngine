@@ -44,7 +44,7 @@ void Resource::Load()
 	{
 		FireCorruptedEvent();
 		m_state = ResourceStatus::Corrupted;
-		LoadDefault();
+		LoadCorruptedResource();
 	}
 }
 

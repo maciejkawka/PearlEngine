@@ -97,6 +97,9 @@ namespace PrRenderer::Resources {
 		inline TextureFormat GetFormat() { return m_format; }
 
 	protected:
+		virtual void LoadUnitTexture(Core::Color p_unitColor) = 0;
+		void LoadCorruptedResource() override;
+
 		RendererID m_ID;
 		size_t m_height;
 		size_t m_width;
