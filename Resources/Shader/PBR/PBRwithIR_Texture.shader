@@ -147,17 +147,46 @@ void main()
     F0 = mix(F0, albedo, metallic);
 
     vec3 Lo = vec3(0.0);
-    int clampedLightNumber = clamp(lightNumber, 0, 4);
+    int clampedLightNumber = clamp(lightNumber, 0, MAX_LIGHT_NUM);
     for (int i = 0; i < clampedLightNumber; i++)
     {
+        //Light variables
         mat4 light = lightMat[i];
+        int lightType = int(light[0].w);
         vec3 lightPos = light[0].xyz;
         vec3 lightColor = vec3(light[2].xyz);
+        vec3 lightDir = normalize(-light[1].xyz);
+ 
+        vec3 L = vec3(0);
+        float attenuation = 0;
 
-        vec3 L = normalize(lightPos - IN.pos);
+        //Check light type and calculate 
+        if(lightType == 0) //Directional Light
+        {
+            L = lightDir;
+            attenuation = 1.0;
+        }
+        if(lightType == 1) //Point Light
+        {
+            L = normalize(lightPos - IN.pos);
+        
+            float distance = length(lightPos - IN.pos);
+            attenuation = 1.0 / (distance * distance);
+        }
+        if(lightType == 2) //Spot Light
+        {
+            L = normalize(lightPos - IN.pos);
+            float distance = length(lightPos - IN.pos);
+
+            float theta = dot(L, lightDir);
+            float epsilon = light[1].w - light[2].w;
+            float intensity = clamp((theta - light[2].w) / epsilon, 0.0, 1.0);
+
+            attenuation =  1.0 / (distance * distance);
+            attenuation = attenuation * intensity;
+        }     
+
         vec3 H = normalize(V + L);
-        float distance = length(lightPos - IN.pos);
-        float attenuation = 1.0 / (distance * distance);
         vec3 radiance = lightColor * attenuation;
 
         float NDF = DistributionGGX(N, H, roughness);
