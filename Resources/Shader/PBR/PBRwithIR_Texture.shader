@@ -15,17 +15,27 @@ uniform vec2 mainTex_offset = vec2(0, 0);
 out Vertex{
     vec3 pos;
     vec3 normals;
+    mat3 TBN;
     vec2 uv0;
 } OUT;
 
 
 void main()
 {
-    OUT.pos = vec3(modelMatrix * vec4(aPos,1.0));
-    OUT.normals = mat3(modelMatrix) * aNormals;
-    OUT.uv0 = aUV0 * mainTex_scale + mainTex_offset;
+    //Normal moved to tangent space
+    mat3 normalMat = transpose(inverse(mat3(modelMatrix)));
+    vec3 normals = normalize(normalMat * normalize(aNormals)); 
+    vec3 tangents = normalize(normalMat * normalize(aTangents.xyz));
+    vec3 bitangents = normalize(cross(tangents, normals) * aTangents.w);
+    OUT.TBN = mat3(tangents, bitangents, normals);
 
-    gl_Position = VPMatrix * vec4(OUT.pos,1.0);
+    //UVs and pos calculations
+    OUT.uv0 = aUV0 * mainTex_scale + mainTex_offset;
+    
+    vec4 worldPos = (modelMatrix * vec4(aPos, 1.0));
+    OUT.pos = worldPos.xyz; 
+
+    gl_Position = VPMatrix * worldPos;
 }
 
 #fragment
@@ -37,6 +47,7 @@ out vec4 FragColor;
 in Vertex{
     vec3 pos;
     vec3 normals;
+    mat3 TBN;
     vec2 uv0;
 } IN;
 
@@ -61,23 +72,6 @@ uniform int lightNumber = 0;
 uniform vec3 ambientColor;
 
 uniform vec3 camPos;
-
-vec3 getNormalFromMap()
-{
-    vec3 tangentNormal = texture(normalMap, IN.uv0).xyz * 2.0 - 1.0;
-
-    vec3 Q1  = dFdx(IN.pos);
-    vec3 Q2  = dFdy(IN.pos);
-    vec2 st1 = dFdx(IN.uv0);
-    vec2 st2 = dFdy(IN.uv0);
-
-    vec3 N   = normalize(IN.normals);
-    vec3 T  = normalize(Q1*st2.t - Q2*st1.t);
-    vec3 B  = -normalize(cross(N, T));
-    mat3 TBN = mat3(T, B, N);
-
-    return normalize(TBN * tangentNormal);
-}
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
@@ -127,16 +121,16 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 void main()
 {
     vec3 albedo = texture(albedoMap, IN.uv0).rgb;
+    albedo = pow(albedo.rgb, vec3(2.2));
     float metallic = texture(metallicMap, IN.uv0).r;
     float roughness = texture(roughnessMap, IN.uv0).r;
     float ao = texture(aoMap, IN.uv0).r;
 
-    //  vec3 albedo = vec3(1.0,0.0,0.0);    
-    //  float metallic = 0.4;
-    //  float roughness = 0.1;
-    //  float ao = 1.0;
+    //Normal Mapping 
+    vec3 N = texture(normalMap, IN.uv0).rgb;
+    N = normalize(IN.TBN * normalize(N * 2.0 - 1.0));
 
-    vec3 N = getNormalFromMap();
+    //Basic Light Calculations
     vec3 V = normalize(camPos - IN.pos);
     vec3 R = reflect(-V,N);
 
@@ -146,6 +140,7 @@ void main()
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
 
+    //Calculate All Lights
     vec3 Lo = vec3(0.0);
     int clampedLightNumber = clamp(lightNumber, 0, MAX_LIGHT_NUM);
     for (int i = 0; i < clampedLightNumber; i++)
@@ -185,7 +180,7 @@ void main()
             attenuation =  1.0 / (distance * distance);
             attenuation = attenuation * intensity;
         }     
-
+    
         vec3 H = normalize(V + L);
         vec3 radiance = lightColor * attenuation;
 

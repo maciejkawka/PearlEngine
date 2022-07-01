@@ -60,8 +60,10 @@ void Renderer3D::DrawMeshNow(Resources::MeshPtr p_mesh, PrCore::Math::vec3 p_pos
 {
 	auto camera = PrRenderer::Core::Camera::GetMainCamera();
 	const auto& VPMatrix = camera->RecalculateMatrices();
-	auto modelMatrix = PrCore::Math::translate(PrCore::Math::mat4(1.0f), p_position) * PrCore::Math::scale(PrCore::Math::mat4(1), p_scale);
-	
+	auto modelMatrix = PrCore::Math::translate(PrCore::Math::mat4(1.0f), p_position);
+	modelMatrix  = modelMatrix * PrCore::Math::mat4_cast(p_rotation);
+	modelMatrix = PrCore::Math::scale(modelMatrix, p_scale);
+
 	if(p_material->HasProperty("camPos"))
 		p_material->SetProperty("camPos", camera->GetPosition());
 	
