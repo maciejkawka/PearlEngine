@@ -27,12 +27,14 @@ void main()
     vec3 normals = normalize(normalMat * normalize(aNormals)); 
     vec3 tangents = normalize(normalMat * normalize(aTangents.xyz));
     vec3 bitangents = normalize(cross(tangents, normals) * aTangents.w);
+    
     OUT.TBN = mat3(tangents, bitangents, normals);
     OUT.normals = normals;
     
-    //UVs and pos calculations
+    //UVs calculations
     OUT.uv0 = aUV0 * albedoMap_scale + albedoMap_offset;
     
+    //Set vertex to world space
     vec4 worldPos = (modelMatrix * vec4(aPos, 1.0));
     OUT.pos = worldPos.xyz; 
 
@@ -76,7 +78,7 @@ uniform sampler2D brdfLUT;
 // lights
 uniform mat4 lightMat[4];
 uniform int lightNumber = 0;
-uniform vec3 ambientColor;
+uniform vec3 ambientColor; //To be add in future
 
 //Additional
 uniform vec3 camPos;
