@@ -28,7 +28,8 @@ void main()
     vec3 tangents = normalize(normalMat * normalize(aTangents.xyz));
     vec3 bitangents = normalize(cross(tangents, normals) * aTangents.w);
     OUT.TBN = mat3(tangents, bitangents, normals);
-
+    OUT.normals = normals;
+    
     //UVs and pos calculations
     OUT.uv0 = aUV0 * albedoMap_scale + albedoMap_offset;
     
