@@ -101,6 +101,9 @@ std::vector<PrCore::Math::vec4> Mesh::CalculateTangents()
 	if (m_vertices.empty())
 		return tangents;
 
+	if (m_UVs[0].empty())
+		return tangents;
+
 	for (int i = 0; i < m_indicesCount; i += 3)
 	{
 		auto tangentA = PrCore::Math::normalize(GenerateTangent(i, i + 1, i + 2));
