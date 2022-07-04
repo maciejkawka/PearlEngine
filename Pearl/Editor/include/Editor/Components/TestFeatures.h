@@ -14,6 +14,7 @@ namespace PrEditor::Components {
 
 	private:
 		PrRenderer::Core::Renderer3D* m_renderer3D;
+		PrRenderer::Resources::MeshPtr m_mesh;
 		float dir = 0.0f;
 	};
 }
