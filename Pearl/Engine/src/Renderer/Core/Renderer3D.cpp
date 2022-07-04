@@ -9,8 +9,6 @@
 #include"Core/Resources/ResourceLoader.h"
 
 #include"Renderer/Core/Defines.h"
-#include "Renderer/Buffers/VertexBuffer.h"
-#include "Renderer/Buffers/VertexArray.h"
 #include "Renderer/Buffers/Framebuffer.h"
 
 using namespace PrRenderer::Core;
@@ -22,22 +20,37 @@ Renderer3D::Renderer3D()
 	PrCore::Events::EventManager::GetInstance().AddListener(windowResizedListener, PrCore::Events::WindowResizeEvent::s_type);
 	m_color = PrCore::Math::vec3(0.0f);
 
-
 	m_quad = Resources::Mesh::CreatePrimitive(Resources::Quad);
 }
 
 void Renderer3D::Begin()
 {
-	if (m_IRMap == nullptr)
-		GenerateIRMap();
-	if (m_LUTMap == nullptr)
-		GenerateLUTMap();
-	if (m_prefilteredMap == nullptr)
-		GeneratePrefilterMap();
-
 	Core::LowRenderer::EnableDepth(true);
 	Core::LowRenderer::Clear(Core::ClearFlag::ColorBuffer | Core::ClearFlag::DepthBuffer);
 	LowRenderer::ClearColor(0.1f, 0.1f, 0.8f, 1.0f);
+}
+
+void Renderer3D::SetCubemap(PrRenderer::Resources::MaterialPtr p_cubemap)
+{
+	m_cubemap.reset();
+	m_IRMap.reset();
+	m_prefilteredMap.reset();
+	m_LUTMap.reset();
+
+	if (p_cubemap == nullptr)
+	{
+		auto blackTexture = Resources::Texture2D::GenerateBlackTexture();
+		m_IRMap = std::static_pointer_cast<Resources::Cubemap>(blackTexture);
+		m_prefilteredMap = std::static_pointer_cast<Resources::Cubemap>(blackTexture);
+		m_LUTMap = blackTexture;
+		return;
+	}
+
+	m_cubemap = p_cubemap;
+
+	GenerateIRMap();
+	GeneratePrefilterMap();
+	GenerateLUTMap();
 }
 
 void Renderer3D::AddLight(const Light& p_light)
@@ -227,10 +240,6 @@ void Renderer3D::GeneratePrefilterMap()
 	unsigned int mipMapNumber = 5;
 	for (int i = 0; i < mipMapNumber; i++)
 	{
-		auto width = (unsigned int)(128 * PrCore::Math::pow(0.5f, i));
-		auto height = (unsigned int)(128 * PrCore::Math::pow(0.5f, i));
-		Core::LowRenderer::SetViewport(width, height, 0, 0);
-
 		float roughness = (float)i / (float)(mipMapNumber - 1);
 		shader->SetUniformFloat("roughness", roughness);
 		for (int j = 0; j < 6; j++)
