@@ -252,6 +252,12 @@
     <ClInclude Include="include\Engine\Renderer\Resources\CubemapManager.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\Utils\UUID.h">
+      <Filter>Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Utils\NonCopyable.h">
+      <Filter>Core\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -400,6 +406,9 @@
     </ClCompile>
     <ClCompile Include="src\Renderer\Resources\Cubemap.cpp">
       <Filter>Renderer\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Utils\UUID.cpp">
+      <Filter>Core\Utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
