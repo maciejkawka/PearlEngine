@@ -267,14 +267,14 @@
     <ClInclude Include="include\Engine\Core\ECS\ComponentPool.h">
       <Filter>Core\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Core\ECS\Entity.h">
-      <Filter>Core\ECS</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine\Core\ECS\EntityManager.h">
       <Filter>Core\ECS</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Core\Utils\Assert.h">
       <Filter>Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\ECS\Defines.h">
+      <Filter>Core\ECS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -428,21 +428,15 @@
     <ClCompile Include="src\Core\Utils\UUID.cpp">
       <Filter>Core\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\ECS\Entity.cpp">
-      <Filter>Core\ECS</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\ECS\EntityManager.cpp">
       <Filter>Core\ECS</Filter>
     </ClCompile>
-    <ClCompile Include="include\Engine\Core\ECS\ComponentPool.cpp">
+    <ClCompile Include="src\Core\ECS\Defines.cpp">
       <Filter>Core\ECS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\Engine\Core\ECS\ComponentPool.inl">
-      <Filter>Core\ECS</Filter>
-    </None>
-    <None Include="include\Engine\Core\ECS\Entity.inl">
       <Filter>Core\ECS</Filter>
     </None>
     <None Include="include\Engine\Core\ECS\EntityManager.inl">

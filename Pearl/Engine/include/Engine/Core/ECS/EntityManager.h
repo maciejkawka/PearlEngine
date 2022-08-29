@@ -1,5 +1,4 @@
 #pragma once
-#include"Core/ECS/Entity.h"
 #include "Core/ECS/ComponentPool.h"
 
 #include "Core/Utils/NonCopyable.h"
@@ -11,7 +10,39 @@
 
 namespace PrCore::ECS {
 
-	using ComponentSignature = std::bitset<MAX_COMPONENTS>;
+	class EntityManager;
+
+	class Entity {
+	public:
+		Entity() = delete;
+		Entity(ID p_ID, EntityManager* p_entityManager) : m_ID(p_ID), m_entityManager(p_entityManager) {}
+		Entity(const Entity& other) = default;
+		Entity& operator = (const Entity& other) = default;
+
+		inline ID GetID() const { return m_ID; }
+
+		void Destroy();
+		bool IsValid() const;
+
+		//Components
+		template<class T>
+		T* AddComponent();
+
+		template<class T>
+		T* GetComponent();
+
+		template<class T>
+		void RemoveComponent();
+
+		template<class T>
+		bool HasComponent();
+
+	private:
+		void Invalidate();
+
+		ID m_ID;
+		EntityManager* m_entityManager;
+	};
 
 	class EntityManager: public Utils::NonCopyable {
 	public:

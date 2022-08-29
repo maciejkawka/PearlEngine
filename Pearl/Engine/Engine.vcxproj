@@ -12,8 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Engine\Core\ECS\ComponentPool.h" />
-    <ClInclude Include="include\Engine\Core\ECS\Entity.h" />
     <ClInclude Include="include\Engine\Core\ECS\EntityManager.h" />
+    <ClInclude Include="include\Engine\Core\ECS\Defines.h" />
     <ClInclude Include="include\Engine\Core\ECS\Test.h" />
     <ClInclude Include="include\Engine\Core\Entry\AppContext.h" />
     <ClInclude Include="include\Engine\Core\Entry\Application.h" />
@@ -88,9 +88,8 @@
     <ClInclude Include="include\Engine\Renderer\Resources\Uniform.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\Engine\Core\ECS\ComponentPool.cpp" />
-    <ClCompile Include="src\Core\ECS\Entity.cpp" />
     <ClCompile Include="src\Core\ECS\EntityManager.cpp" />
+    <ClCompile Include="src\Core\ECS\Defines.cpp" />
     <ClCompile Include="src\Core\Entry\AppContext.cpp" />
     <ClCompile Include="src\Core\Entry\Application.cpp" />
     <ClCompile Include="src\Core\Events\EventManager.cpp" />
@@ -149,7 +148,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="include\Engine\Core\ECS\ComponentPool.inl" />
-    <None Include="include\Engine\Core\ECS\Entity.inl" />
     <None Include="include\Engine\Core\ECS\EntityManager.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

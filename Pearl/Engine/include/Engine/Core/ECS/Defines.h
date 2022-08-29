@@ -1,13 +1,13 @@
 #pragma once
 #include<cstdint>
+#include<bitset>
 
 namespace PrCore::ECS {
-
-	class EntityManager;
 
 	constexpr unsigned int MAX_ENTITIES = 10000;
 	constexpr unsigned int MAX_COMPONENTS = 64;
 
+	using ComponentSignature = std::bitset<MAX_COMPONENTS>;
 
 	//ID wrapps version and Index
 	//       ________________________
@@ -42,44 +42,9 @@ namespace PrCore::ECS {
 		uint32_t DEBUG_VERSION;
 #endif
 	};
-	
+
 	const ID INVALID_ID;
-
-	class Entity {
-
-
-	public:
-		Entity() = delete;
-		Entity(ID p_ID, EntityManager* p_entityManager): m_ID(p_ID), m_entityManager(p_entityManager) {} 
-		Entity(const Entity& other) = default;
-		Entity& operator = (const Entity & other) = default;
-
-		inline ID GetID() const { return m_ID; }
-
-		void Destroy();
-		bool IsValid();
-
-		//Components
-		//template<class T>
-		//T* AddComponent();
-
-		//template<class T>
-		//T* GetComponent();
-
-		//template<class T>
-		//void RemoveComponent();
-
-		//template<class T>
-		//bool HasComponent();
-
-	private:
-		void Invalidate();
-
-		ID m_ID;
-		EntityManager* m_entityManager;
-	}; 
 }
-
 
 namespace std {
 
@@ -91,5 +56,3 @@ namespace std {
 		}
 	};
 }
-
-//#include "Core/ECS/EntityManager.inl"

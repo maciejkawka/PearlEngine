@@ -4,6 +4,27 @@
 
 using namespace PrCore::ECS;
 
+void Entity::Destroy()
+{
+	PR_ASSERT(m_entityManager != nullptr, "EntityManager is nullptr");
+
+	m_entityManager->DestoryEntity(m_ID);
+	Invalidate();
+}
+
+bool Entity::IsValid() const
+{
+	PR_ASSERT(m_entityManager != nullptr, "EntityManager is nullptr");
+
+	return m_entityManager->IsValid(m_ID);
+}
+
+void Entity::Invalidate()
+{
+	m_ID = INVALID_ID;
+}
+
+
 EntityManager::EntityManager():
 	m_entitiesNumber(0)
 {
