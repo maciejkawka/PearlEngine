@@ -35,6 +35,7 @@ namespace PrCore::ECS {
 	{
 		PR_ASSERT(IsValid(p_ID), std::string("ID " + std::to_string(p_ID.GetID()) + "is invalid"));
 
+		m_entitiesSignature[p_ID.GetIndex() - 1].set(GetTypeID<T>());
 		auto componentPool = GetComponentPool<T>();
 		return componentPool->AllocateData(p_ID);
 	}
@@ -53,6 +54,7 @@ namespace PrCore::ECS {
 	{
 		PR_ASSERT(IsValid(p_ID), std::string("ID " + std::to_string(p_ID.GetID()) + "is invalid"));
 
+		m_entitiesSignature[p_ID.GetIndex() - 1].reset(GetTypeID<T>());
 		auto componentPool = GetComponentPool<T>();
 		return componentPool->RemoveData(p_ID);
 	}
@@ -61,14 +63,14 @@ namespace PrCore::ECS {
 	bool EntityManager::HasComponent(ID p_ID)
 	{
 		PR_ASSERT(IsValid(p_ID), std::string("ID " + std::to_string(p_ID.GetID()) + "is invalid"));
-
-		auto componentPool = GetComponentPool<T>();
-		return componentPool->DataExist(p_ID);
+		return m_entitiesSignature[p_ID.GetIndex() - 1].test(GetTypeID<T>());
 	}
 
 	template<class T>
 	void EntityManager::RegisterComponent()
 	{
+		PR_ASSERT(m_typeComponentCounter < 64, "Cannot register more components");
+
 		auto componentID = GetTypeID<T>();
 		auto componentPool = std::make_shared<ComponentPool<T>>();
 		m_ComponentPools[componentID] = componentPool;

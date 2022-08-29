@@ -8,8 +8,8 @@
 namespace PrCore::ECS {
 
 	class IComponentPool : public Utils::NonCopyable {
-
-		//Empty class that helps storing pools in array
+	public:
+		virtual void EntityDestroyed(ID p_ID) = 0;
 	};
 
 	template<class T>
@@ -25,6 +25,8 @@ namespace PrCore::ECS {
 
 		bool DataExist(ID p_ID);
 
+		void EntityDestroyed(ID p_ID) override;
+
 	private:
 		//Vector holds all one type components created
 		//Component vector is packed
@@ -39,8 +41,6 @@ namespace PrCore::ECS {
 
 		//Number of all components
 		size_t m_componentsNumber;
-
-		
 	};
 
 }

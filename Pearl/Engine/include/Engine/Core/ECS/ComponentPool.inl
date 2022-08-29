@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Utils/Assert.h"
+#include "ComponentPool.h"
 
 namespace PrCore::ECS {
 
@@ -29,7 +30,7 @@ namespace PrCore::ECS {
 		PR_ASSERT(m_entityToIndexMap.find(p_ID) != m_entityToIndexMap.end(), "Entity does not have component " + std::string(typeid(T).name()));
 		PR_ASSERT(p_ID.GetIndex() <= MAX_ENTITIES, "Wrong ID");
 
-		return &m_components[p_ID.GetIndex() - 1];
+		return &m_components[m_entityToIndexMap[p_ID]];
 	}
 
 	template<class T>
@@ -57,5 +58,11 @@ namespace PrCore::ECS {
 	bool ComponentPool<T>::DataExist(ID p_ID)
 	{
 		return m_entityToIndexMap.find(p_ID) != m_entityToIndexMap.end();
+	}
+
+	template<class T>
+	 void ComponentPool<T>::EntityDestroyed(ID p_ID)
+	{
+		RemoveData(p_ID);
 	}
 }
