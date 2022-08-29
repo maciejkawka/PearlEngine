@@ -32,6 +32,7 @@
 
 //Engine Subsystems
 #include"Core/Utils/Logger.h"
+#include"Core/Utils/Assert.h"
 #include"Core/Math/Math.h"
 #include"Renderer/Core/Color.h"
 
