@@ -1,16 +1,14 @@
 #pragma once
 #include"Core/ECS/EntityManager.h"
-#include"Core/Utils/NonCopyable.h"
 
 namespace PrCore::ECS {
 	
-	class EntityViewer: public  Utils::NonCopyable {
+	class EntityViewer {
 	public:
+		EntityViewer() = delete;
 		EntityViewer(EntityManager* p_entityManager):
 		m_entityManager(p_entityManager)
 		{}
-
-		~EntityViewer() = default;
 
 		template<typename... ComponentType>
 		EntityManager::TypedView<ComponentType...> EntitesWithComponents()

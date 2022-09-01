@@ -70,7 +70,7 @@ namespace PrCore::ECS {
 	template<class T>
 	void EntityManager::RegisterComponent()
 	{
-		PR_ASSERT(m_typeComponentCounter < 64, "Cannot register more components");
+		PR_ASSERT(m_typeComponentCounter < MAX_COMPONENTS, "Cannot register more components");
 
 		auto componentID = GetTypeID<T>();
 		auto componentPool = std::make_shared<ComponentPool<T>>();
@@ -95,7 +95,7 @@ namespace PrCore::ECS {
 	{
 		auto componentID = GetTypeID<T>();
 		auto findComponentPool = m_ComponentPools.find(componentID);
-		PR_ASSERT(findComponentPool != m_ComponentPools.end(), "Component not registered" + std::string(typeid(T).name()));
+		PR_ASSERT(findComponentPool != m_ComponentPools.end(), "Component not registered " + std::string(typeid(T).name()));
 
 		return std::static_pointer_cast<ComponentPool<T>>(m_ComponentPools[componentID]);
 	}

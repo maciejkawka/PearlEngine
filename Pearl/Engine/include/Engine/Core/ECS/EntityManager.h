@@ -105,7 +105,7 @@ namespace PrCore::ECS {
 		class BasicView {
 		public:
 			BasicView() = delete;
-			BasicView(EntityManager* p_entityManager) :
+			explicit BasicView(EntityManager* p_entityManager) :
 				m_entityManager(p_entityManager)
 			{}
 
@@ -130,14 +130,14 @@ namespace PrCore::ECS {
 		class TypedView {
 		public:
 			TypedView() = delete;
-			TypedView(EntityManager* p_entityManager) :
+			explicit TypedView(EntityManager* p_entityManager) :
 				m_entityManager(p_entityManager)
 			{
 				if (sizeof...(ComponentTypes) == 0)
 					PR_ASSERT(sizeof...(ComponentTypes) != 0, "No Component Specitied in ComponentWithComponents");
 				else
 				{
-					int componentIDs[] = { m_entityManager->GetTypeID<ComponentTypes>() ... };
+					size_t componentIDs[] = { m_entityManager->GetTypeID<ComponentTypes>() ... };
 					for (int i = 0; i < (sizeof...(ComponentTypes)); i++)
 						m_mask.set(componentIDs[i]);
 				}

@@ -93,6 +93,7 @@
   <ItemGroup>
     <ClCompile Include="src\Core\ECS\EntityManager.cpp" />
     <ClCompile Include="src\Core\ECS\Defines.cpp" />
+    <ClCompile Include="src\Core\ECS\SystemManager.cpp" />
     <ClCompile Include="src\Core\Entry\AppContext.cpp" />
     <ClCompile Include="src\Core\Entry\Application.cpp" />
     <ClCompile Include="src\Core\Events\EventManager.cpp" />
@@ -152,6 +153,7 @@
   <ItemGroup>
     <None Include="include\Engine\Core\ECS\ComponentPool.inl" />
     <None Include="include\Engine\Core\ECS\EntityManager.inl" />
+    <None Include="include\Engine\Core\ECS\SystemManager.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

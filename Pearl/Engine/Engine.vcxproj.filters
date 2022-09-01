@@ -443,12 +443,18 @@
     <ClCompile Include="src\Core\ECS\Defines.cpp">
       <Filter>Core\ECS</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\ECS\SystemManager.cpp">
+      <Filter>Core\ECS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\Engine\Core\ECS\ComponentPool.inl">
       <Filter>Core\ECS</Filter>
     </None>
     <None Include="include\Engine\Core\ECS\EntityManager.inl">
+      <Filter>Core\ECS</Filter>
+    </None>
+    <None Include="include\Engine\Core\ECS\SystemManager.inl">
       <Filter>Core\ECS</Filter>
     </None>
   </ItemGroup>
