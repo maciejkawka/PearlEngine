@@ -93,7 +93,7 @@ namespace PrCore::ECS {
 			{
 				do {
 					m_index++;
-				} while (m_index < m_entitiesNumber && m_entityManager->m_entitiesSignature[m_index] != m_mask);
+				} while (m_index < m_entitiesNumber && (m_entityManager->m_entitiesSignature[m_index] & m_mask) != m_mask);
 
 				return *this;
 			}
@@ -146,7 +146,7 @@ namespace PrCore::ECS {
 			TypedIterator begin() const
 			{
 				int index = 0;
-				while (index < m_entityManager->m_entitiesNumber && m_entityManager->m_entitiesSignature[index] != m_mask)
+				while (index < m_entityManager->m_entitiesNumber && (m_entityManager->m_entitiesSignature[index] & m_mask) != m_mask)
 					index++;
 
 				return TypedIterator(index, m_entityManager, m_entityManager->m_entitiesNumber, m_mask);
