@@ -276,6 +276,15 @@
     <ClInclude Include="include\Engine\Core\ECS\Defines.h">
       <Filter>Core\ECS</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\ECS\BaseSystem.h">
+      <Filter>Core\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\ECS\EntityViewer.h">
+      <Filter>Core\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\ECS\SystemManager.h">
+      <Filter>Core\ECS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">

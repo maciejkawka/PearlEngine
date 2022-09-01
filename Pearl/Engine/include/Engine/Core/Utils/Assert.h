@@ -10,7 +10,7 @@ namespace PrCore::Utils {
 #ifdef PR_ASSERTENABLE
 	#define PR_ASSERT(EX, ...) (void)((EX) ||  (PrCore::Utils::pearl_assert(#EX, __FILE__, __LINE__, ## __VA_ARGS__),0))
 #else
-	#define ASSERT(EX)
+	#define PR_ASSERT(EX, ...)
 #endif
 
 

@@ -1,3 +1,4 @@
+#include "EntityManager.h"
 #pragma once
 
 namespace PrCore::ECS {
@@ -74,6 +75,12 @@ namespace PrCore::ECS {
 		auto componentID = GetTypeID<T>();
 		auto componentPool = std::make_shared<ComponentPool<T>>();
 		m_ComponentPools[componentID] = componentPool;
+	}
+
+	template<typename ...ComponentTypes>
+	EntityManager::TypedView<ComponentTypes...> EntityManager::GetEntitiesWithComponents()
+	{
+		return TypedView<ComponentTypes...>(this);
 	}
 
 	template<class T>

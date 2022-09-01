@@ -78,3 +78,14 @@ bool EntityManager::IsValid(ID p_ID) const
 		p_ID.GetIndex() <= m_entitiesSignature.size() &&
 		p_ID.GetVersion() == m_entitiesVersion[p_ID.GetIndex() - 1];
 }
+
+EntityManager::BasicView EntityManager::GetAllEntities()
+{
+	return BasicView(this);
+}
+
+Entity EntityManager::ConstructEntityonIndex(uint32_t p_index)
+{
+	auto entityID = ID(p_index, m_entitiesVersion[p_index - 1]);
+	return Entity(entityID, this);
+}

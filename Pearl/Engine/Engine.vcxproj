@@ -11,9 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Engine\Core\ECS\BaseSystem.h" />
     <ClInclude Include="include\Engine\Core\ECS\ComponentPool.h" />
+    <ClInclude Include="include\Engine\Core\ECS\EntityViewer.h" />
     <ClInclude Include="include\Engine\Core\ECS\EntityManager.h" />
     <ClInclude Include="include\Engine\Core\ECS\Defines.h" />
+    <ClInclude Include="include\Engine\Core\ECS\SystemManager.h" />
     <ClInclude Include="include\Engine\Core\ECS\Test.h" />
     <ClInclude Include="include\Engine\Core\Entry\AppContext.h" />
     <ClInclude Include="include\Engine\Core\Entry\Application.h" />
