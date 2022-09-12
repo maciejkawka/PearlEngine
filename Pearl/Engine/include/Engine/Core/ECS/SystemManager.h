@@ -29,9 +29,11 @@ namespace PrCore::ECS {
 		template<class System>
 		void UpdateSystem(float p_dt);
 
-		//TODO
-		//template<class System>
-		//void SetActiveSystem(bool p_isActive);
+		template<class System>
+		void SetActiveSystem(bool p_isActive);
+
+		template<class System>
+		bool IsActiveSystem();
 
 	private:
 		template<class System>

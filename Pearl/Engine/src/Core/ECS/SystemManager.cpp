@@ -31,5 +31,8 @@ void SystemManager::UpdateGroup(uint8_t p_systemGroup, float p_dt)
 
 	auto systemsVector = *systemsIterator;
 	for (auto system : systemsVector.second)
-		system->OnUpdate(p_dt);
+	{
+		if(system->IsActive())
+			system->OnUpdate(p_dt);
+	}
 }

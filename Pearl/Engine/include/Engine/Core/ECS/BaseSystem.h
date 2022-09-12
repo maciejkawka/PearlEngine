@@ -20,23 +20,33 @@ namespace PrCore::ECS {
 		{}
 
 		~BaseSystem() = default;
+
 		virtual void OnUpdate(float p_dt) = 0;
-		virtual void Init() {}
-	
+		virtual void OnCreate() {}
+		virtual void OnEnable() {}
+		virtual void OnDisable() {}
+
+		inline void SetActive(bool p_isActive)
+		{
+			if (m_isActive && p_isActive != m_isActive)
+				OnDisable();
+			else if (!m_isActive && p_isActive != m_isActive)
+				OnEnable();
+
+			m_isActive = p_isActive;
+		}
+		inline bool IsActive() const { return m_isActive; }
 	protected:
 		EntityViewer m_entityViewer;
 		uint8_t m_updateGroup;
 		bool m_isActive;
 
 	private:
-		void Init_Base(EntityManager* p_entityManager)
+		void Init(EntityManager* p_entityManager)
 		{
 			m_entityViewer = EntityViewer(p_entityManager);
 			m_updateGroup = (uint8_t)UpdateGroup::Update;
 			m_isActive = true;
-
-			//If the system need to inistiate something do it there
-			Init();
 		}
 
 		friend class SystemManager;
