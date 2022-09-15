@@ -285,6 +285,9 @@
     <ClInclude Include="include\Engine\Core\ECS\SystemManager.h">
       <Filter>Core\ECS</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\Events\ECSEvents.h">
+      <Filter>Core\Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">

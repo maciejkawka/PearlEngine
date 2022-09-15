@@ -1,6 +1,8 @@
 #include"Core/Common/pearl_pch.h"
 
 #include "Core/ECS/EntityManager.h"
+#include"Core/Events/EventManager.h"
+#include"Core/Events/ECSEvents.h"
 
 using namespace PrCore::ECS;
 
@@ -82,6 +84,18 @@ bool EntityManager::IsValid(ID p_ID) const
 EntityManager::BasicView EntityManager::GetAllEntities()
 {
 	return BasicView(this);
+}
+
+void EntityManager::FireEntityCreated(Entity p_entity)
+{
+	Events::EventPtr event = std::make_shared<Events::EntityCreatedEvent>(p_entity);
+	Events::EventManager::GetInstance().FireEvent(event);
+}
+
+void EntityManager::FireEntityDestoryed(Entity p_entity)
+{
+	Events::EventPtr event = std::make_shared<Events::EntityDestroyedEvent>(p_entity);
+	Events::EventManager::GetInstance().FireEvent(event);
 }
 
 Entity EntityManager::ConstructEntityonIndex(uint32_t p_index)

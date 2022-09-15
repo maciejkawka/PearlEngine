@@ -191,6 +191,9 @@ namespace PrCore::ECS {
 		BasicView GetAllEntities();
 
 	private:
+		void FireEntityCreated(Entity p_entity);
+		void FireEntityDestoryed(Entity p_entity);
+
 		Entity ConstructEntityonIndex(uint32_t p_index);
 
 		template<class T>

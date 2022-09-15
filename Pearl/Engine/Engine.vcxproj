@@ -21,6 +21,7 @@
     <ClInclude Include="include\Engine\Core\Entry\AppContext.h" />
     <ClInclude Include="include\Engine\Core\Entry\Application.h" />
     <ClInclude Include="include\Engine\Core\Entry\EntryPoint.h" />
+    <ClInclude Include="include\Engine\Core\Events\ECSEvents.h" />
     <ClInclude Include="include\Engine\Core\Events\Event.h" />
     <ClInclude Include="include\Engine\Core\Events\EventManager.h" />
     <ClInclude Include="include\Engine\Core\Events\InputEvents.h" />
