@@ -36,3 +36,8 @@ void SystemManager::UpdateGroup(uint8_t p_systemGroup, float p_dt)
 			system->OnUpdate(p_dt);
 	}
 }
+
+void SystemManager::UpdateGroup(ECS::UpdateGroup p_systemGroup, float p_dt)
+{
+	UpdateGroup((uint8_t)p_systemGroup, p_dt);
+}

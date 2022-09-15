@@ -14,7 +14,10 @@ namespace PrCore::ECS {
 
 	class Entity {
 	public:
-		Entity() = delete;
+		Entity():
+			m_ID(INVALID_ID),
+			m_entityManager(nullptr)
+		{}
 		Entity(ID p_ID, EntityManager* p_entityManager) : m_ID(p_ID), m_entityManager(p_entityManager) {}
 		Entity(const Entity& other) = default;
 		Entity& operator = (const Entity& other) = default;
@@ -189,6 +192,8 @@ namespace PrCore::ECS {
 		TypedView<ComponentTypes...> GetEntitiesWithComponents();
 
 		BasicView GetAllEntities();
+
+		inline size_t GetEntityCount() const { return m_entitiesNumber; }
 
 	private:
 		void FireEntityCreated(Entity p_entity);

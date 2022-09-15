@@ -288,6 +288,15 @@
     <ClInclude Include="include\Engine\Core\Events\ECSEvents.h">
       <Filter>Core\Events</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\ECS\Scene.h">
+      <Filter>Core\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\ECS\BaseComponent.h">
+      <Filter>Core\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\ECS\MandatoryComponents.h">
+      <Filter>Core\ECS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -449,6 +458,9 @@
     <ClCompile Include="src\Core\ECS\SystemManager.cpp">
       <Filter>Core\ECS</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\ECS\Scene.cpp">
+      <Filter>Core\ECS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\Engine\Core\ECS\ComponentPool.inl">
@@ -458,6 +470,9 @@
       <Filter>Core\ECS</Filter>
     </None>
     <None Include="include\Engine\Core\ECS\SystemManager.inl">
+      <Filter>Core\ECS</Filter>
+    </None>
+    <None Include="include\Engine\Core\ECS\Scene.inl">
       <Filter>Core\ECS</Filter>
     </None>
   </ItemGroup>

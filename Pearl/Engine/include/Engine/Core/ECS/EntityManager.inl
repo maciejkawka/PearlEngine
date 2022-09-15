@@ -36,6 +36,9 @@ namespace PrCore::ECS {
 	{
 		PR_ASSERT(IsValid(p_ID), std::string("ID " + std::to_string(p_ID.GetID()) + "is invalid"));
 
+		if(m_ComponentPools.find(GetTypeID<T>()) == m_ComponentPools.end())
+			RegisterComponent<T>();
+
 		m_entitiesSignature[p_ID.GetIndex() - 1].set(GetTypeID<T>());
 		auto componentPool = GetComponentPool<T>();
 		return componentPool->AllocateData(p_ID);

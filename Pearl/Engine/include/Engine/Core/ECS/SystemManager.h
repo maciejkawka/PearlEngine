@@ -26,6 +26,8 @@ namespace PrCore::ECS {
 
 		void UpdateGroup(uint8_t p_systemGroup, float p_dt);
 
+		void UpdateGroup(ECS::UpdateGroup p_systemGroup, float p_dt);
+
 		template<class System>
 		void UpdateSystem(float p_dt);
 
