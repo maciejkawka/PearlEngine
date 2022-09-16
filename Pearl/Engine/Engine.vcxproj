@@ -17,7 +17,7 @@
     <ClInclude Include="include\Engine\Core\ECS\EntityViewer.h" />
     <ClInclude Include="include\Engine\Core\ECS\EntityManager.h" />
     <ClInclude Include="include\Engine\Core\ECS\Defines.h" />
-    <ClInclude Include="include\Engine\Core\ECS\MandatoryComponents.h" />
+    <ClInclude Include="include\Engine\Core\ECS\Components.h" />
     <ClInclude Include="include\Engine\Core\ECS\Scene.h" />
     <ClInclude Include="include\Engine\Core\ECS\SystemManager.h" />
     <ClInclude Include="include\Engine\Core\ECS\Test.h" />

@@ -199,6 +199,12 @@ namespace PrCore::ECS {
 		void FireEntityCreated(Entity p_entity);
 		void FireEntityDestoryed(Entity p_entity);
 
+		template<class T>
+		void FireComponentAdded(Entity p_entity, T* p_component);
+
+		template<class T>
+		void FireComponentRemoved(Entity p_entity, T* p_component);
+
 		Entity ConstructEntityonIndex(uint32_t p_index);
 
 		template<class T>

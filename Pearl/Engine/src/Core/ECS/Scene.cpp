@@ -2,7 +2,7 @@
 
 #include "Core/ECS/Scene.h"
 #include"Core/ECS/SystemManager.h"
-#include"Core/ECS/MandatoryComponents.h"
+#include"Core/ECS/Components.h"
 
 using namespace PrCore::ECS;
 

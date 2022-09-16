@@ -294,7 +294,7 @@
     <ClInclude Include="include\Engine\Core\ECS\BaseComponent.h">
       <Filter>Core\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Core\ECS\MandatoryComponents.h">
+    <ClInclude Include="include\Engine\Core\ECS\Components.h">
       <Filter>Core\ECS</Filter>
     </ClInclude>
   </ItemGroup>

@@ -29,5 +29,33 @@ namespace PrCore::Events {
 		inline const static EventType s_type = 0x1153264b;
 	};
 
+	template<class Component>
+	class ComponentAddedEvent : public Event {
+	public:
+		ComponentAddedEvent(ECS::Entity p_entity, Component* p_component) :
+			m_entity(p_entity),
+		m_component(p_component)
+		{}
 
+		ECS::Entity m_entity;
+		Component* m_component;
+
+		virtual inline EventType GetType() { return s_type; }
+		inline const static EventType s_type = 0x8976fc84;
+	};
+
+	template<class Component>
+	class ComponentRemovedEvent : public Event {
+	public:
+		ComponentRemovedEvent(ECS::Entity p_entity, Component* p_component) :
+			m_entity(p_entity),
+			m_component(p_component)
+		{}
+
+		ECS::Entity m_entity;
+		Component* m_component;
+
+		virtual inline EventType GetType() { return s_type; }
+		inline const static EventType s_type = 0x353e5392;
+	};
 }

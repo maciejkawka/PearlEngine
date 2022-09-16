@@ -1,5 +1,8 @@
-#include "EntityManager.h"
 #pragma once
+#include "EntityManager.h"
+
+#include "Core/Events/ECSEvents.h"
+#include "Core/Events/EventManager.h"
 
 namespace PrCore::ECS {
 
@@ -84,6 +87,20 @@ namespace PrCore::ECS {
 	EntityManager::TypedView<ComponentTypes...> EntityManager::GetEntitiesWithComponents()
 	{
 		return TypedView<ComponentTypes...>(this);
+	}
+
+	template<class T>
+	void EntityManager::FireComponentAdded(Entity p_entity, T* p_component)
+	{
+		Events::EventPtr event = std::make_shared<Events::ComponentAddedEvent<T>>(p_entity, p_component);
+		Events::EventManager::GetInstance().FireEvent(event);
+	}
+
+	template<class T>
+	void EntityManager::FireComponentRemoved(Entity p_entity, T* p_component)
+	{
+		Events::EventPtr event = std::make_shared<Events::ComponentAddedEvent<T>>(p_entity, p_component);
+		Events::EventManager::GetInstance().FireEvent(event);
 	}
 
 	template<class T>
