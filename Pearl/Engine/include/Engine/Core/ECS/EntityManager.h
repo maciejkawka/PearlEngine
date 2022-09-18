@@ -24,7 +24,7 @@ namespace PrCore::ECS {
 
 		inline ID GetID() const { return m_ID; }
 
-		void Destroy();
+		void Destroy(); //Not very safe should be removed
 		bool IsValid() const;
 
 		//Components

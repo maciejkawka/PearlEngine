@@ -40,6 +40,11 @@ Entity Scene::CreateEntity(const std::string& p_name)
 
 void Scene::DestoryEntity(Entity p_entity)
 {
+	m_entitiesToDestory.push(p_entity);
+}
+
+void Scene::DestoryEntityImmediate(Entity p_entity)
+{
 	m_entityManager->DestoryEntity(p_entity.GetID());
 }
 
@@ -98,6 +103,16 @@ void Scene::FixUpdate(float p_dt) const
 void Scene::LateUpdate(float p_dt) const
 {
 	m_systemManager->UpdateGroup(UpdateGroup::LateUpdate, p_dt);
+}
+
+void Scene::CleanDestroyedEntities()
+{
+	while (!m_entitiesToDestory.empty())
+	{
+		Entity entity = m_entitiesToDestory.front();
+		m_entitiesToDestory.pop();
+		m_entityManager->DestoryEntity(entity.GetID());
+	}
 }
 
 size_t Scene::GetEntitiesCount()

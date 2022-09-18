@@ -37,7 +37,7 @@ namespace PrCore::ECS {
 	template<class T>
 	T* EntityManager::AddComponent(ID p_ID)
 	{
-		PR_ASSERT(IsValid(p_ID), std::string("ID " + std::to_string(p_ID.GetID()) + "is invalid"));
+		PR_ASSERT(IsValid(p_ID), std::string("ID is invalid"));
 
 		if(m_ComponentPools.find(GetTypeID<T>()) == m_ComponentPools.end())
 			RegisterComponent<T>();
@@ -50,7 +50,7 @@ namespace PrCore::ECS {
 	template<class T>
 	T* EntityManager::GetComponent(ID p_ID)
 	{
-		PR_ASSERT(IsValid(p_ID), std::string("ID " + std::to_string(p_ID.GetID()) + "is invalid"));
+		PR_ASSERT(IsValid(p_ID), std::string("ID is invalid"));
 
 		auto componentPool = GetComponentPool<T>();
 		return componentPool->GetData(p_ID);
@@ -59,7 +59,7 @@ namespace PrCore::ECS {
 	template<class T>
 	void EntityManager::RemoveComponent(ID p_ID)
 	{
-		PR_ASSERT(IsValid(p_ID), std::string("ID " + std::to_string(p_ID.GetID()) + "is invalid"));
+		PR_ASSERT(IsValid(p_ID), std::string("ID is invalid"));
 
 		m_entitiesSignature[p_ID.GetIndex() - 1].reset(GetTypeID<T>());
 		auto componentPool = GetComponentPool<T>();
@@ -69,7 +69,7 @@ namespace PrCore::ECS {
 	template<class T>
 	bool EntityManager::HasComponent(ID p_ID)
 	{
-		PR_ASSERT(IsValid(p_ID), std::string("ID " + std::to_string(p_ID.GetID()) + "is invalid"));
+		PR_ASSERT(IsValid(p_ID), std::string("ID is invalid"));
 		return m_entitiesSignature[p_ID.GetIndex() - 1].test(GetTypeID<T>());
 	}
 

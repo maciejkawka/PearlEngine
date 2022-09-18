@@ -3,6 +3,7 @@
 
 #include"Core/ECS/EntityManager.h"
 #include"Core/Utils/UUID.h"
+#include<queue>
 
 namespace PrCore::ECS {
 
@@ -18,6 +19,7 @@ namespace PrCore::ECS {
 
 		Entity CreateEntity(const std::string& p_name);
 		void DestoryEntity(Entity p_entity);
+		void DestoryEntityImmediate(Entity p_entity);
 
 		template<class System>
 		void RegisterSystem();
@@ -36,6 +38,7 @@ namespace PrCore::ECS {
 		void Update(float p_dt) const;
 		void FixUpdate(float p_dt) const;
 		void LateUpdate(float p_dt) const;
+		void CleanDestroyedEntities();
 
 		//void RenderUpdate(float p_dt) const;
 		//void PhysicsUpdate(float p_dt) const;
@@ -57,6 +60,8 @@ namespace PrCore::ECS {
 
 		SystemManager* m_systemManager;
 		EntityManager* m_entityManager;
+
+		std::queue<Entity> m_entitiesToDestory;
 	};
 }
 

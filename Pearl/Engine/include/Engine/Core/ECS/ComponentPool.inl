@@ -27,8 +27,12 @@ namespace PrCore::ECS {
 	template<class T>
 	T* ComponentPool<T>::GetData(ID p_ID)
 	{
-		PR_ASSERT(m_entityToIndexMap.find(p_ID) != m_entityToIndexMap.end(), "Entity does not have component " + std::string(typeid(T).name()));
 		PR_ASSERT(p_ID.GetIndex() <= MAX_ENTITIES, "Wrong ID");
+
+		//If no component return null
+		//PR_ASSERT(m_entityToIndexMap.find(p_ID) != m_entityToIndexMap.end(), "Entity does not have component " + std::string(typeid(T).name()));
+		if(m_entityToIndexMap.find(p_ID) == m_entityToIndexMap.end())
+			return nullptr;
 
 		return &m_components[m_entityToIndexMap[p_ID]];
 	}
