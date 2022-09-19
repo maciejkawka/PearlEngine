@@ -14,9 +14,7 @@ namespace PrCore::ECS {
 	public:
 		Scene(const std::string& p_name);
 		//Scene(const std::string& p_name, const std::string& p_path) {}
-
-		~Scene();
-
+		
 		Entity CreateEntity(const std::string& p_name);
 		void DestoryEntity(Entity p_entity);
 		void DestoryEntityImmediate(Entity p_entity);
@@ -54,6 +52,8 @@ namespace PrCore::ECS {
 		size_t GetEntitiesCount();
 
 	private:
+		~Scene();
+
 		Utils::UUID m_UUID;
 		std::string m_name;
 		std::string m_path;
@@ -62,6 +62,8 @@ namespace PrCore::ECS {
 		EntityManager* m_entityManager;
 
 		std::queue<Entity> m_entitiesToDestory;
+
+		friend class SceneManager;
 	};
 }
 

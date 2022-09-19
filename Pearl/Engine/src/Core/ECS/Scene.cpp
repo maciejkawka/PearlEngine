@@ -10,7 +10,7 @@ Scene::Scene(const std::string& p_name) :
 	m_name(p_name)
 {
 	m_path = "";
-	Utils::UUIDGenerator(m_UUID);
+	m_UUID = Utils::UUIDGenerator().Generate();
 
 	m_entityManager = new EntityManager();
 	m_systemManager = new SystemManager(m_entityManager);
@@ -58,8 +58,7 @@ Entity Scene::GetEntityByName(const std::string& p_name)
 			return entity;
 	}
 
-	PRLOG_WARN("No entity name {0} found", p_name);
-	return Entity(INVALID_ID, m_entityManager);
+	return Entity();
 }
 
 Entity Scene::GetEntityByID(Utils::UUID p_UUID)
@@ -72,8 +71,7 @@ Entity Scene::GetEntityByID(Utils::UUID p_UUID)
 			return entity;
 	}
 
-	PRLOG_WARN("No entity UUID {0} found", p_UUID);
-	return Entity(INVALID_ID, m_entityManager);
+	return Entity();
 }
 
 Entity Scene::GetEntityByTag(const std::string& p_tag)
@@ -86,8 +84,7 @@ Entity Scene::GetEntityByTag(const std::string& p_tag)
 			return entity;
 	}
 
-	PRLOG_WARN("No entity tag {0} found", p_tag);
-	return Entity(INVALID_ID, m_entityManager);
+	return Entity();
 }
 
 void Scene::Update(float p_dt) const

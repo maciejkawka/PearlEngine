@@ -19,6 +19,7 @@
     <ClInclude Include="include\Engine\Core\ECS\Defines.h" />
     <ClInclude Include="include\Engine\Core\ECS\Components.h" />
     <ClInclude Include="include\Engine\Core\ECS\Scene.h" />
+    <ClInclude Include="include\Engine\Core\ECS\SceneManager.h" />
     <ClInclude Include="include\Engine\Core\ECS\SystemManager.h" />
     <ClInclude Include="include\Engine\Core\ECS\Test.h" />
     <ClInclude Include="include\Engine\Core\Entry\AppContext.h" />
@@ -49,6 +50,7 @@
     <ClInclude Include="include\Engine\Core\Utils\Logger.h" />
     <ClInclude Include="include\Engine\Core\Utils\Clock.h" />
     <ClInclude Include="include\Engine\Core\Utils\NonCopyable.h" />
+    <ClInclude Include="include\Engine\Core\Utils\Singleton.h" />
     <ClInclude Include="include\Engine\Core\Utils\StringUtils.h" />
     <ClInclude Include="include\Engine\Core\Utils\UUID.h" />
     <ClInclude Include="include\Engine\Core\Windowing\GLWindow.h" />
@@ -98,6 +100,7 @@
     <ClCompile Include="src\Core\ECS\EntityManager.cpp" />
     <ClCompile Include="src\Core\ECS\Defines.cpp" />
     <ClCompile Include="src\Core\ECS\Scene.cpp" />
+    <ClCompile Include="src\Core\ECS\SceneManager.cpp" />
     <ClCompile Include="src\Core\ECS\SystemManager.cpp" />
     <ClCompile Include="src\Core\Entry\AppContext.cpp" />
     <ClCompile Include="src\Core\Entry\Application.cpp" />

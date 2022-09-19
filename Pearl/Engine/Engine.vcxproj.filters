@@ -297,6 +297,12 @@
     <ClInclude Include="include\Engine\Core\ECS\Components.h">
       <Filter>Core\ECS</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\Utils\Singleton.h">
+      <Filter>Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\ECS\SceneManager.h">
+      <Filter>Core\ECS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -459,6 +465,9 @@
       <Filter>Core\ECS</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\ECS\Scene.cpp">
+      <Filter>Core\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ECS\SceneManager.cpp">
       <Filter>Core\ECS</Filter>
     </ClCompile>
   </ItemGroup>

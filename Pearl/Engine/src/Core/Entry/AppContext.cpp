@@ -6,7 +6,7 @@
 #include"Core/Filesystem/FileSystem.h"
 #include"Core/Filesystem/ConfigFile.h"
 #include"Core/Resources/ResourceLoader.h"
-
+#include"Core/ECS/SceneManager.h"
 #include"Renderer/OpenGL/GLContext.h"
 
 
@@ -54,12 +54,15 @@ PrCore::Entry::AppContext::AppContext()
 	m_renderer3D = new PrRenderer::Core::Renderer3D();
 
 	m_input = new PrCore::Input::InputManager();
+
+	ECS::SceneManager::Init();
 }
 
 PrCore::Entry::AppContext::~AppContext()
 {
 	PRLOG_INFO("Deleting AppContext");
-	
+
+	ECS::SceneManager::Terminate();
 	delete m_input;
 	delete m_renderer3D;
 	delete m_rendererContext;
