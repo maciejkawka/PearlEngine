@@ -15,6 +15,9 @@ namespace PrCore::ECS {
 		PR_ASSERT(m_entityToIndexMap.find(p_ID) == m_entityToIndexMap.end(), "Entity already has component " + std::string(typeid(T).name()));
 		PR_ASSERT(p_ID.GetIndex() <= MAX_ENTITIES, "Wrong ID");
 
+		if (!std::is_base_of<BaseComponent, T>::value)
+			PR_ASSERT(false, "Component must expand PrCore::ECS::BaseComponent");
+
 		auto nextComponentIndex = m_componentsNumber;
 		m_entityToIndexMap[p_ID] = nextComponentIndex;
 		m_indexToEntityMap[nextComponentIndex] = p_ID;
@@ -65,8 +68,15 @@ namespace PrCore::ECS {
 	}
 
 	template<class T>
-	 void ComponentPool<T>::EntityDestroyed(ID p_ID)
+	void ComponentPool<T>::EntityDestroyed(ID p_ID)
 	{
 		RemoveData(p_ID);
 	}
+
+	template<class T>
+	 BaseComponent* ComponentPool<T>::GetRawData(ID p_ID)
+	 {
+		 T* component = GetData(p_ID);
+		 return reinterpret_cast<BaseComponent*>(component);
+	 }
 }

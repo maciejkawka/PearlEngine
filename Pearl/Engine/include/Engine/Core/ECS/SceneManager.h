@@ -12,7 +12,7 @@ namespace PrCore::ECS {
 
 		Scene* CreateScene(const std::string& p_name);
 		void DeleteScene(const Scene* p_scene);
-		//Scene& LoadScene(const std::string& p_path);
+		//Scene* LoadScene(const std::string& p_path);
 		//void UnloadScene(const std::string& p_path);
 		//void SaveScene(const std::string& p_path = "");
 

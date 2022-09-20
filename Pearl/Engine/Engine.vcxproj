@@ -46,6 +46,7 @@
     <ClInclude Include="include\Engine\Core\Resources\ResourceLoader.h" />
     <ClInclude Include="include\Engine\Core\Resources\ResourceManager.h" />
     <ClInclude Include="include\Engine\Core\Utils\Assert.h" />
+    <ClInclude Include="include\Engine\Core\Utils\ISerializable.h" />
     <ClInclude Include="include\Engine\Core\Utils\JSONParser.h" />
     <ClInclude Include="include\Engine\Core\Utils\Logger.h" />
     <ClInclude Include="include\Engine\Core\Utils\Clock.h" />

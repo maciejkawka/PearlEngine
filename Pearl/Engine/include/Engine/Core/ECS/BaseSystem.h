@@ -1,5 +1,6 @@
 #pragma once
 #include"Core/ECS/EntityViewer.h"
+#include"Core/Utils/ISerializable.h"
 
 
 namespace PrCore::ECS {
@@ -11,7 +12,7 @@ namespace PrCore::ECS {
 		LateUpdate = 1<<7
 	};
 
-	class BaseSystem {
+	class BaseSystem: public Utils::ISerializable {
 	public:
 		BaseSystem() :
 			m_entityViewer(nullptr),
@@ -35,7 +36,12 @@ namespace PrCore::ECS {
 
 			m_isActive = p_isActive;
 		}
+
 		inline bool IsActive() const { return m_isActive; }
+
+		inline virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
+		inline virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
+
 	protected:
 		EntityViewer m_entityViewer;
 		uint8_t m_updateGroup;

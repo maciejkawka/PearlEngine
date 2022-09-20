@@ -116,3 +116,28 @@ size_t Scene::GetEntitiesCount()
 {
 	return m_entityManager->GetEntityCount();
 }
+
+void Scene::OnSerialize(Utils::JSON::json& p_serialized)
+{
+	using namespace Utils::JSON;
+
+	//Possible Scene Settings here
+
+	//
+
+
+	//Scene Serialize
+	p_serialized["name"] = m_name;
+	p_serialized["path"] = m_path;
+	p_serialized["UUID"] = m_UUID;
+	p_serialized["entitiesCount"] = m_entityManager->GetEntityCount();
+
+	Utils::JSON::json entitesJSON;
+	m_entityManager->OnSerialize(entitesJSON);
+
+	p_serialized["entities"] = entitesJSON;
+
+	Utils::JSON::json systemsJSON;
+	m_systemManager->OnSerialize(systemsJSON);
+	p_serialized["systems"] = systemsJSON;
+}

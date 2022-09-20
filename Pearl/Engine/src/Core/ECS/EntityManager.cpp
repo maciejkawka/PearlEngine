@@ -1,6 +1,7 @@
 #include"Core/Common/pearl_pch.h"
 
 #include "Core/ECS/EntityManager.h"
+#include "Core/ECS/BaseComponent.h"
 #include"Core/Events/EventManager.h"
 #include"Core/Events/ECSEvents.h"
 
@@ -84,6 +85,47 @@ bool EntityManager::IsValid(ID p_ID) const
 EntityManager::BasicView EntityManager::GetAllEntities()
 {
 	return BasicView(this);
+}
+
+ComponentSignature EntityManager::GetComponentSignature(ID p_ID)
+{
+	PR_ASSERT(IsValid(p_ID), std::string("ID " + std::to_string(p_ID.GetID()) + "is invalid"));
+	return m_entitiesSignature[p_ID.GetIndex() - 1];
+}
+
+void EntityManager::OnSerialize(Utils::JSON::json& p_serialized)
+{
+	//Serialize Entities
+	for (int i=1;i<=m_entitiesNumber;i++)
+	{
+		Utils::JSON::json entityJSON;
+		auto entity = ConstructEntityonIndex(i);
+		auto ID = entity.GetID();
+		auto entitySignature = m_entitiesSignature[i - 1];
+
+		entityJSON["ID"] = ID.GetID();
+
+		//Serialize Components on Entity
+		Utils::JSON::json componentsJSON;
+		for (int j = 0; j < entitySignature.size(); j++)
+		{
+			if (entitySignature.test(j))
+			{
+				auto componentPool = m_ComponentPools[j];
+				auto component = componentPool->GetRawData(ID);
+
+				Utils::JSON::json serializedComponents;
+				serializedComponents["name"] = typeid(*component).name();
+				component->OnSerialize(serializedComponents);
+
+				componentsJSON.push_back(serializedComponents);
+			}
+		}
+
+		entityJSON["Components"] = componentsJSON;
+
+		p_serialized.push_back(entityJSON);
+	}
 }
 
 void EntityManager::FireEntityCreated(Entity p_entity)

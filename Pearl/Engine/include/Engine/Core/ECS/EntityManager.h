@@ -2,6 +2,7 @@
 #include "Core/ECS/ComponentPool.h"
 
 #include "Core/Utils/NonCopyable.h"
+#include "Core/Utils/ISerializable.h"
 
 #include<vector>
 #include<bitset>
@@ -47,7 +48,7 @@ namespace PrCore::ECS {
 		EntityManager* m_entityManager;
 	};
 
-	class EntityManager: public Utils::NonCopyable {
+	class EntityManager: public Utils::NonCopyable, Utils::ISerializable {
 	public:
 		//Local Classes
 		class BasicIterator {
@@ -193,7 +194,12 @@ namespace PrCore::ECS {
 
 		BasicView GetAllEntities();
 
+		ComponentSignature GetComponentSignature(ID p_ID);
+
 		inline size_t GetEntityCount() const { return m_entitiesNumber; }
+
+		void OnSerialize(Utils::JSON::json& p_serialized) override;
+		void OnDeserialize(const Utils::JSON::json& p_serialized) override {}
 
 	private:
 		void FireEntityCreated(Entity p_entity);

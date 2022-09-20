@@ -2,6 +2,7 @@
 #include "Core/ECS/BaseSystem.h"
 
 #include "Core/Utils/NonCopyable.h"
+#include "Core/Utils/ISerializable.h"
 
 #include <unordered_map>
 #include <array>
@@ -12,7 +13,7 @@ namespace PrCore::ECS {
 
 	constexpr unsigned int MAX_SYSTEMS = 100;
 
-	class SystemManager: Utils::NonCopyable {
+	class SystemManager: public Utils::NonCopyable, Utils::ISerializable  {
 	public:
 		SystemManager() = delete;
 		SystemManager(EntityManager* p_entityManager);
@@ -36,6 +37,10 @@ namespace PrCore::ECS {
 
 		template<class System>
 		bool IsActiveSystem();
+
+		void OnSerialize(Utils::JSON::json& p_serialized) override;
+
+		void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
 
 	private:
 		template<class System>

@@ -15,6 +15,11 @@ namespace PrCore::ECS {
 	class UUIDComponent : public BaseComponent {
 	public:
 		Utils::UUID UUID;
+
+		void OnSerialize(Utils::JSON::json& p_serialized) override
+		{
+			p_serialized["UUID"] = UUID;
+		}
 	};
 
 	class NameComponent : public BaseComponent {

@@ -27,7 +27,7 @@ namespace PrCore::ECS {
 
 		inline uint32_t GetIndex() const { return m_ID >> 32; }
 		inline uint32_t GetVersion() const { return uint32_t(m_ID); }
-		inline uint32_t GetID() const { return m_ID; }
+		inline uint64_t GetID() const { return m_ID; }
 
 		inline bool IsValid() const { return m_ID >> 32 != 0; }
 

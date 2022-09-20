@@ -3,6 +3,7 @@
 
 #include"Core/ECS/EntityManager.h"
 #include"Core/Utils/UUID.h"
+#include"Core/Utils/ISerializable.h"
 #include<queue>
 
 namespace PrCore::ECS {
@@ -10,7 +11,7 @@ namespace PrCore::ECS {
 	class SystemManager;
 	class EntityManager;
 
-	class Scene {
+	class Scene: public Utils::ISerializable {
 	public:
 		Scene(const std::string& p_name);
 		//Scene(const std::string& p_name, const std::string& p_path) {}
@@ -50,6 +51,9 @@ namespace PrCore::ECS {
 		inline void SetScenePath(const std::string& p_path) { m_path = p_path; }
 
 		size_t GetEntitiesCount();
+
+		void OnSerialize(Utils::JSON::json& p_serialized) override;
+		void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
 
 	private:
 		~Scene();
