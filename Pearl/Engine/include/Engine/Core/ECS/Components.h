@@ -25,11 +25,21 @@ namespace PrCore::ECS {
 	class NameComponent : public BaseComponent {
 	public:
 		std::string name;
+
+		void OnSerialize(Utils::JSON::json& p_serialized) override
+		{
+			p_serialized["name"] = name;
+		}
 	};
 
 	class TagComponent : public BaseComponent {
 	public:
 		std::string tag;
+
+		void OnSerialize(Utils::JSON::json& p_serialized) override
+		{
+			p_serialized["tag"] = tag;
+		}
 	};
 	//
 

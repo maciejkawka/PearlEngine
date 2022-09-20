@@ -48,7 +48,7 @@ void SystemManager::OnSerialize(Utils::JSON::json& p_serialized)
 	{
 		Utils::JSON::json system;
 		auto systemPtr = m_systems[i];
-		system["name"] = typeid(*systemPtr).name();
+		system["systemType"] = typeid(*systemPtr).name();
 		system["updateGroup"] = systemPtr->m_updateGroup;
 		system["isActive"] = systemPtr->m_isActive;
 

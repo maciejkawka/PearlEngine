@@ -115,7 +115,7 @@ void EntityManager::OnSerialize(Utils::JSON::json& p_serialized)
 				auto component = componentPool->GetRawData(ID);
 
 				Utils::JSON::json serializedComponents;
-				serializedComponents["name"] = typeid(*component).name();
+				serializedComponents["componentType"] = typeid(*component).name();
 				component->OnSerialize(serializedComponents);
 
 				componentsJSON.push_back(serializedComponents);
