@@ -199,7 +199,7 @@ namespace PrCore::ECS {
 		inline size_t GetEntityCount() const { return m_entitiesNumber; }
 
 		void OnSerialize(Utils::JSON::json& p_serialized) override;
-		void OnDeserialize(const Utils::JSON::json& p_serialized) override {}
+		void OnDeserialize(const Utils::JSON::json& p_serialized) override;
 
 	private:
 		void FireEntityCreated(Entity p_entity);

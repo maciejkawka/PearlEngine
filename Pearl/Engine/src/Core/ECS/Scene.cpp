@@ -125,7 +125,6 @@ void Scene::OnSerialize(Utils::JSON::json& p_serialized)
 
 	//
 
-
 	//Scene Serialize
 	p_serialized["name"] = m_name;
 	p_serialized["path"] = m_path;
@@ -140,4 +139,22 @@ void Scene::OnSerialize(Utils::JSON::json& p_serialized)
 	Utils::JSON::json systemsJSON;
 	m_systemManager->OnSerialize(systemsJSON);
 	p_serialized["systems"] = systemsJSON;
+}
+
+void Scene::OnDeserialize(const Utils::JSON::json& p_deserialized)
+{
+	//Possible Scene Settings here
+
+	//
+
+	//Scene Deserialize
+	m_name = p_deserialized["name"];
+	m_path = p_deserialized["path"];
+	m_UUID = p_deserialized["UUID"];
+
+	auto entitiesJSON = p_deserialized["entities"];
+	m_entityManager->OnDeserialize(entitiesJSON);
+
+	auto systemsJSON = p_deserialized["systems"];
+	m_systemManager->OnDeserialize(systemsJSON);
 }

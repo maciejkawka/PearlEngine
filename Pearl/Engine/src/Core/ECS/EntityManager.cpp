@@ -4,6 +4,7 @@
 #include "Core/ECS/BaseComponent.h"
 #include"Core/Events/EventManager.h"
 #include"Core/Events/ECSEvents.h"
+#include "Core/ECS/ComponentMap.h"
 
 using namespace PrCore::ECS;
 
@@ -122,9 +123,25 @@ void EntityManager::OnSerialize(Utils::JSON::json& p_serialized)
 			}
 		}
 
-		entityJSON["Components"] = componentsJSON;
+		entityJSON["components"] = componentsJSON;
 
 		p_serialized.push_back(entityJSON);
+	}
+}
+
+void EntityManager::OnDeserialize(const Utils::JSON::json& p_serialized)
+{
+	for(auto& entityJSON : p_serialized)
+	{
+		auto entity = CreateEntity();
+
+		auto components = entityJSON["components"];
+		for(auto& componentJSON: components)
+		{
+			std::string componentType = componentJSON["componentType"];
+			auto component = DeduceComponentTypeByString(entity, componentType);
+			component->OnDeserialize(componentJSON);
+		}
 	}
 }
 

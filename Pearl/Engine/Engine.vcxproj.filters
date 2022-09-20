@@ -306,6 +306,15 @@
     <ClInclude Include="include\Engine\Core\Utils\ISerializable.h">
       <Filter>Core\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\ECS\ComponentMap.h">
+      <Filter>Core\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\ECS\SystemMap.h">
+      <Filter>Core\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\ECS\Systems.h">
+      <Filter>Core\ECS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">

@@ -40,7 +40,7 @@ namespace PrCore::ECS {
 
 		void OnSerialize(Utils::JSON::json& p_serialized) override;
 
-		void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
+		void OnDeserialize(const Utils::JSON::json& p_deserialized) override;
 
 	private:
 		template<class System>

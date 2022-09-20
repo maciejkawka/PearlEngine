@@ -20,6 +20,11 @@ namespace PrCore::ECS {
 		{
 			p_serialized["UUID"] = UUID;
 		}
+
+		void OnDeserialize(const Utils::JSON::json& p_deserialized) override
+		{
+			UUID = p_deserialized["UUID"];
+		}
 	};
 
 	class NameComponent : public BaseComponent {
@@ -30,6 +35,11 @@ namespace PrCore::ECS {
 		{
 			p_serialized["name"] = name;
 		}
+
+		void OnDeserialize(const Utils::JSON::json& p_deserialized) override
+		{
+			name = p_deserialized["name"];
+		}
 	};
 
 	class TagComponent : public BaseComponent {
@@ -39,6 +49,11 @@ namespace PrCore::ECS {
 		void OnSerialize(Utils::JSON::json& p_serialized) override
 		{
 			p_serialized["tag"] = tag;
+		}
+
+		void OnDeserialize(const Utils::JSON::json& p_deserialized) override
+		{
+			tag = p_deserialized["tag"];
 		}
 	};
 	//
@@ -110,4 +125,10 @@ namespace PrCore::ECS {
 	};
 
 	//
+
+	//Test
+	struct TimeComponent : public BaseComponent
+	{
+		float time = 0;
+	};
 }

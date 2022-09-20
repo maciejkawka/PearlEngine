@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="include\Engine\Core\ECS\BaseComponent.h" />
     <ClInclude Include="include\Engine\Core\ECS\BaseSystem.h" />
+    <ClInclude Include="include\Engine\Core\ECS\ComponentMap.h" />
     <ClInclude Include="include\Engine\Core\ECS\ComponentPool.h" />
     <ClInclude Include="include\Engine\Core\ECS\EntityViewer.h" />
     <ClInclude Include="include\Engine\Core\ECS\EntityManager.h" />
@@ -21,6 +22,8 @@
     <ClInclude Include="include\Engine\Core\ECS\Scene.h" />
     <ClInclude Include="include\Engine\Core\ECS\SceneManager.h" />
     <ClInclude Include="include\Engine\Core\ECS\SystemManager.h" />
+    <ClInclude Include="include\Engine\Core\ECS\SystemMap.h" />
+    <ClInclude Include="include\Engine\Core\ECS\Systems.h" />
     <ClInclude Include="include\Engine\Core\ECS\Test.h" />
     <ClInclude Include="include\Engine\Core\Entry\AppContext.h" />
     <ClInclude Include="include\Engine\Core\Entry\Application.h" />

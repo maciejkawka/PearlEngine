@@ -1,5 +1,6 @@
 #include "Core/Common/pearl_pch.h"
 #include "Core/ECS/SystemManager.h"
+#include"Core/ECS/SystemMap.h"
 
 using namespace PrCore::ECS;
 
@@ -49,11 +50,28 @@ void SystemManager::OnSerialize(Utils::JSON::json& p_serialized)
 		Utils::JSON::json system;
 		auto systemPtr = m_systems[i];
 		system["systemType"] = typeid(*systemPtr).name();
-		system["updateGroup"] = systemPtr->m_updateGroup;
 		system["isActive"] = systemPtr->m_isActive;
 
 		systemPtr->OnSerialize(system);
 
 		p_serialized.push_back(system);
+	}
+}
+
+void SystemManager::OnDeserialize(const Utils::JSON::json& p_deserialized)
+{
+	for (auto& systemJSON : p_deserialized)
+	{
+		std::string systemType = systemJSON["systemType"];
+		DeduceSystemTypeByString(this, systemType);
+	}
+
+	for(int i=0;i< m_systemTypeCounter + 1; i++)
+	{
+		auto system = m_systems[i];
+		auto& systemJSON = p_deserialized[i];
+
+		system->SetActive(systemJSON["isActive"]);
+		system->OnDeserialize(systemJSON);
 	}
 }
