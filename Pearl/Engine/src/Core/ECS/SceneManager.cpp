@@ -4,6 +4,8 @@
 #include"Core/Filesystem/FileSystem.h"
 #include"Core/ECS/Scene.h"
 
+#include"Core/Filesystem/FileSystem.h"
+
 using namespace PrCore::ECS;
 
 SceneManager::~SceneManager()
@@ -41,6 +43,48 @@ void SceneManager::DeleteScene(const Scene* p_scene)
 	p_scene = nullptr;
 }
 
+Scene* SceneManager::LoadScene(const std::string& p_path)
+{
+	std::string dir = SCENE_DIR;
+	dir += ("/" + p_path);
+
+	Filesystem::FileStreamPtr file = Filesystem::FileSystem::GetInstance().OpenFileStream(dir.c_str());
+	PR_ASSERT(file != nullptr, "File cannot be opened! Path " + dir);
+
+	char* data = new char[file->GetSize()];
+	file->Read(data);
+
+	std::vector<uint8_t> dataVector;
+
+	for (auto i = 0; i < file->GetSize(); i++)
+		dataVector.push_back(*(data + i));
+	delete[] data;
+
+	auto sceneJSON = Utils::JSON::json::parse(dataVector);
+
+	auto scene = CreateScene("");
+	scene->OnDeserialize(sceneJSON);
+
+	return scene;
+}
+
+void SceneManager::SaveSceneByName(const std::string& p_name, const std::string& p_path)
+{
+	auto scene = GetScenebyName(p_name);
+	auto path = p_path.empty() ? scene->GetScenePath() : p_path;
+
+	SaveScene(scene, path);
+}
+
+void SceneManager::SaveSceneByReference(Scene* p_scene, const std::string& p_path)
+{
+	PR_ASSERT(p_scene != nullptr, "Scene ptr == nullptr");
+
+	auto path = p_path.empty() ? p_scene->GetScenePath() : p_path;
+
+	SaveScene(p_scene, path);
+}
+
 Scene* SceneManager::GetScenebyName(const std::string& p_name)
 {
 	const auto sceneIterator = std::find_if(m_scenes.begin(), m_scenes.end(), [&](const Scene* p_scene)
@@ -73,4 +117,20 @@ size_t SceneManager::GetSceneCount() const
 std::vector<Scene*> SceneManager::GetAllScenes()
 {
 	return m_scenes;
+}
+
+void SceneManager::SaveScene(Scene* p_scene, const std::string& p_path)
+{
+	PR_ASSERT(!p_path.empty(), "Scene path invalid " + p_path);
+
+	Utils::JSON::json sceneJSON;
+	p_scene->OnSerialize(sceneJSON);
+
+	auto sceneStr = sceneJSON.dump(4);
+
+	std::string dir = SCENE_DIR;
+	dir += ('/' + p_path);
+	Filesystem::FileStreamPtr file = Filesystem::FileSystem::GetInstance().OpenFileStream(dir, Filesystem::DataAccess::Write);
+	int lenght = sceneStr.length();
+	file->Write(sceneStr.c_str(), lenght);
 }

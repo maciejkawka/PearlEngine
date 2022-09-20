@@ -66,7 +66,7 @@ void SystemManager::OnDeserialize(const Utils::JSON::json& p_deserialized)
 		DeduceSystemTypeByString(this, systemType);
 	}
 
-	for(int i=0;i< m_systemTypeCounter + 1; i++)
+	for(int i=0;i< m_systemTypeCounter; i++)
 	{
 		auto system = m_systems[i];
 		auto& systemJSON = p_deserialized[i];

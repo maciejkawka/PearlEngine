@@ -14,9 +14,8 @@ namespace PrCore::ECS {
 	class Scene: public Utils::ISerializable {
 	public:
 		Scene(const std::string& p_name);
-		//Scene(const std::string& p_name, const std::string& p_path) {}
 		
-		Entity CreateEntity(const std::string& p_name);
+		Entity CreateEntity(const std::string& p_name = "Entity");
 		void DestoryEntity(Entity p_entity);
 		void DestoryEntityImmediate(Entity p_entity);
 
