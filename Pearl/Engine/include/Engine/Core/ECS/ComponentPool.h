@@ -20,6 +20,8 @@ namespace PrCore::ECS {
 	public:
 		ComponentPool();
 
+		~ComponentPool();
+
 		T* AllocateData(ID p_ID);
 
 		T* GetData(ID p_ID);
@@ -36,7 +38,7 @@ namespace PrCore::ECS {
 		//Vector holds all one type components created
 		//Component vector is packed
 		//Vector capacity would be set as quarter of max entities at the beginig
-		std::array<T, MAX_ENTITIES> m_components;
+		std::array<T*, MAX_ENTITIES> m_components;
 
 		//Map holds Entites to index references
 		std::unordered_map<ID, size_t> m_entityToIndexMap;

@@ -5,6 +5,9 @@
 #include "Core/ECS/SceneManager.h"
 #include "Core/ECS/Scene.h"
 
+
+#include"Core/ECS/Systems/TransformSystem.h"
+
 namespace PrCore::ECS {
 
 	class Increase : public BaseSystem {

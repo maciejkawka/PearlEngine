@@ -10,6 +10,17 @@ namespace PrCore::ECS {
 	{}
 
 	template<class T>
+	ComponentPool<T>::~ComponentPool()
+	{
+		for(int i=0;i<m_componentsNumber;i++)
+		{
+			auto component = m_components[i];
+			if (component != nullptr)
+				delete component;
+		}
+	}
+
+	template<class T>
 	T* ComponentPool<T>::AllocateData(ID p_ID)
 	{
 		PR_ASSERT(m_entityToIndexMap.find(p_ID) == m_entityToIndexMap.end(), "Entity already has component " + std::string(typeid(T).name()));
@@ -21,10 +32,10 @@ namespace PrCore::ECS {
 		auto nextComponentIndex = m_componentsNumber;
 		m_entityToIndexMap[p_ID] = nextComponentIndex;
 		m_indexToEntityMap[nextComponentIndex] = p_ID;
-		m_components[nextComponentIndex] = T();
+		m_components[nextComponentIndex] = new T();
 		m_componentsNumber++;
 
-		return &m_components[nextComponentIndex];
+		return m_components[nextComponentIndex];
 	}
 
 	template<class T>
@@ -37,7 +48,7 @@ namespace PrCore::ECS {
 		if(m_entityToIndexMap.find(p_ID) == m_entityToIndexMap.end())
 			return nullptr;
 
-		return &m_components[m_entityToIndexMap[p_ID]];
+		return m_components[m_entityToIndexMap[p_ID]];
 	}
 
 	template<class T>
@@ -49,7 +60,9 @@ namespace PrCore::ECS {
 		auto removedEntityIndex = m_entityToIndexMap[p_ID];
 		auto lastComponentIndex = m_componentsNumber - 1;
 
+		delete m_components[removedEntityIndex];
 		m_components[removedEntityIndex] = m_components[lastComponentIndex];
+		m_components[lastComponentIndex] = nullptr;
 
 		auto lastEntity = m_indexToEntityMap[lastComponentIndex];
 		m_entityToIndexMap[lastEntity] = removedEntityIndex;

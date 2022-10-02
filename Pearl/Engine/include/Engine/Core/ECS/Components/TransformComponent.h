@@ -37,9 +37,17 @@ namespace PrCore::ECS {
 		Math::mat4 GetWorldMatrix() const { return m_worldMat; }
 		Math::mat4 GetLocalMatrix() const { return m_localMat; }
 
+		//Do not use does not update position, rotation, scale
+		inline void SetWorldMatrix(const Math::mat4& p_worldMat) { m_worldMat = p_worldMat; }
+		inline void SetLocalMatrix(const Math::mat4& p_localMat) { m_localMat = p_localMat; }
+
 		bool IsDirty() const { return m_isDirty; }
 		void SetDiry(bool p_isDirty) { m_isDirty = p_isDirty; }
 
+		void DecomposeWorldMatrix();
+		void DecomposeLocalMatrix();
+
+	private:
 		Math::mat4 m_worldMat;
 		Math::vec3 m_position;
 		Math::quat m_rotation;
