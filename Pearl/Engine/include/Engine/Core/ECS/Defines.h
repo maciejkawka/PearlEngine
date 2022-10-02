@@ -32,6 +32,7 @@ namespace PrCore::ECS {
 		inline bool IsValid() const { return m_ID >> 32 != 0; }
 
 		inline bool operator ==(const ID& p_ID) const { return p_ID.m_ID == m_ID; }
+		inline bool operator<(const ID& p_ID) const { return m_ID < p_ID.m_ID; }
 		inline bool operator !=(const ID& p_ID) const { return p_ID.m_ID != m_ID; }
 
 	private:

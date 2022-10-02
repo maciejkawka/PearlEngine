@@ -41,11 +41,30 @@ namespace PrCore::ECS {
 		template<class T>
 		bool HasComponent();
 
+		inline bool operator<(const Entity& p_entity) const { return m_ID < p_entity.GetID(); }
+		inline bool operator==(const Entity& p_entity) const { return m_ID == p_entity.GetID(); }
+		inline bool operator!=(const Entity& p_entity) const { return m_ID != p_entity.GetID(); }
+
 	private:
 		void Invalidate();
 
 		ID m_ID;
 		EntityManager* m_entityManager;
+	};
+
+	class IComponentRemover {
+	public:
+		virtual ~IComponentRemover() = default;
+		virtual void RemoveComponent(Entity p_entity) = 0;
+	};
+
+	template<class Component>
+	class ComponentRemover : public IComponentRemover {
+	public:
+		inline void RemoveComponent(Entity p_entity) override
+		{
+			p_entity.RemoveComponent<Component>();
+		}
 	};
 
 	class EntityManager: public Utils::NonCopyable, Utils::ISerializable {
@@ -235,6 +254,19 @@ namespace PrCore::ECS {
 
 		//maps holds all components in pack array
 		std::unordered_map<size_t, std::shared_ptr<IComponentPool>> m_ComponentPools;
+
+		//map holds all component in case to remove
+		std::unordered_map<size_t, std::shared_ptr<IComponentRemover>> m_ComponentRemovers;
+	};
+}
+
+namespace std {
+	template<>
+	struct hash<PrCore::ECS::Entity> {
+		size_t operator()(const PrCore::ECS::Entity& p_entity) const {
+
+			return p_entity.GetID().GetID();
+		}
 	};
 }
 

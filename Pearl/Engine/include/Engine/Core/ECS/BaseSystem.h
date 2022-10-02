@@ -7,6 +7,7 @@ namespace PrCore::ECS {
 
 	enum class UpdateGroup
 	{
+		Custom = 0,
 		Update = 1<<3,
 		FixUpdate = 1<<4,
 		LateUpdate = 1<<7

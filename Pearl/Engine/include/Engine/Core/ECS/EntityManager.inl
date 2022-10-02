@@ -44,7 +44,9 @@ namespace PrCore::ECS {
 
 		m_entitiesSignature[p_ID.GetIndex() - 1].set(GetTypeID<T>());
 		auto componentPool = GetComponentPool<T>();
-		return componentPool->AllocateData(p_ID);
+		auto component = componentPool->AllocateData(p_ID);
+		FireComponentAdded<T>(ConstructEntityonIndex(p_ID.GetIndex()), component);
+		return component;
 	}
 
 	template<class T>
@@ -63,7 +65,9 @@ namespace PrCore::ECS {
 
 		m_entitiesSignature[p_ID.GetIndex() - 1].reset(GetTypeID<T>());
 		auto componentPool = GetComponentPool<T>();
-		return componentPool->RemoveData(p_ID);
+
+		FireComponentRemoved<T>(ConstructEntityonIndex(p_ID.GetIndex()), componentPool->GetData(p_ID));
+		componentPool->RemoveData(p_ID);
 	}
 
 	template<class T>
@@ -79,8 +83,8 @@ namespace PrCore::ECS {
 		PR_ASSERT(m_typeComponentCounter < MAX_COMPONENTS, "Cannot register more components");
 
 		auto componentID = GetTypeID<T>();
-		auto componentPool = std::make_shared<ComponentPool<T>>();
-		m_ComponentPools[componentID] = componentPool;
+		m_ComponentPools[componentID] = std::make_shared<ComponentPool<T>>();;
+		m_ComponentRemovers[componentID] = std::make_shared<ComponentRemover<T>>();;
 	}
 
 	template<typename ...ComponentTypes>
@@ -99,7 +103,7 @@ namespace PrCore::ECS {
 	template<class T>
 	void EntityManager::FireComponentRemoved(Entity p_entity, T* p_component)
 	{
-		Events::EventPtr event = std::make_shared<Events::ComponentAddedEvent<T>>(p_entity, p_component);
+		Events::EventPtr event = std::make_shared<Events::ComponentRemovedEvent<T>>(p_entity, p_component);
 		Events::EventManager::GetInstance().FireEvent(event);
 	}
 

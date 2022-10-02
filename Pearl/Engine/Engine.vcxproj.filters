@@ -49,6 +49,12 @@
     <Filter Include="Core\ECS">
       <UniqueIdentifier>{4eadba5b-8c97-4929-8b61-df1a77a6bd2e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\ECS\Components">
+      <UniqueIdentifier>{aedec7ba-f7de-4843-9a68-1c8dd9202a91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\ECS\Systems">
+      <UniqueIdentifier>{42e6eb27-5723-4725-8204-a05365a90990}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Engine\Core\Entry\AppContext.h">
@@ -315,6 +321,12 @@
     <ClInclude Include="include\Engine\Core\ECS\Systems.h">
       <Filter>Core\ECS</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\ECS\Components\TransformComponent.h">
+      <Filter>Core\ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\ECS\Systems\TransformSystem.h">
+      <Filter>Core\ECS\Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -481,6 +493,12 @@
     </ClCompile>
     <ClCompile Include="src\Core\ECS\SceneManager.cpp">
       <Filter>Core\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ECS\Components\TransformComponent.cpp">
+      <Filter>Core\ECS\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ECS\Systems\TransformSystem.cpp">
+      <Filter>Core\ECS\Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

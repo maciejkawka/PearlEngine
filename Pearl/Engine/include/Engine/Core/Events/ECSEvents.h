@@ -2,6 +2,7 @@
 
 #include"Core/Events/Event.h"
 #include"Core/ECS/EntityManager.h"
+#include"Core/ECS/BaseComponent.h"
 
 namespace PrCore::Events {
 
@@ -41,8 +42,11 @@ namespace PrCore::Events {
 		Component* m_component;
 
 		virtual inline EventType GetType() { return s_type; }
-		inline const static EventType s_type = 0x8976fc84;
+		const static EventType s_type;
 	};
+
+	template<class Component>
+	const EventType ComponentAddedEvent<Component>::s_type = typeid(ComponentAddedEvent<Component>).hash_code() + 0x8976fc84;
 
 	template<class Component>
 	class ComponentRemovedEvent : public Event {
@@ -56,6 +60,10 @@ namespace PrCore::Events {
 		Component* m_component;
 
 		virtual inline EventType GetType() { return s_type; }
-		inline const static EventType s_type = 0x353e5392;
+		const static EventType s_type;
 	};
+
+	template<class Component>
+	const EventType ComponentRemovedEvent<Component>::s_type = typeid(ComponentRemovedEvent<Component>).hash_code() + 0x353e5392;
+
 }

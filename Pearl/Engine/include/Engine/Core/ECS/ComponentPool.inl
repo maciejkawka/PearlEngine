@@ -56,7 +56,7 @@ namespace PrCore::ECS {
 		m_indexToEntityMap[removedEntityIndex] = lastEntity;
 
 		m_entityToIndexMap.erase(p_ID);
-		m_entityToIndexMap.erase(lastEntity);
+		m_indexToEntityMap.erase(lastComponentIndex);
 
 		m_componentsNumber--;
 	}

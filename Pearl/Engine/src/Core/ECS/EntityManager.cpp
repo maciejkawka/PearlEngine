@@ -62,13 +62,14 @@ void EntityManager::DestoryEntity(ID p_ID)
 	PR_ASSERT(IsValid(p_ID), std::string("ID " + std::to_string(p_ID.GetID()) + "is invalid"));
 
 	//Remove all components
-	for (const auto& componentPoolPair : m_ComponentPools)
+	auto entitySignature = m_entitiesSignature[p_ID.GetIndex() - 1];
+	for (const auto& componentRemoverPair : m_ComponentRemovers)
 	{
 		//Small  if statement to faster find if component exist
-		if(m_entitiesSignature[p_ID.GetIndex() -1].test(componentPoolPair.first))
-			componentPoolPair.second->EntityDestroyed(p_ID);
+		if (entitySignature.test(componentRemoverPair.first))
+			componentRemoverPair.second->RemoveComponent(ConstructEntityonIndex(p_ID.GetIndex()));
 	}
-	
+
 	auto index = p_ID.GetIndex();
 	m_entitiesSignature[index - 1].reset();
 	m_entitiesVersion[index - 1]++;
