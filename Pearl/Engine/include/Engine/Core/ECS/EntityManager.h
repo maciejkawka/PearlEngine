@@ -4,6 +4,8 @@
 #include "Core/Utils/NonCopyable.h"
 #include "Core/Utils/ISerializable.h"
 
+#include"Core/Events/Event.h"
+
 #include<vector>
 #include<bitset>
 #include<queue>
@@ -41,6 +43,8 @@ namespace PrCore::ECS {
 		template<class T>
 		bool HasComponent();
 
+		ComponentSignature GetComponentSignature();
+
 		inline bool operator<(const Entity& p_entity) const { return m_ID < p_entity.GetID(); }
 		inline bool operator==(const Entity& p_entity) const { return m_ID == p_entity.GetID(); }
 		inline bool operator!=(const Entity& p_entity) const { return m_ID != p_entity.GetID(); }
@@ -69,6 +73,8 @@ namespace PrCore::ECS {
 
 	class EntityManager: public Utils::NonCopyable, Utils::ISerializable {
 	public:
+		using HierarchicalPair = std::pair<int, Entity>;
+
 		//Local Classes
 		class BasicIterator {
 		public:
@@ -81,6 +87,7 @@ namespace PrCore::ECS {
 				m_entitiesNumber(p_entitiesNumber),
 				m_index(p_index)
 			{}
+			virtual ~BasicIterator() = default;
 
 			Entity operator*() const
 			{
@@ -89,7 +96,7 @@ namespace PrCore::ECS {
 			}
 			bool operator==(const BasicIterator& p_other) const { return m_index == p_other.m_index; }
 			bool operator!=(const BasicIterator& p_other) const { return m_index != p_other.m_index; }
-			BasicIterator& operator++()
+			virtual BasicIterator& operator++()
 			{
 				do {
 					m_index++;
@@ -112,7 +119,7 @@ namespace PrCore::ECS {
 				m_mask(p_mask)
 			{}
 
-			BasicIterator& operator++()
+			virtual BasicIterator& operator++() override
 			{
 				do {
 					m_index++;
@@ -124,7 +131,60 @@ namespace PrCore::ECS {
 		protected:
 			ComponentSignature m_mask;
 		};
-		
+
+		class HierarchicalIterator {
+		public:
+			using iterator_category = std::input_iterator_tag;
+			using difference_type = HierarchicalPair;
+
+			HierarchicalIterator() = delete;
+			explicit HierarchicalIterator(size_t p_index, EntityManager* p_entityManager, size_t p_entitiesNumber) :
+				m_entityManager(p_entityManager),
+				m_entitiesNumber(p_entitiesNumber),
+				m_index(p_index)
+			{}
+			virtual ~HierarchicalIterator() = default;
+
+			Entity operator*() const
+			{
+				PR_ASSERT(m_index < m_entitiesNumber, "Iterator out of range");
+				return m_entityManager->m_hierarchicalEntites[m_index].second;
+			}
+			bool operator==(const HierarchicalIterator& p_other) const { return m_index == p_other.m_index; }
+			bool operator!=(const HierarchicalIterator& p_other) const { return m_index != p_other.m_index; }
+			virtual HierarchicalIterator& operator++()
+			{
+				m_index++;
+				return *this;
+			}
+		protected:
+			EntityManager* m_entityManager;
+			size_t m_entitiesNumber;
+			size_t m_index;
+		};
+
+		class HierarchicalTypedIterator: public HierarchicalIterator {
+		public:
+			HierarchicalTypedIterator() = delete;
+			explicit HierarchicalTypedIterator(size_t p_index, EntityManager* p_entityManager, size_t p_entitiesNumber, ComponentSignature p_mask) :
+				HierarchicalIterator(p_index, p_entityManager, p_entitiesNumber),
+				m_mask(p_mask)
+			{}
+
+			virtual HierarchicalTypedIterator& operator++() override
+			{
+				Entity nextEntity;
+				do {
+					m_index++;
+				} while (m_index < m_entitiesNumber && (m_entityManager->m_hierarchicalEntites[m_index].second.GetComponentSignature() & m_mask) != m_mask);
+
+				return *this;
+			}
+
+		protected:
+			ComponentSignature m_mask;
+		};
+
 		class BasicView {
 		public:
 			BasicView() = delete;
@@ -184,6 +244,66 @@ namespace PrCore::ECS {
 			ComponentSignature m_mask;
 		};
 
+		class BasicHierarchicalView {
+		public:
+			BasicHierarchicalView() = delete;
+			explicit BasicHierarchicalView(EntityManager* p_entityManager);
+			virtual ~BasicHierarchicalView() = default;
+
+			HierarchicalIterator begin() const
+			{
+				return HierarchicalIterator(0, m_entityManager, m_entityManager->m_entitiesNumber);
+			}
+
+			HierarchicalIterator end() const
+			{
+				return HierarchicalIterator(m_entityManager->m_hierarchicalEntites.size(), m_entityManager, m_entityManager->m_entitiesNumber);
+			}
+
+		protected:
+			EntityManager* m_entityManager;
+
+			void UpdateHierarchicalEntites();
+			int RecursiveHierarchyCreation(Entity p_entity, int p_depthIndex);
+		};
+
+		template<typename... ComponentTypes>
+		class TypedHierarchicalView: public  BasicHierarchicalView {
+		public:
+			TypedHierarchicalView() = delete;
+			explicit TypedHierarchicalView(EntityManager* p_entityManager) :
+				BasicHierarchicalView(p_entityManager)
+			{
+				if (sizeof...(ComponentTypes) == 0)
+					PR_ASSERT(sizeof...(ComponentTypes) != 0, "No Component Specitied in ComponentWithComponents");
+				else
+				{
+					size_t componentIDs[] = { m_entityManager->GetTypeID<ComponentTypes>() ... };
+					for (int i = 0; i < (sizeof...(ComponentTypes)); i++)
+						m_mask.set(componentIDs[i]);
+				}
+			}
+
+			HierarchicalTypedIterator begin() const
+			{
+				int index = 0;
+				auto hierarchicalEntities = m_entityManager->m_hierarchicalEntites;
+				while (index < m_entityManager->m_entitiesNumber && (hierarchicalEntities[index].second.GetComponentSignature() & m_mask) != m_mask)
+					index++;
+
+				return HierarchicalTypedIterator(index, m_entityManager, m_entityManager->m_hierarchicalEntites.size(), m_mask);
+			}
+
+			virtual HierarchicalTypedIterator end() const
+			{
+				auto size = m_entityManager->m_hierarchicalEntites.size();
+				return HierarchicalTypedIterator(size, m_entityManager, size, m_mask);
+			}
+
+		protected:
+			ComponentSignature m_mask;
+		};
+
 		//Methods
 		EntityManager();
 
@@ -213,6 +333,11 @@ namespace PrCore::ECS {
 
 		BasicView GetAllEntities();
 
+		template<typename... ComponentTypes>
+		TypedHierarchicalView<ComponentTypes...> GetHierrarchicalEntitiesWithComponents();
+
+		BasicHierarchicalView GetAllHierrarchicalEntities();
+
 		ComponentSignature GetComponentSignature(ID p_ID);
 
 		inline size_t GetEntityCount() const { return m_entitiesNumber; }
@@ -231,6 +356,10 @@ namespace PrCore::ECS {
 		void FireComponentRemoved(Entity p_entity, T* p_component);
 
 		Entity ConstructEntityonIndex(uint32_t p_index);
+
+		//For Hierrarchical Vector
+		void OnParentAdded(Events::EventPtr p_event);	
+		void OnParentRemoved(Events::EventPtr p_event);
 
 		template<class T>
 		size_t GetTypeID();
@@ -257,6 +386,10 @@ namespace PrCore::ECS {
 
 		//map holds all component in case to remove
 		std::unordered_map<size_t, std::shared_ptr<IComponentRemover>> m_ComponentRemovers;
+
+		//vector with hierrarchical entites
+		std::vector<HierarchicalPair> m_hierarchicalEntites;
+		bool m_isHierarchicalEntitiesDirty;
 	};
 }
 

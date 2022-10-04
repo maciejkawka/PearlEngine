@@ -21,6 +21,17 @@ namespace PrCore::ECS {
 			return m_entityManager->GetAllEntities();
 		}
 
+		EntityManager::BasicHierarchicalView AllHierarchicalEntities()
+		{
+			return m_entityManager->GetAllHierrarchicalEntities();
+		}
+
+		template<typename... ComponentType>
+		EntityManager::TypedHierarchicalView<ComponentType...> HierarchicalEntitiesWithComponents()
+		{
+			return m_entityManager->GetHierrarchicalEntitiesWithComponents<ComponentType...>();
+		}
+
 	private:
 		EntityManager* m_entityManager;
 	};

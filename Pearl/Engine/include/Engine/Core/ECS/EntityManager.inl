@@ -93,6 +93,12 @@ namespace PrCore::ECS {
 		return TypedView<ComponentTypes...>(this);
 	}
 
+	template<typename ...ComponentTypes>
+	EntityManager::TypedHierarchicalView<ComponentTypes...> EntityManager::GetHierrarchicalEntitiesWithComponents()
+	{
+		return TypedHierarchicalView<ComponentTypes...>(this);
+	}
+
 	template<class T>
 	void EntityManager::FireComponentAdded(Entity p_entity, T* p_component)
 	{
