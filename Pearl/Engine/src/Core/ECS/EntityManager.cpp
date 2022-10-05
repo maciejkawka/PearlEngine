@@ -11,8 +11,8 @@ using namespace PrCore::ECS;
 void Entity::Destroy()
 {
 	PR_ASSERT(m_entityManager != nullptr, "EntityManager is nullptr");
-
-	m_entityManager->DestoryEntity(m_ID);
+	
+	AddComponent<ToDestoryTag>();
 	Invalidate();
 }
 

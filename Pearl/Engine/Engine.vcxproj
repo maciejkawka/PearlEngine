@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Engine\Core\ECS\Components\CoreComponents.h" />
     <ClInclude Include="include\Engine\Core\ECS\BaseComponent.h" />
     <ClInclude Include="include\Engine\Core\ECS\BaseSystem.h" />
     <ClInclude Include="include\Engine\Core\ECS\ComponentMap.h" />

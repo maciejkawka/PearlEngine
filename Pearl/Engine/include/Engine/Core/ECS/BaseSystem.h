@@ -5,7 +5,7 @@
 
 namespace PrCore::ECS {
 
-	enum class UpdateGroup
+	enum class UpdateGroup : uint8_t
 	{
 		Custom = 0,
 		Update = 1<<3,

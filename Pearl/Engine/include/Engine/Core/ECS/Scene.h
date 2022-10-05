@@ -4,7 +4,6 @@
 #include"Core/ECS/EntityManager.h"
 #include"Core/Utils/UUID.h"
 #include"Core/Utils/ISerializable.h"
-#include<queue>
 
 namespace PrCore::ECS {
 
@@ -17,7 +16,7 @@ namespace PrCore::ECS {
 		
 		Entity CreateEntity(const std::string& p_name = "Entity");
 		void DestoryEntity(Entity p_entity);
-		void DestoryEntityImmediate(Entity p_entity);
+		void DestoryEntityImmediate(Entity p_entity); //Does not destory hierrarchy
 
 		template<class System>
 		void RegisterSystem();
@@ -63,8 +62,6 @@ namespace PrCore::ECS {
 
 		SystemManager* m_systemManager;
 		EntityManager* m_entityManager;
-
-		std::queue<Entity> m_entitiesToDestory;
 
 		friend class SceneManager;
 	};

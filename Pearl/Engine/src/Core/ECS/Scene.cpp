@@ -40,7 +40,7 @@ Entity Scene::CreateEntity(const std::string& p_name)
 
 void Scene::DestoryEntity(Entity p_entity)
 {
-	m_entitiesToDestory.push(p_entity);
+	p_entity.AddComponent<ToDestoryTag>();
 }
 
 void Scene::DestoryEntityImmediate(Entity p_entity)
@@ -104,12 +104,20 @@ void Scene::LateUpdate(float p_dt) const
 
 void Scene::CleanDestroyedEntities()
 {
-	while (!m_entitiesToDestory.empty())
+	for (auto entity : m_entityManager->GetAllHierrarchicalEntities())
 	{
-		Entity entity = m_entitiesToDestory.front();
-		m_entitiesToDestory.pop();
-		m_entityManager->DestoryEntity(entity.GetID());
+		if (entity.HasComponent<ToDestoryTag>())
+			continue;
+
+		auto parentComponent = entity.GetComponent<ParentComponent>();
+		auto parent = parentComponent->parent;
+
+		if (parent.HasComponent<ToDestoryTag>())
+			entity.AddComponent<ToDestoryTag>();
 	}
+
+	for(auto entity: m_entityManager->GetEntitiesWithComponents<ToDestoryTag>())
+		m_entityManager->DestoryEntity(entity.GetID());
 }
 
 size_t Scene::GetEntitiesCount()

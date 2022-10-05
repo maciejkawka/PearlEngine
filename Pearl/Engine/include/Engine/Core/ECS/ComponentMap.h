@@ -10,9 +10,12 @@ namespace PrCore::ECS {
 	{
 		BaseComponent* component = nullptr;
 
-		if		(p_typeName == typeid(NameComponent).name())		component = p_entity.AddComponent<NameComponent>();
-		else if (p_typeName == typeid(UUIDComponent).name())		component = p_entity.AddComponent<UUIDComponent>();
-		else if (p_typeName == typeid(TagComponent).name())			component = p_entity.AddComponent<TagComponent>();
+		if		(p_typeName == typeid(NameComponent).name())			component = p_entity.AddComponent<NameComponent>();
+		else if (p_typeName == typeid(UUIDComponent).name())			component = p_entity.AddComponent<UUIDComponent>();
+		else if (p_typeName == typeid(TagComponent).name())				component = p_entity.AddComponent<TagComponent>();
+		else if (p_typeName == typeid(TransformComponent).name())		component = p_entity.AddComponent<TransformComponent>();
+		else if (p_typeName == typeid(ParentComponent).name())			component = p_entity.AddComponent<ParentComponent>();
+		else if (p_typeName == typeid(ToDestoryTag).name())			component = p_entity.AddComponent<ToDestoryTag>();
 		else if (p_typeName == typeid(TimeComponent).name())			component = p_entity.AddComponent<TimeComponent>();
 		else														PR_ASSERT(true, "Component type invalid" + p_typeName);
 
