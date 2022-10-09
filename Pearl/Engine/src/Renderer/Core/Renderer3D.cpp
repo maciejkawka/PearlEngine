@@ -53,7 +53,7 @@ void Renderer3D::SetCubemap(PrRenderer::Resources::MaterialPtr p_cubemap)
 	GenerateLUTMap();
 }
 
-void Renderer3D::AddLight(const Light& p_light)
+void Renderer3D::AddLight(const PrCore::Math::mat4& p_lightmMat)
 {
 	if (m_lightData.size() == MAX_LIGHTNUM)
 	{
@@ -61,7 +61,7 @@ void Renderer3D::AddLight(const Light& p_light)
 		return;
 	}
 
-	m_lightData.push_back(p_light.GetPackedMatrix());
+	m_lightData.push_back(p_lightmMat);
 }
 
 void Renderer3D::SetAmbientLight(PrRenderer::Core::Color p_ambientColor)

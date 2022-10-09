@@ -2,6 +2,7 @@
 #include"Core/Resources/Resource.h"
 
 #include"Renderer/Core/Defines.h"
+#include"Renderer/Core/Color.h"
 #include"Renderer/Buffers/VertexArray.h"
 
 #include<array>

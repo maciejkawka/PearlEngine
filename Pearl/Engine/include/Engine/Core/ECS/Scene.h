@@ -35,9 +35,10 @@ namespace PrCore::ECS {
 		void Update(float p_dt) const;
 		void FixUpdate(float p_dt) const;
 		void LateUpdate(float p_dt) const;
-		void CleanDestroyedEntities();
+		void UpdateHierrarchicalEntities(float p_dt) const;
+		void CleanDestroyedEntities() const;
 
-		//void RenderUpdate(float p_dt) const;
+		void RenderUpdate(float p_dt) const;
 		//void PhysicsUpdate(float p_dt) const;
 
 		//Getters and Setters

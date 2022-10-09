@@ -8,7 +8,7 @@ using namespace PrCore::ECS;
 
 void HierarchyTransform::OnCreate()
 {
-	m_updateGroup = static_cast<uint8_t>(UpdateGroup::Update);
+	m_updateGroup = static_cast<uint8_t>(UpdateGroup::Custom);
 }
 
 void HierarchyTransform::OnUpdate(float p_dt)

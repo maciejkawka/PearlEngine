@@ -3,6 +3,8 @@
 #include "Core/ECS/Scene.h"
 #include"Core/ECS/SystemManager.h"
 #include"Core/ECS/Components.h"
+#include"Core/ECS/Systems/MeshRendererSystem.h"
+#include"Core/ECS/Systems/TransformSystem.h"
 
 using namespace PrCore::ECS;
 
@@ -102,7 +104,7 @@ void Scene::LateUpdate(float p_dt) const
 	m_systemManager->UpdateGroup(UpdateGroup::LateUpdate, p_dt);
 }
 
-void Scene::CleanDestroyedEntities()
+void Scene::CleanDestroyedEntities() const
 {
 	for (auto entity : m_entityManager->GetAllHierrarchicalEntities())
 	{
@@ -118,6 +120,16 @@ void Scene::CleanDestroyedEntities()
 
 	for(auto entity: m_entityManager->GetEntitiesWithComponents<ToDestoryTag>())
 		m_entityManager->DestoryEntity(entity.GetID());
+}
+
+void Scene::UpdateHierrarchicalEntities(float p_dt) const
+{
+	m_systemManager->UpdateSystem<HierarchyTransform>(p_dt);
+}
+
+void Scene::RenderUpdate(float p_dt) const
+{
+	m_systemManager->UpdateSystem<MeshRendererSystem>(p_dt);
 }
 
 size_t Scene::GetEntitiesCount()

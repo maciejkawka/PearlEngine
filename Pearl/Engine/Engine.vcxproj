@@ -16,6 +16,7 @@
     <ClInclude Include="include\Engine\Core\ECS\BaseSystem.h" />
     <ClInclude Include="include\Engine\Core\ECS\ComponentMap.h" />
     <ClInclude Include="include\Engine\Core\ECS\ComponentPool.h" />
+    <ClInclude Include="include\Engine\Core\ECS\Components\RendererComponents.h" />
     <ClInclude Include="include\Engine\Core\ECS\Components\TransformComponent.h" />
     <ClInclude Include="include\Engine\Core\ECS\EntityViewer.h" />
     <ClInclude Include="include\Engine\Core\ECS\EntityManager.h" />
@@ -26,6 +27,7 @@
     <ClInclude Include="include\Engine\Core\ECS\SystemManager.h" />
     <ClInclude Include="include\Engine\Core\ECS\SystemMap.h" />
     <ClInclude Include="include\Engine\Core\ECS\Systems.h" />
+    <ClInclude Include="include\Engine\Core\ECS\Systems\MeshRendererSystem.h" />
     <ClInclude Include="include\Engine\Core\ECS\Systems\TransformSystem.h" />
     <ClInclude Include="include\Engine\Core\ECS\Test.h" />
     <ClInclude Include="include\Engine\Core\Entry\AppContext.h" />
@@ -110,6 +112,7 @@
     <ClCompile Include="src\Core\ECS\Scene.cpp" />
     <ClCompile Include="src\Core\ECS\SceneManager.cpp" />
     <ClCompile Include="src\Core\ECS\SystemManager.cpp" />
+    <ClCompile Include="src\Core\ECS\Systems\MeshRendererSystem.cpp" />
     <ClCompile Include="src\Core\ECS\Systems\TransformSystem.cpp" />
     <ClCompile Include="src\Core\Entry\AppContext.cpp" />
     <ClCompile Include="src\Core\Entry\Application.cpp" />

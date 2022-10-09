@@ -1,0 +1,85 @@
+#include"Core/Common/pearl_pch.h"
+
+#include "Core/ECS/Systems/MeshRendererSystem.h"
+#include"Core/Resources/ResourceLoader.h"
+
+#include"Renderer/Core/Renderer3D.h"
+
+using namespace PrCore::ECS;
+using namespace PrRenderer::Core;
+
+PrCore::Math::mat4 MeshRendererSystem::GetPackedMatrix(const LightComponent* p_lightComponent, const TransformComponent* p_transform) const
+{
+	Math::mat4 mat;
+
+	auto position = p_transform->GetPosition();
+	mat[0][0] = position.x;
+	mat[0][1] = position.y;
+	mat[0][2] = position.z;
+	mat[0][3] = (float)p_lightComponent->GetType();
+
+	auto direction = p_transform->GetForwardVector();
+	mat[1][0] = direction.x;
+	mat[1][1] = direction.y;
+	mat[1][2] = direction.z;
+	mat[1][3] = Math::cos(Math::radians(p_lightComponent->GetInnerCone()));
+
+	auto color = p_lightComponent->GetColor();
+	mat[2][0] = color.x;
+	mat[2][1] = color.y;
+	mat[2][2] = color.z;
+	mat[2][3] = Math::cos(Math::radians(p_lightComponent->GetOutterCone()));
+
+	mat[3][0] = p_lightComponent->GetQuadraticAttenuation();
+	mat[3][1] = p_lightComponent->GetLinearAttenuation();
+	mat[3][2] = p_lightComponent->GetConstantAttenuation();
+	mat[3][3] = p_lightComponent->GetRange();
+
+	return mat;
+}
+
+MeshRendererSystem::~MeshRendererSystem()
+{
+}
+
+void MeshRendererSystem::OnCreate()
+{
+	m_updateGroup = (uint8_t)UpdateGroup::Custom;
+
+	auto cubemapMaterialHDR = Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("skymapHDRMaterial.mat");
+	Renderer3D::GetInstance().SetCubemap(cubemapMaterialHDR);
+}
+
+void MeshRendererSystem::OnUpdate(float p_dt)
+{
+	for (auto entity : m_entityViewer.EntitesWithComponents<LightComponent, TransformComponent>())
+	{
+		auto transform = entity.GetComponent<TransformComponent>();
+		auto light = entity.GetComponent<LightComponent>();
+
+		auto mat = GetPackedMatrix(light, transform);
+		Renderer3D::GetInstance().AddLight(mat);
+	}
+
+	for(auto entity: m_entityViewer.EntitesWithComponents<MeshRendererComponent, TransformComponent>())
+	{
+		auto transform = entity.GetComponent<TransformComponent>();
+		auto meshRenderer = entity.GetComponent<MeshRendererComponent>();
+		auto material = meshRenderer->material;
+		auto mesh = meshRenderer->mesh;
+
+		auto cubemap = Renderer3D::GetInstance().GetIRMap();
+		auto lut = Renderer3D::GetInstance().GetLUT();
+		auto prefiltered = Renderer3D::GetInstance().GetPrefiltered();
+
+		material->SetTexture("irradianceMap", cubemap);
+		material->SetTexture("prefilterMap", prefiltered);
+		material->SetTexture("brdfLUT", lut);
+
+		auto position = transform->GetPosition();
+		auto rotation = transform->GetRotation();
+		auto scale = transform->GetScale();
+
+		Renderer3D::GetInstance().DrawMeshNow(mesh, position, rotation, scale, material);
+	}
+}

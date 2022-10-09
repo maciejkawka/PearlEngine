@@ -6,15 +6,15 @@
 
 #include"Core/Math/Math.h"
 #include"Core/Events/Event.h"
+#include"Core/Utils/Singleton.h"
 
 #define MAX_LIGHTNUM 4
 
 namespace PrRenderer::Core {
 
-	class Renderer3D {
+	class Renderer3D: public PrCore::Utils::Singleton<Renderer3D> {
 	public:
 		Renderer3D();
-		~Renderer3D() = default;
 
 		void Begin();
 
@@ -24,7 +24,7 @@ namespace PrRenderer::Core {
 		Resources::CubemapPtr GetPrefiltered() { return m_prefilteredMap; }
 		Resources::TexturePtr GetLUT() { return m_LUTMap; }
 		
-		void AddLight(const Light& p_light);
+		void AddLight(const PrCore::Math::mat4& p_lightmMat);
 		void SetAmbientLight(Color p_ambientColor);
 
 		//void DrawMesh(Resources::MeshPtr p_mesh, PrCore::Math::vec3 p_position, PrCore::Math::quat p_rotation, Resources::MaterialPtr p_material) {}
@@ -32,6 +32,7 @@ namespace PrRenderer::Core {
 
 		void Flush();
 
+		
 	private:
 		void OnWindowResize(PrCore::Events::EventPtr p_event);
 

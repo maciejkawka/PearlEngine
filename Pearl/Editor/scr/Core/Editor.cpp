@@ -1,7 +1,10 @@
 #include"Editor/Core/Editor.h"
+
+#include "Core/ECS/Scene.h"
 #include"Editor/Core/EditorContext.h"
 #include"Engine/Core/Utils/Logger.h"
 #include"Engine/Core/Events/EventManager.h"
+#include"Engine/Core/ECS/SceneManager.h"
 
 #include"Renderer/Resources/ShaderManager.h"
 #include"Renderer/Resources/TextureManager.h"
@@ -15,7 +18,7 @@ using namespace PrCore::Events;
 Editor::Editor()
 {
 	m_appContext = new EditorContext();
-	m_testFeatures = new Components::TestFeatures(m_appContext->m_renderer3D);
+	m_testFeatures = new Components::TestFeatures();
 	m_basicCamera = new Components::BasicCamera(PrRenderer::Core::CameraType::Perspective);
 	m_basicCamera->GetCamera()->SetSize(5.0f);
 }
@@ -30,16 +33,23 @@ Editor::~Editor()
 void Editor::PreFrame()
 {
 	m_appContext->m_window->PollEvents();
-	m_appContext->m_renderer3D->Begin();
+	PrRenderer::Core::Renderer3D::GetInstance().Begin();
+
+	//Exit
+	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
+		m_shouldClose = true;
 }
 
 void Editor::OnFrame(float p_deltaTime)
 {
 	m_basicCamera->Update(p_deltaTime);
 
-	//Exit
-	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
-		m_shouldClose = true;
+	//Camera Settings
+	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::O))
+		PrRenderer::Core::Camera::GetMainCamera()->SetType(PrRenderer::Core::CameraType::Ortographic);
+
+	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::P))
+		PrRenderer::Core::Camera::GetMainCamera()->SetType(PrRenderer::Core::CameraType::Perspective);
 
 	//Show Mouse Pos
 	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::LEFT_CONTROL))
@@ -55,19 +65,31 @@ void Editor::OnFrame(float p_deltaTime)
 	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::F1))
 		PRLOG_INFO("{0}", (int)(1 / p_deltaTime));
 
-	//Camera Settings
-	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::O))
-		PrRenderer::Core::Camera::GetMainCamera()->SetType(PrRenderer::Core::CameraType::Ortographic);
-
-	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::P))
-		PrRenderer::Core::Camera::GetMainCamera()->SetType(PrRenderer::Core::CameraType::Perspective);
-
 	m_testFeatures->Update(p_deltaTime);
+
+	//Scene Update
+	auto scenes = PrCore::ECS::SceneManager::GetInstance().GetAllScenes();
+
+	for(auto scene : scenes)
+	{
+		scene->Update(p_deltaTime);
+
+		//Phisics Tick
+		scene->FixUpdate(p_deltaTime);
+		//
+
+		scene->LateUpdate(p_deltaTime);
+
+		scene->UpdateHierrarchicalEntities(p_deltaTime);
+		scene->CleanDestroyedEntities();
+
+		scene->RenderUpdate(p_deltaTime);
+	}
 }
 
 void Editor::PostFrame()
 {
-	m_appContext->m_renderer3D->Flush();
+	PrRenderer::Core::Renderer3D::GetInstance().Flush();
 	m_appContext->m_window->SwapBuffers();
 	m_appContext->m_input->ResetFlags();
 	

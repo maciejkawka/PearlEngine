@@ -288,6 +288,9 @@ namespace PrCore::ECS {
 			{
 				int index = 0;
 				auto hierarchicalEntities = m_entityManager->m_hierarchicalEntites;
+				if (hierarchicalEntities.empty())
+					return end();
+
 				while (index < m_entityManager->m_entitiesNumber && (hierarchicalEntities[index].second.GetComponentSignature() & m_mask) != m_mask)
 					index++;
 

@@ -34,7 +34,7 @@ namespace PrRenderer::Core {
 		inline CameraType GetType() { return m_type; }
 		inline const PrCore::Math::vec3& GetPosition() { return m_position; }
 		inline const PrCore::Math::vec3& GetRotation() { return m_rotation; }
-		inline const Color& GetClearColor() { return m_clearColor; }
+		inline const Color GetClearColor() { return m_clearColor; }
 				
 		inline float GetFar() { return m_far; }
 		inline float GetNear() { return m_near; }
