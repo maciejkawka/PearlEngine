@@ -24,6 +24,24 @@ void SystemManager::Reset()
 	m_systemGroups.clear();
 }
 
+void SystemManager::UpdateOnEnable()
+{
+	while(!m_onEnable.empty())
+	{
+		m_onEnable.front()->OnEnable();
+		m_onEnable.pop();
+	}
+}
+
+void SystemManager::UpdateOnDisable()
+{
+	while (!m_onDisable.empty())
+	{
+		m_onDisable.front()->OnDisable();
+		m_onDisable.pop();
+	}
+}
+
 void SystemManager::UpdateGroup(uint8_t p_systemGroup, float p_dt)
 {
 	auto systemsIterator = m_systemGroups.find(p_systemGroup);

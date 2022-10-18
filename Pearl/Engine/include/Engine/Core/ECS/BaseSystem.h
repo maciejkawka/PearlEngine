@@ -28,16 +28,7 @@ namespace PrCore::ECS {
 		virtual void OnEnable() {}
 		virtual void OnDisable() {}
 
-		inline void SetActive(bool p_isActive)
-		{
-			if (m_isActive && p_isActive != m_isActive)
-				OnDisable();
-			else if (!m_isActive && p_isActive != m_isActive)
-				OnEnable();
-
-			m_isActive = p_isActive;
-		}
-
+		inline void SetActive(bool p_isActive) { m_isActive = p_isActive; }
 		inline bool IsActive() const { return m_isActive; }
 
 		inline virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}

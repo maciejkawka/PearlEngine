@@ -23,7 +23,10 @@ namespace PrRenderer::Core {
 		Resources::CubemapPtr GetIRMap() { return m_IRMap; }
 		Resources::CubemapPtr GetPrefiltered() { return m_prefilteredMap; }
 		Resources::TexturePtr GetLUT() { return m_LUTMap; }
-		
+
+		void SetMainCamera(Camera* p_camera);
+		Camera* GetMainCamera() { return m_mainCamera; }
+
 		void AddLight(const PrCore::Math::mat4& p_lightmMat);
 		void SetAmbientLight(Color p_ambientColor);
 
@@ -54,6 +57,7 @@ namespace PrRenderer::Core {
 		PrCore::Math::vec3 m_color;
 
 		Resources::MeshPtr m_quad;
+		Camera* m_mainCamera;
 	};
 
 }

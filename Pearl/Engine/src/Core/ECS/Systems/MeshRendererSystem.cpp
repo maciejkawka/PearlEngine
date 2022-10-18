@@ -40,18 +40,43 @@ PrCore::Math::mat4 MeshRendererSystem::GetPackedMatrix(const LightComponent* p_l
 
 MeshRendererSystem::~MeshRendererSystem()
 {
+	delete m_camera;
 }
 
 void MeshRendererSystem::OnCreate()
 {
 	m_updateGroup = (uint8_t)UpdateGroup::Custom;
-
+	m_camera = new Camera();
 	auto cubemapMaterialHDR = Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("skymapHDRMaterial.mat");
 	Renderer3D::GetInstance().SetCubemap(cubemapMaterialHDR);
 }
 
+void MeshRendererSystem::OnEnable()
+{
+}
+
+void MeshRendererSystem::OnDisable()
+{
+	Renderer3D::GetInstance().SetMainCamera(nullptr);
+}
+
 void MeshRendererSystem::OnUpdate(float p_dt)
 {
+	//Set First Camera that was found in the scene
+	for (auto entity : m_entityViewer.EntitesWithComponents<CameraComponent, TransformComponent>())
+	{
+		auto camera = entity.GetComponent<CameraComponent>()->GetCamera();
+		auto transform = entity.GetComponent<TransformComponent>();
+
+		camera->SetPosition(transform->GetPosition());
+		camera->SetRotation(transform->GetRotation());
+
+		if (camera != Renderer3D::GetInstance().GetMainCamera())
+			Renderer3D::GetInstance().SetMainCamera(camera);
+
+		break;
+	}
+
 	for (auto entity : m_entityViewer.EntitesWithComponents<LightComponent, TransformComponent>())
 	{
 		auto transform = entity.GetComponent<TransformComponent>();

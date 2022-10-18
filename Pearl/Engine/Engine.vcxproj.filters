@@ -267,9 +267,6 @@
     <ClInclude Include="include\Engine\Core\Utils\NonCopyable.h">
       <Filter>Core\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Core\ECS\Test.h">
-      <Filter>Core\ECS</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine\Core\ECS\ComponentPool.h">
       <Filter>Core\ECS</Filter>
     </ClInclude>

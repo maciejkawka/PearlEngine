@@ -16,7 +16,7 @@ namespace PrCore::ECS {
 		auto system = new System();
 		system->Init(m_entityManager);
 		system->OnCreate();
-		system->OnEnable();
+		m_onEnable.push(system);
 
 		m_systems[systemID] = system;
 
@@ -44,8 +44,17 @@ namespace PrCore::ECS {
 	void SystemManager::SetActiveSystem(bool p_isActive)
 	{
 		auto systemID = GetSystemID<System>();
-		if (m_systems[systemID] != nullptr)
+		auto system = m_systems[systemID];
+		if (system != nullptr)
+		{
+			auto actualIsActive = system->m_isActive;
+			if (actualIsActive && p_isActive != actualIsActive)
+				m_onDisable.push(system);
+			else if (!actualIsActive && p_isActive != actualIsActive)
+				m_onEnable.push(system);
+
 			m_systems[systemID]->SetActive(p_isActive);
+		}
 	}
 
 	template<class System>

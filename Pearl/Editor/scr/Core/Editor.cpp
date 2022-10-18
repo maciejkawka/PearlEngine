@@ -21,6 +21,7 @@ Editor::Editor()
 	m_testFeatures = new Components::TestFeatures();
 	m_basicCamera = new Components::BasicCamera(PrRenderer::Core::CameraType::Perspective);
 	m_basicCamera->GetCamera()->SetSize(5.0f);
+	PrRenderer::Core::Renderer3D::GetInstance().SetMainCamera(m_basicCamera->GetCamera());
 }
 
 Editor::~Editor()
@@ -72,6 +73,8 @@ void Editor::OnFrame(float p_deltaTime)
 
 	for(auto scene : scenes)
 	{
+		scene->OnEnable();
+
 		scene->Update(p_deltaTime);
 
 		//Phisics Tick
@@ -84,6 +87,8 @@ void Editor::OnFrame(float p_deltaTime)
 		scene->CleanDestroyedEntities();
 
 		scene->RenderUpdate(p_deltaTime);
+
+		scene->OnDisable();
 	}
 }
 

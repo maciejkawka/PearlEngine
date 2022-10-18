@@ -10,9 +10,13 @@ namespace PrCore::ECS {
 		~MeshRendererSystem();
 
 		void OnCreate() override;
+		void OnEnable() override;
+		void OnDisable() override;
 		void OnUpdate(float p_dt) override;
 
 	private:
 		Math::mat4 GetPackedMatrix(const LightComponent* p_lightComponent,const TransformComponent* p_transform) const;
+
+		PrRenderer::Core::Camera* m_camera;
 	};
 }

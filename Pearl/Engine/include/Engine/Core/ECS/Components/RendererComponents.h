@@ -77,40 +77,26 @@ namespace PrCore::ECS {
 
 	class CameraComponent: public BaseComponent {
 	public:
-		CameraComponent():
-			m_clearColor(PrRenderer::Core::Color::Black),
-			m_type(PrRenderer::Core::CameraType::Perspective),
-			m_far(100.0f),
-			m_near(1.0f),
-			m_FOV(45.0f),
-			m_ratio(16.0f / 9.0f),
-			m_size(1.0f)
-		{}
+		CameraComponent() = default;
 
-		inline void SetType(PrRenderer::Core::CameraType p_type) { m_type = p_type; }
-		inline void SetClearColor(const PrRenderer::Core::Color& p_clearColor) { m_clearColor = p_clearColor; }
-		inline void SetFar(float p_far) { m_far = p_far; }
-		inline void SetNear(float p_near) { m_near = p_near; }
-		inline void SetFOV(float p_FOV) { m_FOV = p_FOV; }
-		inline void SetRatio(float p_ratio) { m_ratio = p_ratio; }
-		inline void SetSize(float p_size) { m_size = p_size; }
+		inline void SetType(PrRenderer::Core::CameraType p_type) { m_camera.SetType(p_type); }
+		inline void SetClearColor(const PrRenderer::Core::Color& p_clearColor) { m_camera.SetClearColor(p_clearColor); }
+		inline void SetFar(float p_far) {m_camera.SetFar(p_far); }
+		inline void SetNear(float p_near) { m_camera.SetNear(p_near); }
+		inline void SetFOV(float p_FOV) { m_camera.SetFOV(p_FOV); }
+		inline void SetRatio(float p_ratio) { m_camera.SetRatio(p_ratio); }
+		inline void SetSize(float p_size) { m_camera.SetSize(p_size); }
 
-		inline PrRenderer::Core::CameraType GetType() { return m_type; }
-		inline PrRenderer::Core::Color GetClearColor() { return m_clearColor; }
-		inline float GetFar() { return m_far; }
-		inline float GetNear() { return m_near; }
-		inline float GetFOV() { return m_FOV; }
-		inline float GetRatio() { return m_ratio; }
-		inline float GetSize() { return m_size; }
+		inline PrRenderer::Core::CameraType GetType() { return m_camera.GetType(); }
+		inline PrRenderer::Core::Color GetClearColor() { return m_camera.GetClearColor(); }
+		inline float GetFar() { return m_camera.GetFar(); }
+		inline float GetNear() { return m_camera.GetNear(); }
+		inline float GetFOV() { return m_camera.GetFOV(); }
+		inline float GetRatio() { return m_camera.GetRatio(); }
+		inline float GetSize() { return m_camera.GetSize(); }
 
+		inline PrRenderer::Core::Camera* GetCamera() { return &m_camera; }
 	private:
-		PrRenderer::Core::Color m_clearColor;
-		PrRenderer::Core::CameraType m_type;
-
-		float m_far;
-		float m_near;
-		float m_FOV;
-		float m_ratio;
-		float m_size;
+		PrRenderer::Core::Camera m_camera;
 	};
 }

@@ -25,6 +25,11 @@ namespace PrCore::ECS {
 
 		void Reset();
 
+		//Event functions
+		void UpdateOnEnable();
+
+		void UpdateOnDisable();
+
 		void UpdateGroup(uint8_t p_systemGroup, float p_dt);
 
 		void UpdateGroup(ECS::UpdateGroup p_systemGroup, float p_dt);
@@ -53,6 +58,10 @@ namespace PrCore::ECS {
 
 		//vector holds systems to update per system
 		std::array<BaseSystem*, MAX_SYSTEMS> m_systems;
+
+		//queues to update event functions
+		std::queue<BaseSystem*> m_onEnable;
+		std::queue<BaseSystem*> m_onDisable;
 
 		EntityManager* m_entityManager;
 	};

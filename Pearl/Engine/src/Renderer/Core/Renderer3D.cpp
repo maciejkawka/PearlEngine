@@ -53,6 +53,12 @@ void Renderer3D::SetCubemap(PrRenderer::Resources::MaterialPtr p_cubemap)
 	GenerateLUTMap();
 }
 
+void Renderer3D::SetMainCamera(Camera* p_camera)
+{
+	m_mainCamera = p_camera;
+	Camera::SetMainCamera(p_camera);
+}
+
 void Renderer3D::AddLight(const PrCore::Math::mat4& p_lightmMat)
 {
 	if (m_lightData.size() == MAX_LIGHTNUM)
@@ -71,14 +77,15 @@ void Renderer3D::SetAmbientLight(PrRenderer::Core::Color p_ambientColor)
 
 void Renderer3D::DrawMeshNow(Resources::MeshPtr p_mesh, PrCore::Math::vec3 p_position, PrCore::Math::quat p_rotation, PrCore::Math::vec3 p_scale, Resources::MaterialPtr p_material)
 {
-	auto camera = PrRenderer::Core::Camera::GetMainCamera();
-	const auto& VPMatrix = camera->RecalculateMatrices();
+	PrCore::Math::mat4 VPMatrix = PrCore::Math::mat4(1.0f);
+	if(m_mainCamera)
+		VPMatrix = m_mainCamera->RecalculateMatrices();
 	auto modelMatrix = PrCore::Math::translate(PrCore::Math::mat4(1.0f), p_position);
 	modelMatrix  = modelMatrix * PrCore::Math::mat4_cast(p_rotation);
 	modelMatrix = PrCore::Math::scale(modelMatrix, p_scale);
 
 	if(p_material->HasProperty("camPos"))
-		p_material->SetProperty("camPos", camera->GetPosition());
+		p_material->SetProperty("camPos", m_mainCamera->GetPosition());
 	
 	if (p_material->HasProperty("VPMatrix"))
 		p_material->SetProperty("VPMatrix", VPMatrix);

@@ -89,6 +89,11 @@ Entity Scene::GetEntityByTag(const std::string& p_tag)
 	return Entity();
 }
 
+void Scene::OnEnable() const
+{
+	m_systemManager->UpdateOnEnable();
+}
+
 void Scene::Update(float p_dt) const
 {
 	m_systemManager->UpdateGroup(UpdateGroup::Update, p_dt);
@@ -125,6 +130,11 @@ void Scene::CleanDestroyedEntities() const
 void Scene::UpdateHierrarchicalEntities(float p_dt) const
 {
 	m_systemManager->UpdateSystem<HierarchyTransform>(p_dt);
+}
+
+void Scene::OnDisable() const
+{
+	m_systemManager->UpdateOnDisable();
 }
 
 void Scene::RenderUpdate(float p_dt) const

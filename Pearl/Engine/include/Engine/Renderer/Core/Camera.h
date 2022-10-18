@@ -23,6 +23,7 @@ namespace PrRenderer::Core {
 		inline void SetType(CameraType p_type) { m_type = p_type; }
 		inline void SetPosition(const PrCore::Math::vec3& p_position) { m_position = p_position; }
 		inline void SetRotation(const PrCore::Math::vec3& p_rotation) { m_rotation = p_rotation; }
+		inline void SetRotation(const PrCore::Math::quat& p_rotation) { m_rotation = PrCore::Math::eulerAngles(p_rotation); }
 		inline void SetClearColor(const Color& p_clearColor) { m_clearColor = p_clearColor; }
 		
 		inline void SetFar(float p_far) { m_far = p_far; }

@@ -32,10 +32,12 @@ namespace PrCore::ECS {
 		Entity GetEntityByTag(const std::string& p_tag);
 
 		//Updates
+		void OnEnable() const;
 		void Update(float p_dt) const;
 		void FixUpdate(float p_dt) const;
 		void LateUpdate(float p_dt) const;
 		void UpdateHierrarchicalEntities(float p_dt) const;
+		void OnDisable() const;
 		void CleanDestroyedEntities() const;
 
 		void RenderUpdate(float p_dt) const;
