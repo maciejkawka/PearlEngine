@@ -1,6 +1,5 @@
 #pragma once
 #include"Core/ECS/SystemManager.h"
-#include"Core/ECS/BaseSystem.h"
 #include"Core/ECS/Systems.h"
 
 namespace PrCore::ECS {
@@ -9,8 +8,9 @@ namespace PrCore::ECS {
 	{
 		BaseSystem* system = nullptr;
 
-		if (p_typeName == typeid(Increase).name())					p_systemManager->RegisterSystem<Increase>();
-		//else if (p_typeName == typeid(Increase).name())			p_systemManager->RegisterSystem<Increase>();
-		else														PR_ASSERT(true, "System type is invalid" + p_typeName);
+		if (p_typeName == typeid(MeshRendererSystem).name())				p_systemManager->RegisterSystem<MeshRendererSystem>();
+		else if (p_typeName == typeid(HierarchyTransform).name())			p_systemManager->RegisterSystem<HierarchyTransform>();
+		else if (p_typeName == typeid(TestSystem).name())					p_systemManager->RegisterSystem<TestSystem>();
+		else																PR_ASSERT(true, "System type is invalid" + p_typeName);
 	}
 }

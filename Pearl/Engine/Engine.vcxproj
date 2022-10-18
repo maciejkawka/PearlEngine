@@ -28,6 +28,7 @@
     <ClInclude Include="include\Engine\Core\ECS\SystemMap.h" />
     <ClInclude Include="include\Engine\Core\ECS\Systems.h" />
     <ClInclude Include="include\Engine\Core\ECS\Systems\MeshRendererSystem.h" />
+    <ClInclude Include="include\Engine\Core\ECS\Systems\TestSystem.h" />
     <ClInclude Include="include\Engine\Core\ECS\Systems\TransformSystem.h" />
     <ClInclude Include="include\Engine\Core\Entry\AppContext.h" />
     <ClInclude Include="include\Engine\Core\Entry\Application.h" />
