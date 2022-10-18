@@ -114,6 +114,8 @@ MeshPtr Mesh::CreateCube()
 		16, 18, 19, 20, 21, 22, 20, 22, 23
 	};
 
+	cube->SetName("Primitive_Cube");
+
 	cube->m_vertices = vertices;
 	cube->m_indices = indices;
 	cube->m_normals = normals;
@@ -2021,6 +2023,8 @@ MeshPtr Mesh::CreateSphere()
 		378, 511, 513, 377, 508, 377, 511,
 		509, 508, 377, 509, 508, 509, 510
 	};
+
+	sphere->SetName("Primitive_Sphere");
 
 	sphere->m_vertices = vertices;
 	sphere->m_indices = indices;
@@ -4063,6 +4067,8 @@ MeshPtr Mesh::CreateCapsule()
 		542, 543, 544
 	};
 
+	capsule->SetName("Primitive_Capsule");
+
 	capsule->m_vertices = vertices;
 	capsule->m_indices = indices;
 	capsule->m_normals = normals;
@@ -4395,6 +4401,8 @@ MeshPtr Mesh::CreateCylinder()
 		41, 80, 77, 41, 78, 78, 41,
 		79
 	};
+
+	cylinder->SetName("Primitive_Cylinder");
 
 	cylinder->m_vertices = vertices;
 	cylinder->m_indices = indices;
@@ -4879,6 +4887,8 @@ MeshPtr Mesh::CreatePlane()
 		14, 14, 25, 26
 	};
 
+	plane->SetName("Primitive_Plane");
+
 	plane->m_vertices = vertices;
 	plane->m_indices = indices;
 	plane->m_normals = normals;
@@ -4925,6 +4935,8 @@ MeshPtr Mesh::CreateQuad()
 	{
 		0, 3, 1, 3, 0, 2
 	};
+
+	quad->SetName("Primitive_Quad");
 
 	quad->m_vertices = vertices;
 	quad->m_indices = indices;

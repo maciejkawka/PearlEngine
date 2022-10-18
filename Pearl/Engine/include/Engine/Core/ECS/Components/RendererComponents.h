@@ -1,5 +1,7 @@
 #pragma once
 #include"Core/ECS/BaseComponent.h"
+#include"Core/Resources/ResourceLoader.h"
+#include "Core/Resources/ResourceManager.h"
 #include"Renderer/Resources/Mesh.h"
 #include"Renderer/Resources/Material.h"
 #include"Renderer/Core/Color.h"
@@ -20,11 +22,39 @@ namespace PrCore::ECS {
 
 		std::shared_ptr<PrRenderer::Resources::Mesh> mesh;
 		std::shared_ptr < PrRenderer::Resources::Material> material;
+
+		virtual void OnSerialize(Utils::JSON::json& p_serialized) override
+		{
+			p_serialized["Mesh"] = mesh->GetName();
+			p_serialized["Material"] = material->GetName();
+		}
+
+		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override
+		{
+			std::string meshName = p_deserialized["Mesh"];
+			if(meshName.find("Primitive_Cube") != std::string::npos)
+				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
+			else if (meshName.find("Primitive_Sphere") != std::string::npos)
+				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Sphere);
+			else if (meshName.find("Primitive_Capsule") != std::string::npos)
+				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Capsule);
+			else if (meshName.find("Primitive_Cylinder") != std::string::npos)
+				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cylinder);
+			else if (meshName.find("Primitive_Plane") != std::string::npos)
+				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Plane);
+			else if (meshName.find("Primitive_Quad") != std::string::npos)
+				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Quad);
+			else
+				mesh = Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Mesh>(p_deserialized["Mesh"]);
+
+			material = Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>(p_deserialized["Material"]);
+		}
 	};
 
 	class LightComponent : public BaseComponent {
 	public:
 		LightComponent() :
+			m_direction(PrCore::Math::vec3(1.0f)),
 			m_color(PrRenderer::Core::Color::White),
 			m_linearAttenuation(0.5f),
 			m_quadraticAttenuation(0.5f),
@@ -60,8 +90,36 @@ namespace PrCore::ECS {
 		inline float GetInnerCone() const { return m_innerCone; }
 		inline float GetOutterCone() const { return m_outterCone; }
 
+		virtual void OnSerialize(Utils::JSON::json& p_serialized) override
+		{
+			p_serialized["Direction"] = Utils::JSONParser::ParseVec3(m_direction);
+			p_serialized["Color"] = Utils::JSONParser::ParseColor(m_color);
+			p_serialized["LinearAttenuation"] = m_linearAttenuation;
+			p_serialized["QuadraticAttenuation"] = m_quadraticAttenuation;
+			p_serialized["ConstantAttenuation"] = m_constantAttenuation;
+			p_serialized["Range"] = m_range;
+
+			p_serialized["Type"] = (int)m_type;
+			p_serialized["InnerCone"] = m_innerCone;
+			p_serialized["OutterCone"] = m_outterCone;
+		}
+
+		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override
+		{
+			m_direction = Utils::JSONParser::ToVec3(p_deserialized["Direction"]);
+			m_color = Utils::JSONParser::ToColor(p_deserialized["Color"]);
+			m_linearAttenuation = p_deserialized["LinearAttenuation"];
+			m_quadraticAttenuation = p_deserialized["QuadraticAttenuation"];
+			m_constantAttenuation = p_deserialized["ConstantAttenuation"];
+			m_range = p_deserialized["Range"];
+
+			m_type = p_deserialized["Type"];
+			m_innerCone = p_deserialized["InnerCone"];
+			m_outterCone = p_deserialized["OutterCone"];
+		}
+
 	private:
-		PrCore::Math::vec3 m_direction;
+		Math::vec3 m_direction;
 		PrRenderer::Core::Color m_color;
 
 		float m_linearAttenuation;
@@ -72,7 +130,6 @@ namespace PrCore::ECS {
 		LightType m_type;
 		float m_innerCone;
 		float m_outterCone;
-
 	};
 
 	class CameraComponent: public BaseComponent {
@@ -96,6 +153,30 @@ namespace PrCore::ECS {
 		inline float GetSize() { return m_camera.GetSize(); }
 
 		inline PrRenderer::Core::Camera* GetCamera() { return &m_camera; }
+
+
+		virtual void OnSerialize(Utils::JSON::json& p_serialized) override
+		{
+			p_serialized["Type"] = (int)m_camera.GetType();
+			p_serialized["ClearColor"] = Utils::JSONParser::ParseColor(m_camera.GetClearColor());
+			p_serialized["Far"] = m_camera.GetFar();
+			p_serialized["Near"] = m_camera.GetNear();
+			p_serialized["FOV"] = m_camera.GetFOV();
+			p_serialized["Ratio"] = m_camera.GetRatio();
+			p_serialized["Size"] = m_camera.GetSize();
+		}
+
+		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override
+		{
+			m_camera.SetType(p_deserialized["Type"]);
+			m_camera.SetClearColor(Utils::JSONParser::ToColor(p_deserialized["ClearColor"]));
+			m_camera.SetFar(p_deserialized["Far"]);
+			m_camera.SetNear(p_deserialized["Near"]);
+			m_camera.SetFOV(p_deserialized["FOV"]);
+			m_camera.SetRatio(p_deserialized["Ratio"]);
+			m_camera.SetSize(p_deserialized["Size"]);
+		}
+
 	private:
 		PrRenderer::Core::Camera m_camera;
 	};

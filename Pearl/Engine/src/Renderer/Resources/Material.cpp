@@ -333,7 +333,7 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 				for (auto& property : value.items())
 				{
 					if (property.value()["name"] == uniformName)
-						uniform.value = std::make_any<int>(property.value()["value"]);
+						uniform.value = std::make_any<bool>(property.value()["value"]);
 				}
 			}
 

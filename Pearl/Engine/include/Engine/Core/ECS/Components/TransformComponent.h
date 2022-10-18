@@ -47,6 +47,30 @@ namespace PrCore::ECS {
 		void DecomposeWorldMatrix();
 		void DecomposeLocalMatrix();
 
+		virtual void OnSerialize(Utils::JSON::json& p_serialized) override
+		{
+			p_serialized["Position"] = Utils::JSONParser::ParseVec3(m_position);
+			p_serialized["Rotation"] = Utils::JSONParser::ParseQuat(m_rotation);
+			p_serialized["Scale"] = Utils::JSONParser::ParseVec3(m_scale);
+
+			p_serialized["LocalPosition"] = Utils::JSONParser::ParseVec3(m_localPosition);
+			p_serialized["LocalRotation"] = Utils::JSONParser::ParseQuat(m_localRotation);
+			p_serialized["LocalScale"] = Utils::JSONParser::ParseVec3(m_localScale);
+		}
+		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override
+		{
+			m_position = Utils::JSONParser::ToVec3(p_deserialized["Position"]);
+			m_rotation = Utils::JSONParser::ToQuat(p_deserialized["Rotation"]);
+			m_scale = Utils::JSONParser::ToVec3(p_deserialized["Scale"]);
+
+			m_localPosition = Utils::JSONParser::ToVec3(p_deserialized["LocalPosition"]);
+			m_localRotation = Utils::JSONParser::ToQuat(p_deserialized["LocalRotation"]);
+			m_localScale = Utils::JSONParser::ToVec3(p_deserialized["LocalScale"]);
+
+			GenerateWorldMatrix();
+			GenerateLocalMatrix();
+		}
+
 	private:
 		Math::mat4 m_worldMat;
 		Math::vec3 m_position;
@@ -65,5 +89,8 @@ namespace PrCore::ECS {
 	public:
 		Entity parent;
 		bool isDirty = true;
+
+		virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
+		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
 	};
 }

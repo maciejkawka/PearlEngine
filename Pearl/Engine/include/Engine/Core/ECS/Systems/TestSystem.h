@@ -21,5 +21,8 @@ namespace PrCore::ECS
 				transform->SetPosition(position);
 			}
 		}
+
+		inline virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
+		inline virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
 	};
 }

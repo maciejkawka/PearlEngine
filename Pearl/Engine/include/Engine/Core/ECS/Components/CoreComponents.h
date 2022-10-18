@@ -51,6 +51,7 @@ namespace PrCore::ECS {
 
 	class ToDestoryTag : public BaseComponent {
 	public:
-
+		virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
+		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
 	};
 }

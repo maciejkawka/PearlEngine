@@ -9,5 +9,8 @@ namespace PrCore::ECS {
 
 		void OnCreate() override;
 		void OnUpdate(float p_dt) override;
+
+		inline virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
+		inline virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
 	};
 }

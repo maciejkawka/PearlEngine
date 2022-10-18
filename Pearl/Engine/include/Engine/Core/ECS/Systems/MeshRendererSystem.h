@@ -14,6 +14,9 @@ namespace PrCore::ECS {
 		void OnDisable() override;
 		void OnUpdate(float p_dt) override;
 
+		inline virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
+		inline virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
+
 	private:
 		Math::mat4 GetPackedMatrix(const LightComponent* p_lightComponent,const TransformComponent* p_transform) const;
 

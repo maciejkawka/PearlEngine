@@ -31,9 +31,6 @@ namespace PrCore::ECS {
 		inline void SetActive(bool p_isActive) { m_isActive = p_isActive; }
 		inline bool IsActive() const { return m_isActive; }
 
-		inline virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
-		inline virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
-
 	protected:
 		EntityViewer m_entityViewer;
 		uint8_t m_updateGroup;

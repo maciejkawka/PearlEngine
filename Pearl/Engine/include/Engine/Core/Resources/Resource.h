@@ -37,6 +37,9 @@ namespace PrCore::Resources {
 		inline std::string GetName() const { return m_name; }
 		inline ResourceHandle GetHandle() const { return m_handle; }
 
+		//Only for not a file resources
+		inline void SetName(const std::string& p_name) { m_name = p_name; }
+
 		inline ResourceStatus GetStatus() const { return m_state; }
 
 		inline bool IsLoading() const { return m_state == ResourceStatus::Loading; }
