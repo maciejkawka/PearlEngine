@@ -336,6 +336,9 @@
     <ClInclude Include="include\Engine\Core\ECS\Systems\TestSystem.h">
       <Filter>Core\ECS\Systems</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\ECS\ECS.h">
+      <Filter>Core\ECS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">

@@ -18,6 +18,7 @@
     <ClInclude Include="include\Engine\Core\ECS\ComponentPool.h" />
     <ClInclude Include="include\Engine\Core\ECS\Components\RendererComponents.h" />
     <ClInclude Include="include\Engine\Core\ECS\Components\TransformComponent.h" />
+    <ClInclude Include="include\Engine\Core\ECS\ECS.h" />
     <ClInclude Include="include\Engine\Core\ECS\EntityViewer.h" />
     <ClInclude Include="include\Engine\Core\ECS\EntityManager.h" />
     <ClInclude Include="include\Engine\Core\ECS\Defines.h" />

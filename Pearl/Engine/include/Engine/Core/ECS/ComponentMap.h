@@ -13,7 +13,7 @@ namespace PrCore::ECS {
 		//Core
 		if		(p_typeName == typeid(NameComponent).name())			component = p_entity.AddComponent<NameComponent>();
 		else if (p_typeName == typeid(UUIDComponent).name())			component = p_entity.AddComponent<UUIDComponent>();
-		else if (p_typeName == typeid(ToDestoryTag).name())			component = p_entity.AddComponent<ToDestoryTag>();
+		else if (p_typeName == typeid(ToDestoryTag).name())				component = p_entity.AddComponent<ToDestoryTag>();
 		else if (p_typeName == typeid(TagComponent).name())				component = p_entity.AddComponent<TagComponent>();
 
 		//Transform
@@ -21,10 +21,10 @@ namespace PrCore::ECS {
 		else if (p_typeName == typeid(ParentComponent).name())			component = p_entity.AddComponent<ParentComponent>();
 
 		//Renderer
-		else if (p_typeName == typeid(MeshRendererComponent).name())			component = p_entity.AddComponent<MeshRendererComponent>();
+		else if (p_typeName == typeid(MeshRendererComponent).name())	component = p_entity.AddComponent<MeshRendererComponent>();
 		else if (p_typeName == typeid(LightComponent).name())			component = p_entity.AddComponent<LightComponent>();
 		else if (p_typeName == typeid(CameraComponent).name())			component = p_entity.AddComponent<CameraComponent>();
-		else														PR_ASSERT(true, "Component type invalid" + p_typeName);
+		else															PR_ASSERT(true, "Component type invalid" + p_typeName);
 
 		return component;
 	}
