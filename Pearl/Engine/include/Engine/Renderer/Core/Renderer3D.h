@@ -14,8 +14,6 @@ namespace PrRenderer::Core {
 
 	class Renderer3D: public PrCore::Utils::Singleton<Renderer3D> {
 	public:
-		Renderer3D();
-
 		void Begin();
 
 		void SetCubemap(PrRenderer::Resources::MaterialPtr p_cubemap);
@@ -37,8 +35,9 @@ namespace PrRenderer::Core {
 
 		
 	private:
-		void OnWindowResize(PrCore::Events::EventPtr p_event);
+		Renderer3D();
 
+		void OnWindowResize(PrCore::Events::EventPtr p_event);
 		void DrawCubemap();
 		
 		//PBR Maps
@@ -58,6 +57,8 @@ namespace PrRenderer::Core {
 
 		Resources::MeshPtr m_quad;
 		Camera* m_mainCamera;
+
+		friend Singleton<Renderer3D>;
 	};
 
 }

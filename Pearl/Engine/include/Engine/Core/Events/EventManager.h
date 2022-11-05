@@ -1,5 +1,6 @@
 #pragma once
 #include"Event.h"
+#include"Core/Utils/Singleton.h"
 
 #include"entt.hpp"
 #include<map>
@@ -11,23 +12,13 @@ namespace PrCore::Events {
 
 	typedef entt::delegate<void(EventPtr)> EventListener;
 
-	class EventManager {
+	class EventManager: public Utils::Singleton<EventManager> {
 
 		typedef std::list<EventListener> EventListenerList;
 		typedef std::map<EventType, EventListenerList> EventMap;
 		typedef std::list<EventPtr> EventQueue;
 
 	public:
-		EventManager(EventManager&) = delete;
-		EventManager(EventManager&&) = delete;
-		EventManager& operator=(const EventManager&) = delete;
-		EventManager& operator=(EventManager&&) = delete;
-
-		inline static EventManager& GetInstance() { return *s_instance; }
-
-		static void Init();
-		static void Terminate();
-
 		bool AddListener(const EventListener& p_listener, EventType p_type);
 		bool RemoveListener(const EventListener& p_listener, EventType p_type);
 
@@ -38,12 +29,10 @@ namespace PrCore::Events {
 
 	private:
 		EventManager();
-		~EventManager() {}
-
 		EventMap m_eventMap;
 		EventQueue m_eventQueue[EVENTQUEUE_NUM];
 		int m_activeQueue;
 
-		static EventManager* s_instance;
+		friend Singleton<EventManager>;
 	};
 }

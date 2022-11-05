@@ -1,11 +1,11 @@
 #pragma once
 #include"Core/Events/Event.h"
-
+#include"Core/Utils/NonCopyable.h"
 namespace PrCore::Entry {
 
 	class AppContext;
 
-	class Application {
+	class Application: public Utils::NonCopyable {
 	public:
 		Application();
 

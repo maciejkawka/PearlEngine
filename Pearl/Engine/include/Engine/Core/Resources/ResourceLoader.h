@@ -1,4 +1,5 @@
 #pragma once
+#include"Core/Utils/Singleton.h"
 
 #include<memory>
 #include<string>
@@ -15,11 +16,8 @@ namespace PrCore::Resources {
 
 	class ResourceManager;
 
-	class ResourceLoader {
+	class ResourceLoader: public Utils::Singleton<ResourceLoader> {
 	public:
-		static ResourceLoader& GetInstance();
-		static void Terminate();
-
 		template<class T>
 		std::shared_ptr<T> LoadResource(const std::string& p_name);
 
@@ -43,8 +41,6 @@ namespace PrCore::Resources {
 
 	private:
 		ResourceLoader();
-		ResourceLoader(ResourceManager&) = delete;
-		ResourceLoader(ResourceManager&&) = delete;
 		~ResourceLoader();
 
 		PrRenderer::Resources::MaterialManager* m_materialManager;
@@ -52,8 +48,8 @@ namespace PrCore::Resources {
 		PrRenderer::Resources::TextureManager* m_textureManager;
 		PrRenderer::Resources::CubemapManager* m_cubemapManager;
 		PrRenderer::Resources::ShaderManager* m_shaderManager;
-
-		inline static ResourceLoader* s_instance = nullptr;;
+		
+		friend Singleton<ResourceLoader>;
 	};
 
 

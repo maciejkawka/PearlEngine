@@ -19,7 +19,7 @@ PrCore::Entry::AppContext::AppContext()
 	PrCore::Filesystem::FileSystem::Init();
 	PrCore::Events::EventManager::Init();
 
-	PrCore::Resources::ResourceLoader::GetInstance();
+	PrCore::Resources::ResourceLoader::Init();
 
 	PrCore::Filesystem::ConfigFile contexConfig("graphic.cfg");	
 	PrCore::Windowing::WindowContext context;
@@ -53,7 +53,7 @@ PrCore::Entry::AppContext::AppContext()
 
 	PrRenderer::Core::Renderer3D::Init();
 
-	m_input = new PrCore::Input::InputManager();
+	PrCore::Input::InputManager::Init();
 
 	ECS::SceneManager::Init();
 }
@@ -63,7 +63,7 @@ PrCore::Entry::AppContext::~AppContext()
 	PRLOG_INFO("Deleting AppContext");
 
 	ECS::SceneManager::Terminate();
-	delete m_input;
+	Input::InputManager::Terminate();
 	PrRenderer::Core::Renderer3D::Terminate();
 	delete m_rendererContext;
 	delete m_window;

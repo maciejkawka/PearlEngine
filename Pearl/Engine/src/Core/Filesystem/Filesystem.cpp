@@ -5,35 +5,15 @@
 
 using namespace PrCore::Filesystem;
 
-FileSystem* FileSystem::s_fileSystem = nullptr;
-
-PrCore::Filesystem::FileSystem::FileSystem()
+FileSystem::FileSystem()
 {
 	PHYSFS_init(NULL);
-	PRLOG_INFO("Init Filesystem");
 	InitDir();
 }
 
-PrCore::Filesystem::FileSystem::~FileSystem()
+FileSystem::~FileSystem()
 {
 	PHYSFS_deinit();
-	PRLOG_INFO("Terminate Filesystem");
-}
-
-void PrCore::Filesystem::FileSystem::Init()
-{
-	if (s_fileSystem != nullptr)
-		return;
-
-	s_fileSystem = new FileSystem();
-}
-
-void PrCore::Filesystem::FileSystem::Terminate()
-{
-	if (s_fileSystem == nullptr)
-		return;
-
-	delete s_fileSystem;
 }
 
 PrFile* FileSystem::OpenFile(const std::string& p_name, DataAccess p_access)
@@ -60,7 +40,7 @@ FileStreamPtr FileSystem::OpenFileStream(const std::string& p_name, DataAccess p
 
 }
 
-void PrCore::Filesystem::FileSystem::CloseFile(PrFile* p_file)
+void FileSystem::CloseFile(PrFile* p_file)
 {
 	int error = PHYSFS_close(p_file);
 	if (error)

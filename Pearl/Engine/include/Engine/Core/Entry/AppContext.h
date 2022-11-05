@@ -18,6 +18,5 @@ namespace PrCore::Entry {
 
 		PrCore::Windowing::GLWindow* m_window;
 		PrRenderer::Core::Context* m_rendererContext;
-		PrCore::Input::InputManager* m_input;
 	};
 }

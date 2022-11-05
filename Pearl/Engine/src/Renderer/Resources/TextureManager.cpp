@@ -14,5 +14,5 @@ PrCore::Resources::Resource* TextureManager::CreateImpl(const std::string& p_nam
 
 TextureManager::TextureManager()
 {
-	PRLOG_INFO("Init Texture Manager");
+	PRLOG_INFO("Init {0}", typeid(TextureManager).name());
 }

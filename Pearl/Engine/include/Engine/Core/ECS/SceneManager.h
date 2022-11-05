@@ -8,7 +8,7 @@ namespace PrCore::ECS {
 
 	class SceneManager: public Utils::Singleton<SceneManager> {
 	public:
-		~SceneManager() override;
+		~SceneManager();
 
 		Scene* CreateScene(const std::string& p_name = "Scene");
 		void DeleteScene(const Scene* p_scene);

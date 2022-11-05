@@ -15,7 +15,7 @@ namespace PrCore::ECS
 				auto transform = entity.GetComponent<TransformComponent>();
 
 				auto position = transform->GetPosition();
-				if (PrCore::Input::InputManager::IsKeyHold(Input::PrKey::W))
+				if (Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::W))
 					position.x += p_dt;
 
 				transform->SetPosition(position);

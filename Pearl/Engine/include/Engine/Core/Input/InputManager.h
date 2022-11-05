@@ -2,65 +2,66 @@
 #include"PrKey.h"
 #include"PrMouseButton.h"
 #include"PrKeyState.h"
+
+#include"Core/Utils/Singleton.h"
 #include"Core/Events/Event.h"
 #include"Core/Math/Math.h"
+
 #include<unordered_map>
 
 namespace PrCore::Input {
 
-	class InputManager {
+	class InputManager: public Utils::Singleton<InputManager> {
 
-		typedef std::unordered_map<PrCore::Input::PrKey, PrCore::Input::PrInputState>			KeyStateMap;
-		typedef std::unordered_map<PrCore::Input::PrKey, bool>									KeyHoldMap;
-		typedef std::unordered_map<PrCore::Input::PrMouseButton, PrCore::Input::PrInputState>	ButtonStateMap;
-		typedef std::unordered_map<PrCore::Input::PrMouseButton, bool>							ButtonHoldMap;
+		typedef std::unordered_map<PrKey, PrInputState>				KeyStateMap;
+		typedef std::unordered_map<PrKey, bool>						KeyHoldMap;
+		typedef std::unordered_map<PrMouseButton, PrInputState>		ButtonStateMap;
+		typedef std::unordered_map<PrMouseButton, bool>				ButtonHoldMap;
 
 	public:
-		InputManager();
+		bool IsKeyPressed(PrKey p_key);
+		bool IsKeyReleased(PrKey p_key);
+		bool IsKeyHold(PrKey p_key);
 
-		~InputManager();
+		bool IsButtonPressed(PrMouseButton p_key);
+		bool IsButtonReleased(PrMouseButton p_key);
+		bool IsButtonHold(PrMouseButton p_key);
 
-		static bool IsKeyPressed(PrCore::Input::PrKey p_key);
-		static bool IsKeyReleased(PrCore::Input::PrKey p_key);
-		static bool IsKeyHold(PrCore::Input::PrKey p_key);
+		bool IsAnyKeyPressed();
+		bool IsAnyKeyHold();
 
-		static bool IsButtonPressed(PrCore::Input::PrMouseButton p_key);
-		static bool IsButtonReleased(PrCore::Input::PrMouseButton p_key);
-		static bool IsButtonHold(PrCore::Input::PrMouseButton p_key);
-
-		static bool IsAnyKeyPressed();
-		static bool IsAnyKeyHold();
-
-		static double GetMouseScroll();
-		static double GetMouseX();
-		static double GetMouseY();
-		static Math::vec2 GetMousePosition();
+		double GetMouseScroll();
+		double GetMouseX();
+		double GetMouseY();
+		Math::vec2 GetMousePosition();
 
 		void ResetFlags();
 
 	private:
-		void OnKeyPressed(PrCore::Events::EventPtr p_event);
-		void OnKeyReleased(PrCore::Events::EventPtr p_event);
+		InputManager();
+		~InputManager();
 
-		void OnMouseButtonPressed(PrCore::Events::EventPtr p_event);
-		void OnMouseButtonReleased(PrCore::Events::EventPtr p_event);
+		void OnKeyPressed(Events::EventPtr p_event);
+		void OnKeyReleased(Events::EventPtr p_event);
 
-		void OnMouseMoved(PrCore::Events::EventPtr p_event);
-		void OnMouseScroll(PrCore::Events::EventPtr p_event);
+		void OnMouseButtonPressed(Events::EventPtr p_event);
+		void OnMouseButtonReleased(Events::EventPtr p_event);
 
+		void OnMouseMoved(Events::EventPtr p_event);
+		void OnMouseScroll(Events::EventPtr p_event);
 
-		static KeyStateMap s_keyState;
-		static KeyHoldMap s_keyHold;
-		static ButtonStateMap s_buttonState;
-		static ButtonHoldMap s_buttonHold;
+		KeyStateMap s_keyState;
+		KeyHoldMap s_keyHold;
+		ButtonStateMap s_buttonState;
+		ButtonHoldMap s_buttonHold;
 		
-		static double s_mouseXPos;
-		static double s_mouseYPos;
-		static double s_mouseScroll;
+		double s_mouseXPos;
+		double s_mouseYPos;
+		double s_mouseScroll;
 
-		static bool s_anyPressed;
-		static bool s_anyHold;
+		bool s_anyPressed;
+		bool s_anyHold;
 
-
+		friend Singleton<InputManager>;
 	};
 }

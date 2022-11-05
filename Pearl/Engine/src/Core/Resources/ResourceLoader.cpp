@@ -16,20 +16,6 @@
 
 using namespace PrCore::Resources;
 
-ResourceLoader& ResourceLoader::GetInstance()
-{
-	if (s_instance == nullptr)
-		s_instance = new ResourceLoader();
-
-	return *s_instance;
-}
-
-void ResourceLoader::Terminate()
-{
-	if (s_instance)
-		delete s_instance;
-}
-
 ResourceLoader::ResourceLoader()
 {
 	m_materialManager = new PrRenderer::Resources::MaterialManager();

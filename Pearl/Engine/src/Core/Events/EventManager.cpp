@@ -1,34 +1,13 @@
 #include"Core/Common/pearl_pch.h"
 
-
 #include"Core/Events/EventManager.h"
 #include"Core/Utils/Logger.h"
 
 using namespace PrCore::Events;
 
-EventManager* EventManager::s_instance = nullptr;
-
 EventManager::EventManager() :
 	m_activeQueue(0)
 {}
-
-void EventManager::Init()
-{
-	if (!s_instance)
-	{
-		s_instance = new EventManager();
-		PRLOG_INFO("Init EventManager");
-	}
-}
-
-void EventManager::Terminate()
-{
-	if (s_instance)
-	{
-		delete s_instance;
-		PRLOG_INFO("Terminate EventManager");
-	}
-}
 
 bool EventManager::AddListener(const EventListener& p_listener, EventType p_type)
 {

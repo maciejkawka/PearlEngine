@@ -6,7 +6,7 @@ using namespace PrRenderer::Resources;
 
 CubemapManager::CubemapManager()
 {
-	PRLOG_INFO("Init Cubemap Manager");
+	PRLOG_INFO("Init {0}", typeid(CubemapManager).name());
 }
 
 PrCore::Resources::Resource* CubemapManager::CreateImpl(const std::string& p_name)

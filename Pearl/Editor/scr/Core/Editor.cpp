@@ -37,7 +37,7 @@ void Editor::PreFrame()
 	PrRenderer::Core::Renderer3D::GetInstance().Begin();
 
 	//Exit
-	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
+	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
 		m_shouldClose = true;
 }
 
@@ -46,16 +46,16 @@ void Editor::OnFrame(float p_deltaTime)
 	m_basicCamera->Update(p_deltaTime);
 
 	//Camera Settings
-	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::O))
+	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::O))
 		PrRenderer::Core::Camera::GetMainCamera()->SetType(PrRenderer::Core::CameraType::Ortographic);
 
-	if (PrCore::Input::InputManager::IsKeyPressed(PrCore::Input::PrKey::P))
+	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::P))
 		PrRenderer::Core::Camera::GetMainCamera()->SetType(PrRenderer::Core::CameraType::Perspective);
 
 	//Show Mouse Pos
-	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::LEFT_CONTROL))
+	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::LEFT_CONTROL))
 	{
-		auto mousePos = PrCore::Input::InputManager::GetMousePosition();
+		auto mousePos = PrCore::Input::InputManager::GetInstance().GetMousePosition();
 		auto xPos = mousePos.x;
 		auto yPos = mousePos.y;
 
@@ -63,7 +63,7 @@ void Editor::OnFrame(float p_deltaTime)
 	}
 
 	//Show FPS
-	if (PrCore::Input::InputManager::IsKeyHold(PrCore::Input::PrKey::F1))
+	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F1))
 		PRLOG_INFO("{0}", (int)(1 / p_deltaTime));
 
 	m_testFeatures->Update(p_deltaTime);
@@ -96,7 +96,7 @@ void Editor::PostFrame()
 {
 	PrRenderer::Core::Renderer3D::GetInstance().Flush();
 	m_appContext->m_window->SwapBuffers();
-	m_appContext->m_input->ResetFlags();
+	PrCore::Input::InputManager::GetInstance().ResetFlags();
 	
 	EventManager::GetInstance().Update();
 }

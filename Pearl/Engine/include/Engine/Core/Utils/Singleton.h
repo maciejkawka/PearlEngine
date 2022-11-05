@@ -40,7 +40,7 @@ namespace PrCore::Utils {
 
 	protected:
 		Singleton() = default;
-		virtual ~Singleton() = default;
+		~Singleton() = default;
 
 		inline static T* s_instance = nullptr;
 	};

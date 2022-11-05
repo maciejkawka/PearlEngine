@@ -1,6 +1,9 @@
 #pragma once
 #include"FileStream.h"
 #include"StandardFileStream.h"
+
+#include"Core/Utils/Singleton.h"
+
 #include<vector>
 
 namespace PrCore::Filesystem {
@@ -14,17 +17,8 @@ namespace PrCore::Filesystem {
 #define SCENE_DIR "Scene"
 
 	//TODO Implement Commented Functions
-	class FileSystem {
+	class FileSystem: public Utils::Singleton<FileSystem> {
 	public:
-		FileSystem(FileSystem&) = delete;
-		FileSystem(FileSystem&&) = delete;
-		FileSystem& operator=(const FileSystem&) = delete;
-		FileSystem& operator=(FileSystem&&) = delete;
-
-		inline static FileSystem& GetInstance() { return *s_fileSystem; }
-		static void Init();
-		static void Terminate();
-
 		PrFile* OpenFile(const std::string& p_name, DataAccess p_access = DataAccess::Read);
 		//PrFile* OpenFileDirect(const std::string& p_name, DataAccess p_access = DataAccess::Read);
 		FileStreamPtr OpenFileStream(const std::string& p_name, DataAccess p_access = DataAccess::Read);
@@ -51,6 +45,6 @@ namespace PrCore::Filesystem {
 
 		void InitDir();
 
-		static FileSystem* s_fileSystem;
+		friend Singleton<FileSystem>;
 	};
 }

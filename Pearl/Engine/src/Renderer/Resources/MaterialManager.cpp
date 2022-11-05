@@ -8,7 +8,7 @@ using namespace PrCore::Resources;
 
 MaterialManager::MaterialManager()
 {
-	PRLOG_INFO("Init Material Manager");
+	PRLOG_INFO("Init {0}", typeid(MaterialManager).name());
 }
 
 Resource* MaterialManager::CreateImpl(const std::string& p_name)

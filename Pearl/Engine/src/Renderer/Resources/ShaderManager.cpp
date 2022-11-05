@@ -8,7 +8,7 @@ using namespace PrCore::Resources;
 
 ShaderManager::ShaderManager()
 {
-	PRLOG_INFO("Init Shader Manager");
+	PRLOG_INFO("Init {0}", typeid(ShaderManager).name());
 }
 
 Resource* ShaderManager::CreateImpl(const std::string& p_name)

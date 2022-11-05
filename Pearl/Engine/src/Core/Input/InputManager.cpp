@@ -4,20 +4,7 @@
 #include"Core/Events/EventManager.h"
 #include"Core/Events/InputEvents.h"
 
-
 using namespace PrCore::Input;
-
-InputManager::KeyStateMap		InputManager::s_keyState;
-InputManager::KeyHoldMap		InputManager::s_keyHold;
-InputManager::ButtonStateMap	InputManager::s_buttonState;
-InputManager::ButtonHoldMap		InputManager::s_buttonHold;
-
-double InputManager::s_mouseXPos;
-double InputManager::s_mouseYPos;
-double InputManager::s_mouseScroll;
-
-bool InputManager::s_anyPressed = false;
-bool InputManager::s_anyHold = false;
 
 InputManager::InputManager()
 {
@@ -45,7 +32,8 @@ InputManager::InputManager()
 	mouseScrollListener.connect<&InputManager::OnMouseScroll>(this);
 	Events::EventManager::GetInstance().AddListener(mouseScrollListener, Events::MouseScrollEvent::s_type);
 
-	PRLOG_INFO("Init InputManager");
+	s_anyPressed = false;
+	s_anyHold = false;
 }
 
 InputManager::~InputManager()
@@ -73,8 +61,6 @@ InputManager::~InputManager()
 	Events::EventListener mouseScrollListener;
 	mouseScrollListener.connect<&InputManager::OnMouseScroll>(this);
 	Events::EventManager::GetInstance().RemoveListener(mouseScrollListener, Events::MouseScrollEvent::s_type);
-
-	PRLOG_INFO("Terminate InputManager");
 }
 
 bool InputManager::IsKeyPressed(Input::PrKey p_key)

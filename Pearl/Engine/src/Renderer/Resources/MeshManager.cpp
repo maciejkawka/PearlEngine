@@ -6,7 +6,7 @@ using namespace PrRenderer::Resources;
 
 MeshManager::MeshManager()
 {
-	PRLOG_INFO("Init Mesh Manager");
+	PRLOG_INFO("Init {0}", typeid(MeshManager).name());
 }
 
 PrCore::Resources::Resource* MeshManager::CreateImpl(const std::string& p_name)

@@ -13,8 +13,7 @@
 
 namespace PrCore::Utils {
 
-	class Logger {		
-	
+	class Logger {
 	public:
 		Logger() = delete;
 		~Logger() = delete;
