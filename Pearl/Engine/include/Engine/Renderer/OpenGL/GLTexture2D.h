@@ -3,18 +3,18 @@
 
 namespace PrRenderer::OpenGL {
 
-	class GLTexture2D : public PrRenderer::Resources::Texture2D {
+	class GLTexture2D : public Resources::Texture2D {
 	public:
 		GLTexture2D() = default;
 
-		GLTexture2D(RendererID p_rendererID, size_t p_width, size_t p_height, PrRenderer::Resources::TextureFormat p_format);
+		GLTexture2D(RendererID p_rendererID, size_t p_width, size_t p_height, Resources::TextureFormat p_format);
 
 		//Constructor for managed resource
 		GLTexture2D(const std::string& p_name, PrCore::Resources::ResourceHandle p_handle) :
 			Texture2D(p_name, p_handle)
 		{}
 
-		~GLTexture2D();
+		~GLTexture2D() override;
 
 		void Bind(unsigned int p_slot = 0) override;
 		void Unbind(unsigned int p_slot = 0) override;
@@ -25,10 +25,10 @@ namespace PrRenderer::OpenGL {
 		virtual void IsMipMapped(bool p_mipmap) override;
 		virtual void IsReadable(bool p_readable) override;
 		
-		virtual void SetMinFiltering(PrRenderer::Resources::TextureFiltering p_minfiltering) override;
-		virtual void SetMagFiltering(PrRenderer::Resources::TextureFiltering p_magfiltering) override;
-		virtual void SetWrapModeU(PrRenderer::Resources::TextureWrapMode p_wrapU) override;
-		virtual void SetWrapModeV(PrRenderer::Resources::TextureWrapMode p_wrapV) override;
+		virtual void SetMinFiltering(Resources::TextureFiltering p_minfiltering) override;
+		virtual void SetMagFiltering(Resources::TextureFiltering p_magfiltering) override;
+		virtual void SetWrapModeU(Resources::TextureWrapMode p_wrapU) override;
+		virtual void SetWrapModeV(Resources::TextureWrapMode p_wrapV) override;
 
 	protected:
 		void LoadUnitTexture(Core::Color p_unitColor) override;

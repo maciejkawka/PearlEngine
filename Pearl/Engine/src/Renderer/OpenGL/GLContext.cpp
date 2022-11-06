@@ -1,4 +1,3 @@
-#pragma once
 #include"Core/Common/pearl_pch.h"
 
 #include"Renderer/Core/LowRenderer.h"
@@ -27,13 +26,10 @@ void GLContext::Init()
         m_isActive = false;
         return;       
     }
-    else
-    {
-        PRLOG_INFO("Renderer: GLContext Init!");
-        PRLOG_INFO("OpenGL:\n Vendor: {0}\n Renderer: {1}\n Version: {2}", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION));
-    
-        m_isActive = true;
-    }
 
+    PRLOG_INFO("Renderer: GLContext Init!");
+    PRLOG_INFO("OpenGL:\n Vendor: {0}\n Renderer: {1}\n Version: {2}", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION));
+    
+    m_isActive = true;
     Core::LowRenderer::Init(Core::GraphicsAPI::OpenGL);
 }

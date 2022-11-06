@@ -4,8 +4,12 @@
 
 namespace PrRenderer::Buffers{
 
+	class VertexBuffer;
+	typedef std::shared_ptr<VertexBuffer> VertexBufferPtr;
+
 	class VertexBuffer {
 	public:
+		VertexBuffer() = default;
 		virtual ~VertexBuffer() {}
 
 		virtual void Bind() = 0;

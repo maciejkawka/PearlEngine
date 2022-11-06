@@ -2,7 +2,6 @@
 #include"Core/ECS/EntityViewer.h"
 #include"Core/Utils/ISerializable.h"
 
-
 namespace PrCore::ECS {
 
 	enum class UpdateGroup : uint8_t

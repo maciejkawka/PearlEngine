@@ -52,7 +52,7 @@ void GLWindow::PollEvents()
 	glfwPollEvents();
 }
 
-void PrCore::Windowing::GLWindow::SwapBuffers()
+void GLWindow::SwapBuffers()
 {
 	glfwSwapBuffers(m_window);
 }
@@ -134,7 +134,7 @@ void GLWindow::SetIcon(std::string p_path)
 
 void GLWindow::BindCallbacks()
 {
-	using namespace PrCore::Events;
+	using namespace Events;
 
 	//Close Window Callback
 	glfwSetWindowCloseCallback(m_window, [](GLFWwindow* p_window)

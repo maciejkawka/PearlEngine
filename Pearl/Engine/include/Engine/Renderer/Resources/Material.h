@@ -34,8 +34,8 @@ namespace PrRenderer::Resources {
 
 		~Material() = default;
 
-		void SetColor(const PrRenderer::Core::Color& p_color);
-		const PrRenderer::Core::Color& GetColor();
+		void SetColor(const Core::Color& p_color);
+		const Core::Color& GetColor();
 
 		inline void SetShader(ShaderPtr p_shader) { m_shader = p_shader; }
 		inline ShaderPtr GetShader() { return m_shader; }

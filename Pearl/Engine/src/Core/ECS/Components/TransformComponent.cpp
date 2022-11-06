@@ -2,7 +2,6 @@
 
 #include"Core/ECS/Components/TransformComponent.h"
 
-
 using namespace PrCore::ECS;
 
 TransformComponent::TransformComponent()

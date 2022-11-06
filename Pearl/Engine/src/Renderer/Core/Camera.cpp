@@ -8,11 +8,11 @@ namespace Math = PrCore::Math;
 
 Camera* Camera::s_mainCamera = nullptr;
 
-Camera::Camera():
+Camera::Camera() :
 	m_FOV(45.0f),
 	m_near(1.0f),
 	m_far(100.0f),
-	m_ratio(16.0f/9.0f),
+	m_ratio(16.0f / 9.0f),
 	m_size(1.0f),
 	m_type(CameraType::Perspective),
 	m_projectionMatrix(Math::mat4(1)),
@@ -21,7 +21,6 @@ Camera::Camera():
 	m_clearColor(Color::Black),
 	m_position(Math::vec3(0)),
 	m_rotation(Math::vec3(0))
-
 {}
 
 Camera::Camera(CameraType p_cameraType) :

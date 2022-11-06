@@ -6,7 +6,7 @@ namespace PrCore::Utils {
 	class Clock {
 	public:
 		Clock();
-		~Clock() {}
+		~Clock() = default;
 
 		float GetDeltaTime();
 

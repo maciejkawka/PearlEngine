@@ -7,7 +7,7 @@ namespace PrRenderer::OpenGL {
 	class GLFramebuffer : public Buffers::Framebufffer {
 	public:
 		GLFramebuffer(const Buffers::FramebufferSettings& p_settings);
-		~GLFramebuffer();
+		~GLFramebuffer() override;
 
 		void Bind() override;
 		void Unbind() override;
@@ -35,7 +35,7 @@ namespace PrRenderer::OpenGL {
 
 		std::vector<Buffers::FramebufferTexture> m_colorTextureAttachments;
 		std::set<RendererID> m_trackedAttachments;
-		std::vector<PrRenderer::Resources::TexturePtr> m_colorTextures;
+		std::vector<Resources::TexturePtr> m_colorTextures;
 		Buffers::FramebufferTexture m_depthStencilTextureAttachment;
 	};
 

@@ -6,7 +6,7 @@
 
 using namespace PrRenderer::Buffers;
 
-PrRenderer::VertexArrayPtr VertexArray::Create()
+VertexArrayPtr VertexArray::Create()
 {
 	switch (Core::RendererAPI::GetGraphicsAPI())
 	{

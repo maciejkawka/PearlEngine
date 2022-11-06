@@ -9,7 +9,7 @@ namespace PrCore::Entry {
 	public:
 		Application();
 
-		virtual ~Application();
+		virtual ~Application() override = default;
 
 		void Run();
 
@@ -22,9 +22,9 @@ namespace PrCore::Entry {
 		virtual void PostFrame() = 0;
 	
 	private:
-		void OnWindowClose(PrCore::Events::EventPtr p_event);
+		void OnWindowClose(Events::EventPtr p_event);
 
-		void OnWindowMinimalized(PrCore::Events::EventPtr p_event);
+		void OnWindowMinimalized(Events::EventPtr p_event);
 
 	protected:
 		AppContext* m_appContext;

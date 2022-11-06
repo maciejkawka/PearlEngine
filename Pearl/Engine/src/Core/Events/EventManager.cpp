@@ -76,7 +76,6 @@ bool EventManager::QueueEvent(EventPtr& p_event)
 		return true;
 	}
 
-	//PRLOG_WARN("No listeners for event: {0}", p_event->GetType());
 	return false;
 }
 

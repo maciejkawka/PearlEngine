@@ -19,7 +19,7 @@
 
 using namespace PrRenderer::OpenGL;
 
-GLCubemap::GLCubemap(RendererID p_rendererID, size_t p_width, size_t p_height, PrRenderer::Resources::TextureFormat p_format)
+GLCubemap::GLCubemap(RendererID p_rendererID, size_t p_width, size_t p_height, Resources::TextureFormat p_format)
 {
 	m_ID = p_rendererID;
 	m_width = p_width;
@@ -58,35 +58,35 @@ void GLCubemap::GenerateMipMaps()
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
-void GLCubemap::SetMinFiltering(PrRenderer::Resources::TextureFiltering p_minfiltering)
+void GLCubemap::SetMinFiltering(Resources::TextureFiltering p_minfiltering)
 {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, TextureFilterToGL(p_minfiltering));
 	m_minFiltering = p_minfiltering;
 }
 
-void GLCubemap::SetMagFiltering(PrRenderer::Resources::TextureFiltering p_magfiltering)
+void GLCubemap::SetMagFiltering(Resources::TextureFiltering p_magfiltering)
 {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, TextureFilterToGL(p_magfiltering));
 	m_magFiltering = p_magfiltering;
 }
 
-void GLCubemap::SetWrapModeU(PrRenderer::Resources::TextureWrapMode p_wrapU)
+void GLCubemap::SetWrapModeU(Resources::TextureWrapMode p_wrapU)
 {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, TextureWrapToGL(p_wrapU));
 	m_wrapU = p_wrapU;
 }
 
-void GLCubemap::SetWrapModeV(PrRenderer::Resources::TextureWrapMode p_wrapV)
+void GLCubemap::SetWrapModeV(Resources::TextureWrapMode p_wrapV)
 {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, TextureWrapToGL(p_wrapV));
 	m_wrapV = p_wrapV;
 }
 
-void GLCubemap::SetWrapModeR(PrRenderer::Resources::TextureWrapMode p_wrapR)
+void GLCubemap::SetWrapModeR(Resources::TextureWrapMode p_wrapR)
 {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, TextureWrapToGL(p_wrapR));
@@ -189,16 +189,16 @@ unsigned char* GLCubemap::ReadRawData(const std::string& p_name, bool p_first)
 	switch (channelsNumber)
 	{
 	case 1:
-		format = PrRenderer::Resources::TextureFormat::R8;
+		format = Resources::TextureFormat::R8;
 		break;
 	case 2:
-		format = PrRenderer::Resources::TextureFormat::RG16;
+		format = Resources::TextureFormat::RG16;
 		break;
 	case 3:
-		format = PrRenderer::Resources::TextureFormat::RGB24;
+		format = Resources::TextureFormat::RGB24;
 		break;
 	case 4:
-		format = PrRenderer::Resources::TextureFormat::RGBA32;
+		format = Resources::TextureFormat::RGBA32;
 		break;
 	default:
 		PRLOG_WARN("Cannot specify texture {} channel format", m_name);
@@ -211,10 +211,10 @@ unsigned char* GLCubemap::ReadRawData(const std::string& p_name, bool p_first)
 		switch (channelsNumber)
 		{
 		case 3:
-			m_format = PrRenderer::Resources::TextureFormat::RGB16F;
+			m_format = Resources::TextureFormat::RGB16F;
 			break;
 		case 4:
-			m_format = PrRenderer::Resources::TextureFormat::RGBA16F;
+			m_format = Resources::TextureFormat::RGBA16F;
 			break;
 		default:
 			PRLOG_WARN("Cannot specify texture {} channel format", m_name);
@@ -265,15 +265,12 @@ bool GLCubemap::LoadTexturesNames()
 
 	auto json = PrCore::Utils::JSON::json::parse(dataVector);
 
-
 	m_facesNames.push_back(json["right"]);
 	m_facesNames.push_back(json["left"]);
 	m_facesNames.push_back(json["top"]);
 	m_facesNames.push_back(json["bottom"]);
 	m_facesNames.push_back(json["front"]);
 	m_facesNames.push_back(json["back"]);
-	
-
 }
 
 bool GLCubemap::LoadSixSided()
@@ -318,8 +315,8 @@ bool GLCubemap::LoadSixSided()
 bool GLCubemap::LoadHDR()
 {
 	//Load HDR texture and shader
-	auto texture = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Texture2D>(m_name);
-	auto shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Shader>("Cubemap/HDRToCubemap.shader");
+	auto texture = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Texture2D>(m_name);
+	auto shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Cubemap/HDRToCubemap.shader");
 
 	//Create Framebuffer 
 	Buffers::FramebufferSettings fbSettings;
@@ -357,16 +354,16 @@ bool GLCubemap::LoadHDR()
 
 	framebuffer->Bind();
 
-	auto cube = PrRenderer::Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
+	auto cube = Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
 	cube->Bind();
 	for (int i = 0; i < 6; i++)
 	{
 		framebuffer->SetAttachmentDetails(0, i);
 		shader->SetUniformMat4("view", captureViews[i]);
 
-		PrRenderer::Core::LowRenderer::Clear(Core::ClearFlag::ColorBuffer | Core::ClearFlag::DepthBuffer);
+		Core::LowRenderer::Clear(Core::ClearFlag::ColorBuffer | Core::ClearFlag::DepthBuffer);
 		
-		PrRenderer::Core::LowRenderer::Draw(cube->GetVertexArray());
+		Core::LowRenderer::Draw(cube->GetVertexArray());
 	}
 
 	shader->Unbind();
@@ -374,8 +371,8 @@ bool GLCubemap::LoadHDR()
 	framebuffer->Unbind();
 	cube->Unbind();
 
-	PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<PrRenderer::Resources::Texture2D>(m_name);
-	PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<PrRenderer::Resources::Shader>("HDRToCubemap.shader");
+	PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<Resources::Texture2D>(m_name);
+	PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<Resources::Shader>("HDRToCubemap.shader");
 
 	//Set cubemap
 	m_ID = framebuffer->GetTextureID();

@@ -26,7 +26,7 @@ void Mesh::SetIndices(const std::vector<unsigned int>& p_indices)
 	m_stateChanged = true;
 }
 
-void Mesh::SetColors(const std::vector<PrRenderer::Core::Color>& p_colors)
+void Mesh::SetColors(const std::vector<Core::Color>& p_colors)
 {
 	if (p_colors.size() != m_verticesCount)
 	{

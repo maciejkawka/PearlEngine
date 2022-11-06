@@ -6,7 +6,7 @@
 
 using namespace PrRenderer::OpenGL;
 
-PrRenderer::OpenGL::GLVertexBuffer::GLVertexBuffer()
+GLVertexBuffer::GLVertexBuffer()
 {
 	glGenBuffers(1, &m_bufferID);
 }

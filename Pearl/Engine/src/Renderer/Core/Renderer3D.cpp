@@ -8,7 +8,6 @@
 #include"Core/Events/EventManager.h"  //Cannot debug with this line.
 #include"Core/Resources/ResourceLoader.h"
 
-#include"Renderer/Core/Defines.h"
 #include "Renderer/Buffers/Framebuffer.h"
 
 using namespace PrRenderer::Core;
@@ -25,12 +24,12 @@ Renderer3D::Renderer3D()
 
 void Renderer3D::Begin()
 {
-	Core::LowRenderer::EnableDepth(true);
-	Core::LowRenderer::Clear(Core::ClearFlag::ColorBuffer | Core::ClearFlag::DepthBuffer);
+	LowRenderer::EnableDepth(true);
+	LowRenderer::Clear(Core::ClearFlag::ColorBuffer | ClearFlag::DepthBuffer);
 	LowRenderer::ClearColor(0.1f, 0.1f, 0.8f, 1.0f);
 }
 
-void Renderer3D::SetCubemap(PrRenderer::Resources::MaterialPtr p_cubemap)
+void Renderer3D::SetCubemap(Resources::MaterialPtr p_cubemap)
 {
 	m_cubemap.reset();
 	m_IRMap.reset();
@@ -70,7 +69,7 @@ void Renderer3D::AddLight(const PrCore::Math::mat4& p_lightmMat)
 	m_lightData.push_back(p_lightmMat);
 }
 
-void Renderer3D::SetAmbientLight(PrRenderer::Core::Color p_ambientColor)
+void Renderer3D::SetAmbientLight(Color p_ambientColor)
 {
 	m_color = p_ambientColor;
 }
@@ -135,7 +134,7 @@ void Renderer3D::OnWindowResize(PrCore::Events::EventPtr p_event)
 
 void Renderer3D::DrawCubemap()
 {
-	auto camera = PrRenderer::Core::Camera::GetMainCamera();
+	auto camera = Camera::GetMainCamera();
 	if (m_cubemap->HasProperty("view"))
 		m_cubemap->SetProperty("view", camera->GetViewMatrix());
 	if (m_cubemap->HasProperty("proj"))
@@ -162,10 +161,10 @@ void Renderer3D::GenerateIRMap()
 	settings.globalHeight = 32;
 	settings.colorTextureAttachments = texture;
 
-	FramebuffferPtr framebuffer = Buffers::Framebufffer::Create(settings);
+	auto framebuffer = Buffers::Framebufffer::Create(settings);
 
 	auto shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("IrradianceMap.shader");
-	auto cube = PrRenderer::Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
+	auto cube = Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
 	auto cubemap = m_cubemap->GetTexture("skybox");
 
 	PrCore::Math::mat4 captureProjection = PrCore::Math::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
@@ -191,8 +190,8 @@ void Renderer3D::GenerateIRMap()
 		shader->SetUniformMat4("view", captureViews[i]);
 		framebuffer->SetAttachmentDetails(0, i);
 		
-		PrRenderer::Core::LowRenderer::Clear(Core::ClearFlag::ColorBuffer | Core::ClearFlag::DepthBuffer);
-		Core::LowRenderer::Draw(cube->GetVertexArray());
+		LowRenderer::Clear(ClearFlag::ColorBuffer | ClearFlag::DepthBuffer);
+		LowRenderer::Draw(cube->GetVertexArray());
 	}
 
 	m_IRMap = std::static_pointer_cast<Resources::Cubemap>(framebuffer->GetTexturePtr(0));
@@ -220,10 +219,10 @@ void Renderer3D::GeneratePrefilterMap()
 	settings.mipMaped = true;
 	settings.colorTextureAttachments = texture;
 
-	FramebuffferPtr framebuffer = Buffers::Framebufffer::Create(settings);
+	auto framebuffer = Buffers::Framebufffer::Create(settings);
 
 	auto shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("prefilteredCube.shader");
-	auto cube = PrRenderer::Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
+	auto cube = Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
 	auto cubemap = m_cubemap->GetTexture("skybox");
 
 	PrCore::Math::mat4 captureProjection = PrCore::Math::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
@@ -253,8 +252,8 @@ void Renderer3D::GeneratePrefilterMap()
 		{
 			shader->SetUniformMat4("view", captureViews[j]);
 			framebuffer->SetAttachmentDetails(0, j, i);
-			Core::LowRenderer::Clear(Core::ClearFlag::ColorBuffer | Core::ClearFlag::DepthBuffer);
-			Core::LowRenderer::Draw(cube->GetVertexArray());
+			LowRenderer::Clear(ClearFlag::ColorBuffer | ClearFlag::DepthBuffer);
+			LowRenderer::Draw(cube->GetVertexArray());
 		}
 	}
 
@@ -282,14 +281,14 @@ void Renderer3D::GenerateLUTMap()
 	auto framebuffer = Buffers::Framebufffer::Create(settings);
 
 	auto shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("LUTMap.shader");
-	auto quad = PrRenderer::Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Quad);
+	auto quad = Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Quad);
 
 	shader->Bind();
 	quad->Bind();
 	framebuffer->Bind();
 
-	LowRenderer::Clear(Core::ClearFlag::ColorBuffer | Core::ClearFlag::DepthBuffer);
-	Core::LowRenderer::Draw(quad->GetVertexArray());
+	LowRenderer::Clear(ClearFlag::ColorBuffer | ClearFlag::DepthBuffer);
+	LowRenderer::Draw(quad->GetVertexArray());
 
 	m_LUTMap = framebuffer->GetTexturePtr();
 

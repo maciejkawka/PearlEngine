@@ -12,17 +12,17 @@
 
 PrCore::Entry::AppContext::AppContext()
 {
-	PrCore::Utils::Logger::Init();
+	Utils::Logger::Init();
 	PRLOG_INFO("Building AppContext");
 
 	//Init Engine Subsystems
-	PrCore::Filesystem::FileSystem::Init();
-	PrCore::Events::EventManager::Init();
+	Filesystem::FileSystem::Init();
+	Events::EventManager::Init();
 
-	PrCore::Resources::ResourceLoader::Init();
+	Resources::ResourceLoader::Init();
 
-	PrCore::Filesystem::ConfigFile contexConfig("graphic.cfg");	
-	PrCore::Windowing::WindowContext context;
+	Filesystem::ConfigFile contexConfig("graphic.cfg");	
+	Windowing::WindowContext context;
 	if (contexConfig.isValid())
 	{
 		context.debugMode = contexConfig.GetSetting<bool>("debugMode");
@@ -32,9 +32,9 @@ PrCore::Entry::AppContext::AppContext()
 		context.versionMajor = contexConfig.GetSetting("versionMajor");
 	}
 
-	PrCore::Windowing::GLWindow::InitDevice(context);
+	Windowing::GLWindow::InitDevice(context);
 	
-	PrCore::Windowing::WindowSettings windowSettings;
+	Windowing::WindowSettings windowSettings;
 	if (contexConfig.isValid())
 	{
 		windowSettings.title = contexConfig.GetSetting<std::string>("title");
@@ -46,14 +46,14 @@ PrCore::Entry::AppContext::AppContext()
 		windowSettings.vSync = contexConfig.GetSetting<bool>("vSync");
 	}
 
-	m_window = new PrCore::Windowing::GLWindow(windowSettings);
+	m_window = new Windowing::GLWindow(windowSettings);
 
 	m_rendererContext = new PrRenderer::OpenGL::GLContext();
 	m_rendererContext->Init();
 
 	PrRenderer::Core::Renderer3D::Init();
 
-	PrCore::Input::InputManager::Init();
+	Input::InputManager::Init();
 
 	ECS::SceneManager::Init();
 }
@@ -67,8 +67,8 @@ PrCore::Entry::AppContext::~AppContext()
 	PrRenderer::Core::Renderer3D::Terminate();
 	delete m_rendererContext;
 	delete m_window;
-	PrCore::Windowing::GLWindow::TerminateDevice();
-	PrCore::Resources::ResourceLoader::Terminate();
-	PrCore::Events::EventManager::Terminate();
-	PrCore::Filesystem::FileSystem::Terminate();
+	Windowing::GLWindow::TerminateDevice();
+	Resources::ResourceLoader::Terminate();
+	Events::EventManager::Terminate();
+	Filesystem::FileSystem::Terminate();
 }

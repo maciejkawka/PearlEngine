@@ -7,7 +7,7 @@
 
 using namespace PrRenderer::Buffers;
 
-PrRenderer::VertexBufferPtr VertexBuffer::Create()
+VertexBufferPtr VertexBuffer::Create()
 {
 	switch (Core::RendererAPI::GetGraphicsAPI())
 	{
@@ -21,7 +21,7 @@ PrRenderer::VertexBufferPtr VertexBuffer::Create()
 	}
 }
 
-PrRenderer::VertexBufferPtr VertexBuffer::Create(void* p_data, size_t p_size)
+VertexBufferPtr VertexBuffer::Create(void* p_data, size_t p_size)
 {
 	switch (Core::RendererAPI::GetGraphicsAPI())
 	{

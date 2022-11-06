@@ -24,7 +24,7 @@ TexturePtr Cubemap::GenerateRedTexture()
 
 TexturePtr Cubemap::GenerateUnitTexture(Core::Color p_color)
 {
-	Resources::CubemapPtr texture;
+	CubemapPtr texture;
 	switch (Core::RendererAPI::GetGraphicsAPI())
 	{
 	case Core::GraphicsAPI::OpenGL: texture = std::make_shared<OpenGL::GLCubemap>(); break;

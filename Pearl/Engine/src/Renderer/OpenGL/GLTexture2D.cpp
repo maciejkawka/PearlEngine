@@ -5,14 +5,14 @@
 
 #include"glad/glad.h"
 
-#define STB_IMAGE_IMPLEMENTATION //Dirty as fuck :/
+#define STB_IMAGE_IMPLEMENTATION
 #include"stb/stb_image.h"
 
 #include"Core/Filesystem/FileSystem.h"
 
 using namespace PrRenderer::OpenGL;
 
-GLTexture2D::GLTexture2D(RendererID p_rendererID, size_t p_width, size_t p_height, PrRenderer::Resources::TextureFormat p_format)
+GLTexture2D::GLTexture2D(RendererID p_rendererID, size_t p_width, size_t p_height, Resources::TextureFormat p_format)
 {
 	m_ID = p_rendererID;
 	m_width = p_width;
@@ -21,7 +21,7 @@ GLTexture2D::GLTexture2D(RendererID p_rendererID, size_t p_width, size_t p_heigh
 	m_format = p_format;
 }
 
-PrRenderer::OpenGL::GLTexture2D::~GLTexture2D()
+GLTexture2D::~GLTexture2D()
 {
 	if(m_ID != 0)
 		glDeleteTextures(1, &m_ID);
@@ -35,11 +35,10 @@ void GLTexture2D::Bind(unsigned int p_slot)
 
 void GLTexture2D::Unbind(unsigned int p_slot)
 {
-	//glActiveTexture(GL_TEXTURE0 + p_slot);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void PrRenderer::OpenGL::GLTexture2D::GenerateMipMaps()
+void GLTexture2D::GenerateMipMaps()
 {
 	glBindTexture(GL_TEXTURE_2D, m_ID);
 	glGenerateMipmap(GL_TEXTURE_2D);
@@ -54,28 +53,28 @@ void GLTexture2D::IsReadable(bool p_readable)
 {
 }
 
-void GLTexture2D::SetMinFiltering(PrRenderer::Resources::TextureFiltering p_minfiltering)
+void GLTexture2D::SetMinFiltering(Resources::TextureFiltering p_minfiltering)
 {
 	glBindTexture(GL_TEXTURE_2D, m_ID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, TextureFilterToGL(p_minfiltering));
 	m_minFiltering = p_minfiltering;
 }
 
-void GLTexture2D::SetMagFiltering(PrRenderer::Resources::TextureFiltering p_magfiltering)
+void GLTexture2D::SetMagFiltering(Resources::TextureFiltering p_magfiltering)
 {
 	glBindTexture(GL_TEXTURE_2D, m_ID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, TextureFilterToGL(p_magfiltering));
 	m_magFiltering = p_magfiltering;
 }
 
-void GLTexture2D::SetWrapModeU(PrRenderer::Resources::TextureWrapMode p_wrapU)
+void GLTexture2D::SetWrapModeU(Resources::TextureWrapMode p_wrapU)
 {
 	glBindTexture(GL_TEXTURE_2D, m_ID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, TextureWrapToGL(p_wrapU));
 	m_wrapU = p_wrapU;
 }
 
-void GLTexture2D::SetWrapModeV(PrRenderer::Resources::TextureWrapMode p_wrapV)
+void GLTexture2D::SetWrapModeV(Resources::TextureWrapMode p_wrapV)
 {
 	glBindTexture(GL_TEXTURE_2D, m_ID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, TextureWrapToGL(p_wrapV));
@@ -121,7 +120,7 @@ void GLTexture2D::PreUnloadImpl()
 {
 }
 
-bool PrRenderer::OpenGL::GLTexture2D::UnloadImpl()
+bool GLTexture2D::UnloadImpl()
 {
 	if(m_readable)
 		stbi_image_free(m_rawData);
@@ -182,16 +181,16 @@ void GLTexture2D::CalculateSize()
 	{
 		switch (m_format)
 		{
-		case PrRenderer::Resources::TextureFormat::R8:
+		case Resources::TextureFormat::R8:
 			m_size += m_width * m_height * 8;
 			break;
-		case PrRenderer::Resources::TextureFormat::RG16:
+		case Resources::TextureFormat::RG16:
 			m_size += m_width * m_height * 2 * 8;
 			break;
-		case PrRenderer::Resources::TextureFormat::RGB24:
+		case Resources::TextureFormat::RGB24:
 			m_size += m_width * m_height * 3 * 8;
 			break;
-		case PrRenderer::Resources::TextureFormat::RGBA32:
+		case Resources::TextureFormat::RGBA32:
 			m_size += m_width * m_height * 4 * 8;
 			break;
 		default:
@@ -221,16 +220,16 @@ unsigned char* GLTexture2D::ReadRawData()
 	switch (channelsNumber)
 	{
 	case 1:
-		m_format = PrRenderer::Resources::TextureFormat::R8;
+		m_format = Resources::TextureFormat::R8;
 		break;
 	case 2:
-		m_format = PrRenderer::Resources::TextureFormat::RG16;
+		m_format = Resources::TextureFormat::RG16;
 		break;
 	case 3:
-		m_format = PrRenderer::Resources::TextureFormat::RGB24;
+		m_format = Resources::TextureFormat::RGB24;
 		break;
 	case 4:
-		m_format = PrRenderer::Resources::TextureFormat::RGBA32;
+		m_format = Resources::TextureFormat::RGBA32;
 		break;
 	default:
 		PRLOG_WARN("Cannot specify texture {} channel format", m_name);
@@ -243,10 +242,10 @@ unsigned char* GLTexture2D::ReadRawData()
 		switch (channelsNumber)
 		{
 		case 3:
-			m_format = PrRenderer::Resources::TextureFormat::RGB16F;
-			break;
-		case 4:
-			m_format = PrRenderer::Resources::TextureFormat::RGBA16F;
+			m_format = Resources::TextureFormat::RGB16F;
+			break;	   
+		case 4:		   
+			m_format = Resources::TextureFormat::RGBA16F;
 			break;
 		default:
 			PRLOG_WARN("Cannot specify texture {} channel format", m_name);

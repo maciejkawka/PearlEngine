@@ -16,7 +16,7 @@ namespace PrRenderer::Core {
 	public:
 		void Begin();
 
-		void SetCubemap(PrRenderer::Resources::MaterialPtr p_cubemap);
+		void SetCubemap(Resources::MaterialPtr p_cubemap);
 		Resources::MaterialPtr GetCubemap() { return m_cubemap; }
 		Resources::CubemapPtr GetIRMap() { return m_IRMap; }
 		Resources::CubemapPtr GetPrefiltered() { return m_prefilteredMap; }

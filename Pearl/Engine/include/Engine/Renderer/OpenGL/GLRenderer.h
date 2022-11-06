@@ -7,7 +7,7 @@ namespace PrRenderer::OpenGL {
 	class GLRenderer : public Core::RendererAPI {
 	public:
 		GLRenderer();
-		~GLRenderer() = default;
+		~GLRenderer() override = default;
 
 		void Clear(Core::ClearFlag p_flag) override;
 		void ClearColor(float p_r, float p_g, float p_b, float p_a = 1.0f) override;
@@ -19,8 +19,8 @@ namespace PrRenderer::OpenGL {
 		void SetDepthTest(bool p_enable) override;
 		void SetDepthAlgorythm(Core::ComparaisonAlgorithm p_algorythm) override;
 
-		void Draw(PrRenderer::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles) override;
-		void DrawArray(PrRenderer::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles) override;
+		void Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles) override;
+		void DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles) override;
 
 	};
 }

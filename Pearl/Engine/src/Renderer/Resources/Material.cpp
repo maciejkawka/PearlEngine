@@ -52,7 +52,7 @@ Material::Material(const Material& p_material):
 	m_textures = p_material.m_textures;
 }
 
-void Material::SetColor(const PrRenderer::Core::Color& p_color)
+void Material::SetColor(const Core::Color& p_color)
 {
 	auto find = m_uniforms.find(COLOR_UNIFORM);
 	if (find != m_uniforms.end())
@@ -66,11 +66,11 @@ const PrRenderer::Core::Color& Material::GetColor()
 	if (find != m_uniforms.end())
 	{
 		auto vec4 = std::any_cast<PrCore::Math::vec4>(find->second.value);
-		return PrRenderer::Core::Color(vec4);
+		return Core::Color(vec4);
 	}
 
 	PRLOG_WARN("Renderer: Material {0}, missing uniform {1}", m_name, COLOR_UNIFORM);
-	return PrRenderer::Core::Color();
+	return Core::Color();
 }
 
 void Material::Bind()
@@ -151,7 +151,7 @@ void Material::Bind()
 	}
 }
 
-void PrRenderer::Resources::Material::Unbind()
+void Material::Unbind()
 {
 	m_shader->Unbind();
 
@@ -223,7 +223,7 @@ PrCore::Math::vec2 Material::GetTexOffset(const std::string& p_name)
 	return PrCore::Math::vec2();
 }
 
-bool PrRenderer::Resources::Material::HasProperty(const std::string& p_name)
+bool Material::HasProperty(const std::string& p_name)
 {
 	return m_uniforms.find(p_name) != m_uniforms.end();
 }
@@ -232,7 +232,7 @@ void Material::PreLoadImpl()
 {
 }
 
-bool PrRenderer::Resources::Material::LoadImpl()
+bool Material::LoadImpl()
 {
 	auto jsonFile = ReadFile();
 	if (jsonFile == nullptr)
@@ -274,7 +274,7 @@ void Material::CalculateSize()
 {
 }
 
-bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
+bool Material::PopulateBasedOnShader(JSON::json& p_json)
 {
 	float version = p_json["materialVersion"];
 	if (version != m_materialVersion)
@@ -528,9 +528,11 @@ bool Material::PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json)
 			break;
 		}
 	}
+
+	return true;
 }
 
-PrCore::Utils::JSON::json Material::ReadFile()
+JSON::json Material::ReadFile()
 {
 	std::string dir = MATERIAL_DIR;
 	dir += ("/" + m_name);

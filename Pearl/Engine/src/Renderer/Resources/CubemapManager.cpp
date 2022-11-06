@@ -11,5 +11,5 @@ CubemapManager::CubemapManager()
 
 PrCore::Resources::Resource* CubemapManager::CreateImpl(const std::string& p_name)
 {
-	return static_cast<Resources::Cubemap*>(new OpenGL::GLCubemap(p_name, NextResourceHandle()));
+	return static_cast<Cubemap*>(new OpenGL::GLCubemap(p_name, NextResourceHandle()));
 }

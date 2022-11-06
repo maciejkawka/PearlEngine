@@ -18,7 +18,7 @@ namespace PrCore::ECS {
 	class MeshRendererComponent: public BaseComponent {
 	public:
 		MeshRendererComponent() = default;
-		~MeshRendererComponent() = default;
+		~MeshRendererComponent() override = default;
 
 		std::shared_ptr<PrRenderer::Resources::Mesh> mesh;
 		std::shared_ptr < PrRenderer::Resources::Material> material;
@@ -64,7 +64,7 @@ namespace PrCore::ECS {
 			m_innerCone(0.0f),
 			m_outterCone(0.0f)
 		{}
-		~LightComponent() = default;
+		~LightComponent() override = default;
 
 		inline void SetType(LightType p_type) { m_type = p_type; }
 		inline void SetDirection(PrCore::Math::vec3 p_direction) { m_direction = p_direction; }

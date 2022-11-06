@@ -13,19 +13,19 @@ namespace PrCore::Filesystem {
 
 		MemoryStream(const std::string& p_name, size_t p_size, DataAccess p_dataAccess = DataAccess::Both);
 
-		virtual ~MemoryStream();
+		virtual ~MemoryStream() override;
 
-		virtual size_t Read(void* p_data, size_t p_size = 0);
-		virtual size_t Write(const void* p_data, size_t p_size);
-		virtual void Clear();
-		virtual void Close(bool p_deleteStream = false);
+		virtual size_t Read(void* p_data, size_t p_size = 0) override;
+		virtual size_t Write(const void* p_data, size_t p_size) override;
+		virtual void Clear() override;
+		virtual void Close(bool p_deleteStream = false) override;
 
-		virtual std::string GetLine(size_t p_dataSize, char delim = '\n');
-		virtual int Peek();
+		virtual std::string GetLine(size_t p_dataSize, char delim = '\n') override;
+		virtual int Peek() override;
 
-		virtual bool End();
-		virtual void Seek(size_t p_newPosition);
-		virtual size_t Tell();
+		virtual bool End() override;
+		virtual void Seek(size_t p_newPosition) override;
+		virtual size_t Tell() override;
 
 	protected:
 		unsigned char* m_data;

@@ -23,10 +23,10 @@ namespace PrCore::Resources {
 		Resource() = delete;
 
 		//Constructor for unmanaged Resource
-		Resource(const std::string& p_name);
+		explicit Resource(const std::string& p_name);
 
 		//Constructor for managed Resource
-		Resource(const std::string& p_name, ResourceHandle p_ID);
+		explicit Resource(const std::string& p_name, ResourceHandle p_ID);
 
 		virtual ~Resource() = default;
 

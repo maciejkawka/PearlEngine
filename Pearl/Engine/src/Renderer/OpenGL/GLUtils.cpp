@@ -90,7 +90,7 @@ unsigned int PrRenderer::OpenGL::TextureFormatToInternalGL(Resources::TextureFor
 	}
 }
 
-unsigned int PrRenderer::OpenGL::TextureWrapToGL(PrRenderer::Resources::TextureWrapMode p_wrap)
+unsigned int PrRenderer::OpenGL::TextureWrapToGL(Resources::TextureWrapMode p_wrap)
 {
 	switch (p_wrap)
 	{
@@ -109,7 +109,7 @@ unsigned int PrRenderer::OpenGL::TextureWrapToGL(PrRenderer::Resources::TextureW
 	}
 }
 
-unsigned int PrRenderer::OpenGL::TextureFilterToGL(PrRenderer::Resources::TextureFiltering p_filter)
+unsigned int PrRenderer::OpenGL::TextureFilterToGL(Resources::TextureFiltering p_filter)
 {
 	switch (p_filter)
 	{
@@ -167,16 +167,16 @@ unsigned int PrRenderer::OpenGL::PrimitiveToGL(Core::Primitives p_primitives)
 {
 	switch (p_primitives)
 	{
-	case PrRenderer::Core::Primitives::Points:
+	case Core::Primitives::Points:
 		return GL_POINTS;
 		break;
-	case PrRenderer::Core::Primitives::LineStrip:
+	case Core::Primitives::LineStrip:
 		return GL_LINE_STRIP;
 		break;
-	case PrRenderer::Core::Primitives::TriangleStrip:
+	case Core::Primitives::TriangleStrip:
 		return GL_TRIANGLE_STRIP;
 		break;
-	case PrRenderer::Core::Primitives::Triangles:
+	case Core::Primitives::Triangles:
 		return GL_TRIANGLES;
 		break;
 	default:
@@ -188,28 +188,28 @@ unsigned int PrRenderer::OpenGL::ComparaisonToGL(Core::ComparaisonAlgorithm p_al
 {
 	switch (p_algorythm)
 	{
-	case PrRenderer::Core::ComparaisonAlgorithm::Never:
+	case Core::ComparaisonAlgorithm::Never:
 		return GL_NEVER;
 		break;
-	case PrRenderer::Core::ComparaisonAlgorithm::Less:
+	case Core::ComparaisonAlgorithm::Less:
 		return GL_LESS;
 		break;
-	case PrRenderer::Core::ComparaisonAlgorithm::Equal:
+	case Core::ComparaisonAlgorithm::Equal:
 		return GL_EQUAL;
 		break;
-	case PrRenderer::Core::ComparaisonAlgorithm::LessEqual:
+	case Core::ComparaisonAlgorithm::LessEqual:
 		return GL_LEQUAL;
 		break;
-	case PrRenderer::Core::ComparaisonAlgorithm::Greater:
+	case Core::ComparaisonAlgorithm::Greater:
 		return GL_GREATER;
 		break;
-	case PrRenderer::Core::ComparaisonAlgorithm::NotEqual:
+	case Core::ComparaisonAlgorithm::NotEqual:
 		return GL_NOTEQUAL;
 		break;
-	case PrRenderer::Core::ComparaisonAlgorithm::GreaterEqual:
+	case Core::ComparaisonAlgorithm::GreaterEqual:
 		return GL_GEQUAL;
 		break;
-	case PrRenderer::Core::ComparaisonAlgorithm::Always:
+	case Core::ComparaisonAlgorithm::Always:
 		return GL_ALWAYS;
 		break;
 	default:

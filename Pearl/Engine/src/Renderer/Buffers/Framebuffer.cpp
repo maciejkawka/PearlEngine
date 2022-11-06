@@ -4,10 +4,9 @@
 #include "Renderer/Core/RendererAPI.h"
 #include "Renderer/OpenGL/GLFramebuffer.h"
 
-
 using namespace PrRenderer::Buffers;
 
-FramebuffferPtr Framebufffer::Create(const Buffers::FramebufferSettings& p_settings)
+FramebuffferPtr Framebufffer::Create(const FramebufferSettings& p_settings)
 {
 	switch (Core::RendererAPI::GetGraphicsAPI())
 	{

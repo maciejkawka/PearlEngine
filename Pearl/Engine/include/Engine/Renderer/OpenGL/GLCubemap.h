@@ -7,7 +7,7 @@ namespace PrRenderer::OpenGL {
 	public:
 		GLCubemap() = default;
 
-		GLCubemap(RendererID p_rendererID, size_t p_width, size_t p_height, PrRenderer::Resources::TextureFormat p_format);
+		GLCubemap(RendererID p_rendererID, size_t p_width, size_t p_height, Resources::TextureFormat p_format);
 
 		//Constructor for managed resource
 		GLCubemap(std::string p_name, PrCore::Resources::ResourceHandle p_handle);

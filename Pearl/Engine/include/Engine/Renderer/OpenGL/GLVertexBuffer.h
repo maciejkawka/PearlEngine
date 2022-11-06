@@ -8,7 +8,7 @@ namespace PrRenderer::OpenGL {
 		GLVertexBuffer();
 		GLVertexBuffer(void* p_data, size_t p_size);
 
-		~GLVertexBuffer();
+		~GLVertexBuffer() override;
 
 		void Bind() override;
 		void Unbind() override;

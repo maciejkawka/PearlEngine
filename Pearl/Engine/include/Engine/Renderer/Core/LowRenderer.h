@@ -45,8 +45,8 @@ namespace PrRenderer::Core {
 		// static void SetColorMask() 
 		
 		//Draw
-		static void Draw(PrRenderer::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles);
-		static void DrawArray(PrRenderer::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles);
+		static void Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles);
+		static void DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles);
 
 	private:
 		inline static RendererAPI* m_rendererAPI = nullptr;

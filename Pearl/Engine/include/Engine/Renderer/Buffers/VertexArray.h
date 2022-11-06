@@ -1,11 +1,18 @@
 #pragma once
 #include"Renderer/Core/Defines.h"
+#include"Renderer/Buffers/IndexBuffer.h"
+#include"Renderer/Buffers/VertexBuffer.h"
+
 #include<vector>
 
 namespace PrRenderer::Buffers {
 
+	class VertexArray;
+	typedef std::shared_ptr<VertexArray> VertexArrayPtr;
+
 	class VertexArray {
 	public:
+		VertexArray() = default;
 		virtual ~VertexArray() {}
 
 		virtual void Bind() = 0;

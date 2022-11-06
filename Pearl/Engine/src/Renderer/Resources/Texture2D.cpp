@@ -6,7 +6,7 @@
 
 using namespace PrRenderer::Resources;
 
-TexturePtr Texture2D::GenerateUnitTexture(PrRenderer::Core::Color p_color)
+TexturePtr Texture2D::GenerateUnitTexture(Core::Color p_color)
 {
 	Resources::Texture2DPtr texture;
 	switch (Core::RendererAPI::GetGraphicsAPI())

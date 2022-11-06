@@ -7,7 +7,7 @@ namespace PrCore::ECS {
 	class MeshRendererSystem: public BaseSystem {
 	public:
 		MeshRendererSystem() = default;
-		~MeshRendererSystem();
+		~MeshRendererSystem() override;
 
 		void OnCreate() override;
 		void OnEnable() override;

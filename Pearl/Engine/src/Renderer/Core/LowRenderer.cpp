@@ -9,10 +9,10 @@ void LowRenderer::Init(GraphicsAPI p_API)
 {
 	switch (p_API)
 	{
-	case PrRenderer::Core::GraphicsAPI::OpenGL:
+	case GraphicsAPI::OpenGL:
 		m_rendererAPI = new OpenGL::GLRenderer();
 		break;
-	case PrRenderer::Core::GraphicsAPI::DirectX:
+	case GraphicsAPI::DirectX:
 		break;
 	default:
 		PRLOG_ERROR("Wrong GraphicsAPI");
@@ -63,12 +63,12 @@ void LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm p_algorythm)
 	m_rendererAPI->SetDepthAlgorythm(p_algorythm);
 }
 
-void LowRenderer::Draw(PrRenderer::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives)
+void LowRenderer::Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives)
 {
 	m_rendererAPI->Draw(p_vertexArray, p_primitives);
 }
 
-void LowRenderer::DrawArray(PrRenderer::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives)
+void LowRenderer::DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives)
 {
 	m_rendererAPI->DrawArray(p_vertexArray, p_primitives);
 }

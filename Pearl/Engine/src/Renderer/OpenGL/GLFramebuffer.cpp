@@ -78,7 +78,7 @@ void GLFramebuffer::Resize(size_t width, size_t height)
 	UpdateFamebuffer();
 }
 
-void GLFramebuffer::ClearAttachmentColor(unsigned int p_attachment, PrRenderer::Core::Color p_color)
+void GLFramebuffer::ClearAttachmentColor(unsigned int p_attachment, Core::Color p_color)
 {
 	if(p_attachment < m_colorTextureIDs.size());
 
@@ -321,12 +321,12 @@ void GLFramebuffer::GenerateTexture(unsigned int p_index)
 	Resources::TexturePtr texture;
 	if (textureSettings.cubeTexture)
 	{
-		auto cubemap = std::make_shared<OpenGL::GLCubemap>(m_colorTextureIDs[p_index], width, height, textureSettings.format);
+		auto cubemap = std::make_shared<GLCubemap>(m_colorTextureIDs[p_index], width, height, textureSettings.format);
 		cubemap->SetWrapModeR(textureSettings.wrapModeR);
 		texture = cubemap;
 	}
 	else
-		texture = std::make_shared<OpenGL::GLTexture2D>(m_colorTextureIDs[p_index], width, height, textureSettings.format);
+		texture = std::make_shared<GLTexture2D>(m_colorTextureIDs[p_index], width, height, textureSettings.format);
 
 	texture->SetMagFiltering(textureSettings.filteringMag);
 	texture->SetMinFiltering(textureSettings.filteringMin);

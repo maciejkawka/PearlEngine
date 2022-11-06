@@ -1,3 +1,5 @@
+#pragma once
+
 namespace PrCore::Windowing{
 
 	struct WindowContext {

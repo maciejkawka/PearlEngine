@@ -1,9 +1,6 @@
 #include"Core/Common/pearl_pch.h"
 
 #include "Renderer/OpenGL/GLRenderer.h"
-#include"Renderer/Buffers/VertexArray.h"
-#include"Renderer/Buffers/IndexBuffer.h"
-#include"Renderer/Buffers/VertexBuffer.h"
 #include"Renderer/OpenGL/GLUtils.h"
 
 #include"glad/glad.h"
@@ -44,7 +41,7 @@ void GLRenderer::SetViewport(int p_width, int p_height, int p_x, int p_y)
 	glViewport(p_x, p_y, p_width, p_height);
 }
 
-void PrRenderer::OpenGL::GLRenderer::EnableDepth(bool p_enable)
+void GLRenderer::EnableDepth(bool p_enable)
 {
 	// Enable/Disable Writing and Testing
 	if (p_enable)
@@ -64,7 +61,7 @@ void GLRenderer::SetDepthAlgorythm(Core::ComparaisonAlgorithm p_algorythm)
 	glDepthFunc(ComparaisonToGL(p_algorythm));
 }
 
-void GLRenderer::Draw(PrRenderer::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives)
+void GLRenderer::Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives)
 {
 	auto indices = p_vertexArray->GetIndexBuffer();
 	if (indices == nullptr)
@@ -73,7 +70,7 @@ void GLRenderer::Draw(PrRenderer::VertexArrayPtr p_vertexArray, Core::Primitives
 		glDrawElements(PrimitiveToGL(p_primitives), indices->GetSize(), GL_UNSIGNED_INT, 0);
 }
 
-void PrRenderer::OpenGL::GLRenderer::DrawArray(PrRenderer::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives)
+void GLRenderer::DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives)
 {
 	glDrawArrays(PrimitiveToGL(p_primitives), 0, p_vertexArray->GetVertexNumber());
 }

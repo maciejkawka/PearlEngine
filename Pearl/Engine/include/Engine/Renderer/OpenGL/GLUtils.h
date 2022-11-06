@@ -1,6 +1,7 @@
 #pragma once
 #include"Renderer/Resources/Texture.h"
 #include"Renderer/Core/RendererAPI.h"
+
 namespace PrRenderer::OpenGL {
 
 	//Textures
@@ -17,5 +18,4 @@ namespace PrRenderer::OpenGL {
 
 	//General
 	unsigned int BoolToGL(bool p_bool);
-
 }

@@ -1,6 +1,5 @@
 #pragma once
-#include"WindowContext.h"
-#include"WindowSettings.h"
+#include<string>
 
 namespace PrCore::Windowing {
 

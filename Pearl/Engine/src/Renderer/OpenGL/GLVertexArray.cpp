@@ -29,7 +29,7 @@ void GLVertexArray::Unbind()
 	glBindVertexArray(0);
 }
 
-void GLVertexArray::SetVertexBuffer(const VertexBufferPtr p_vertexBuffer)
+void GLVertexArray::SetVertexBuffer(const Buffers::VertexBufferPtr p_vertexBuffer)
 {
 	glBindVertexArray(m_bufferID);
 	p_vertexBuffer->Bind();
@@ -111,7 +111,7 @@ void GLVertexArray::SetVertexBuffer(const VertexBufferPtr p_vertexBuffer)
 	glBindVertexArray(0);
 }
 
-void GLVertexArray::SetIndexBuffer(const IndexBufferPtr p_indexBuffer)
+void GLVertexArray::SetIndexBuffer(const Buffers::IndexBufferPtr p_indexBuffer)
 {
 	glBindVertexArray(m_bufferID);
 	m_indexBuffer = p_indexBuffer;

@@ -1,6 +1,7 @@
 #pragma once
 #include"Window.h"
-
+#include"WindowContext.h"
+#include"WindowSettings.h"
 
 class GLFWwindow;
 

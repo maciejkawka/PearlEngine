@@ -6,6 +6,9 @@
 
 namespace PrRenderer::Buffers {
 
+	class Framebufffer;
+	typedef std::shared_ptr<Framebufffer> FramebuffferPtr;
+
 	struct FramebufferTexture {
 
 		FramebufferTexture() = default;
@@ -18,8 +21,7 @@ namespace PrRenderer::Buffers {
 			size_t p_with = 0,
 			size_t p_height = 0,
 			bool p_cubeTexture = false,
-			Resources::TextureWrapMode p_wrapModeR = Resources::TextureWrapMode::Clamp
-			) :
+			Resources::TextureWrapMode p_wrapModeR = Resources::TextureWrapMode::Clamp) :
 			width(p_with),
 			height(p_height),
 			format(p_format),
@@ -83,7 +85,7 @@ namespace PrRenderer::Buffers {
 		inline const FramebufferSettings& GetSettings() const { return m_settings; }
 		inline RendererID GetID() const { return m_ID; }
 
-		static FramebuffferPtr Create(const Buffers::FramebufferSettings& p_settings);
+		static FramebuffferPtr Create(const FramebufferSettings& p_settings);
 
 	protected:
 		RendererID m_ID;
@@ -93,5 +95,5 @@ namespace PrRenderer::Buffers {
 		FramebufferSettings m_settings;
 	};
 
-	typedef std::shared_ptr<Buffers::Framebufffer> FramebuffferPtr;
+	typedef std::shared_ptr<Framebufffer> FramebuffferPtr;
 }

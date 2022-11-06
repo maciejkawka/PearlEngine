@@ -25,7 +25,7 @@ namespace PrRenderer::Resources {
 			m_ID(0)
 		{}
 
-		virtual ~Shader() {}
+		virtual ~Shader() override = default;
 
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;

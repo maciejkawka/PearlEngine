@@ -4,7 +4,7 @@
 
 using namespace PrRenderer::Resources;
 
-void PrRenderer::Resources::Texture::LoadCorruptedResource()
+void Texture::LoadCorruptedResource()
 {
 	Core::Color color;
 	color.r = 255;

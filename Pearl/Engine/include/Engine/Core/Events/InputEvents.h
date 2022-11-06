@@ -10,10 +10,10 @@ namespace PrCore::Events {
 	public:
 		KeyPressedEvent(int p_key)
 		{
-			m_key = (PrCore::Input::PrKey)p_key;
+			m_key = (Input::PrKey)p_key;
 		}
 
-		PrCore::Input::PrKey m_key;
+		Input::PrKey m_key;
 
 		virtual inline EventType GetType() { return s_type; }
 		inline const static EventType s_type = 0x80e66091;
@@ -23,10 +23,10 @@ namespace PrCore::Events {
 	public:
 		KeyReleasedEvent(int p_key)
 		{
-			m_key = (PrCore::Input::PrKey)p_key;
+			m_key = (Input::PrKey)p_key;
 		}
 
-		PrCore::Input::PrKey m_key;
+		Input::PrKey m_key;
 
 		virtual inline EventType GetType() { return s_type; }
 		inline const static EventType s_type = 0x26dfe3a;
@@ -36,10 +36,10 @@ namespace PrCore::Events {
 	public:
 		MouseButtonPressedEvent(int p_button)
 		{
-			m_button = (PrCore::Input::PrMouseButton)p_button;
+			m_button = (Input::PrMouseButton)p_button;
 		}
 
-		PrCore::Input::PrMouseButton m_button;
+		Input::PrMouseButton m_button;
 
 		virtual inline EventType GetType() { return s_type; }
 		inline const static EventType s_type = 0xb84be5a9;
@@ -49,10 +49,10 @@ namespace PrCore::Events {
 	public:
 		MouseButtonReleasedEvent(int p_button)
 		{
-			m_button = (PrCore::Input::PrMouseButton)p_button;
+			m_button = (Input::PrMouseButton)p_button;
 		}
 
-		PrCore::Input::PrMouseButton m_button;
+		Input::PrMouseButton m_button;
 
 		virtual inline EventType GetType() { return s_type; }
 		inline const static EventType s_type = 0xe4f62295;

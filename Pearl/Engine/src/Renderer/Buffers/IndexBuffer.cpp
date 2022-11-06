@@ -7,8 +7,7 @@
 
 using namespace PrRenderer::Buffers;
 
-
-PrRenderer::IndexBufferPtr IndexBuffer::Create()
+IndexBufferPtr IndexBuffer::Create()
 {
 	switch (Core::RendererAPI::GetGraphicsAPI())
 	{

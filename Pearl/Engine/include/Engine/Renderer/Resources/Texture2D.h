@@ -28,7 +28,7 @@ namespace PrRenderer::Resources {
 		//const Core::Color* GetPixels();
 
 	private:
-		static TexturePtr GenerateUnitTexture(PrRenderer::Core::Color p_color);
+		static TexturePtr GenerateUnitTexture(Core::Color p_color);
 
 	};
 

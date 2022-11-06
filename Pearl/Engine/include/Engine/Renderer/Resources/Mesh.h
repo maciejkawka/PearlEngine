@@ -11,6 +11,9 @@
 
 namespace PrRenderer::Resources {
 
+	class Mesh;
+	typedef std::shared_ptr<Mesh> MeshPtr;
+
 	enum PrimitiveType
 	{
 		Cube,
@@ -53,13 +56,13 @@ namespace PrRenderer::Resources {
 		inline std::vector<unsigned int> GetIndices() { return m_indices; }
 		inline size_t GetIndicesCount() { return m_indicesCount; }
 
-		inline std::vector<PrRenderer::Core::Color> GetColors() { return m_colors; }
+		inline std::vector<Core::Color> GetColors() { return m_colors; }
 		inline std::vector<PrCore::Math::vec3> GetNormals() { return m_normals; }
 		inline std::vector<PrCore::Math::vec4> GetTangents() { return m_tangents; }
 
 		void SetVertices(const std::vector<PrCore::Math::vec3>& p_vertices);
 		void SetIndices(const std::vector<unsigned int>& p_indices);
-		void SetColors(const std::vector<PrRenderer::Core::Color>& p_colors);
+		void SetColors(const std::vector<Core::Color>& p_colors);
 		void SetNormals(const std::vector<PrCore::Math::vec3>& p_normals);
 		void SetTangents(const std::vector<PrCore::Math::vec4>& p_tangents);
 
@@ -84,7 +87,7 @@ namespace PrRenderer::Resources {
 
 		std::vector<PrCore::Math::vec3>			m_vertices;
 		size_t									m_verticesCount;
-		std::vector<PrRenderer::Core::Color>	m_colors;
+		std::vector<Core::Color>	m_colors;
 		std::vector<PrCore::Math::vec3>			m_normals;
 		std::vector<PrCore::Math::vec4>			m_tangents;
 
@@ -103,6 +106,4 @@ namespace PrRenderer::Resources {
 		static MeshPtr CreatePlane();
 		static MeshPtr CreateQuad();
 	};
-
-	typedef std::shared_ptr<Mesh> MeshPtr;
 }

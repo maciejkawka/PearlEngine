@@ -9,9 +9,9 @@ namespace PrCore::Filesystem {
 	class ConfigFile {
 	public:
 		ConfigFile(const std::string& p_fileName);
-		ConfigFile():
-		m_isValid(false)
-		 {}
+		ConfigFile() :
+			m_isValid(false)
+		{}
 
 		~ConfigFile() {}
 

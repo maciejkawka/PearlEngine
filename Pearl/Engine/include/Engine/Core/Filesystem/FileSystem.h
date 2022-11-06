@@ -1,7 +1,6 @@
 #pragma once
 #include"FileStream.h"
 #include"StandardFileStream.h"
-
 #include"Core/Utils/Singleton.h"
 
 #include<vector>

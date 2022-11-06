@@ -13,7 +13,7 @@ ResourceManager::ResourceManager() :
 {
 	m_maxMemory = UINT_MAX;
 
-	using namespace PrCore::Events;
+	using namespace Events;
 	EventListener loadedListener;
 	loadedListener.connect<&ResourceManager::OnResourceLoaded>();
 	EventManager::GetInstance().AddListener(loadedListener, ResourceLoadedEvent::s_type);
@@ -57,8 +57,8 @@ void ResourceManager::DeleteImpl(ResourcePtr& p_resource)
 
 void ResourceManager::FireCacheMiss(CacheMiss p_cacheMiss)
 {
-	PrCore::Events::EventPtr event = std::make_shared<PrCore::Events::CacheMissEvent>(p_cacheMiss);
-	PrCore::Events::EventManager::GetInstance().QueueEvent(event);
+	Events::EventPtr event = std::make_shared<Events::CacheMissEvent>(p_cacheMiss);
+	Events::EventManager::GetInstance().QueueEvent(event);
 }
 
 ResourcePtr ResourceManager::Load(const std::string& p_name)
@@ -181,19 +181,19 @@ ResourcePtr ResourceManager::GetResource(const std::string& p_name)
 	return resource;
 }
 
-void ResourceManager::OnResourceLoaded(PrCore::Events::EventPtr p_event)
+void ResourceManager::OnResourceLoaded(Events::EventPtr p_event)
 {
-	auto event = std::static_pointer_cast<PrCore::Events::ResourceLoadedEvent>(p_event);
+	auto event = std::static_pointer_cast<Events::ResourceLoadedEvent>(p_event);
 	PRLOG_INFO("Resource handle {0} Name {1} loaded", event->m_ID, event->m_name);
 }
 
-void ResourceManager::OnResourceUnloaded(PrCore::Events::EventPtr p_event)
+void ResourceManager::OnResourceUnloaded(Events::EventPtr p_event)
 {
-	auto event = std::static_pointer_cast<PrCore::Events::ResourceUnloadedEvent>(p_event);
+	auto event = std::static_pointer_cast<Events::ResourceUnloadedEvent>(p_event);
 	PRLOG_INFO("Resource handle {0} Name {1} unloaded", event->m_ID, event->m_name);
 }
 
-void ResourceManager::OnResourceCorrupted(PrCore::Events::EventPtr p_event)
+void ResourceManager::OnResourceCorrupted(Events::EventPtr p_event)
 {
 	auto event = std::static_pointer_cast<PrCore::Events::ResourceCorruptedEvent>(p_event);
 	PRLOG_ERROR("Resource handle {0} Name {1} corrupted", event->m_ID, event->m_name);
@@ -236,7 +236,7 @@ void ResourceManager::MemoryCheck()
 	}
 }
 
-void PrCore::Resources::ResourceManager::UpdateMemoryUsage()
+void ResourceManager::UpdateMemoryUsage()
 {
 	size_t actualMemoryUsage = 0;
 	for (auto rsource : m_resources)

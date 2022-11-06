@@ -9,7 +9,7 @@ using namespace PrCore::Utils;
 std::shared_ptr<spdlog::logger> Logger::s_mainLogger = nullptr;
 std::shared_ptr<spdlog::logger> Logger::s_fileLogger = nullptr;
 
-void PrCore::Utils::Logger::Init()
+void Logger::Init()
 {
 	//Main logger
 	auto consoleSink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();

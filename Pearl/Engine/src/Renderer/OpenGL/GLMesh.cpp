@@ -101,10 +101,10 @@ bool GLMesh::LoadImpl()
     {
         PRLOG_ERROR("Renderer: Mesh {0} invalid", m_name);
         return false;
-
     }
 
     UpdateBuffers();
+    return true;
 }
 
 void GLMesh::PostLoadImpl()
@@ -158,12 +158,9 @@ void GLMesh::CalculateSize()
 
 void GLMesh::UpdateBuffers()
 {
-    PrRenderer::VertexBufferPtr vertexBuffer = PrRenderer::Buffers::VertexBuffer::Create();
-    PrRenderer::IndexBufferPtr indexBuffer = PrRenderer::Buffers::IndexBuffer::Create();
-    PrRenderer::Buffers::BufferLayout bufferLayout;
-
-   // vertexBuffer.reset(new GLVertexBuffer());
-    //indexBuffer.reset(new GLIndexBuffer());
+    auto vertexBuffer = Buffers::VertexBuffer::Create();
+    auto indexBuffer = Buffers::IndexBuffer::Create();
+    Buffers::BufferLayout bufferLayout;
     
     //Vertex
     bufferLayout.AddElementBuffer({ "Vertex", Buffers::ShaderDataType::Float3 });
@@ -243,7 +240,7 @@ void GLMesh::UpdateBuffers()
     m_stateChanged = false;
 }
 
-bool PrRenderer::OpenGL::GLMesh::PopulateOBJ()
+bool GLMesh::PopulateOBJ()
 {
     std::string dir = MESH_DIR;
     dir += ("/" + m_name);
@@ -338,4 +335,6 @@ bool PrRenderer::OpenGL::GLMesh::PopulateOBJ()
 
     m_indicesCount = m_indices.size();
     m_verticesCount = m_vertices.size();
+
+    return true;
 }

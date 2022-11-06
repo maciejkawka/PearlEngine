@@ -8,7 +8,7 @@ namespace PrRenderer::OpenGL {
 		GLIndexBuffer();
 		GLIndexBuffer(uint32_t* p_indices, uint32_t p_size);
 
-		~GLIndexBuffer();
+		~GLIndexBuffer() override;
 
 		void Bind() override;
 		void Unbind() override;
