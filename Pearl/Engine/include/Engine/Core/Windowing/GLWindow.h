@@ -28,7 +28,7 @@ namespace PrCore::Windowing {
 		void SetVSync(bool p_vsync) override;
 		inline bool IsVSync() override { return m_settings.vSync; }
 
-		void SetIcon(std::string p_path) override; //TODO
+		void SetIcon(std::string p_path) override;
 
 	private:
 		void BindCallbacks();

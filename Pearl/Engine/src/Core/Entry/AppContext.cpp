@@ -44,6 +44,7 @@ PrCore::Entry::AppContext::AppContext()
 		windowSettings.resizable = contexConfig.GetSetting<bool>("resizable");
 		windowSettings.decorated = contexConfig.GetSetting<bool>("decorated");
 		windowSettings.vSync = contexConfig.GetSetting<bool>("vSync");
+		windowSettings.iconPath = contexConfig.GetSetting<std::string>("iconPath");
 	}
 
 	m_window = new Windowing::GLWindow(windowSettings);

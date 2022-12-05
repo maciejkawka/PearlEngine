@@ -7,6 +7,9 @@
 #include"Core/Events/WindowEvents.h"
 #include"Core/Events/InputEvents.h"
 
+#include"Core/Filesystem/FileSystem.h"
+#include"stb/stb_image.h"
+
 using namespace PrCore::Windowing;
 
 WindowContext GLWindow::s_context;
@@ -97,6 +100,9 @@ GLWindow::GLWindow(const WindowSettings& p_settings) :
 	BindCallbacks();
 	glfwMakeContextCurrent(m_window);
 
+	if (!m_settings.iconPath.empty())
+		SetIcon(ROOT_DIR + m_settings.iconPath);
+
 	s_mainWindow = this;
 }
 
@@ -125,11 +131,10 @@ void GLWindow::SetVSync(bool p_vsync)
 
 void GLWindow::SetIcon(std::string p_path)
 {
-	//TODO
-	//GLFWimage images;
-	//images[0] = load_icon("my_icon.png");
+	GLFWimage images[1];
+	images[0].pixels = stbi_load(p_path.c_str(), &images[0].width, &images[0].height, 0, 4);
 
-	//glfwSetWindowIcon(window, 2, images);
+	glfwSetWindowIcon(m_window, 1, images);
 }
 
 void GLWindow::BindCallbacks()

@@ -21,5 +21,7 @@ namespace PrCore::Windowing {
 
 		bool decorated = true;
 
+		std::string iconPath = "";
+
 	};
 }
