@@ -3,6 +3,7 @@
 #include"Core/Resources/ResourceManager.h"
 #include"Core/Events/EventManager.h"
 #include"Core/Events/ResourceEvents.h"
+#include"Core/Utils/Assert.h"
 
 using namespace PrCore::Resources;
 
@@ -34,8 +35,7 @@ ResourceManager::~ResourceManager()
 
 ResourcePtr ResourceManager::CreateResource(const std::string& p_name)
 {
-	if (p_name.empty())
-		return ResourcePtr();
+	PR_ASSERT(!p_name.empty(), "Resource name is empty");
 
 	auto findResource = m_resourceName.find(p_name);
 	if (m_resourceName.find(p_name) != m_resourceName.end())
@@ -63,8 +63,7 @@ void ResourceManager::FireCacheMiss(CacheMiss p_cacheMiss)
 
 ResourcePtr ResourceManager::Load(const std::string& p_name)
 {
-	if (p_name.empty())
-		return ResourcePtr();
+	PR_ASSERT(!p_name.empty(), "Resource name is empty");
 
 	ResourcePtr resource = ResourceByName(p_name);
 
@@ -91,8 +90,7 @@ ResourcePtr ResourceManager::Reload(const std::string& p_name)
 
 void ResourceManager::Unload(const std::string& p_name)
 {
-	if (p_name.empty())
-		return;
+	PR_ASSERT(!p_name.empty(), "Resource name is empty");
 
 	ResourcePtr resource = ResourceByName(p_name);
 	if (resource != nullptr && resource->IsLoaded())
@@ -119,8 +117,7 @@ void ResourceManager::UnloadAll()
 
 void ResourceManager::Delete(const std::string& p_name)
 {
-	if (p_name.empty())
-		return;
+	PR_ASSERT(!p_name.empty(), "Resource name is empty");
 
 	ResourcePtr resource = ResourceByName(p_name);
 	if (resource == nullptr)
@@ -214,7 +211,7 @@ ResourcePtr ResourceManager::ResourceByName(const std::string& p_name)
 	auto resource = m_resourceName.find(p_name);
 
 	if (resource == m_resourceName.end())
-		return nullptr;
+		return ResourcePtr();
 	return resource->second;
 }
 
