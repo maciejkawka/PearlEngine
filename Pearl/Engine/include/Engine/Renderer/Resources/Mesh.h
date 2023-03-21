@@ -50,7 +50,7 @@ namespace PrRenderer::Resources {
 
 		inline std::shared_ptr<Buffers::VertexArray> GetVertexArray() { return m_VA; }
 
-		inline std::vector<PrCore::Math::vec3> GetVertices() { return m_vertices; }
+		inline const std::vector<PrCore::Math::vec3>& GetVertices() { return m_vertices; }
 		inline size_t GetVerticesCount() { return m_verticesCount; }
 
 		inline std::vector<unsigned int> GetIndices() { return m_indices; }
