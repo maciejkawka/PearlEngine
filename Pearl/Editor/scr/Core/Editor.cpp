@@ -94,6 +94,7 @@ void Editor::OnFrame(float p_deltaTime)
 
 void Editor::PostFrame()
 {
+	PrRenderer::Core::Renderer3D::GetInstance().Render();
 	PrRenderer::Core::Renderer3D::GetInstance().Flush();
 	m_appContext->m_window->SwapBuffers();
 	PrCore::Input::InputManager::GetInstance().ResetFlags();

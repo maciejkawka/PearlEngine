@@ -93,18 +93,19 @@ void MeshRendererSystem::OnUpdate(float p_dt)
 		auto material = meshRenderer->material;
 		auto mesh = meshRenderer->mesh;
 
-		auto cubemap = Renderer3D::GetInstance().GetIRMap();
-		auto lut = Renderer3D::GetInstance().GetLUT();
-		auto prefiltered = Renderer3D::GetInstance().GetPrefiltered();
-
-		material->SetTexture("irradianceMap", cubemap);
-		material->SetTexture("prefilterMap", prefiltered);
-		material->SetTexture("brdfLUT", lut);
-
+		//Calculate modelMatrix
 		auto position = transform->GetPosition();
 		auto rotation = transform->GetRotation();
 		auto scale = transform->GetScale();
+		auto modelMatrix = PrCore::Math::translate(PrCore::Math::mat4(1.0f), position);
+		modelMatrix = modelMatrix * PrCore::Math::mat4_cast(rotation);
+		modelMatrix *= PrCore::Math::scale(PrCore::Math::mat4(1.0f), scale);
 
-		Renderer3D::GetInstance().DrawMeshNow(mesh, position, rotation, scale, material);
+		MeshRenderObject object;
+		object.mesh = mesh;
+		object.material = material;
+		object.castShadow = false;
+		object.worldMat = std::move(modelMatrix);
+		Renderer3D::GetInstance().AddMeshRenderObject(std::move(object));
 	}
 }

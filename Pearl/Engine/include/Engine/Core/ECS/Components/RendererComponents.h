@@ -21,7 +21,7 @@ namespace PrCore::ECS {
 		~MeshRendererComponent() override = default;
 
 		std::shared_ptr<PrRenderer::Resources::Mesh> mesh;
-		std::shared_ptr < PrRenderer::Resources::Material> material;
+		std::shared_ptr<PrRenderer::Resources::Material> material;
 
 		virtual void OnSerialize(Utils::JSON::json& p_serialized) override
 		{

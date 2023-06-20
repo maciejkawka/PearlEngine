@@ -342,6 +342,12 @@
     <ClInclude Include="include\Engine\Renderer\Core\BoundingVolume.h">
       <Filter>Renderer\Core</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Core\MeshRenderObject.h">
+      <Filter>Renderer\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Core\RenderCommand.h">
+      <Filter>Renderer\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -519,6 +525,9 @@
       <Filter>Core\ECS\Systems</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Core\BoundingVolume.cpp">
+      <Filter>Renderer\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Core\RenderCommand.cpp">
       <Filter>Renderer\Core</Filter>
     </ClCompile>
   </ItemGroup>

@@ -19,7 +19,9 @@ Renderer3D::Renderer3D()
 	PrCore::Events::EventManager::GetInstance().AddListener(windowResizedListener, PrCore::Events::WindowResizeEvent::s_type);
 	m_color = PrCore::Math::vec3(0.0f);
 
-	m_quad = Resources::Mesh::CreatePrimitive(Resources::Quad);
+
+	m_transparentMeshObjects.reserve(MAX_OPAQUE_RENDERABLES);
+	m_opaqueMeshObjects.reserve(MAX_TRANSPARENT_RENDERABLES);
 }
 
 void Renderer3D::Begin()
@@ -74,52 +76,91 @@ void Renderer3D::SetAmbientLight(Color p_ambientColor)
 	m_color = p_ambientColor;
 }
 
+void Renderer3D::AddMeshRenderObject(MeshRenderObject&& p_meshRenderObject)
+{
+	//Calculate sorting hash
+	std::uint32_t hashName = std::hash<std::string>{}(p_meshRenderObject.material->GetName());
+
+	if(!p_meshRenderObject.isTransparent)
+	{
+		if (m_opaqueMeshObjects.size() >= m_opaqueMeshObjects.capacity())
+		{
+			PRLOG_WARN("Renderer3D opaque buffer exceded the limit {0}, discarding object", m_opaqueMeshObjects.capacity());
+			return;
+		}
+
+		m_opaqueMeshObjects.push_back( p_meshRenderObject);
+		m_opaqueMeshPriority.push_back({ hashName, m_opaqueMeshObjects.end() - 1 });
+	}
+	else
+	{
+		if (m_transparentMeshObjects.size() >= m_transparentMeshObjects.capacity())
+		{
+			PRLOG_WARN("Renderer3D tranparent buffer exceded the limit {0}, discarding object", m_transparentMeshObjects.capacity());
+			return;
+		}
+
+		m_transparentMeshObjects.push_back(p_meshRenderObject);
+		m_transparentMeshPriority.push_back({ hashName, m_transparentMeshObjects.end() - 1 });
+	}
+}
+
 void Renderer3D::DrawMeshNow(Resources::MeshPtr p_mesh, PrCore::Math::vec3 p_position, PrCore::Math::quat p_rotation, PrCore::Math::vec3 p_scale, Resources::MaterialPtr p_material)
 {
-	PrCore::Math::mat4 VPMatrix = PrCore::Math::mat4(1.0f);
-	if(m_mainCamera)
-		VPMatrix = m_mainCamera->RecalculateMatrices();
-	auto modelMatrix = PrCore::Math::translate(PrCore::Math::mat4(1.0f), p_position);
-	modelMatrix  = modelMatrix * PrCore::Math::mat4_cast(p_rotation);
-	modelMatrix = PrCore::Math::scale(modelMatrix, p_scale);
+	//TODO
+}
 
-	if(p_material->HasProperty("camPos"))
-		p_material->SetProperty("camPos", m_mainCamera->GetPosition());
-	
-	if (p_material->HasProperty("VPMatrix"))
-		p_material->SetProperty("VPMatrix", VPMatrix);
-	
-	if (p_material->HasProperty("modelMatrix"))
-		p_material->SetProperty("modelMatrix", modelMatrix);
+void Renderer3D::Render()
+{
+	RenderData renderData{
+		m_lightData,
+		m_IRMap,
+		m_prefilteredMap,
+		m_LUTMap,
+		m_color,
+		false
+	};
 
-	if (p_material->HasProperty("MVP"))
-		p_material->SetProperty("MVP", VPMatrix * modelMatrix);
-	
-	if (p_material->HasProperty("ambientColor"))
-		p_material->SetProperty("ambientColor", m_color);
+	if (m_prefilteredMap && m_IRMap && m_LUTMap != nullptr)
+		renderData.hasCubeMap = true;
 
-	if (!m_lightData.empty())
+	//Render cubemap
+	if(m_cubemap)
+		m_RCQueue.push(new CubemapRenderRC(m_cubemap));
+
+
+	//Render Opaque
+	std::sort(m_opaqueMeshPriority.begin(), m_opaqueMeshPriority.end());
+	for (auto& [_, object] : m_opaqueMeshPriority)
 	{
-		if (p_material->HasProperty("lightMat[0]"))
-			p_material->SetPropertyArray("lightMat[0]", m_lightData.data(), m_lightData.size());
-
-		if (p_material->HasProperty("lightNumber"))
-			p_material->SetProperty("lightNumber", (int)m_lightData.size());
+		m_RCQueue.push(new MeshRenderRC(std::move(*object), renderData));
 	}
 
-	p_material->Bind();
-	p_mesh->Bind();
+	//Render Transparent
+	std::sort(m_transparentMeshPriority.begin(), m_transparentMeshPriority.end());
+	for (auto& [_, object] : m_transparentMeshPriority)
+	{
+		m_RCQueue.push(new MeshRenderRC(std::move(*object), renderData));
+	}
 
-	LowRenderer::Draw(p_mesh->GetVertexArray());
-	p_material->Unbind();
-	p_mesh->Unbind();
 }
 
 void Renderer3D::Flush()
 {
-	if(m_cubemap)
-		DrawCubemap();
+	m_mainCamera->RecalculateMatrices();
 
+	while (!m_RCQueue.empty())
+	{
+		auto command = m_RCQueue.front();
+		command->Invoke(m_mainCamera);
+		delete command;
+		m_RCQueue.pop();
+	}
+
+	m_transparentMeshPriority.clear();
+	m_opaqueMeshPriority.clear();
+	m_opaqueMeshObjects.clear();
+	m_transparentMeshObjects.clear();
 	m_lightData.clear();
 }
 
@@ -128,26 +169,8 @@ void Renderer3D::OnWindowResize(PrCore::Events::EventPtr p_event)
 	auto windowResizeEvent = std::static_pointer_cast<PrCore::Events::WindowResizeEvent>(p_event);
 	auto width = windowResizeEvent->m_width;
 	auto height = windowResizeEvent->m_height;
-
+	
 	LowRenderer::SetViewport(width, height);
-}
-
-void Renderer3D::DrawCubemap()
-{
-	auto camera = Camera::GetMainCamera();
-	if (m_cubemap->HasProperty("view"))
-		m_cubemap->SetProperty("view", camera->GetViewMatrix());
-	if (m_cubemap->HasProperty("proj"))
-		m_cubemap->SetProperty("proj", camera->GetProjectionMatrix());
-
-	LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::LessEqual);
-
-	m_cubemap->Bind();
-	m_quad->Bind();
-	LowRenderer::Draw(m_quad->GetVertexArray(), Primitives::TriangleStrip);
-	m_quad->Unbind();
-	m_cubemap->Unbind();
-	LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::Less);
 }
 
 void Renderer3D::GenerateIRMap()

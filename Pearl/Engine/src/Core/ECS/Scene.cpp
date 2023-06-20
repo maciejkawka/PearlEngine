@@ -182,9 +182,9 @@ void Scene::OnDeserialize(const Utils::JSON::json& p_deserialized)
 	m_path = p_deserialized["path"];
 	m_UUID = p_deserialized["UUID"];
 
-	auto entitiesJSON = p_deserialized["entities"];
-	m_entityManager->OnDeserialize(entitiesJSON);
-
 	auto systemsJSON = p_deserialized["systems"];
 	m_systemManager->OnDeserialize(systemsJSON);
+
+	auto entitiesJSON = p_deserialized["entities"];
+	m_entityManager->OnDeserialize(entitiesJSON);
 }

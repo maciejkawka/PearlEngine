@@ -33,19 +33,19 @@ namespace PrRenderer::Core {
 		inline void SetSize(float p_size) { m_size = p_size; }
 
 		inline CameraType GetType() { return m_type; }
-		inline const PrCore::Math::vec3& GetPosition() { return m_position; }
-		inline const PrCore::Math::vec3& GetRotation() { return m_rotation; }
+		inline const PrCore::Math::vec3& GetPosition() const { return m_position; }
+		inline const PrCore::Math::vec3& GetRotation() const { return m_rotation; }
 		inline const Color GetClearColor() { return m_clearColor; }
 				
-		inline float GetFar() { return m_far; }
-		inline float GetNear() { return m_near; }
-		inline float GetFOV() { return m_FOV; }
-		inline float GetRatio() { return m_ratio; }
-		inline float GetSize() { return m_size; }
+		inline float GetFar() const { return m_far; }
+		inline float GetNear() const { return m_near; }
+		inline float GetFOV() const { return m_FOV; }
+		inline float GetRatio() const { return m_ratio; }
+		inline float GetSize() const { return m_size; }
 
-		inline const PrCore::Math::mat4& GetProjectionMatrix() { return m_projectionMatrix; }
-		inline const PrCore::Math::mat4& GetViewMatrix() { return m_viewMatrix; }
-		inline const PrCore::Math::mat4& GetCameraMatrix() { return m_cameraMatrix; }
+		inline const PrCore::Math::mat4& GetProjectionMatrix() const { return m_projectionMatrix; }
+		inline const PrCore::Math::mat4& GetViewMatrix() const { return m_viewMatrix; }
+		inline const PrCore::Math::mat4& GetCameraMatrix() const { return m_cameraMatrix; }
 
 		const PrCore::Math::mat4& RecalculateMatrices();
 
