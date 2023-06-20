@@ -135,7 +135,7 @@ namespace PrRenderer::Core {
 	{
 		bool operator()(const Renderer3D::SortPair& a, const Renderer3D::SortPair& b) const
 		{
-			return a.first.GetDepth() < b.first.GetDepth();
+			return a.first.GetDepth() > b.first.GetDepth();
 		}
 	};
 }

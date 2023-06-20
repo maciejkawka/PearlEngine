@@ -39,6 +39,26 @@ namespace PrRenderer::Core {
 		Always
 	};
 
+	enum class BlendingAlgorithm
+	{
+		Zero,
+		One,
+		SourceColor,
+		OneMinusSorceColor,
+		DestinationColor,
+		OneMinusDestinationColor,
+		SourceAlpha,
+		OneMinusSourceAlpha,
+		DestinationAlpha,
+		OneMinusDestinationAlpha
+	};
+
+	enum class CullFaceMode
+	{
+		Back,
+		Front,
+		BackAndFront
+	};
 
 	class RendererAPI {
 	public:
@@ -54,8 +74,14 @@ namespace PrRenderer::Core {
 		virtual void SetDepthTest(bool p_enable) = 0;
 		virtual void SetDepthAlgorythm(ComparaisonAlgorithm p_algorythm) = 0;
 
+		virtual void EnableBlending(bool p_enable) = 0;
+		virtual void SetBlendingAlgorythm(BlendingAlgorithm p_source, BlendingAlgorithm p_dest) = 0;
+
 		virtual void Draw(Buffers::VertexArrayPtr p_vertexArray, Primitives p_primitives = Primitives::Triangles) = 0;
 		virtual void DrawArray(Buffers::VertexBufferPtr p_vertexArray, Primitives p_primitives = Primitives::Triangles) = 0;
+
+		virtual void EnableCullFace(bool p_enable) = 0;
+		virtual void SetCullFaceMode(CullFaceMode p_mode) = 0;
 
 		inline static GraphicsAPI GetGraphicsAPI() { return m_graphicsAPI; }
 

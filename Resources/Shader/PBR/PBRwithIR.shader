@@ -63,9 +63,10 @@ uniform sampler2D normalMap;
 uniform sampler2D metallicMap;
 uniform sampler2D roughnessMap;
 uniform sampler2D aoMap;
+uniform sampler2D transparencyMap;
 
 // material textures
-uniform vec3 albedoValue;
+uniform vec4 albedoValue;
 uniform float metallicValue;
 uniform float roughnessValue;
 uniform float aoValue = 1.0;
@@ -82,6 +83,7 @@ uniform vec3 ambientColor; //To be add in future
 
 //Additional
 uniform vec3 camPos;
+uniform bool transparent;
 uniform bool normalMapping;
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -139,7 +141,7 @@ void main()
     float aoTex = texture(aoMap, IN.uv0).r;
 
     //Get textures and values combined
-    vec3 albedo = albedoTex + albedoValue;
+    vec3 albedo = albedoTex + albedoValue.rgb;
     float metallic = metallicTex + metallicValue;
     float roughness = roughnessTex + roughnessValue;
     float ao = aoTex + aoValue;
@@ -238,9 +240,13 @@ void main()
     vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
-    vec3 ambient = (kD * diffuse + specular) * ao;
+    float transparentTex = 1.0;
+    if(transparent)
+        transparentTex = min(texture(transparencyMap, IN.uv0).r + albedoValue.a, 1.0);
+
+    vec3 ambient = (kD * diffuse * transparentTex + specular) * ao;
     
-    vec3 color = ambient + Lo;
+    vec3 color = ambient + Lo * transparentTex;
 
     //tone maping    
     color = color/(color + vec3(1.0));
@@ -248,5 +254,5 @@ void main()
     //gamma correction
     color = pow(color, vec3(1.0/2.2));
 
-    FragColor = vec4(color,1.0);
+    FragColor = vec4(color,transparentTex);
 } 

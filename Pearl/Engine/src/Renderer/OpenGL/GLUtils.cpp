@@ -217,6 +217,50 @@ unsigned int PrRenderer::OpenGL::ComparaisonToGL(Core::ComparaisonAlgorithm p_al
 	}
 }
 
+unsigned int PrRenderer::OpenGL::BlendingToGL(Core::BlendingAlgorithm p_algorythm)
+{
+	switch(p_algorythm)
+	{
+	case Core::BlendingAlgorithm::Zero: 
+		return GL_ZERO;
+	case Core::BlendingAlgorithm::One:
+		return GL_ONE;
+	case Core::BlendingAlgorithm::SourceColor:
+		return GL_SRC_COLOR;
+	case Core::BlendingAlgorithm::OneMinusSorceColor:
+		return GL_ONE_MINUS_SRC_COLOR;
+	case Core::BlendingAlgorithm::DestinationColor:
+		return GL_DST_COLOR;
+	case Core::BlendingAlgorithm::OneMinusDestinationColor:
+		return GL_ONE_MINUS_DST_COLOR;
+	case Core::BlendingAlgorithm::SourceAlpha:
+		return GL_SRC_ALPHA;
+	case Core::BlendingAlgorithm::OneMinusSourceAlpha:
+		return GL_ONE_MINUS_SRC_ALPHA;
+	case Core::BlendingAlgorithm::DestinationAlpha:
+		return GL_DST_ALPHA;
+	case Core::BlendingAlgorithm::OneMinusDestinationAlpha:
+		return GL_ONE_MINUS_DST_ALPHA;
+	default:
+		return -1;
+	}
+}
+
+unsigned int PrRenderer::OpenGL::CullFaceToGL(Core::CullFaceMode p_mode)
+{
+	switch (p_mode)
+	{
+	case Core::CullFaceMode::Back:
+		return GL_BACK;
+	case Core::CullFaceMode::Front:
+		return GL_FRONT;
+	case Core::CullFaceMode::BackAndFront:
+		return GL_FRONT_AND_BACK;
+	default:
+		return -1;
+	}
+}
+
 unsigned int PrRenderer::OpenGL::BoolToGL(bool p_bool)
 {
 	if (p_bool)

@@ -63,6 +63,16 @@ void LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm p_algorythm)
 	m_rendererAPI->SetDepthAlgorythm(p_algorythm);
 }
 
+void LowRenderer::EnableBlending(bool p_enable)
+{
+	m_rendererAPI->EnableBlending(p_enable);
+}
+
+void LowRenderer::SetBlendingAlgorythm(BlendingAlgorithm p_source, BlendingAlgorithm p_dest)
+{
+	m_rendererAPI->SetBlendingAlgorythm(p_source, p_dest);
+}
+
 void LowRenderer::Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives)
 {
 	m_rendererAPI->Draw(p_vertexArray, p_primitives);
@@ -71,4 +81,14 @@ void LowRenderer::Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p
 void LowRenderer::DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives)
 {
 	m_rendererAPI->DrawArray(p_vertexArray, p_primitives);
+}
+
+void LowRenderer::EnableCullFace(bool p_enable)
+{
+	m_rendererAPI->EnableCullFace(p_enable);
+}
+
+void LowRenderer::SetCullFaceMode(CullFaceMode p_mode)
+{
+	m_rendererAPI->SetCullFaceMode(p_mode);
 }

@@ -37,8 +37,8 @@ namespace PrRenderer::Core {
 		//static void SetCullFace();
 
 		//Blending
-		//static void EnableBlending();
-		//static void SetBlendingAlgorythm();
+		static void EnableBlending(bool p_enable);
+		static void SetBlendingAlgorythm(BlendingAlgorithm p_source, BlendingAlgorithm p_dest);
 
 		//Color Masks
 		// static void SetColorMask()
@@ -48,6 +48,9 @@ namespace PrRenderer::Core {
 		static void Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles);
 		static void DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles);
 
+		//Other
+		static void EnableCullFace(bool p_enable);
+		static void SetCullFaceMode(CullFaceMode p_mode);
 	private:
 		inline static RendererAPI* m_rendererAPI = nullptr;
 

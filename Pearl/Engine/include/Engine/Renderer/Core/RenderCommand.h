@@ -42,6 +42,16 @@ namespace PrRenderer::Core
 		RenderData m_renderData;
 	};
 
+	class TransparentMeshRenderRC: public MeshRenderRC {
+	public:
+		TransparentMeshRenderRC() = delete;
+		TransparentMeshRenderRC(MeshRenderObject&& p_meshRenderObject, const RenderData& p_renderData):
+		MeshRenderRC(std::move(p_meshRenderObject), p_renderData)
+		{}
+
+		void Invoke(const Camera* p_camera) override;
+	};
+
 	class InstancedMeshesRC : public MeshRenderRC {
 		InstancedMeshesRC() = delete;
 		InstancedMeshesRC(MeshRenderObject&& p_meshRenderObject, const RenderData& p_renderData) :

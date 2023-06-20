@@ -27,6 +27,7 @@ Renderer3D::Renderer3D()
 
 void Renderer3D::Begin()
 {
+	LowRenderer::EnableCullFace(true);
 	LowRenderer::EnableDepth(true);
 	LowRenderer::Clear(Core::ClearFlag::ColorBuffer | ClearFlag::DepthBuffer);
 	LowRenderer::ClearColor(0.1f, 0.1f, 0.8f, 1.0f);
@@ -155,7 +156,7 @@ void Renderer3D::Render()
 	std::sort(m_transparentMeshPriority.begin(), m_transparentMeshPriority.end(), TransparenctySort());
 	for (auto& [_, object] : m_transparentMeshPriority)
 	{
-		m_RCQueue.push(new MeshRenderRC(std::move(*object), renderData));
+		m_RCQueue.push(new TransparentMeshRenderRC(std::move(*object), renderData));
 	}
 	PRLOG_INFO("RENDERED FINISHED");
 }

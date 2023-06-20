@@ -14,7 +14,8 @@ namespace PrRenderer::OpenGL {
 	//Renderer
 	unsigned int PrimitiveToGL(Core::Primitives p_primitives);
 	unsigned int ComparaisonToGL(Core::ComparaisonAlgorithm p_algorythm);
-
+	unsigned int BlendingToGL(Core::BlendingAlgorithm p_algorythm);
+	unsigned int CullFaceToGL(Core::CullFaceMode p_mode);
 
 	//General
 	unsigned int BoolToGL(bool p_bool);

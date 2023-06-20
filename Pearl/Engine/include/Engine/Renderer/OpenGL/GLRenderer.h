@@ -19,8 +19,13 @@ namespace PrRenderer::OpenGL {
 		void SetDepthTest(bool p_enable) override;
 		void SetDepthAlgorythm(Core::ComparaisonAlgorithm p_algorythm) override;
 
+		void EnableBlending(bool p_enable) override;
+		void SetBlendingAlgorythm(Core::BlendingAlgorithm p_source, Core::BlendingAlgorithm p_dest) override;
+
 		void Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles) override;
 		void DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles) override;
 
+		void EnableCullFace(bool p_enable) override;
+		void SetCullFaceMode(Core::CullFaceMode p_mode) override;
 	};
 }
