@@ -104,8 +104,8 @@ void MeshRendererSystem::OnUpdate(float p_dt)
 		MeshRenderObject object;
 		object.mesh = mesh;
 		object.material = material;
-		object.castShadow = false;
 		object.worldMat = std::move(modelMatrix);
+		object.position = std::move(position);
 		Renderer3D::GetInstance().AddMeshRenderObject(std::move(object));
 	}
 }

@@ -9,6 +9,7 @@
 #include"Core/Resources/ResourceLoader.h"
 
 #include "Renderer/Buffers/Framebuffer.h"
+#include "Renderer/Core/BoundingVolume.h"
 
 using namespace PrRenderer::Core;
 
@@ -78,10 +79,23 @@ void Renderer3D::SetAmbientLight(Color p_ambientColor)
 
 void Renderer3D::AddMeshRenderObject(MeshRenderObject&& p_meshRenderObject)
 {
+	//Frustrum culling
+	////Discard if out of frustrum
+	const auto frustrum = Frustrum(m_mainCamera->GetProjectionMatrix(), m_mainCamera->GetViewMatrix());
+	const auto bundingBox = BoxVolume(p_meshRenderObject.mesh->GetVertices());
+	if (!bundingBox.IsOnFrustrum(frustrum, p_meshRenderObject.worldMat))
+		return;
+
+	//
+
 	//Calculate sorting hash
 	std::uint32_t hashName = std::hash<std::string>{}(p_meshRenderObject.material->GetName());
+	RenderSortingHash hash(p_meshRenderObject);
+	hash.SetDepth(CalculateDepthValue(p_meshRenderObject.position));
+	//
 
-	if(!p_meshRenderObject.isTransparent)
+	//Add objects to the list
+	if(p_meshRenderObject.material->GetRenderType() == Resources::RenderType::Opaque)
 	{
 		if (m_opaqueMeshObjects.size() >= m_opaqueMeshObjects.capacity())
 		{
@@ -90,7 +104,7 @@ void Renderer3D::AddMeshRenderObject(MeshRenderObject&& p_meshRenderObject)
 		}
 
 		m_opaqueMeshObjects.push_back( p_meshRenderObject);
-		m_opaqueMeshPriority.push_back({ hashName, m_opaqueMeshObjects.end() - 1 });
+		m_opaqueMeshPriority.push_back({ hash, m_opaqueMeshObjects.end() - 1 });
 	}
 	else
 	{
@@ -101,7 +115,7 @@ void Renderer3D::AddMeshRenderObject(MeshRenderObject&& p_meshRenderObject)
 		}
 
 		m_transparentMeshObjects.push_back(p_meshRenderObject);
-		m_transparentMeshPriority.push_back({ hashName, m_transparentMeshObjects.end() - 1 });
+		m_transparentMeshPriority.push_back({ hash, m_transparentMeshObjects.end() - 1 });
 	}
 }
 
@@ -133,16 +147,17 @@ void Renderer3D::Render()
 	std::sort(m_opaqueMeshPriority.begin(), m_opaqueMeshPriority.end());
 	for (auto& [_, object] : m_opaqueMeshPriority)
 	{
+		PRLOG_INFO("RENDERING {0}", object->mesh->GetName());
 		m_RCQueue.push(new MeshRenderRC(std::move(*object), renderData));
 	}
 
 	//Render Transparent
-	std::sort(m_transparentMeshPriority.begin(), m_transparentMeshPriority.end());
+	std::sort(m_transparentMeshPriority.begin(), m_transparentMeshPriority.end(), TransparenctySort());
 	for (auto& [_, object] : m_transparentMeshPriority)
 	{
 		m_RCQueue.push(new MeshRenderRC(std::move(*object), renderData));
 	}
-
+	PRLOG_INFO("RENDERED FINISHED");
 }
 
 void Renderer3D::Flush()
@@ -321,3 +336,9 @@ void Renderer3D::GenerateLUTMap()
 
 	PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<Resources::Shader>("LUTMap.shader");
 }
+
+//size_t Renderer3D::CalculateDepthValue(const PrCore::Math::vec3& p_position)
+//{
+//	auto distance = PrCore::Math::distance(p_position, m_mainCamera->GetPosition());
+//	return (distance - m_mainCamera->GetNear()) / (m_mainCamera->GetFar() - m_mainCamera->GetNear());
+//}

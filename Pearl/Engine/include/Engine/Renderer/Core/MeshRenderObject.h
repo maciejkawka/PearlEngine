@@ -10,9 +10,10 @@ namespace PrRenderer::Core {
 
         Resources::MeshPtr mesh;
         Resources::MaterialPtr material;
-        PrCore::Math::mat4 worldMat;
 
-        bool isTransparent = false;
+        PrCore::Math::mat4 worldMat;
+        PrCore::Math::vec3 position;
+
         bool castShadow = false;
     };
 }
