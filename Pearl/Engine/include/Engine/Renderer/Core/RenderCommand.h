@@ -25,6 +25,14 @@ namespace PrRenderer::Core
 		bool hasCubeMap;
 	};
 
+	struct InstancedMeshObject {
+		Resources::MeshPtr mesh;
+		Resources::MaterialPtr material;
+
+		size_t instanceCount;
+		std::vector<PrCore::Math::mat4> wordMatrices;
+	};
+
 	class MeshRenderRC: public RenderCommand {
 	public:
 		MeshRenderRC() = delete;
@@ -52,13 +60,19 @@ namespace PrRenderer::Core
 		void Invoke(const Camera* p_camera) override;
 	};
 
-	class InstancedMeshesRC : public MeshRenderRC {
+	class InstancedMeshesRC : public RenderCommand {
+	public:
 		InstancedMeshesRC() = delete;
-		InstancedMeshesRC(MeshRenderObject&& p_meshRenderObject, const RenderData& p_renderData) :
-			MeshRenderRC(std::move(p_meshRenderObject), p_renderData)
+		InstancedMeshesRC(InstancedMeshObject&& p_instancedMeshObject, const RenderData& p_renderData) :
+			m_instancedMeshObject(p_instancedMeshObject),
+			m_renderData(p_renderData)
 		{}
 
 		void Invoke(const Camera* p_camera) override;
+
+	protected:
+		InstancedMeshObject m_instancedMeshObject;
+		RenderData m_renderData;
 	};
 
 	class CubemapRenderRC: public RenderCommand {

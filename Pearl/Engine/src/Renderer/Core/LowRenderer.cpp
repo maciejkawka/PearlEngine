@@ -83,6 +83,11 @@ void LowRenderer::DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primit
 	m_rendererAPI->DrawArray(p_vertexArray, p_primitives);
 }
 
+void LowRenderer::DrawInstanced(Buffers::VertexArrayPtr p_vertexArray, size_t p_instanceCount, Primitives p_primitives)
+{
+	m_rendererAPI->DrawInstanced(p_vertexArray, p_instanceCount, p_primitives);
+}
+
 void LowRenderer::EnableCullFace(bool p_enable)
 {
 	m_rendererAPI->EnableCullFace(p_enable);

@@ -10,11 +10,15 @@
 #include"Core/Events/Event.h"
 #include"Core/Utils/Singleton.h"
 
+#include"Core/Resources/ResourceLoader.h"
+
 #include<queue>
 
 #define MAX_LIGHTNUM 4
 #define MAX_OPAQUE_RENDERABLES 2500
 #define MAX_TRANSPARENT_RENDERABLES 2500
+#define MAX_INSTANCE_COUNT 200
+#define MIN_INSTANCE_COUNT 1
 
 namespace PrRenderer::Core {
 
@@ -96,12 +100,14 @@ namespace PrRenderer::Core {
 		void GeneratePrefilterMap();
 		void GenerateLUTMap();
 
-		size_t CalculateDepthValue(const PrCore::Math::vec3& p_position)
-		{
-			auto distance = PrCore::Math::distance(p_position, m_mainCamera->GetPosition());
-			return (distance - m_mainCamera->GetNear()) / (m_mainCamera->GetFar() - m_mainCamera->GetNear()) * 0xFFFFFFFF;
-		}
+		//Instancing
+		inline void CreateInstancesOpaqueMesh();
 
+		//Other
+		size_t CalculateDepthValue(const PrCore::Math::vec3& p_position);
+
+		/////////////////////////////////
+		
 		//PBR Maps
 		Resources::MaterialPtr m_cubemap;
 		Resources::CubemapPtr m_IRMap;
@@ -138,4 +144,84 @@ namespace PrRenderer::Core {
 			return a.first.GetDepth() > b.first.GetDepth();
 		}
 	};
+}
+
+void PrRenderer::Core::Renderer3D::CreateInstancesOpaqueMesh()
+{
+	//Inital variables
+	auto instancedShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("PBR/PBRwithIR_Instanced.shader");
+	PR_ASSERT(instancedShader != nullptr, "Instance shader was not found");
+
+	std::vector<MeshObjectPriority::iterator> instancedObjCandidates;
+	instancedObjCandidates.reserve(m_opaqueMeshObjects.size());
+
+	RenderData renderData{
+	m_lightData,
+	m_IRMap,
+	m_prefilteredMap,
+	m_LUTMap,
+	m_color,
+	false
+	};
+
+	if (m_prefilteredMap && m_IRMap && m_LUTMap != nullptr)
+		renderData.hasCubeMap = true;
+
+
+	for (auto it = m_opaqueMeshPriority.begin(); it != m_opaqueMeshPriority.end(); ++it)
+	{
+		auto& prorityHash = it->first;
+		auto materialHash = prorityHash.GetMaterialHash();
+		auto renderOrder = prorityHash.GetRenderOrder();
+
+		//Find candidates to instance
+		size_t instanceCount = 0;
+		MeshObjectPriority::iterator innerIt;
+		for(innerIt = it; innerIt != m_opaqueMeshPriority.end() && innerIt->first.GetMaterialHash() == materialHash; ++innerIt)
+		{
+			auto candidateMatHash = innerIt->first;
+			//Is it a good candidate to instantiate
+			if (candidateMatHash.GetMaterialHash() == materialHash && candidateMatHash.GetRenderOrder() == renderOrder)
+			{
+				instancedObjCandidates.push_back(innerIt);
+				instanceCount++;
+			}
+		}
+		it = innerIt - 1;
+
+		//Check if worth instancing
+		if (instanceCount > MIN_INSTANCE_COUNT)
+		{
+			for (int i = 0; i < instanceCount; )
+			{
+				//Grab all data
+				Resources::MeshPtr mesh = instancedObjCandidates[i]->second->mesh;
+				Resources::MaterialPtr material = instancedObjCandidates[i]->second->material;
+				Resources::MaterialPtr instancedMaterial = std::make_shared<Resources::Material>(instancedShader);
+				instancedMaterial->CopyPropertiesFrom(*material);
+				std::vector<PrCore::Math::mat4> matrices;
+				matrices.reserve(MAX_INSTANCE_COUNT);
+
+				size_t j = 0;
+				for (auto objectIt = instancedObjCandidates.begin() + i; objectIt != instancedObjCandidates.end() && j < MAX_INSTANCE_COUNT; ++objectIt, j++)
+				{
+					auto object = *objectIt;
+					matrices.push_back(std::move(object->second->worldMat));
+					object->second = m_opaqueMeshObjects.end();
+				}
+				i += j;
+
+				InstancedMeshObject mehsObject {
+					mesh,
+					instancedMaterial,
+					j,
+					std::move(matrices)
+				};
+
+				m_RCQueue.push(new InstancedMeshesRC(std::move(mehsObject), renderData));
+			}
+		}
+
+		instancedObjCandidates.clear();
+	}
 }

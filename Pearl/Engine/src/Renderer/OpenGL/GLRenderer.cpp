@@ -88,6 +88,15 @@ void GLRenderer::DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primiti
 	glDrawArrays(PrimitiveToGL(p_primitives), 0, p_vertexArray->GetVertexNumber());
 }
 
+void GLRenderer::DrawInstanced(Buffers::VertexArrayPtr p_vertexArray, size_t p_instanceCount, Core::Primitives p_primitives)
+{
+	auto indices = p_vertexArray->GetIndexBuffer();
+	if (indices == nullptr)
+		glDrawArraysInstanced(PrimitiveToGL(p_primitives), 0, p_vertexArray->GetVertexBuffers()[0]->GetVertexNumber(), p_instanceCount);
+	else
+		glDrawElementsInstanced(PrimitiveToGL(p_primitives), indices->GetSize(), GL_UNSIGNED_INT, 0, p_instanceCount);
+}
+
 void GLRenderer::EnableCullFace(bool p_enable)
 {
 	if (p_enable)

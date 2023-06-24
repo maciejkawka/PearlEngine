@@ -37,15 +37,20 @@ namespace PrRenderer::Resources {
 		void SetColor(const Core::Color& p_color);
 		const Core::Color& GetColor();
 
-		inline void SetShader(ShaderPtr p_shader) { m_shader = p_shader; }
+		inline void SetShader(ShaderPtr p_shader)
+		{
+			m_shader = p_shader;
+			m_uniforms = m_shader->GetAllUniforms();
+		}
+
 		inline ShaderPtr GetShader() { return m_shader; }
-		inline bool HasShader() { return m_shader != nullptr; }
+		inline bool HasShader() const { return m_shader != nullptr; }
 
 		inline void SetRenderOrder(size_t p_renderOrder) { m_renderOrder = p_renderOrder; }
-		inline size_t GetRenderOrder() { return m_renderOrder; }
+		inline size_t GetRenderOrder() const  { return m_renderOrder; }
 
 		inline void SetRenderType(RenderType p_renderType) { m_renderType = p_renderType; }
-		inline RenderType GetRenderType() { return m_renderType; }
+		inline RenderType GetRenderType() const { return m_renderType; }
 
 		void Bind();
 		void Unbind();
@@ -60,6 +65,8 @@ namespace PrRenderer::Resources {
 		PrCore::Math::vec2 GetTexOffset(const std::string& p_name);
 
 		bool HasProperty(const std::string& p_name);
+
+		void CopyPropertiesFrom(const Material& p_material);
 
 		//Templated
 		template<typename T>

@@ -46,8 +46,8 @@ Material::Material(const Material& p_material):
 	m_shader = p_material.m_shader;
 	m_uniforms = p_material.m_uniforms;
 
-	m_renderType = RenderType::Opaque;
-	m_renderOrder = 0;
+	m_renderType = p_material.GetRenderType();
+	m_renderOrder = p_material.GetRenderOrder();
 
 	m_textures = p_material.m_textures;
 }
@@ -226,6 +226,23 @@ PrCore::Math::vec2 Material::GetTexOffset(const std::string& p_name)
 bool Material::HasProperty(const std::string& p_name)
 {
 	return m_uniforms.find(p_name) != m_uniforms.end();
+}
+
+void Material::CopyPropertiesFrom(const Material& p_material)
+{
+	m_renderType = p_material.GetRenderType();
+	m_renderOrder = p_material.GetRenderOrder();
+	m_textures = p_material.m_textures;
+
+	for(auto& uniformObject : p_material.m_uniforms)
+	{
+		auto& uniformName = uniformObject.first;
+		auto& unform = uniformObject.second;
+
+		auto find = m_uniforms.find(uniformName);
+		if(find != m_uniforms.end() && find->second.type == unform.type)
+			find->second.value = unform.value;
+	}
 }
 
 void Material::PreLoadImpl()

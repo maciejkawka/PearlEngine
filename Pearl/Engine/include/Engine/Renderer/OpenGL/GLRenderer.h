@@ -24,6 +24,7 @@ namespace PrRenderer::OpenGL {
 
 		void Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles) override;
 		void DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles) override;
+		void DrawInstanced(Buffers::VertexArrayPtr p_vertexArray, size_t p_instanceCount, Core::Primitives p_primitives) override;
 
 		void EnableCullFace(bool p_enable) override;
 		void SetCullFaceMode(Core::CullFaceMode p_mode) override;

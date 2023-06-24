@@ -17,7 +17,33 @@ using namespace PrEditor::Components;
 
 TestFeatures::TestFeatures()
 {
-	PrCore::ECS::SceneManager::GetInstance().LoadScene("SceneECS.pearl");
+	auto scene1 = PrCore::ECS::SceneManager::GetInstance().LoadScene("SceneECS.pearl");
+
+	//Add Sphere
+	auto sphereMaterial1 = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("PBR_IR_ValuesSphere.mat");
+	//sphereMaterial1->SetProperty("roughnessValue", 0.99f);
+	//sphereMaterial1->SetProperty("metallicValue", 0.01f);
+	//sphereMaterial1->SetProperty("albedoValue", PrCore::Math::vec4(1.0f, 0.65f, 0.0f, 0.6f));
+	//sphereMaterial1->SetProperty("aoValue", 1.0f);
+	sphereMaterial1->SetRenderType(PrRenderer::Resources::RenderType::Opaque);
+
+	auto sphereMesh1 = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Sphere);
+	//sphereMaterial1->SetProperty("albedoValue", PrCore::Math::vec4(1.0f, 0, 0, 0));
+
+
+	for (int i = 0; i < 20; i++)
+	{
+		for (int j = 0; j < 20; j++)
+		{
+			auto sphere = scene1->CreateEntity("Sphere " + std::to_string(i) + "_" + std::to_string(j));
+			auto spheretransform = sphere.AddComponent<PrCore::ECS::TransformComponent>();
+			spheretransform->SetPosition(PrCore::Math::vec3(i * 5, j * 5, -10));
+			spheretransform->SetLocalScale(PrCore::Math::vec3(2, 2, 2));
+			auto meshRenderer1 = sphere.AddComponent<PrCore::ECS::MeshRendererComponent>();
+			meshRenderer1->material = sphereMaterial1;
+			meshRenderer1->mesh = sphereMesh1;
+		}
+	}
 
 	return;
 

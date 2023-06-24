@@ -47,6 +47,7 @@ namespace PrRenderer::Core {
 		//Draw
 		static void Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles);
 		static void DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles);
+		static void DrawInstanced(Buffers::VertexArrayPtr p_vertexArray, size_t p_instanceCount, Primitives p_primitives = Primitives::Triangles);
 
 		//Other
 		static void EnableCullFace(bool p_enable);

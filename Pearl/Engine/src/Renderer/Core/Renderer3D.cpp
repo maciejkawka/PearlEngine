@@ -5,7 +5,7 @@
 #include"Renderer/Core/Camera.h"
 
 #include"Core/Events/WindowEvents.h"
-#include"Core/Events/EventManager.h"  //Cannot debug with this line.
+//#include"Core/Events/EventManager.h"  //Cannot debug with this line.
 #include"Core/Resources/ResourceLoader.h"
 
 #include "Renderer/Buffers/Framebuffer.h"
@@ -15,9 +15,9 @@ using namespace PrRenderer::Core;
 
 Renderer3D::Renderer3D()
 {
-	PrCore::Events::EventListener windowResizedListener;
-	windowResizedListener.connect<&Renderer3D::OnWindowResize>(this);
-	PrCore::Events::EventManager::GetInstance().AddListener(windowResizedListener, PrCore::Events::WindowResizeEvent::s_type);
+	//PrCore::Events::EventListener windowResizedListener;
+	//windowResizedListener.connect<&Renderer3D::OnWindowResize>(this);
+	//PrCore::Events::EventManager::GetInstance().AddListener(windowResizedListener, PrCore::Events::WindowResizeEvent::s_type);
 	m_color = PrCore::Math::vec3(0.0f);
 
 
@@ -143,13 +143,20 @@ void Renderer3D::Render()
 	if(m_cubemap)
 		m_RCQueue.push(new CubemapRenderRC(m_cubemap));
 
-
 	//Render Opaque
 	std::sort(m_opaqueMeshPriority.begin(), m_opaqueMeshPriority.end());
+
+	//Try instancing
+	CreateInstancesOpaqueMesh();
+
+	//Normal render
 	for (auto& [_, object] : m_opaqueMeshPriority)
 	{
-		PRLOG_INFO("RENDERING {0}", object->mesh->GetName());
-		m_RCQueue.push(new MeshRenderRC(std::move(*object), renderData));
+		if(object != m_opaqueMeshObjects.end())
+		{
+			//PRLOG_INFO("RENDERING {0}", object->mesh->GetName());
+			m_RCQueue.push(new MeshRenderRC(std::move(*object), renderData));
+		}
 	}
 
 	//Render Transparent
@@ -158,7 +165,7 @@ void Renderer3D::Render()
 	{
 		m_RCQueue.push(new TransparentMeshRenderRC(std::move(*object), renderData));
 	}
-	PRLOG_INFO("RENDERED FINISHED");
+	//PRLOG_INFO("RENDERED FINISHED");
 }
 
 void Renderer3D::Flush()
@@ -338,8 +345,77 @@ void Renderer3D::GenerateLUTMap()
 	PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<Resources::Shader>("LUTMap.shader");
 }
 
-//size_t Renderer3D::CalculateDepthValue(const PrCore::Math::vec3& p_position)
+//void Renderer3D::CreateInstancesOpaqueMesh()
 //{
-//	auto distance = PrCore::Math::distance(p_position, m_mainCamera->GetPosition());
-//	return (distance - m_mainCamera->GetNear()) / (m_mainCamera->GetFar() - m_mainCamera->GetNear());
+//	for (auto it = m_opaqueMeshPriority.begin(); it <= m_opaqueMeshPriority.end(); ++it)
+//	{
+//		auto iterator = it->second;
+//		auto prorityHash = it->first;
+//		auto materialHash = prorityHash.GetMaterialHash();
+//		auto renderOrder = prorityHash.GetRenderOrder();
+//
+//		//Find candidates to instance
+//		size_t instanceCount = 0;
+//		std::vector<MeshObjectPriority::iterator> m_instancedObjects;
+//		auto localIt = it;
+//		do
+//		{
+//			auto candidateMatHash = localIt->first;
+//			if (candidateMatHash.GetMaterialHash() == materialHash && candidateMatHash.GetRenderOrder() == renderOrder)
+//			{
+//				m_instancedObjects.push_back(localIt);
+//				instanceCount++;
+//			}
+//
+//			++localIt;
+//		} while (localIt->first.GetMaterialHash() == materialHash);
+//
+//		//If worth instancing
+//		if (instanceCount >= MIN_INSTANCE_COUNT)
+//		{
+//			auto instancedShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("PBR/PBRwithIR_Instanced.shader");
+//			PR_ASSERT(instancedShader != nullptr, "Instance shader was not found");
+//
+//			for (int i = 0; i < instanceCount; )
+//			{
+//				//Grab all data
+//				Resources::MeshPtr mesh = m_instancedObjects[0]->second->mesh;
+//				Resources::MaterialPtr material = m_instancedObjects[0]->second->material;
+//				Resources::MaterialPtr instancedMaterial = std::make_shared<Resources::Material>(instancedShader);
+//				instancedMaterial->CopyPropertiesFrom(*material);
+//
+//				std::vector<PrCore::Math::mat4> matrices;
+//				for (auto object : m_instancedObjects)
+//				{
+//					matrices.push_back(std::move(object->second->worldMat));
+//					m_opaqueMeshPriority.erase(object);
+//					i++;
+//				}
+//
+//				RenderData renderData{
+//					m_lightData,
+//					m_IRMap,
+//					m_prefilteredMap,
+//					m_LUTMap,
+//					m_color,
+//					false
+//				};
+//
+//				InstancedMeshObject mehsObject{
+//					mesh,
+//					instancedMaterial,
+//					instanceCount,
+//					std::move(matrices)
+//				};
+//
+//				m_RCQueue.push(new InstancedMeshesRC(std::move(mehsObject), renderData));
+//			}
+//		}
+//	}
 //}
+
+size_t Renderer3D::CalculateDepthValue(const PrCore::Math::vec3& p_position)
+{
+	auto distance = PrCore::Math::distance(p_position, m_mainCamera->GetPosition());
+	return (distance - m_mainCamera->GetNear()) / (m_mainCamera->GetFar() - m_mainCamera->GetNear());
+}

@@ -79,7 +79,7 @@ namespace PrRenderer::Core {
 
 		virtual void Draw(Buffers::VertexArrayPtr p_vertexArray, Primitives p_primitives = Primitives::Triangles) = 0;
 		virtual void DrawArray(Buffers::VertexBufferPtr p_vertexArray, Primitives p_primitives = Primitives::Triangles) = 0;
-
+		virtual void DrawInstanced(Buffers::VertexArrayPtr p_vertexArray, size_t p_instanceCount, Primitives p_primitives = Primitives::Triangles) = 0;
 		virtual void EnableCullFace(bool p_enable) = 0;
 		virtual void SetCullFaceMode(CullFaceMode p_mode) = 0;
 
