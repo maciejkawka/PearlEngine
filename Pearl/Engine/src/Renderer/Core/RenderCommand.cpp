@@ -31,9 +31,6 @@ void MeshRenderRC::Invoke()
 	if (material->HasProperty("modelMatrix"))
 		material->SetProperty("modelMatrix", m_meshRenderObject.worldMat);
 
-	if (material->HasProperty("MVP"))
-		material->SetProperty("MVP", VPMatrix * m_meshRenderObject.worldMat);
-
 	if (material->HasProperty("ambientColor"))
 		material->SetProperty("ambientColor", m_renderData->ambientColor);
 

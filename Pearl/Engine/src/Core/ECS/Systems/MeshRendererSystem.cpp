@@ -93,19 +93,11 @@ void MeshRendererSystem::OnUpdate(float p_dt)
 		auto material = meshRenderer->material;
 		auto mesh = meshRenderer->mesh;
 
-		//Calculate modelMatrix
-		auto position = transform->GetPosition();
-		auto rotation = transform->GetRotation();
-		auto scale = transform->GetScale();
-		auto modelMatrix = PrCore::Math::translate(PrCore::Math::mat4(1.0f), position);
-		modelMatrix = modelMatrix * PrCore::Math::mat4_cast(rotation);
-		modelMatrix *= PrCore::Math::scale(PrCore::Math::mat4(1.0f), scale);
-
 		MeshRenderObject object;
 		object.mesh = mesh;
 		object.material = material;
-		object.worldMat = std::move(modelMatrix);
-		object.position = std::move(position);
+		object.worldMat = std::move(transform->GetWorldMatrix());
+		object.position = std::move(transform->GetPosition());
 		Renderer3D::GetInstance().AddMeshRenderObject(std::move(object));
 	}
 }

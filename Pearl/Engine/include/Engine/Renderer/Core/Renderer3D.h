@@ -48,15 +48,13 @@ namespace PrRenderer::Core {
 		void SetAmbientLight(Color p_ambientColor);
 
 		void AddMeshRenderObject(MeshRenderObject&& p_meshRenderObject);
-		void DrawMeshNow(Resources::MeshPtr p_mesh, PrCore::Math::vec3 p_position, PrCore::Math::quat p_rotation, PrCore::Math::vec3 p_scale, Resources::MaterialPtr p_material);
+		void DrawMesh(Resources::MeshPtr p_mesh, PrCore::Math::vec3 p_position, PrCore::Math::quat p_rotation, PrCore::Math::vec3 p_scale, Resources::MaterialPtr p_material);
 
 		void Begin();
 		void Render();
 		void Flush();
 		
 	private:
-		//using MeshRenderBuffer = RenderBuffer<MeshRenderObject, RenderSortingHash>;
-
 		Renderer3D();
 
 		//Events
@@ -83,15 +81,10 @@ namespace PrRenderer::Core {
 		Resources::ShaderPtr m_instancingShader;
 		bool m_useInstancing = true;
 
-		/////////////////////////////////
 		//Stored rendered objects
 		//Mesh Objects
-		RenderBuffer<MeshRenderObject, RenderSortingHash> m_opaqueObjects;
-		RenderBuffer<MeshRenderObject, RenderSortingHash, RenderSortingHash::TransparenctySort> m_transparentObjects;
-
-		//More objects in future
-
-		/////////////////////////////////
+		RenderObjectsBuffer<MeshRenderObject, RenderSortingHash> m_opaqueObjects;
+		RenderObjectsBuffer<MeshRenderObject, RenderSortingHash, RenderSortingHash::TransparenctySort> m_transparentObjects;
 
 		//RenderCommand
 		using RenderCommandQueue = std::queue<RenderCommand*>;

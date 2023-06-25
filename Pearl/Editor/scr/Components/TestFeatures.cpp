@@ -21,7 +21,7 @@ TestFeatures::TestFeatures()
 
 	//Add Sphere
 	auto sphereMaterial1 = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("PBR_IR_ValuesSphere.mat");
-	//sphereMaterial1->SetProperty("roughnessValue", 0.99f);
+	sphereMaterial1->SetProperty("roughnessValue", 0.99f);
 	//sphereMaterial1->SetProperty("metallicValue", 0.01f);
 	//sphereMaterial1->SetProperty("albedoValue", PrCore::Math::vec4(1.0f, 0.65f, 0.0f, 0.6f));
 	//sphereMaterial1->SetProperty("aoValue", 1.0f);

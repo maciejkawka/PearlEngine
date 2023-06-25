@@ -9,7 +9,6 @@ namespace PrRenderer::Core {
 
 	class RenderSortingHash {
 	public:
-
 		//Sorting Structs
 		struct TransparenctySort
 		{
@@ -19,8 +18,6 @@ namespace PrRenderer::Core {
 			}
 		};
 
-		/////////////////////////////////////////////
-		///
 		RenderSortingHash(const MeshRenderObject& p_renderObject)
 		{
 
@@ -30,7 +27,7 @@ namespace PrRenderer::Core {
 			m_hash = materialHash << 32 | renderOrder << 24;
 		}
 
-		void SetDepth(size_t p_depth)
+		inline void SetDepth(size_t p_depth)
 		{
 			m_hash |= p_depth & 0xFFFFFF;
 		}
@@ -48,17 +45,17 @@ namespace PrRenderer::Core {
 			return m_hash & 0xFFFFFF;
 		}
 
-		bool operator<(const RenderSortingHash& rhs) const
+		inline bool operator<(const RenderSortingHash& rhs) const
 		{
 			return this->m_hash < rhs.m_hash;
 		}
 
-		bool operator>(const RenderSortingHash& rhs) const
+		inline bool operator>(const RenderSortingHash& rhs) const
 		{
 			return this->m_hash > rhs.m_hash;
 		}
 
-		bool operator==(const RenderSortingHash& rhs) const
+		inline bool operator==(const RenderSortingHash& rhs) const
 		{
 			return this->m_hash == rhs.m_hash;
 		}
@@ -67,28 +64,30 @@ namespace PrRenderer::Core {
 		std::uint64_t m_hash;
 	};
 
-	template<class Object, class SortingKey = RenderSortingHash, class Compare = std::less<SortingKey>>
-	class RenderBuffer {
+	template<class RenderObject, class SortingHash = RenderSortingHash, class Compare = std::less<SortingHash>>
+	class RenderObjectsBuffer {
 		using compare_func = Compare;
-		using ObjectBuffer = std::vector<Object>;
-		using ObjectPair = std::pair<SortingKey, Object*>;
+		using ObjectStorage = std::vector<RenderObject>;
+		using BufferPair = std::pair<SortingHash, RenderObject*>;
 	public:
-		using ObjectPriorityVector = std::vector<ObjectPair>;
-		using iterator = typename ObjectPriorityVector::iterator;
-		using const_iterator = typename ObjectPriorityVector::const_iterator;
-		using reverse_iterator = typename ObjectPriorityVector::reverse_iterator;
-		using const_reverse_iterator = typename ObjectPriorityVector::const_reverse_iterator;
-		using reference = typename ObjectPriorityVector::reference;
-		using const_reference = typename ObjectPriorityVector::const_reference;
+		using ObjectBuffer = std::vector<BufferPair>;
+		using key_type = SortingHash;
+		using value_type = RenderObject;
+		using iterator = typename ObjectBuffer::iterator;
+		using const_iterator = typename ObjectBuffer::const_iterator;
+		using reverse_iterator = typename ObjectBuffer::reverse_iterator;
+		using const_reverse_iterator = typename ObjectBuffer::const_reverse_iterator;
+		using reference = typename ObjectBuffer::reference;
+		using const_reference = typename ObjectBuffer::const_reference;
 
-	public:
+	private:
 		class CompareHelper {
 		public:
 			CompareHelper(const compare_func& p_compare) :
 				m_compare(p_compare)
 			{}
 
-			bool operator()(const ObjectPair& a, const ObjectPair& b) const
+			bool operator()(const BufferPair& a, const BufferPair& b) const
 			{
 				return m_compare.operator()(a.first, b.first);
 			}
@@ -97,33 +96,34 @@ namespace PrRenderer::Core {
 			const compare_func& m_compare;
 		};
 
-		RenderBuffer();
-		RenderBuffer(const compare_func& p_compare);
-		RenderBuffer(const compare_func& p_compare, size_t p_capcity);
+	public:
+		RenderObjectsBuffer();
+		RenderObjectsBuffer(const compare_func& p_compare);
+		RenderObjectsBuffer(const compare_func& p_compare, size_t p_capcity);
 
-		~RenderBuffer() = default;
+		~RenderObjectsBuffer() = default;
 
 		//Vector Fuctions
 		//Element access
-		inline reference operator[](size_t p_pos) { return m_objectsPriority[p_pos]; }
-		inline const_reference operator[](size_t p_pos) const { return m_objectsPriority[p_pos]; }
-		inline reference front() { return m_objectsPriority.front(); }
-		inline const_reference front() const { return m_objectsPriority.front(); }
-		inline reference back() { return m_objectsPriority.back(); }
-		inline const_reference back() const { return m_objectsPriority.back(); }
-		inline Object* data() { return m_objectsPriority.data(); }
-		inline const Object* data() const { return m_objectsPriority.data(); }
+		inline reference operator[](size_t p_pos) { return m_objectBuffer[p_pos]; }
+		inline const_reference operator[](size_t p_pos) const { return m_objectBuffer[p_pos]; }
+		inline reference front() { return m_objectBuffer.front(); }
+		inline const_reference front() const { return m_objectBuffer.front(); }
+		inline reference back() { return m_objectBuffer.back(); }
+		inline const_reference back() const { return m_objectBuffer.back(); }
+		inline RenderObject* data() { return m_objectBuffer.data(); }
+		inline const RenderObject* data() const { return m_objectBuffer.data(); }
 
 		//Iterators
-		inline iterator begin() { return m_objectsPriority.begin(); }
-		inline const_iterator cbegin() const { return m_objectsPriority.cbegin(); }
-		inline iterator end() { return m_objectsPriority.end(); }
-		inline const_iterator cend() const { return m_objectsPriority.cend(); }
+		inline iterator begin() { return m_objectBuffer.begin(); }
+		inline const_iterator cbegin() const { return m_objectBuffer.cbegin(); }
+		inline iterator end() { return m_objectBuffer.end(); }
+		inline const_iterator cend() const { return m_objectBuffer.cend(); }
 
-		inline reverse_iterator rbegin() { return m_objectsPriority.rbegin(); }
-		inline const_reverse_iterator crbegin() const { return m_objectsPriority.crbegin(); }
-		inline reverse_iterator rend() { return m_objectsPriority.rend(); }
-		inline const_reverse_iterator crend() const { return m_objectsPriority.crend(); }
+		inline reverse_iterator rbegin() { return m_objectBuffer.rbegin(); }
+		inline const_reverse_iterator crbegin() const { return m_objectBuffer.crbegin(); }
+		inline reverse_iterator rend() { return m_objectBuffer.rend(); }
+		inline const_reverse_iterator crend() const { return m_objectBuffer.crend(); }
 
 		//Capacity
 		void empty();
@@ -137,8 +137,8 @@ namespace PrRenderer::Core {
 		iterator erase(iterator p_first, iterator p_last);
 		iterator erase(const_iterator p_pos);
 		iterator erase(const_iterator p_first, const_iterator p_last);
-		void push_back(const SortingKey& p_hash, Object& p_renderObject);
-		void push_back(SortingKey&& p_hash, Object&& p_renderObject);
+		void push_back(const SortingHash& p_hash, RenderObject& p_renderObject);
+		void push_back(SortingHash&& p_hash, RenderObject&& p_renderObject);
 		void pop_back();
 
 		//Sorting
@@ -146,114 +146,114 @@ namespace PrRenderer::Core {
 		Compare key_compare();
 
 	private:
-		ObjectBuffer m_objectsBuffer;
-		ObjectPriorityVector m_objectsPriority;
+		ObjectStorage m_objectStorage;
+		ObjectBuffer m_objectBuffer;
 	};
 
 	template<class object, class sortingKey, class compare>
-	void RenderBuffer<object, sortingKey, compare>::clear()
+	void RenderObjectsBuffer<object, sortingKey, compare>::clear()
 	{
-		m_objectsPriority.clear();
-		m_objectsBuffer.clear();
+		m_objectBuffer.clear();
+		m_objectStorage.clear();
 	}
 
 	template<class Object, class SortingKey, class Compare>
-	typename RenderBuffer<Object, SortingKey, Compare>::iterator RenderBuffer<Object, SortingKey, Compare>::erase(iterator p_pos)
+	typename RenderObjectsBuffer<Object, SortingKey, Compare>::iterator RenderObjectsBuffer<Object, SortingKey, Compare>::erase(iterator p_pos)
 	{
-		return m_objectsPriority.erase(p_pos);
+		return m_objectBuffer.erase(p_pos);
 	}
 
 	template<class Object, class SortingKey, class Compare>
-	typename RenderBuffer<Object, SortingKey, Compare>::iterator RenderBuffer<Object, SortingKey, Compare>::erase(iterator p_first, iterator p_last)
+	typename RenderObjectsBuffer<Object, SortingKey, Compare>::iterator RenderObjectsBuffer<Object, SortingKey, Compare>::erase(iterator p_first, iterator p_last)
 	{
-		return m_objectsPriority.erase(p_first, p_last);
+		return m_objectBuffer.erase(p_first, p_last);
 	}
 
 	template<class Object, class SortingKey, class Compare>
-	typename RenderBuffer<Object, SortingKey, Compare>::iterator RenderBuffer<Object, SortingKey, Compare>::erase(const_iterator p_pos)
+	typename RenderObjectsBuffer<Object, SortingKey, Compare>::iterator RenderObjectsBuffer<Object, SortingKey, Compare>::erase(const_iterator p_pos)
 	{
-		return m_objectsPriority.erase(p_pos);
+		return m_objectBuffer.erase(p_pos);
 	}
 
 	template<class Object, class SortingKey, class Compare>
-	typename RenderBuffer<Object, SortingKey, Compare>::iterator RenderBuffer<Object, SortingKey, Compare>::erase(const_iterator p_first, const_iterator p_last)
+	typename RenderObjectsBuffer<Object, SortingKey, Compare>::iterator RenderObjectsBuffer<Object, SortingKey, Compare>::erase(const_iterator p_first, const_iterator p_last)
 	{
-		return m_objectsPriority.erase(p_first, p_last);
+		return m_objectBuffer.erase(p_first, p_last);
 	}
 
 	template<class Object, class SortingKey, class Compare>
-	void RenderBuffer<Object, SortingKey, Compare>::push_back(const SortingKey& p_hash, Object& p_renderObject)
+	void RenderObjectsBuffer<Object, SortingKey, Compare>::push_back(const SortingKey& p_hash, Object& p_renderObject)
 	{
-		m_objectsBuffer.push_back(p_renderObject);
-		m_objectsPriority.push_back({ p_hash, &m_objectsBuffer.back() });
+		m_objectStorage.push_back(p_renderObject);
+		m_objectBuffer.push_back({ p_hash, &m_objectStorage.back() });
 	}
 
 	template<class Object, class SortingKey, class Compare>
-	void RenderBuffer<Object, SortingKey, Compare>::push_back(SortingKey&& p_hash, Object&& p_renderObject)
+	void RenderObjectsBuffer<Object, SortingKey, Compare>::push_back(SortingKey&& p_hash, Object&& p_renderObject)
 	{
-		m_objectsBuffer.push_back(std::move(p_renderObject));
-		m_objectsPriority.push_back({ std::move(p_hash), &m_objectsBuffer.back() });
+		m_objectStorage.push_back(std::move(p_renderObject));
+		m_objectBuffer.push_back({ std::move(p_hash), &m_objectStorage.back() });
 	}
 
 	template<class Object, class SortingKey, class Compare>
-	void RenderBuffer<Object, SortingKey, Compare>::pop_back()
+	void RenderObjectsBuffer<Object, SortingKey, Compare>::pop_back()
 	{
-		m_objectsPriority.pop_back();
+		m_objectBuffer.pop_back();
 	}
 
 	template<class Object, class SortingKey, class Compare>
-	void RenderBuffer<Object, SortingKey, Compare>::Sort()
+	void RenderObjectsBuffer<Object, SortingKey, Compare>::Sort()
 	{
-		std::sort(m_objectsPriority.begin(), m_objectsPriority.end(), CompareHelper(Compare()));
+		std::sort(m_objectBuffer.begin(), m_objectBuffer.end(), CompareHelper(Compare()));
 	}
 
 	template<class Object, class SortingKey, class Compare>
-	Compare RenderBuffer<Object, SortingKey, Compare>::key_compare()
+	Compare RenderObjectsBuffer<Object, SortingKey, Compare>::key_compare()
 	{
 		return static_cast<Compare>(*this);
 	}
 
 	template<class Object, class SortingKey, class Compare>
-	RenderBuffer<Object, SortingKey, Compare>::RenderBuffer()
+	RenderObjectsBuffer<Object, SortingKey, Compare>::RenderObjectsBuffer()
 	{
 	}
 
 	template<class Object, class SortingKey, class Compare>
-	RenderBuffer<Object, SortingKey, Compare>::RenderBuffer(const compare_func& p_compare) :
+	RenderObjectsBuffer<Object, SortingKey, Compare>::RenderObjectsBuffer(const compare_func& p_compare) :
 		compare_func(p_compare)
 	{
 	}
 
 	template<class Object, class SortingKey, class Compare>
-	RenderBuffer<Object, SortingKey, Compare>::RenderBuffer(const compare_func& p_compare, size_t p_capcity) :
+	RenderObjectsBuffer<Object, SortingKey, Compare>::RenderObjectsBuffer(const compare_func& p_compare, size_t p_capcity) :
 		compare_func(p_compare)
 	{
-		m_objectsBuffer.reserve(p_capcity);
-		m_objectsPriority.reserve(p_capcity);
+		m_objectStorage.reserve(p_capcity);
+		m_objectBuffer.reserve(p_capcity);
 	}
 
 	template<class Object, class SortingKey, class Compare>
-	void RenderBuffer<Object, SortingKey, Compare>::empty()
+	void RenderObjectsBuffer<Object, SortingKey, Compare>::empty()
 	{
-		m_objectsPriority.empty();
+		m_objectBuffer.empty();
 	}
 
 	template<class Object, class SortingKey, class Compare>
-	size_t RenderBuffer<Object, SortingKey, Compare>::size()
+	size_t RenderObjectsBuffer<Object, SortingKey, Compare>::size()
 	{
-		return m_objectsPriority.size();
+		return m_objectBuffer.size();
 	}
 
 	template<class Object, class SortingKey, class Compare>
-	void RenderBuffer<Object, SortingKey, Compare>::reserve(size_t p_newCap)
+	void RenderObjectsBuffer<Object, SortingKey, Compare>::reserve(size_t p_newCap)
 	{
-		m_objectsPriority.reserve(p_newCap);
-		m_objectsBuffer.reserve(p_newCap);
+		m_objectBuffer.reserve(p_newCap);
+		m_objectStorage.reserve(p_newCap);
 	}
 
 	template<class Object, class SortingKey, class Compare>
-	size_t RenderBuffer<Object, SortingKey, Compare>::capacity()
+	size_t RenderObjectsBuffer<Object, SortingKey, Compare>::capacity()
 	{
-		return m_objectsPriority.capacity();
+		return m_objectBuffer.capacity();
 	}
 }

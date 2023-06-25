@@ -6,8 +6,6 @@
 
 #include"Core/Events/WindowEvents.h"
 #include"Core/Events/EventManager.h"  //Cannot debug with this line.
-#include <random>
-
 #include"Core/Resources/ResourceLoader.h"
 
 #include "Renderer/Buffers/Framebuffer.h"
@@ -21,7 +19,6 @@ Renderer3D::Renderer3D()
 	windowResizedListener.connect<&Renderer3D::OnWindowResize>(this);
 	PrCore::Events::EventManager::GetInstance().AddListener(windowResizedListener, PrCore::Events::WindowResizeEvent::s_type);
 	m_renderData.ambientColor = PrCore::Math::vec3(0.0f);
-
 
 	m_opaqueObjects.reserve(MAX_OPAQUE_RENDERABLES);
 	m_transparentObjects.reserve(MAX_TRANSPARENT_RENDERABLES);
@@ -99,7 +96,6 @@ void Renderer3D::AddMeshRenderObject(MeshRenderObject&& p_meshRenderObject)
 	RenderSortingHash hash(p_meshRenderObject);
 	hash.SetDepth(CalculateDepthValue(p_meshRenderObject.position));
 
-
 	//Add objects to the list
 	if(p_meshRenderObject.material->GetRenderType() == Resources::RenderType::Opaque)
 	{
@@ -123,9 +119,24 @@ void Renderer3D::AddMeshRenderObject(MeshRenderObject&& p_meshRenderObject)
 	}
 }
 
-void Renderer3D::DrawMeshNow(Resources::MeshPtr p_mesh, PrCore::Math::vec3 p_position, PrCore::Math::quat p_rotation, PrCore::Math::vec3 p_scale, Resources::MaterialPtr p_material)
+void Renderer3D::DrawMesh(Resources::MeshPtr p_mesh, PrCore::Math::vec3 p_position, PrCore::Math::quat p_rotation, PrCore::Math::vec3 p_scale, Resources::MaterialPtr p_material)
 {
-	//TODO
+	//Calculate modelMatrix
+	auto position = p_position;
+	auto rotation = p_rotation;
+	auto scale = p_scale;
+	auto modelMatrix = PrCore::Math::translate(PrCore::Math::mat4(1.0f), position);
+	modelMatrix = modelMatrix * PrCore::Math::mat4_cast(rotation);
+	modelMatrix *= PrCore::Math::scale(PrCore::Math::mat4(1.0f), scale);
+
+	MeshRenderObject object{
+		p_mesh,
+		p_material,
+		std::move(modelMatrix),
+		std::move(position)
+	};
+
+	AddMeshRenderObject(std::move(object));
 }
 
 void Renderer3D::Render()
