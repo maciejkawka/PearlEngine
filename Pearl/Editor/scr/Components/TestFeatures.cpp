@@ -25,10 +25,10 @@ TestFeatures::TestFeatures()
 	//sphereMaterial1->SetProperty("metallicValue", 0.01f);
 	//sphereMaterial1->SetProperty("albedoValue", PrCore::Math::vec4(1.0f, 0.65f, 0.0f, 0.6f));
 	//sphereMaterial1->SetProperty("aoValue", 1.0f);
-	sphereMaterial1->SetRenderType(PrRenderer::Resources::RenderType::Opaque);
+	sphereMaterial1->SetRenderType(PrRenderer::Resources::RenderType::Transparent);
 
 	auto sphereMesh1 = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Sphere);
-	//sphereMaterial1->SetProperty("albedoValue", PrCore::Math::vec4(1.0f, 0, 0, 0));
+	sphereMaterial1->SetProperty("albedoValue", PrCore::Math::vec4(1.0f, 0.05f, 0, 0.5f));
 
 
 	for (int i = 0; i < 20; i++)
@@ -41,6 +41,24 @@ TestFeatures::TestFeatures()
 			spheretransform->SetLocalScale(PrCore::Math::vec3(2, 2, 2));
 			auto meshRenderer1 = sphere.AddComponent<PrCore::ECS::MeshRendererComponent>();
 			meshRenderer1->material = sphereMaterial1;
+			meshRenderer1->mesh = sphereMesh1;
+		}
+	}
+
+	auto material2 = std::make_shared<PrRenderer::Resources::Material>(*sphereMaterial1);
+	material2->SetProperty("albedoValue", PrCore::Math::vec4(0.0f, 1.0f, 0.5f, 0.0f));
+	material2->SetRenderType(PrRenderer::Resources::RenderType::Opaque);
+
+	for (int i = 0; i < 20; i++)
+	{
+		for (int j = 0; j < 20; j++)
+		{
+			auto sphere = scene1->CreateEntity("Sphere " + std::to_string(i) + "_" + std::to_string(j));
+			auto spheretransform = sphere.AddComponent<PrCore::ECS::TransformComponent>();
+			spheretransform->SetPosition(PrCore::Math::vec3(i * 5, j * 5, -30));
+			spheretransform->SetLocalScale(PrCore::Math::vec3(2, 2, 2));
+			auto meshRenderer1 = sphere.AddComponent<PrCore::ECS::MeshRendererComponent>();
+			meshRenderer1->material = material2;
 			meshRenderer1->mesh = sphereMesh1;
 		}
 	}

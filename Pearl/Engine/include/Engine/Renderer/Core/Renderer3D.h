@@ -11,8 +11,6 @@
 #include"Core/Events/Event.h"
 #include"Core/Utils/Singleton.h"
 
-#include"Core/Resources/ResourceLoader.h"
-
 #include<queue>
 #include<algorithm>
 
@@ -20,23 +18,31 @@
 #define MAX_OPAQUE_RENDERABLES 2500
 #define MAX_TRANSPARENT_RENDERABLES 2500
 #define MAX_INSTANCE_COUNT 200
-#define MIN_INSTANCE_COUNT 1
+#define MIN_INSTANCE_COUNT 5
 
 namespace PrRenderer::Core {
 
+	struct RenderData {
+		std::vector<PrCore::Math::mat4>		lightData;
+		Resources::CubemapPtr				IRMap;
+		Resources::CubemapPtr				prefilterMap;
+		Resources::TexturePtr				brdfLUT;
+		PrCore::Math::vec3					ambientColor;
+		Camera*								mainCamera;
+
+		bool								hasCubeMap;
+	};
+
 	class Renderer3D: public PrCore::Utils::Singleton<Renderer3D> {
-	public:
-		
-		//using MeshObjectBuffer = std::vector<MeshRenderObject>;
-		//using SortPair = std::pair<RenderSortingHash, MeshObjectBuffer::iterator>;
-		//using MeshObjectPriority = std::vector<SortPair>;
-
-
+	public:		
 		void SetCubemap(Resources::MaterialPtr p_cubemap);
 		Resources::MaterialPtr GetCubemap() { return m_cubemap; }
 
 		void SetMainCamera(Camera* p_camera);
-		Camera* GetMainCamera() { return m_mainCamera; }
+		Camera* GetMainCamera() { return m_renderData.mainCamera; }
+
+		inline void EnableInstancing(bool p_enable) { m_useInstancing = p_enable; }
+		inline bool IsInstancingEnable() const { return m_useInstancing; }
 
 		void AddLight(const PrCore::Math::mat4& p_lightmMat);
 		void SetAmbientLight(Color p_ambientColor);
@@ -49,6 +55,8 @@ namespace PrRenderer::Core {
 		void Flush();
 		
 	private:
+		//using MeshRenderBuffer = RenderBuffer<MeshRenderObject, RenderSortingHash>;
+
 		Renderer3D();
 
 		//Events
@@ -60,36 +68,30 @@ namespace PrRenderer::Core {
 		void GenerateLUTMap();
 
 		//Instancing
-		inline void CreateInstancesOpaqueMesh();
+		template<class MeshRenderBuffer, bool renderUninstanced = true>
+		void InstantateMeshObjects(MeshRenderBuffer& p_meshRenderBuffer);
 
 		//Other
-		size_t CalculateDepthValue(const PrCore::Math::vec3& p_position);
-		Resources::ShaderPtr m_instancingShader;
+		size_t CalculateDepthValue(const PrCore::Math::vec3& p_position) const;
+
 		/////////////////////////////////
-		
-		//PBR Maps
+
+		//RenderData
+		RenderData m_renderData;
+
 		Resources::MaterialPtr m_cubemap;
-		Resources::CubemapPtr m_IRMap;
-		Resources::CubemapPtr m_prefilteredMap;
-		Resources::TexturePtr m_LUTMap;
+		Resources::ShaderPtr m_instancingShader;
+		bool m_useInstancing = true;
 
-		std::vector<PrCore::Math::mat4> m_lightData;
-		PrCore::Math::vec3 m_color;
-
-		Camera* m_mainCamera;
-
+		/////////////////////////////////
 		//Stored rendered objects
 		//Mesh Objects
 		RenderBuffer<MeshRenderObject, RenderSortingHash> m_opaqueObjects;
-		RenderBuffer<MeshRenderObject, RenderSortingHash> m_transparentObjects;
-		//MeshObjectBuffer m_opaqueMeshObjects;
-		//MeshObjectBuffer m_transparentMeshObjects;
-		//MeshObjectPriority m_opaqueMeshPriority;
-		//MeshObjectPriority m_transparentMeshPriority;
+		RenderBuffer<MeshRenderObject, RenderSortingHash, RenderSortingHash::TransparenctySort> m_transparentObjects;
 
 		//More objects in future
 
-		////
+		/////////////////////////////////
 
 		//RenderCommand
 		using RenderCommandQueue = std::queue<RenderCommand*>;
@@ -99,39 +101,24 @@ namespace PrRenderer::Core {
 	};
 }
 
-void PrRenderer::Core::Renderer3D::CreateInstancesOpaqueMesh()
+template<class MeshRenderBuffer, bool renderUninstanced>
+void PrRenderer::Core::Renderer3D::InstantateMeshObjects(MeshRenderBuffer& p_meshRenderBuffer)
 {
-	//Inital variables
-	//auto instancedShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("PBR/PBRwithIR_Instanced.shader");
-	//PR_ASSERT(instancedShader != nullptr, "Instance shader was not found");
-
 	std::vector<MeshRenderObject*> instancedObjCandidates;
-	instancedObjCandidates.reserve(m_opaqueObjects.size());
+	instancedObjCandidates.reserve(p_meshRenderBuffer.size());
 
-	RenderData renderData{
-	m_lightData,
-	m_IRMap,
-	m_prefilteredMap,
-	m_LUTMap,
-	m_color,
-	false
-	};
-
-	if (m_prefilteredMap && m_IRMap && m_LUTMap != nullptr)
-		renderData.hasCubeMap = true;
-
-	for (auto bufferIt = m_opaqueObjects.begin(); bufferIt != m_opaqueObjects.end();)
+	for (auto bufferIt = p_meshRenderBuffer.begin(); bufferIt != p_meshRenderBuffer.end();)
 	{
 		//First element Hash data
 		auto& prorityHash = bufferIt->first;
 		auto materialHash = prorityHash.GetMaterialHash();
 		auto renderOrder = prorityHash.GetRenderOrder();
 
-		//Find candidates to instance
+		//Find candidates to instantiate
 		size_t instanceCount = 0;
 		const auto innerItBegin = bufferIt;
-		while (bufferIt != m_opaqueObjects.end() && bufferIt->first.GetMaterialHash() == materialHash)
-		{
+		while (bufferIt != p_meshRenderBuffer.end() && bufferIt->first.GetMaterialHash() == materialHash)
+		{ 
 			//Is it a good candidate to instantiate
 			auto candidateHash = bufferIt->first;
 			if (candidateHash.GetMaterialHash() == materialHash && candidateHash.GetRenderOrder() == renderOrder)
@@ -145,14 +132,14 @@ void PrRenderer::Core::Renderer3D::CreateInstancesOpaqueMesh()
 		//Check if worth instancing
 		if (instanceCount > MIN_INSTANCE_COUNT)
 		{
-			//Grab all data
+			//Grab common data for all instanced chunk
 			Resources::MeshPtr mesh = instancedObjCandidates[0]->mesh;
 			Resources::MaterialPtr material = instancedObjCandidates[0]->material;
 			Resources::MaterialPtr instancedMaterial = std::make_shared<Resources::Material>(m_instancingShader);
 			instancedMaterial->CopyPropertiesFrom(*material);
+
 			std::vector<PrCore::Math::mat4> matrices;
 			matrices.reserve(MAX_INSTANCE_COUNT);
-
 			for (int i = 0; i < instanceCount; )
 			{
 				while (i < instancedObjCandidates.size() && matrices.size() < MAX_INSTANCE_COUNT)
@@ -168,16 +155,22 @@ void PrRenderer::Core::Renderer3D::CreateInstancesOpaqueMesh()
 					std::move(matrices)
 				};
 
-				m_RCQueue.push(new InstancedMeshesRC(std::move(mehsObject), renderData));
+				m_RCQueue.push(new InstancedMeshesRC(std::move(mehsObject), &m_renderData));
 				matrices.clear();
 			}
 
 			//Erase instanced objects from the buffer
-			bufferIt = m_opaqueObjects.erase(innerItBegin, bufferIt);
+			bufferIt = p_meshRenderBuffer.erase(innerItBegin, bufferIt);
 		}
 		else
 		{
-			//Render non instanced object in correct order
+			if constexpr (renderUninstanced == true)
+			{
+				//Render non instanced object in correct order
+				for (auto object : instancedObjCandidates)
+					m_RCQueue.push(new MeshRenderRC(std::move(*object), &m_renderData));
+				bufferIt = p_meshRenderBuffer.erase(innerItBegin, bufferIt);
+			}
 		}
 
 		instancedObjCandidates.clear();

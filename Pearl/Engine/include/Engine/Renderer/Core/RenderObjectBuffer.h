@@ -24,15 +24,15 @@ namespace PrRenderer::Core {
 		RenderSortingHash(const MeshRenderObject& p_renderObject)
 		{
 
-			std::uint32_t materialHash = std::hash<Resources::MaterialPtr>{}(p_renderObject.material);
-			std::uint8_t renderOrder = p_renderObject.material->GetRenderOrder();
+			size_t materialHash = std::hash<Resources::MaterialPtr>{}(p_renderObject.material);
+			size_t renderOrder = p_renderObject.material->GetRenderOrder();
 
-			m_hash = (uint64_t)materialHash << 32 | (uint64_t)50 << 24;
+			m_hash = materialHash << 32 | renderOrder << 24;
 		}
 
-		void SetDepth(uint32_t p_depth)
+		void SetDepth(size_t p_depth)
 		{
-			m_hash |= p_depth >> 8;
+			m_hash |= p_depth & 0xFFFFFF;
 		}
 
 		inline size_t GetRenderOrder() const

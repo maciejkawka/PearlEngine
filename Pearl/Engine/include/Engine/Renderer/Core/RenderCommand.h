@@ -1,91 +1,80 @@
 #pragma once
 
 #include"Renderer/Core/MeshRenderObject.h"
-#include"Renderer/Resources/Cubemap.h"
 #include"Renderer/Resources/Mesh.h"
 
 namespace PrRenderer::Core
 {
 	class Camera;
+	struct RenderData;
 
 	class RenderCommand {
 	public:
+		RenderCommand() = delete;
+		RenderCommand(const RenderData* p_renderData):
+		m_renderData(p_renderData)
+		{}
 		virtual ~RenderCommand() = default;
-		virtual void Invoke(const Camera* p_camera) = 0;
+
+		virtual void Invoke() = 0;
+
+	protected:
+		const RenderData* m_renderData;
 	};
 
+	class StateChangeRC: public RenderCommand {
+	public:
+		using StateChangeFunction = std::function<void()>;
+		StateChangeRC(StateChangeFunction p_stateCommand):
+		RenderCommand(nullptr)
+		{}
 
-	struct RenderData {
-		const std::vector<PrCore::Math::mat4>& lightData;
-		const PrRenderer::Resources::CubemapPtr irradianceMap;
-		const PrRenderer::Resources::CubemapPtr prefilterMap;
-		const PrRenderer::Resources::TexturePtr brdfLUT;
-		const PrCore::Math::vec3& ambientColor;
+		void Invoke() override;
 
-		bool hasCubeMap;
-	};
-
-	struct InstancedMeshObject {
-		Resources::MeshPtr mesh;
-		Resources::MaterialPtr material;
-
-		size_t instanceCount;
-		std::vector<PrCore::Math::mat4> wordMatrices;
+	private:
+		StateChangeFunction m_stateCommand;
 	};
 
 	class MeshRenderRC: public RenderCommand {
 	public:
 		MeshRenderRC() = delete;
-		MeshRenderRC(MeshRenderObject&& p_meshRenderObject, const RenderData& p_renderData):
-			m_meshRenderObject(p_meshRenderObject),
-			m_renderData(p_renderData)
-		{}
-		~MeshRenderRC()
+		MeshRenderRC(MeshRenderObject&& p_meshRenderObject, const RenderData* p_renderData):
+			RenderCommand(p_renderData),
+			m_meshRenderObject(p_meshRenderObject)
 		{}
 
-		void Invoke(const Camera* p_camera) override;
+		void Invoke() override;
 
 	protected:
 		MeshRenderObject m_meshRenderObject;
-		RenderData m_renderData;
-	};
-
-	class TransparentMeshRenderRC: public MeshRenderRC {
-	public:
-		TransparentMeshRenderRC() = delete;
-		TransparentMeshRenderRC(MeshRenderObject&& p_meshRenderObject, const RenderData& p_renderData):
-		MeshRenderRC(std::move(p_meshRenderObject), p_renderData)
-		{}
-
-		void Invoke(const Camera* p_camera) override;
 	};
 
 	class InstancedMeshesRC : public RenderCommand {
 	public:
 		InstancedMeshesRC() = delete;
-		InstancedMeshesRC(InstancedMeshObject&& p_instancedMeshObject, const RenderData& p_renderData) :
-			m_instancedMeshObject(p_instancedMeshObject),
-			m_renderData(p_renderData)
+		InstancedMeshesRC(InstancedMeshObject&& p_instancedMeshObject, const RenderData* p_renderData) :
+			RenderCommand(p_renderData),
+			m_instancedMeshObject(p_instancedMeshObject)
 		{}
 
-		void Invoke(const Camera* p_camera) override;
+		void Invoke() override;
 
 	protected:
 		InstancedMeshObject m_instancedMeshObject;
-		RenderData m_renderData;
 	};
 
 	class CubemapRenderRC: public RenderCommand {
 	public:
 		CubemapRenderRC() = delete;
-		CubemapRenderRC(PrRenderer::Resources::MaterialPtr p_cubemapMat):
+		CubemapRenderRC(PrRenderer::Resources::MaterialPtr p_cubemapMat, const RenderData* p_renderData):
+			RenderCommand(p_renderData),
 			m_cubemapMat(p_cubemapMat)
 		{
 			if(m_cubemapMesh == nullptr)
 				m_cubemapMesh = Resources::Mesh::CreatePrimitive(Resources::Quad);
 		}
 
-		void Invoke(const Camera* p_camera) override;
+		void Invoke() override;
 
 	protected:
 		//Maintain static quad for all cubemaps

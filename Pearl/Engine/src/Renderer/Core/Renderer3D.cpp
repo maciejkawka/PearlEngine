@@ -5,7 +5,9 @@
 #include"Renderer/Core/Camera.h"
 
 #include"Core/Events/WindowEvents.h"
-//#include"Core/Events/EventManager.h"  //Cannot debug with this line.
+#include"Core/Events/EventManager.h"  //Cannot debug with this line.
+#include <random>
+
 #include"Core/Resources/ResourceLoader.h"
 
 #include "Renderer/Buffers/Framebuffer.h"
@@ -15,10 +17,10 @@ using namespace PrRenderer::Core;
 
 Renderer3D::Renderer3D()
 {
-	//PrCore::Events::EventListener windowResizedListener;
-	//windowResizedListener.connect<&Renderer3D::OnWindowResize>(this);
-	//PrCore::Events::EventManager::GetInstance().AddListener(windowResizedListener, PrCore::Events::WindowResizeEvent::s_type);
-	m_color = PrCore::Math::vec3(0.0f);
+	PrCore::Events::EventListener windowResizedListener;
+	windowResizedListener.connect<&Renderer3D::OnWindowResize>(this);
+	PrCore::Events::EventManager::GetInstance().AddListener(windowResizedListener, PrCore::Events::WindowResizeEvent::s_type);
+	m_renderData.ambientColor = PrCore::Math::vec3(0.0f);
 
 
 	m_opaqueObjects.reserve(MAX_OPAQUE_RENDERABLES);
@@ -39,20 +41,22 @@ void Renderer3D::Begin()
 void Renderer3D::SetCubemap(Resources::MaterialPtr p_cubemap)
 {
 	m_cubemap.reset();
-	m_IRMap.reset();
-	m_prefilteredMap.reset();
-	m_LUTMap.reset();
+	m_renderData.IRMap.reset();
+	m_renderData.prefilterMap.reset();
+	m_renderData.brdfLUT.reset();
 
 	if (p_cubemap == nullptr)
 	{
 		auto blackTexture = Resources::Texture2D::GenerateBlackTexture();
-		m_IRMap = std::static_pointer_cast<Resources::Cubemap>(blackTexture);
-		m_prefilteredMap = std::static_pointer_cast<Resources::Cubemap>(blackTexture);
-		m_LUTMap = blackTexture;
+		m_renderData.IRMap = std::static_pointer_cast<Resources::Cubemap>(blackTexture);
+		m_renderData.prefilterMap = std::static_pointer_cast<Resources::Cubemap>(blackTexture);
+		m_renderData.brdfLUT = blackTexture;
+		m_renderData.hasCubeMap = false;
 		return;
 	}
 
 	m_cubemap = p_cubemap;
+	m_renderData.hasCubeMap = true;
 
 	GenerateIRMap();
 	GeneratePrefilterMap();
@@ -61,42 +65,40 @@ void Renderer3D::SetCubemap(Resources::MaterialPtr p_cubemap)
 
 void Renderer3D::SetMainCamera(Camera* p_camera)
 {
-	m_mainCamera = p_camera;
+	m_renderData.mainCamera = p_camera;
 	Camera::SetMainCamera(p_camera);
 }
 
 void Renderer3D::AddLight(const PrCore::Math::mat4& p_lightmMat)
 {
-	if (m_lightData.size() == MAX_LIGHTNUM)
+	if (m_renderData.lightData.size() == MAX_LIGHTNUM)
 	{
 		PRLOG_WARN("Renderer supports {0} lights only", MAX_LIGHTNUM);
 		return;
 	}
 
-	m_lightData.push_back(p_lightmMat);
+	m_renderData.lightData.push_back(p_lightmMat);
 }
 
 void Renderer3D::SetAmbientLight(Color p_ambientColor)
 {
-	m_color = p_ambientColor;
+	m_renderData.ambientColor = p_ambientColor;
 }
 
 void Renderer3D::AddMeshRenderObject(MeshRenderObject&& p_meshRenderObject)
 {
 	//Frustrum culling
 	////Discard if out of frustrum
-	const auto frustrum = Frustrum(m_mainCamera->GetProjectionMatrix(), m_mainCamera->GetViewMatrix());
+	const auto frustrum = Frustrum(m_renderData.mainCamera->GetProjectionMatrix(), m_renderData.mainCamera->GetViewMatrix());
 	const auto bundingBox = BoxVolume(p_meshRenderObject.mesh->GetVertices());
 	if (!bundingBox.IsOnFrustrum(frustrum, p_meshRenderObject.worldMat))
 		return;
-
-	//
 
 	//Calculate sorting hash
 	std::uint32_t hashName = std::hash<std::string>{}(p_meshRenderObject.material->GetName());
 	RenderSortingHash hash(p_meshRenderObject);
 	hash.SetDepth(CalculateDepthValue(p_meshRenderObject.position));
-	//
+
 
 	//Add objects to the list
 	if(p_meshRenderObject.material->GetRenderType() == Resources::RenderType::Opaque)
@@ -128,62 +130,44 @@ void Renderer3D::DrawMeshNow(Resources::MeshPtr p_mesh, PrCore::Math::vec3 p_pos
 
 void Renderer3D::Render()
 {
-	RenderData renderData{
-		m_lightData,
-		m_IRMap,
-		m_prefilteredMap,
-		m_LUTMap,
-		m_color,
-		false
-	};
-
-	if (m_prefilteredMap && m_IRMap && m_LUTMap != nullptr)
-		renderData.hasCubeMap = true;
-
 	//Render cubemap
 	if(m_cubemap)
-		m_RCQueue.push(new CubemapRenderRC(m_cubemap));
-
-	//Render Opaque
+		m_RCQueue.push(new CubemapRenderRC(m_cubemap, &m_renderData));
+	
 	m_opaqueObjects.Sort();
-
-	//Try instancing
-	CreateInstancesOpaqueMesh();
-
-	//Normal render
-	for (auto [_, object] : m_opaqueObjects)
-	{
-		if(object != nullptr)
-		{
-			//PRLOG_INFO("RENDERING {0}", object->mesh->GetName());
-			m_RCQueue.push(new MeshRenderRC(std::move(*object), renderData));
-		}
-	}
-
-	//Render Transparent
 	m_transparentObjects.Sort();
-	for (auto [_, object] : m_transparentObjects)
+
+	//Schedule rendering
+	if(m_useInstancing)
 	{
-		m_RCQueue.push(new TransparentMeshRenderRC(std::move(*object), renderData));
+		InstantateMeshObjects<decltype(m_opaqueObjects), true>(m_opaqueObjects);
+		InstantateMeshObjects<decltype(m_transparentObjects), true>(m_transparentObjects);
 	}
-	//PRLOG_INFO("RENDERED FINISHED");
+	//Render normal way
+	else
+	{
+		for (auto [_, object] : m_opaqueObjects)
+			m_RCQueue.push(new MeshRenderRC(std::move(*object), &m_renderData));
+		for (auto [_, object] : m_transparentObjects)
+			m_RCQueue.push(new MeshRenderRC(std::move(*object), &m_renderData));
+	}
 }
 
 void Renderer3D::Flush()
 {
-	m_mainCamera->RecalculateMatrices();
+	m_renderData.mainCamera->RecalculateMatrices();
 
 	while (!m_RCQueue.empty())
 	{
 		auto command = m_RCQueue.front();
-		command->Invoke(m_mainCamera);
+		command->Invoke();
 		delete command;
 		m_RCQueue.pop();
 	}
 
 	m_transparentObjects.clear();
 	m_opaqueObjects.clear();
-	m_lightData.clear();
+	m_renderData.lightData.clear();
 }
 
 void Renderer3D::OnWindowResize(PrCore::Events::EventPtr p_event)
@@ -239,7 +223,7 @@ void Renderer3D::GenerateIRMap()
 		LowRenderer::Draw(cube->GetVertexArray());
 	}
 
-	m_IRMap = std::static_pointer_cast<Resources::Cubemap>(framebuffer->GetTexturePtr(0));
+	m_renderData.IRMap = std::static_pointer_cast<Resources::Cubemap>(framebuffer->GetTexturePtr(0));
 
 	shader->Unbind();
 	cubemap->Unbind();
@@ -302,7 +286,7 @@ void Renderer3D::GeneratePrefilterMap()
 		}
 	}
 
-	m_prefilteredMap = std::static_pointer_cast<Resources::Cubemap>(framebuffer->GetTexturePtr());
+	m_renderData.prefilterMap = std::static_pointer_cast<Resources::Cubemap>(framebuffer->GetTexturePtr());
 
 	shader->Unbind();
 	cubemap->Unbind();
@@ -335,7 +319,7 @@ void Renderer3D::GenerateLUTMap()
 	LowRenderer::Clear(ClearFlag::ColorBuffer | ClearFlag::DepthBuffer);
 	LowRenderer::Draw(quad->GetVertexArray());
 
-	m_LUTMap = framebuffer->GetTexturePtr();
+	m_renderData.brdfLUT = framebuffer->GetTexturePtr();
 
 	shader->Unbind();
 	quad->Unbind();
@@ -344,77 +328,9 @@ void Renderer3D::GenerateLUTMap()
 	PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<Resources::Shader>("LUTMap.shader");
 }
 
-//void Renderer3D::CreateInstancesOpaqueMesh()
-//{
-//	for (auto it = m_opaqueMeshPriority.begin(); it <= m_opaqueMeshPriority.end(); ++it)
-//	{
-//		auto iterator = it->second;
-//		auto prorityHash = it->first;
-//		auto materialHash = prorityHash.GetMaterialHash();
-//		auto renderOrder = prorityHash.GetRenderOrder();
-//
-//		//Find candidates to instance
-//		size_t instanceCount = 0;
-//		std::vector<MeshObjectPriority::iterator> m_instancedObjects;
-//		auto localIt = it;
-//		do
-//		{
-//			auto candidateMatHash = localIt->first;
-//			if (candidateMatHash.GetMaterialHash() == materialHash && candidateMatHash.GetRenderOrder() == renderOrder)
-//			{
-//				m_instancedObjects.push_back(localIt);
-//				instanceCount++;
-//			}
-//
-//			++localIt;
-//		} while (localIt->first.GetMaterialHash() == materialHash);
-//
-//		//If worth instancing
-//		if (instanceCount >= MIN_INSTANCE_COUNT)
-//		{
-//			auto instancedShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("PBR/PBRwithIR_Instanced.shader");
-//			PR_ASSERT(instancedShader != nullptr, "Instance shader was not found");
-//
-//			for (int i = 0; i < instanceCount; )
-//			{
-//				//Grab all data
-//				Resources::MeshPtr mesh = m_instancedObjects[0]->second->mesh;
-//				Resources::MaterialPtr material = m_instancedObjects[0]->second->material;
-//				Resources::MaterialPtr instancedMaterial = std::make_shared<Resources::Material>(instancedShader);
-//				instancedMaterial->CopyPropertiesFrom(*material);
-//
-//				std::vector<PrCore::Math::mat4> matrices;
-//				for (auto object : m_instancedObjects)
-//				{
-//					matrices.push_back(std::move(object->second->worldMat));
-//					m_opaqueMeshPriority.erase(object);
-//					i++;
-//				}
-//
-//				RenderData renderData{
-//					m_lightData,
-//					m_IRMap,
-//					m_prefilteredMap,
-//					m_LUTMap,
-//					m_color,
-//					false
-//				};
-//
-//				InstancedMeshObject mehsObject{
-//					mesh,
-//					instancedMaterial,
-//					instanceCount,
-//					std::move(matrices)
-//				};
-//
-//				m_RCQueue.push(new InstancedMeshesRC(std::move(mehsObject), renderData));
-//			}
-//		}
-//	}
-//}
-
-size_t Renderer3D::CalculateDepthValue(const PrCore::Math::vec3& p_position)
+size_t Renderer3D::CalculateDepthValue(const PrCore::Math::vec3& p_position) const
 {
-	auto distance = PrCore::Math::distance(p_position, m_mainCamera->GetPosition());
-	return (distance - m_mainCamera->GetNear()) / (m_mainCamera->GetFar() - m_mainCamera->GetNear());
+	auto camera = m_renderData.mainCamera;
+	auto distance = PrCore::Math::distance(p_position, camera->GetPosition());
+	return (distance - camera->GetNear()) / (camera->GetFar() - camera->GetNear()) * 0xFFFFFF;
 }
