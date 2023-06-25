@@ -2,6 +2,7 @@
 #include"Renderer/Core/Camera.h"
 #include"Renderer/Core/Light.h"
 #include"Renderer/Core/RenderCommand.h"
+#include"Renderer/Core/RenderObjectBuffer.h"
 
 #include"Renderer/Resources/Mesh.h"
 #include"Renderer/Resources/Material.h"
@@ -13,6 +14,7 @@
 #include"Core/Resources/ResourceLoader.h"
 
 #include<queue>
+#include<algorithm>
 
 #define MAX_LIGHTNUM 4
 #define MAX_OPAQUE_RENDERABLES 2500
@@ -24,53 +26,10 @@ namespace PrRenderer::Core {
 
 	class Renderer3D: public PrCore::Utils::Singleton<Renderer3D> {
 	public:
-		class RenderSortingHash {
-		public:
-			RenderSortingHash(const MeshRenderObject& p_renderObject)
-			{
-
-				std::uint32_t materialHash = std::hash<Resources::MaterialPtr>{}(p_renderObject.material);
-				std::uint8_t renderOrder = p_renderObject.material->GetRenderOrder();
-
-				m_hash = (uint64_t)materialHash << 32 | (uint64_t)50 << 24;
-			}
-
-			void SetDepth(uint32_t p_depth)
-			{
-				m_hash |= p_depth >> 8;
-			}
-
-			inline size_t GetRenderOrder() const
-			{
-				return (m_hash & 0xFF000000) >> 24;
-			}
-			inline size_t GetMaterialHash() const
-			{
-				return m_hash >> 32;
-			}
-			inline size_t GetDepth() const
-			{
-				return m_hash & 0xFFFFFF;
-			}
-
-			bool operator<(const RenderSortingHash& rhs) const
-			{
-				return this->m_hash < rhs.m_hash;
-			}
-
-
-			bool operator==(const RenderSortingHash& rhs) const
-			{
-				return this->m_hash == rhs.m_hash;
-			}
-
-		private:
-			std::uint64_t m_hash;
-		};
-
-		using MeshObjectBuffer = std::vector<MeshRenderObject>;
-		using SortPair = std::pair<RenderSortingHash, MeshObjectBuffer::iterator>;
-		using MeshObjectPriority = std::vector<SortPair>;
+		
+		//using MeshObjectBuffer = std::vector<MeshRenderObject>;
+		//using SortPair = std::pair<RenderSortingHash, MeshObjectBuffer::iterator>;
+		//using MeshObjectPriority = std::vector<SortPair>;
 
 
 		void SetCubemap(Resources::MaterialPtr p_cubemap);
@@ -105,7 +64,7 @@ namespace PrRenderer::Core {
 
 		//Other
 		size_t CalculateDepthValue(const PrCore::Math::vec3& p_position);
-
+		Resources::ShaderPtr m_instancingShader;
 		/////////////////////////////////
 		
 		//PBR Maps
@@ -121,10 +80,12 @@ namespace PrRenderer::Core {
 
 		//Stored rendered objects
 		//Mesh Objects
-		MeshObjectBuffer m_opaqueMeshObjects;
-		MeshObjectBuffer m_transparentMeshObjects;
-		MeshObjectPriority m_opaqueMeshPriority;
-		MeshObjectPriority m_transparentMeshPriority;
+		RenderBuffer<MeshRenderObject, RenderSortingHash> m_opaqueObjects;
+		RenderBuffer<MeshRenderObject, RenderSortingHash> m_transparentObjects;
+		//MeshObjectBuffer m_opaqueMeshObjects;
+		//MeshObjectBuffer m_transparentMeshObjects;
+		//MeshObjectPriority m_opaqueMeshPriority;
+		//MeshObjectPriority m_transparentMeshPriority;
 
 		//More objects in future
 
@@ -136,24 +97,16 @@ namespace PrRenderer::Core {
 
 		friend Singleton<Renderer3D>;
 	};
-
-	struct TransparenctySort
-	{
-		bool operator()(const Renderer3D::SortPair& a, const Renderer3D::SortPair& b) const
-		{
-			return a.first.GetDepth() > b.first.GetDepth();
-		}
-	};
 }
 
 void PrRenderer::Core::Renderer3D::CreateInstancesOpaqueMesh()
 {
 	//Inital variables
-	auto instancedShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("PBR/PBRwithIR_Instanced.shader");
-	PR_ASSERT(instancedShader != nullptr, "Instance shader was not found");
+	//auto instancedShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("PBR/PBRwithIR_Instanced.shader");
+	//PR_ASSERT(instancedShader != nullptr, "Instance shader was not found");
 
-	std::vector<MeshObjectPriority::iterator> instancedObjCandidates;
-	instancedObjCandidates.reserve(m_opaqueMeshObjects.size());
+	std::vector<MeshRenderObject*> instancedObjCandidates;
+	instancedObjCandidates.reserve(m_opaqueObjects.size());
 
 	RenderData renderData{
 	m_lightData,
@@ -167,59 +120,64 @@ void PrRenderer::Core::Renderer3D::CreateInstancesOpaqueMesh()
 	if (m_prefilteredMap && m_IRMap && m_LUTMap != nullptr)
 		renderData.hasCubeMap = true;
 
-
-	for (auto it = m_opaqueMeshPriority.begin(); it != m_opaqueMeshPriority.end(); ++it)
+	for (auto bufferIt = m_opaqueObjects.begin(); bufferIt != m_opaqueObjects.end();)
 	{
-		auto& prorityHash = it->first;
+		//First element Hash data
+		auto& prorityHash = bufferIt->first;
 		auto materialHash = prorityHash.GetMaterialHash();
 		auto renderOrder = prorityHash.GetRenderOrder();
 
 		//Find candidates to instance
 		size_t instanceCount = 0;
-		MeshObjectPriority::iterator innerIt;
-		for(innerIt = it; innerIt != m_opaqueMeshPriority.end() && innerIt->first.GetMaterialHash() == materialHash; ++innerIt)
+		const auto innerItBegin = bufferIt;
+		while (bufferIt != m_opaqueObjects.end() && bufferIt->first.GetMaterialHash() == materialHash)
 		{
-			auto candidateMatHash = innerIt->first;
 			//Is it a good candidate to instantiate
-			if (candidateMatHash.GetMaterialHash() == materialHash && candidateMatHash.GetRenderOrder() == renderOrder)
+			auto candidateHash = bufferIt->first;
+			if (candidateHash.GetMaterialHash() == materialHash && candidateHash.GetRenderOrder() == renderOrder)
 			{
-				instancedObjCandidates.push_back(innerIt);
+				instancedObjCandidates.push_back(bufferIt->second);
 				instanceCount++;
 			}
+			++bufferIt;
 		}
-		it = innerIt - 1;
 
 		//Check if worth instancing
 		if (instanceCount > MIN_INSTANCE_COUNT)
 		{
+			//Grab all data
+			Resources::MeshPtr mesh = instancedObjCandidates[0]->mesh;
+			Resources::MaterialPtr material = instancedObjCandidates[0]->material;
+			Resources::MaterialPtr instancedMaterial = std::make_shared<Resources::Material>(m_instancingShader);
+			instancedMaterial->CopyPropertiesFrom(*material);
+			std::vector<PrCore::Math::mat4> matrices;
+			matrices.reserve(MAX_INSTANCE_COUNT);
+
 			for (int i = 0; i < instanceCount; )
 			{
-				//Grab all data
-				Resources::MeshPtr mesh = instancedObjCandidates[i]->second->mesh;
-				Resources::MaterialPtr material = instancedObjCandidates[i]->second->material;
-				Resources::MaterialPtr instancedMaterial = std::make_shared<Resources::Material>(instancedShader);
-				instancedMaterial->CopyPropertiesFrom(*material);
-				std::vector<PrCore::Math::mat4> matrices;
-				matrices.reserve(MAX_INSTANCE_COUNT);
-
-				size_t j = 0;
-				for (auto objectIt = instancedObjCandidates.begin() + i; objectIt != instancedObjCandidates.end() && j < MAX_INSTANCE_COUNT; ++objectIt, j++)
+				while (i < instancedObjCandidates.size() && matrices.size() < MAX_INSTANCE_COUNT)
 				{
-					auto object = *objectIt;
-					matrices.push_back(std::move(object->second->worldMat));
-					object->second = m_opaqueMeshObjects.end();
+					matrices.push_back(instancedObjCandidates[i]->worldMat);
+					i++;
 				}
-				i += j;
 
-				InstancedMeshObject mehsObject {
+				InstancedMeshObject mehsObject{
 					mesh,
 					instancedMaterial,
-					j,
+					matrices.size(),
 					std::move(matrices)
 				};
 
 				m_RCQueue.push(new InstancedMeshesRC(std::move(mehsObject), renderData));
+				matrices.clear();
 			}
+
+			//Erase instanced objects from the buffer
+			bufferIt = m_opaqueObjects.erase(innerItBegin, bufferIt);
+		}
+		else
+		{
+			//Render non instanced object in correct order
 		}
 
 		instancedObjCandidates.clear();

@@ -348,6 +348,7 @@
     <ClInclude Include="include\Engine\Renderer\Core\RenderCommand.h">
       <Filter>Renderer\Core</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Core\RenderObjectBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">

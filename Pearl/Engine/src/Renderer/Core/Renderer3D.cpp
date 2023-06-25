@@ -21,8 +21,11 @@ Renderer3D::Renderer3D()
 	m_color = PrCore::Math::vec3(0.0f);
 
 
-	m_transparentMeshObjects.reserve(MAX_OPAQUE_RENDERABLES);
-	m_opaqueMeshObjects.reserve(MAX_TRANSPARENT_RENDERABLES);
+	m_opaqueObjects.reserve(MAX_OPAQUE_RENDERABLES);
+	m_transparentObjects.reserve(MAX_TRANSPARENT_RENDERABLES);
+
+	m_instancingShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("PBR/PBRwithIR_Instanced.shader");
+	PR_ASSERT(m_instancingShader != nullptr, "Instance shader was not found");
 }
 
 void Renderer3D::Begin()
@@ -98,25 +101,23 @@ void Renderer3D::AddMeshRenderObject(MeshRenderObject&& p_meshRenderObject)
 	//Add objects to the list
 	if(p_meshRenderObject.material->GetRenderType() == Resources::RenderType::Opaque)
 	{
-		if (m_opaqueMeshObjects.size() >= m_opaqueMeshObjects.capacity())
+		if (m_opaqueObjects.size() >= m_opaqueObjects.capacity())
 		{
-			PRLOG_WARN("Renderer3D opaque buffer exceded the limit {0}, discarding object", m_opaqueMeshObjects.capacity());
+			PRLOG_WARN("Renderer3D opaque buffer exceded the limit {0}, discarding object", m_opaqueObjects.capacity());
 			return;
 		}
 
-		m_opaqueMeshObjects.push_back( p_meshRenderObject);
-		m_opaqueMeshPriority.push_back({ hash, m_opaqueMeshObjects.end() - 1 });
+		m_opaqueObjects.push_back(std::move(hash), p_meshRenderObject);
 	}
 	else
 	{
-		if (m_transparentMeshObjects.size() >= m_transparentMeshObjects.capacity())
+		if (m_transparentObjects.size() >= m_transparentObjects.capacity())
 		{
-			PRLOG_WARN("Renderer3D tranparent buffer exceded the limit {0}, discarding object", m_transparentMeshObjects.capacity());
+			PRLOG_WARN("Renderer3D tranparent buffer exceded the limit {0}, discarding object", m_transparentObjects.capacity());
 			return;
 		}
 
-		m_transparentMeshObjects.push_back(p_meshRenderObject);
-		m_transparentMeshPriority.push_back({ hash, m_transparentMeshObjects.end() - 1 });
+		m_transparentObjects.push_back(std::move(hash), p_meshRenderObject);
 	}
 }
 
@@ -144,15 +145,15 @@ void Renderer3D::Render()
 		m_RCQueue.push(new CubemapRenderRC(m_cubemap));
 
 	//Render Opaque
-	std::sort(m_opaqueMeshPriority.begin(), m_opaqueMeshPriority.end());
+	m_opaqueObjects.Sort();
 
 	//Try instancing
 	CreateInstancesOpaqueMesh();
 
 	//Normal render
-	for (auto& [_, object] : m_opaqueMeshPriority)
+	for (auto [_, object] : m_opaqueObjects)
 	{
-		if(object != m_opaqueMeshObjects.end())
+		if(object != nullptr)
 		{
 			//PRLOG_INFO("RENDERING {0}", object->mesh->GetName());
 			m_RCQueue.push(new MeshRenderRC(std::move(*object), renderData));
@@ -160,8 +161,8 @@ void Renderer3D::Render()
 	}
 
 	//Render Transparent
-	std::sort(m_transparentMeshPriority.begin(), m_transparentMeshPriority.end(), TransparenctySort());
-	for (auto& [_, object] : m_transparentMeshPriority)
+	m_transparentObjects.Sort();
+	for (auto [_, object] : m_transparentObjects)
 	{
 		m_RCQueue.push(new TransparentMeshRenderRC(std::move(*object), renderData));
 	}
@@ -180,10 +181,8 @@ void Renderer3D::Flush()
 		m_RCQueue.pop();
 	}
 
-	m_transparentMeshPriority.clear();
-	m_opaqueMeshPriority.clear();
-	m_opaqueMeshObjects.clear();
-	m_transparentMeshObjects.clear();
+	m_transparentObjects.clear();
+	m_opaqueObjects.clear();
 	m_lightData.clear();
 }
 
