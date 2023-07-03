@@ -21,6 +21,7 @@ namespace PrRenderer::Core {
 		static void ClearColor(Color& p_color);
 
 		static void SetViewport(int p_width, int p_height, int p_x = 0, int p_y = 0);
+		static void GetViewport(int& p_width, int& p_height, int& p_x, int& p_y);
 
 		//Depth
 		static void EnableDepth(bool p_enable);

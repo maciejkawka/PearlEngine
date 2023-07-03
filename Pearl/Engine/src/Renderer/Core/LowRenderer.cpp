@@ -48,6 +48,11 @@ void LowRenderer::SetViewport(int p_width, int p_height, int p_x, int p_y)
 	m_rendererAPI->SetViewport(p_width, p_height, p_x, p_y);
 }
 
+void LowRenderer::GetViewport(int& p_width, int& p_height, int& p_x, int& p_y)
+{
+	m_rendererAPI->GetViewport(p_width, p_height, p_x, p_y);
+}
+
 void LowRenderer::EnableDepth(bool p_enable)
 {
 	m_rendererAPI->EnableDepth(p_enable);

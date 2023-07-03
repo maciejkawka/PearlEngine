@@ -41,6 +41,16 @@ void GLRenderer::SetViewport(int p_width, int p_height, int p_x, int p_y)
 	glViewport(p_x, p_y, p_width, p_height);
 }
 
+void GLRenderer::GetViewport(int& p_width, int& p_height, int& p_x, int& p_y)
+{
+	GLint m_viewport[4];
+	glGetIntegerv(GL_VIEWPORT, m_viewport);
+	p_x = m_viewport[0];
+	p_y = m_viewport[1];
+	p_width = m_viewport[2];
+	p_height = m_viewport[3];
+}
+
 void GLRenderer::EnableDepth(bool p_enable)
 {
 	// Enable/Disable Writing and Testing
