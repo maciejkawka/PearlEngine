@@ -11,6 +11,7 @@
 #include"Renderer/Resources/MaterialManager.h"
 #include"Renderer/Resources/Shader.h"
 #include"Renderer/Resources/Material.h"
+#include"Renderer/Core/DeferredRendererFrontend.h"
 
 using namespace PrEditor::Core;
 using namespace PrCore::Events;
@@ -34,11 +35,14 @@ Editor::~Editor()
 void Editor::PreFrame()
 {
 	m_appContext->m_window->PollEvents();
+	PrRenderer::Core::DefferedRendererFrontend::GetInstance().PrepareFrame();
 	PrRenderer::Core::Renderer3D::GetInstance().Begin();
 
 	//Exit
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
 		m_shouldClose = true;
+
+	PrRenderer::Core::DefferedRendererFrontend::GetInstance().AddCamera(m_basicCamera->GetCamera());
 }
 
 void Editor::OnFrame(float p_deltaTime)
@@ -90,6 +94,8 @@ void Editor::OnFrame(float p_deltaTime)
 
 		scene->OnDisable();
 	}
+
+	PrRenderer::Core::DefferedRendererFrontend::GetInstance().BuildFrame();
 }
 
 void Editor::PostFrame()

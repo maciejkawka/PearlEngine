@@ -4,6 +4,7 @@
 #include"Core/Resources/ResourceLoader.h"
 
 #include"Renderer/Core/Renderer3D.h"
+#include"Renderer/Core/DeferredRendererFrontend.h"
 
 using namespace PrCore::ECS;
 using namespace PrRenderer::Core;
@@ -99,5 +100,6 @@ void MeshRendererSystem::OnUpdate(float p_dt)
 		object.worldMat = std::move(transform->GetWorldMatrix());
 		object.position = std::move(transform->GetPosition());
 		Renderer3D::GetInstance().AddMeshRenderObject(std::move(object));
+		PrRenderer::Core::DefferedRendererFrontend::GetInstance().AddMesh(entity);
 	}
 }

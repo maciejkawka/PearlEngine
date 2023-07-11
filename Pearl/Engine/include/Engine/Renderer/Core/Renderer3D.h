@@ -87,7 +87,7 @@ namespace PrRenderer::Core {
 		RenderObjectsBuffer<MeshRenderObject, RenderSortingHash, RenderSortingHash::TransparenctySort> m_transparentObjects;
 
 		//RenderCommand
-		using RenderCommandQueue = std::queue<RenderCommand*>;
+		using RenderCommandQueue = std::queue<RenderCommandOld*>;
 		RenderCommandQueue m_RCQueue;
 
 		friend Singleton<Renderer3D>;

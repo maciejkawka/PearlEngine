@@ -351,6 +351,21 @@
     <ClInclude Include="include\Engine\Renderer\Core\RenderObjectBuffer.h">
       <Filter>Renderer\Core</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Core\DeferredRendererBackend.h">
+      <Filter>Renderer\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Core\DeferredRendererFrontend.h">
+      <Filter>Renderer\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Core\IRendererBackend.h">
+      <Filter>Renderer\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Core\IRenderFrontend.h">
+      <Filter>Renderer\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Core\RenderTypes.h">
+      <Filter>Renderer\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -531,6 +546,18 @@
       <Filter>Renderer\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Core\RenderCommand.cpp">
+      <Filter>Renderer\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Engine\Renderer\Core\DeferredRendererBackend.cpp">
+      <Filter>Renderer\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Core\DeferredRendererFrontend.cpp">
+      <Filter>Renderer\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Core\DefferedRendererBackend.cpp">
+      <Filter>Renderer\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Core\RenderTypes.cpp">
       <Filter>Renderer\Core</Filter>
     </ClCompile>
   </ItemGroup>

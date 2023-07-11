@@ -19,6 +19,15 @@ namespace PrCore::Utils {
 			s_instance = new T();
 		}
 
+		template<typename... Args>
+		inline static void Init(Args... p_args)
+		{
+			PR_ASSERT(s_instance == nullptr, "Object " + std::string(typeid(T).name()) + "is already initiated");
+			PRLOG_INFO("Init {0}", typeid(T).name());
+
+			s_instance = new T(p_args...);
+		}
+
 		inline static void Terminate()
 		{
 			PR_ASSERT(s_instance != nullptr, "Object " + std::string(typeid(T).name()) + "is already initiated");

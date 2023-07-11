@@ -8,6 +8,7 @@
 #include"Core/Resources/ResourceLoader.h"
 #include"Core/ECS/SceneManager.h"
 #include"Renderer/OpenGL/GLContext.h"
+#include"Renderer/Core/DeferredRendererFrontend.h"
 
 
 PrCore::Entry::AppContext::AppContext()
@@ -53,6 +54,7 @@ PrCore::Entry::AppContext::AppContext()
 	m_rendererContext->Init();
 
 	PrRenderer::Core::Renderer3D::Init();
+	PrRenderer::Core::DefferedRendererFrontend::Init(nullptr);
 
 	Input::InputManager::Init();
 
@@ -66,6 +68,7 @@ PrCore::Entry::AppContext::~AppContext()
 	ECS::SceneManager::Terminate();
 	Input::InputManager::Terminate();
 	PrRenderer::Core::Renderer3D::Terminate();
+	PrRenderer::Core::DefferedRendererFrontend::Terminate();
 	delete m_rendererContext;
 	delete m_window;
 	Windowing::GLWindow::TerminateDevice();
