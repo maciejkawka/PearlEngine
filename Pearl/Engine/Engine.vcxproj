@@ -78,14 +78,14 @@
     <ClInclude Include="include\Engine\Renderer\Core\Color.h" />
     <ClInclude Include="include\Engine\Renderer\Core\Context.h" />
     <ClInclude Include="include\Engine\Renderer\Core\ContextSettings.h" />
-    <ClInclude Include="include\Engine\Renderer\Core\DeferredRendererBackend.h" />
     <ClInclude Include="include\Engine\Renderer\Core\DeferredRendererFrontend.h" />
     <ClInclude Include="include\Engine\Renderer\Core\Defines.h" />
+    <ClInclude Include="include\Engine\Renderer\Core\DefRendererBackend.h" />
     <ClInclude Include="include\Engine\Renderer\Core\IRendererBackend.h" />
     <ClInclude Include="include\Engine\Renderer\Core\IRenderFrontend.h" />
     <ClInclude Include="include\Engine\Renderer\Core\RenderTypes.h" />
     <ClInclude Include="include\Engine\Renderer\Core\RenderObjectBuffer.h" />
-    <ClInclude Include="include\Engine\Renderer\Core\Light.h" />
+    <ClInclude Include="include\Engine\Renderer\Resources\Light.h" />
     <ClInclude Include="include\Engine\Renderer\Core\LowRenderer.h" />
     <ClInclude Include="include\Engine\Renderer\Core\MeshRenderObject.h" />
     <ClInclude Include="include\Engine\Renderer\Core\Renderer3D.h" />
@@ -116,7 +116,6 @@
     <ClInclude Include="include\Engine\Renderer\Core\RenderCommand.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\Engine\Renderer\Core\DeferredRendererBackend.cpp" />
     <ClCompile Include="src\Core\ECS\Components\TransformComponent.cpp" />
     <ClCompile Include="src\Core\ECS\EntityManager.cpp" />
     <ClCompile Include="src\Core\ECS\Defines.cpp" />
@@ -157,8 +156,8 @@
     <ClCompile Include="src\Renderer\Core\Camera.cpp" />
     <ClCompile Include="src\Renderer\Core\Color.cpp" />
     <ClCompile Include="src\Renderer\Core\DeferredRendererFrontend.cpp" />
-    <ClCompile Include="src\Renderer\Core\DefferedRendererBackend.cpp" />
-    <ClCompile Include="src\Renderer\Core\Light.cpp" />
+    <ClCompile Include="src\Renderer\Core\DefRendererBackend.cpp" />
+    <ClCompile Include="src\Renderer\Resources\Light.cpp" />
     <ClCompile Include="src\Renderer\Core\LowRenderer.cpp" />
     <ClCompile Include="src\Renderer\Core\RenderCommand.cpp" />
     <ClCompile Include="src\Renderer\Core\Renderer3D.cpp" />

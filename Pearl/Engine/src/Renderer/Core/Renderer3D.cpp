@@ -29,10 +29,11 @@ Renderer3D::Renderer3D()
 
 void Renderer3D::Begin()
 {
-	LowRenderer::EnableCullFace(true);
-	LowRenderer::EnableDepth(true);
-	LowRenderer::Clear(Core::ClearFlag::ColorBuffer | ClearFlag::DepthBuffer);
-	LowRenderer::ClearColor(0.1f, 0.1f, 0.8f, 1.0f);
+	//LowRenderer::EnableCullFace(true);
+	//LowRenderer::EnableDepth(true);
+	//LowRenderer::Clear(Core::ClearFlag::ColorBuffer | ClearFlag::DepthBuffer);
+	//m_RCQueueNew.push(new LowRenderer::ClearRC(Core::ClearFlag::ColorBuffer | ClearFlag::DepthBuffer));
+	//LowRenderer::ClearColor(0.1f, 0.1f, 0.8f, 1.0f);
 }
 
 void Renderer3D::SetCubemap(Resources::MaterialPtr p_cubemap)
@@ -168,13 +169,13 @@ void Renderer3D::Flush()
 {
 	m_renderData.mainCamera->RecalculateMatrices();
 
-	while (!m_RCQueue.empty())
-	{
-		auto command = m_RCQueue.front();
-		command->Invoke();
-		delete command;
-		m_RCQueue.pop();
-	}
+	//while (!m_RCQueue.empty())
+	//{
+		//auto command = m_RCQueue.front();
+		//command->Invoke();
+		//delete command;
+		//m_RCQueue.pop();
+	//}
 
 	m_transparentObjects.clear();
 	m_opaqueObjects.clear();

@@ -89,8 +89,7 @@ void GLFramebuffer::ClearAttachmentColor(unsigned int p_attachment, Core::Color 
 
 PrRenderer::Resources::TexturePtr GLFramebuffer::GetTexturePtr(unsigned int p_index)
 {
-	if (p_index >= m_colorTextureAttachments.size())
-		return Resources::TexturePtr();
+	PR_ASSERT(p_index < m_colorTextureAttachments.size(), "Framebuffer attachemnt index over the size" + this->m_ID);
 
 	//Generate texturePtr and mark texture Id as untracked, this texture
 	//will not be deleted when framebuffer is deleted
@@ -244,7 +243,7 @@ void GLFramebuffer::CreateTextureAttachment(int p_attachmentIndex)
 		glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureID, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + p_attachmentIndex, GL_TEXTURE_2D, textureID, 0);
 
 	m_colorTextureAttachments.push_back(attachment);
 }

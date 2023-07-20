@@ -18,8 +18,6 @@ namespace PrCore::ECS {
 		inline virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
 
 	private:
-		Math::mat4 GetPackedMatrix(const LightComponent* p_lightComponent,const TransformComponent* p_transform) const;
-
 		PrRenderer::Core::Camera* m_camera;
 	};
 }

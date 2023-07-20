@@ -3,6 +3,7 @@
 #include"Core/ECS/ECS.h"
 
 #include "Renderer/Core/DeferredRendererFrontend.h"
+#include "Renderer/Core/DefRendererBackend.h"
 #include "Renderer/Core/BoundingVolume.h"
 
 using namespace PrRenderer::Core;
@@ -11,17 +12,83 @@ using namespace PrRenderer::Core;
 #define MAX_INSTANCE_COUNT 200
 #define MIN_INSTANCE_COUNT 5
 
-DefferedRendererFrontend::DefferedRendererFrontend(IRendererBackend* p_rendererBackend) :
-	IRendererFrontend(p_rendererBackend)
+DefferedRendererFrontend::DefferedRendererFrontend(const RendererSettings& p_settings) :
+	IRendererFrontend(p_settings)
 {
-	//Prepare shaders
-	m_instancingShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("PBR/PBRwithIR_Instanced.shader");
-	PR_ASSERT(m_instancingShader != nullptr, "Instance shader was not found");
-
 	//Prepare frame data
 	m_currentFrame = m_frameData[0];
 	m_previousFrame = m_frameData[1];
 	m_currentFrameIndex = 0;
+
+	//Prepare Lights
+	m_maxPShadowLights = (m_renderSettings.comboShadowMap * m_renderSettings.comboShadowMap) / 
+		(m_renderSettings.pointLightShadowMapSize * m_renderSettings.pointLightShadowMapSize * 6);
+	m_maxSDShadowLights = (m_renderSettings.comboShadowMap * m_renderSettings.comboShadowMap) / 
+		(m_renderSettings.lightShadowMapSize * m_renderSettings.lightShadowMapSize);
+	m_nextPointLightID = 0;
+	m_nextOtherLightsID = 0;
+
+	m_rendererBackend = std::make_shared<DefRendererBackend>(p_settings);
+
+	//Temporary
+	m_instancingShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/gBuffer.shader");
+	PR_ASSERT(m_instancingShader != nullptr, "Instance shader was not found");
+}
+
+void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id)
+{
+	//Main light
+	if(p_lightComponent->mainDirectLight)
+	{
+		if (m_currentFrame->mainDirectLight)
+			PR_ASSERT(false, "FrontendRenderer: Main Direct light already added, cannot have more than one main lights in the scene");
+
+		//If this is main light add it to the frameData and return
+		auto lightobject = std::make_shared<LightObject>();
+		lightobject->id = p_id;
+		lightobject->lightMat = p_lightComponent->m_light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
+		lightobject->shadowMapPos = SIZE_MAX;
+
+		m_currentFrame->mainDirectLight = lightobject;
+		return;
+	}
+
+	//It this is normal light
+	if (m_pointLightNumber >m_maxPShadowLights)
+	{
+		PRLOG_WARN("FrontendRenderer: Discarding point light, max limit exceeded");
+		return;
+	}
+	if(m_otherLightNumber > m_maxSDShadowLights)
+	{
+		PRLOG_WARN("FrontendRenderer: Discarding light, max limit exceeded");
+		return;
+	}
+
+	//This functio rebuilts light mapping every frame atm, not very efficient but it is alright for now, to be changed in the future
+	auto light = p_lightComponent->m_light;
+	LightObject object;
+	object.lightMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
+	object.id = p_id;
+	if (p_lightComponent->m_shadowCast)
+	{
+		if(light->GetType() == Resources::LightType::Point)
+		{
+			object.shadowMapPos = m_nextPointLightID;
+			m_nextPointLightID += 6;
+			m_pointLightNumber++;
+		}
+		else
+		{
+			object.shadowMapPos = m_nextOtherLightsID;
+			m_nextOtherLightsID++;
+			m_otherLightNumber++;
+		}
+	}
+	else
+		object.shadowMapPos = SIZE_MAX;
+
+	m_currentFrame->lights.push_back(std::move(object));
 }
 
 void DefferedRendererFrontend::AddCamera(ECS::CameraComponent* p_camera)
@@ -37,16 +104,22 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 	//Preapre data
 	auto meshComponent = p_entity.GetComponent<ECS::MeshRendererComponent>();
 	auto mesh = meshComponent->mesh;
-	auto material = meshComponent->material;
+	auto oldmaterial = meshComponent->material;
 	auto transformComponent = p_entity.GetComponent<ECS::TransformComponent>();
 	auto worldMatrix = transformComponent->GetWorldMatrix();
 	auto camera = m_currentFrame->camera;
 
+	//Temporary shader replacement
+	auto material = std::make_shared<Resources::Material>(m_instancingShader);
+	material->CopyPropertiesFrom(*oldmaterial);
+	//
+
 	//Frustrum culling
+	//diabled for now
 	const auto frustrum = Frustrum(camera->GetProjectionMatrix(), camera->GetViewMatrix());
 	const auto bundingBox = BoxVolume(mesh->GetVertices());
-	if (!bundingBox.IsOnFrustrum(frustrum, worldMatrix))
-		return;
+	//if (!bundingBox.IsOnFrustrum(frustrum, worldMatrix))
+		//return;
 
 	//Create renderObject
 	RenderObjectPtr object = std::make_shared<RenderObject>();
@@ -71,14 +144,14 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 
 void DefferedRendererFrontend::AddCubemap(Resources::MaterialPtr p_cubemapMat)
 {
-	if (reinterpret_cast<size_t>(p_cubemapMat.get()) != m_previousFrame->cubemapObject->id)
+	if (m_previousFrame->cubemapObject == nullptr || reinterpret_cast<size_t>(p_cubemapMat.get()) != m_previousFrame->cubemapObject->id)
 	{
 		m_currentFrame->renderFlag = m_currentFrame->renderFlag | RendererFlag::RerenderCubeMap;
 		RenderObjectPtr object = std::make_shared<RenderObject>();
 		object->type = RenderObjectType::CubeMap;
 		object->id = reinterpret_cast<size_t>(p_cubemapMat.get());
 		object->material = p_cubemapMat;
-		object->mesh = Resources::Mesh::CreatePrimitive(Resources::Quad);
+		m_currentFrame->cubemapObject = object;
 	}
 	else
 		m_currentFrame->cubemapObject = m_previousFrame->cubemapObject;
@@ -94,6 +167,13 @@ void DefferedRendererFrontend::PrepareFrame()
 	//Clean new current Frame
 	m_currentFrame->opaqueObjects.clear();
 	m_currentFrame->transpatrentObjects.clear();
+	m_currentFrame->lights.clear();
+	m_currentFrame->mainDirectLight = nullptr;
+	m_currentFrame->renderFlag = RendererFlag::None;
+	m_nextPointLightID = 0;
+	m_nextOtherLightsID = 0;
+	m_pointLightNumber = 0;
+	m_otherLightNumber = 0;
 
 }
 
@@ -106,6 +186,7 @@ void DefferedRendererFrontend::BuildFrame()
 	m_currentFrame->transpatrentObjects.sort();
 	InstanciateObjects(m_currentFrame->transpatrentObjects);
 
+	m_rendererBackend->SetFrame(m_currentFrame);
 }
 
 void DefferedRendererFrontend::InstanciateObjects(RenderObjectVector& p_renderObjects)
@@ -136,9 +217,6 @@ void DefferedRendererFrontend::InstanciateObjects(RenderObjectVector& p_renderOb
 		{
 			//Grab common data for all instances
 			const auto& instnaceFront = instanciateCandidates.front();
-			auto instancedMesh = instnaceFront->mesh;
-			auto instancedMat = std::make_shared<Resources::Material>(m_instancingShader);
-			instancedMat->CopyPropertiesFrom(*instnaceFront->material);
 
 			std::vector<PrCore::Math::mat4> matrices;
 			matrices.reserve(MAX_INSTANCE_COUNT);
@@ -147,18 +225,26 @@ void DefferedRendererFrontend::InstanciateObjects(RenderObjectVector& p_renderOb
 				const auto innerItBegin = innerIt;
 				while (i < instanciateCandidates.size() && matrices.size() < MAX_INSTANCE_COUNT)
 				{
-					matrices.push_back(std::move(instnaceFront->worldMat));
+					matrices.push_back(std::move((*innerIt)->worldMat));
 					i++;
 					++innerIt;
 				}
 
+				//Create material for instanced group
+				auto instancedMesh = instnaceFront->mesh;
+				auto instancedMat = std::make_shared<Resources::Material>(m_instancingShader);
+				instancedMat->CopyPropertiesFrom(*instnaceFront->material);
+
 				instancedMat->SetPropertyArray("modelMatrixArray[0]", matrices.data(), matrices.size());
+				instancedMat->SetProperty("instancedCount", (int)matrices.size());
 				RenderObjectPtr instncedObj = std::make_shared<RenderObject>();
 				instncedObj->material = instancedMat;
 				instncedObj->mesh = instancedMesh;
 				instncedObj->id = 0;
 				instncedObj->sortingHash = instnaceFront->sortingHash;
 				instncedObj->type = RenderObjectType::InstancedMesh;
+				instncedObj->instanceSize = matrices.size();
+				instncedObj->worldMatrices = matrices;
 
 				//Erase instanced objects from the buffer
 				innerIt = p_renderObjects.erase(innerItBegin, innerIt);

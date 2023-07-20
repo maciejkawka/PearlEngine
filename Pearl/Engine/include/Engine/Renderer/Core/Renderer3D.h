@@ -1,6 +1,6 @@
 #pragma once
 #include"Renderer/Core/Camera.h"
-#include"Renderer/Core/Light.h"
+#include"Renderer/Resources/Light.h"
 #include"Renderer/Core/RenderCommand.h"
 #include"Renderer/Core/RenderObjectBuffer.h"
 
@@ -89,6 +89,7 @@ namespace PrRenderer::Core {
 		//RenderCommand
 		using RenderCommandQueue = std::queue<RenderCommandOld*>;
 		RenderCommandQueue m_RCQueue;
+		std::queue<RenderCommand*> m_RCQueueNew;
 
 		friend Singleton<Renderer3D>;
 	};

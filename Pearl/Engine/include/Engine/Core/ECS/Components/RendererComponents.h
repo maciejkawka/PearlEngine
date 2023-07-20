@@ -6,6 +6,7 @@
 #include"Renderer/Resources/Material.h"
 #include"Renderer/Core/Color.h"
 #include"Renderer/Core/Camera.h"
+#include"Renderer/Resources/Light.h"
 
 namespace PrCore::ECS {
 
@@ -53,83 +54,34 @@ namespace PrCore::ECS {
 
 	class LightComponent : public BaseComponent {
 	public:
-		LightComponent() :
-			m_direction(PrCore::Math::vec3(1.0f)),
-			m_color(PrRenderer::Core::Color::White),
-			m_linearAttenuation(0.5f),
-			m_quadraticAttenuation(0.5f),
-			m_constantAttenuation(1.0f),
-			m_range(500.0f),
-			m_type(LightType::Directional),
-			m_innerCone(0.0f),
-			m_outterCone(0.0f)
-		{}
-		~LightComponent() override = default;
 
-		inline void SetType(LightType p_type) { m_type = p_type; }
-		inline void SetDirection(PrCore::Math::vec3 p_direction) { m_direction = p_direction; }
-		inline void SetColor(PrRenderer::Core::Color p_color) { m_color = p_color; }
-
-		inline void SetAttenuation(float p_quadratic, float p_linear, float p_constant = 1.0f) {
-			m_linearAttenuation = p_linear; m_quadraticAttenuation = p_quadratic; m_constantAttenuation = p_constant;
-		}
-		inline void SetRange(float p_range) { m_range = p_range; }
-
-		inline void SetInnerCone(float p_inner) { m_innerCone = p_inner; }
-		inline void SetOutterCone(float p_outter) { m_outterCone = p_outter; }
-
-		inline LightType GetType() const { return m_type; }
-		inline PrCore::Math::vec3 GetDirection() const { return m_direction; }
-		inline PrRenderer::Core::Color GetColor() const { return m_color; }
-
-		inline float GetQuadraticAttenuation() const { return m_quadraticAttenuation; }
-		inline float GetLinearAttenuation() const { return m_linearAttenuation; }
-		inline float GetConstantAttenuation() const { return m_constantAttenuation; }
-		inline float GetRange() const { return m_range; }
-
-		inline float GetInnerCone() const { return m_innerCone; }
-		inline float GetOutterCone() const { return m_outterCone; }
+		PrRenderer::Resources::LightPtr m_light = std::make_shared<PrRenderer::Resources::Light>();
+		bool m_shadowCast = true;
+		bool mainDirectLight = false;
 
 		virtual void OnSerialize(Utils::JSON::json& p_serialized) override
 		{
-			p_serialized["Direction"] = Utils::JSONParser::ParseVec3(m_direction);
-			p_serialized["Color"] = Utils::JSONParser::ParseColor(m_color);
-			p_serialized["LinearAttenuation"] = m_linearAttenuation;
-			p_serialized["QuadraticAttenuation"] = m_quadraticAttenuation;
-			p_serialized["ConstantAttenuation"] = m_constantAttenuation;
-			p_serialized["Range"] = m_range;
+			p_serialized["Color"] = Utils::JSONParser::ParseColor(m_light->GetColor());
+			p_serialized["LinearAttenuation"] = m_light->GetLinearAttenuation();
+			p_serialized["QuadraticAttenuation"] = m_light->GetQuadraticAttenuation();
+			p_serialized["ConstantAttenuation"] = m_light->GetConstantAttenuation();
+			p_serialized["Range"] = m_light->GetRange();
 
-			p_serialized["Type"] = (int)m_type;
-			p_serialized["InnerCone"] = m_innerCone;
-			p_serialized["OutterCone"] = m_outterCone;
+			p_serialized["Type"] = m_light->GetType();
+			p_serialized["InnerCone"] = m_light->GetInnerCone();
+			p_serialized["OutterCone"] = m_light->GetOutterCone();
 		}
 
 		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override
 		{
-			m_direction = Utils::JSONParser::ToVec3(p_deserialized["Direction"]);
-			m_color = Utils::JSONParser::ToColor(p_deserialized["Color"]);
-			m_linearAttenuation = p_deserialized["LinearAttenuation"];
-			m_quadraticAttenuation = p_deserialized["QuadraticAttenuation"];
-			m_constantAttenuation = p_deserialized["ConstantAttenuation"];
-			m_range = p_deserialized["Range"];
+			m_light->SetColor(Utils::JSONParser::ToColor(p_deserialized["Color"]));
+			m_light->SetAttenuation(p_deserialized["QuadraticAttenuation"], p_deserialized["LinearAttenuation"], p_deserialized["ConstantAttenuation"]);
+			m_light->SetRange(p_deserialized["Range"]);
 
-			m_type = p_deserialized["Type"];
-			m_innerCone = p_deserialized["InnerCone"];
-			m_outterCone = p_deserialized["OutterCone"];
+			m_light->SetType(p_deserialized["Type"]);
+			m_light->SetInnerCone(p_deserialized["InnerCone"]);
+			m_light->SetOutterCone(p_deserialized["OutterCone"]);
 		}
-
-	private:
-		Math::vec3 m_direction;
-		PrRenderer::Core::Color m_color;
-
-		float m_linearAttenuation;
-		float m_quadraticAttenuation;
-		float m_constantAttenuation;
-		float m_range;
-
-		LightType m_type;
-		float m_innerCone;
-		float m_outterCone;
 	};
 
 	class CameraComponent: public BaseComponent {

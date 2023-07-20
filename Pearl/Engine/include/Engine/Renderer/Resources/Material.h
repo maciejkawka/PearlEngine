@@ -160,7 +160,7 @@ namespace PrRenderer::Resources {
 		{
 			try 
 			{
-				T returnValue = std::any_cast<T>(find->second.value);
+				T& returnValue = std::any_cast<T&>(find->second.value);
 				return returnValue;
 			}
 			catch (const std::bad_any_cast& e)

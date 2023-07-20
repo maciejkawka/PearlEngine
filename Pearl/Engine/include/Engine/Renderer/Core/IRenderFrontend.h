@@ -10,6 +10,7 @@ namespace PrCore::ECS {
 	class MeshRendererComponent;
 	class TransformComponent;
 	class CameraComponent;
+	class LightComponent;
 }
 
 
@@ -20,8 +21,8 @@ namespace PrRenderer::Core {
 
 	class IRendererFrontend {
 	public:
-		explicit IRendererFrontend(IRendererBackend* p_rendererBackend):
-		m_rendererBackend(p_rendererBackend)
+		explicit IRendererFrontend(const RendererSettings& s_settings):
+			m_renderSettings(s_settings)
 		{
 			m_frameData[0] = std::make_shared<FrameData>();
 			m_frameData[1] = std::make_shared<FrameData>();
@@ -32,6 +33,7 @@ namespace PrRenderer::Core {
 		virtual ~IRendererFrontend() = default;
 
 		//Render Entities
+		virtual void AddLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id) = 0;
 		virtual void AddCamera(ECS::CameraComponent* p_camera) = 0;
 		virtual void AddMesh(ECS::Entity& p_entity) = 0;
 		virtual void AddCubemap(Resources::MaterialPtr p_renderObject) = 0;
@@ -54,12 +56,15 @@ namespace PrRenderer::Core {
 		virtual void BuildFrame() = 0;
 		virtual void FillFrameWithColor() = 0;
 
+		//Get Backend
+		RendererBackendPtr GetRendererBackend() { return m_rendererBackend; }
 		/// Debug
 		//void FrawGizmo();
 		//void DrawLine();
 
 	protected:
-		IRendererBackend* m_rendererBackend;
+		RendererBackendPtr m_rendererBackend;
+		RendererSettings m_renderSettings;
 
 		std::array<FrameDataPtr, 2> m_frameData;
 		FrameDataPtr m_currentFrame;

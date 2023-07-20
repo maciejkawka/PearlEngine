@@ -96,10 +96,14 @@ void Editor::OnFrame(float p_deltaTime)
 	}
 
 	PrRenderer::Core::DefferedRendererFrontend::GetInstance().BuildFrame();
+	m_appContext->m_rendererBackend->PreRender();
 }
 
 void Editor::PostFrame()
 {
+	m_appContext->m_rendererBackend->Render();
+	m_appContext->m_rendererBackend->PostRender();
+
 	PrRenderer::Core::Renderer3D::GetInstance().Render();
 	PrRenderer::Core::Renderer3D::GetInstance().Flush();
 	m_appContext->m_window->SwapBuffers();

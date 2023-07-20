@@ -5,6 +5,8 @@
 
 namespace PrRenderer::Core {
 
+#define SHADOW_CASCADES_COUNT 4
+
 	struct RenderObject;
 
 	class SortingHash {
@@ -83,6 +85,10 @@ namespace PrRenderer::Core {
 		SortingHash            sortingHash;
 		PrCore::Math::mat4     worldMat;
 
+		//Instanced ot be moved
+		size_t                 instanceSize;
+		std::vector<PrCore::Math::mat4>    worldMatrices;
+
 	public:
 
 		//Sorting
@@ -111,7 +117,6 @@ namespace PrRenderer::Core {
 
 	using RenderObjectPtr = std::shared_ptr<RenderObject>;
 
-
 	///////////////////////////////////////
 
 
@@ -119,20 +124,34 @@ namespace PrRenderer::Core {
 	///////////////////////////////////////
 
 	struct LightObject {
-		//To be implemented
+		PrCore::Math::mat4        lightMat;
+		size_t                    shadowMapPos;
+		size_t                    id;
 	};
 
 	using LightObjectPtr = std::shared_ptr<LightObject>;
 
 	enum class RendererFlag {
+		None = 0,
 		RerenderAll = 1,
 		RerenderLight = 2,
 		RerenderCubeMap = 4,
 	};
-	DEFINE_ENUM_FLAG_OPERATORS(RendererFlag)
+	DEFINE_ENUM_FLAG_OPERATORS(RendererFlag);
 
-		struct RendererSettings {
+	struct RendererSettings {
 		//Add Renderer settings
+
+
+
+		//Shadows
+		size_t pointLightShadowMapSize = 512;
+		size_t lightShadowMapSize = 1024;
+		size_t comboShadowMap = 8192;
+
+		//CSM
+		float  cascadeShadowBorders[SHADOW_CASCADES_COUNT];
+		size_t cascadeShadowMapSize = 1024;
 	};
 
 	///////////////////////////////////////
@@ -161,10 +180,12 @@ namespace PrRenderer::Core {
 		Camera*                       camera;
 
 		//Lighs and shadows
-		std::vector<LightObjectPtr>   lights;
+		std::vector<LightObject>      lights;
+		LightObjectPtr                mainDirectLight;
+
 
 		//Aux
-		RendererFlag                    renderFlag;
+		RendererFlag                  renderFlag;
 		FrameInfo                     frameInfo;
 		////Lock in future
 	};

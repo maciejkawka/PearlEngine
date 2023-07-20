@@ -19,7 +19,7 @@ namespace PrRenderer::Core
 	class CommandName : public RenderCommand {					         \
 	public:                                                              \
 	typedef std::tuple<__VA_ARGS__> CommandArgs;                         \
-		CommandName(CommandArgs&& args) :                                \
+		explicit CommandName(CommandArgs&& args) :                                \
 		m_args(std::forward<CommandArgs>(args))                          \
 		{}                                                               \
 		void Invoke() override                                           \
@@ -31,11 +31,22 @@ namespace PrRenderer::Core
 		}                                                                \
 	private:                                                             \
 		CommandArgs m_args;												 \
-	};
-	
+	}
 
+#define REGISTER_RENDER_COMMAND(CommandName, FunctionName, ...) \
+	BASIC_RENDER_COMMAND(CommandName ## RC, FunctionName, __VA_ARGS__)
 
+	inline void LambdaFunction(std::function<void(void)> p_lambda)
+	{
+		p_lambda();
+	}
+	REGISTER_RENDER_COMMAND(LambdaFunction, LambdaFunction, std::function<void(void)>);
 
+	template<class CommandType, typename... Args>
+	inline RenderCommandPtr CreateRC(Args&&... args)
+	{
+		return std::make_shared<CommandType>(std::make_tuple(std::forward<Args>(args)...));
+	}
 
 
 

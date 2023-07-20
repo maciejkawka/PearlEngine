@@ -9,6 +9,7 @@
 #include"Core/ECS/SceneManager.h"
 #include"Renderer/OpenGL/GLContext.h"
 #include"Renderer/Core/DeferredRendererFrontend.h"
+#include"Renderer/Core/DefRendererBackend.h"
 
 
 PrCore::Entry::AppContext::AppContext()
@@ -54,7 +55,8 @@ PrCore::Entry::AppContext::AppContext()
 	m_rendererContext->Init();
 
 	PrRenderer::Core::Renderer3D::Init();
-	PrRenderer::Core::DefferedRendererFrontend::Init(nullptr);
+	PrRenderer::Core::DefferedRendererFrontend::Init(PrRenderer::Core::RendererSettings());
+	m_rendererBackend = PrRenderer::Core::DefferedRendererFrontend::GetInstance().GetRendererBackend();
 
 	Input::InputManager::Init();
 

@@ -1,6 +1,7 @@
 #pragma once 
 
 #include"Renderer/Core/RendererAPI.h"
+#include"Renderer/Core/RenderCommand.h"
 
 namespace PrRenderer::Core {
 
@@ -53,6 +54,31 @@ namespace PrRenderer::Core {
 		//Other
 		static void EnableCullFace(bool p_enable);
 		static void SetCullFaceMode(CullFaceMode p_mode);
+
+
+
+		//Commands
+		REGISTER_RENDER_COMMAND(Clear, Clear, ClearFlag);
+		REGISTER_RENDER_COMMAND(ClearColorFloat, ClearColor, float, float, float, float);
+		REGISTER_RENDER_COMMAND(ClearColorColor, ClearColor, Color);
+
+		REGISTER_RENDER_COMMAND(SetViewport, SetViewport, int, int, int, int);
+
+		REGISTER_RENDER_COMMAND(EnableDepth, EnableDepth, bool);
+		REGISTER_RENDER_COMMAND(SetDepthTest, SetDepthTest, bool);
+		REGISTER_RENDER_COMMAND(SetDepthAlgorythm, SetDepthAlgorythm, ComparaisonAlgorithm);
+
+		REGISTER_RENDER_COMMAND(EnableBlending, EnableBlending, bool);
+		REGISTER_RENDER_COMMAND(SetBlendingAlgorythm, SetBlendingAlgorythm, BlendingAlgorithm, BlendingAlgorithm);
+
+		REGISTER_RENDER_COMMAND(Draw, Draw, Buffers::VertexArrayPtr, Core::Primitives);
+		REGISTER_RENDER_COMMAND(DrawArray, DrawArray, Buffers::VertexBufferPtr, Core::Primitives);
+		REGISTER_RENDER_COMMAND(DrawInstanced, DrawInstanced, Buffers::VertexArrayPtr, size_t, Core::Primitives);
+
+		REGISTER_RENDER_COMMAND(EnableCullFace, EnableCullFace, bool);
+		REGISTER_RENDER_COMMAND(SetCullFaceMode, SetCullFaceMode, CullFaceMode);
+
+
 	private:
 		inline static RendererAPI* m_rendererAPI = nullptr;
 
