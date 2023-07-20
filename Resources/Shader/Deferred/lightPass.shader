@@ -29,7 +29,7 @@ out vec4 FragColor;
 
 in vec2 uv0;
 
-#define MAX_LIGHT_NUM 4
+#define MAX_LIGHT_NUM 200
 const float PI = 3.14159265359;
 
 //gBuff textures
@@ -37,12 +37,6 @@ uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
 uniform sampler2D positionMap;
 uniform sampler2D aoMap;
-
-// material textures
-uniform vec4 albedoValue;
-uniform float metallicValue;
-uniform float roughnessValue;
-uniform float aoValue = 1.0;
 
 // IBL
 uniform samplerCube irradianceMap;
@@ -56,7 +50,6 @@ uniform vec3 ambientColor; //To be add in future
 
 //Additional
 uniform vec3 camPos;
-uniform bool transparent;
 uniform bool normalMapping;
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -107,24 +100,18 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 void main()
 {
     //Sample Textures
-    vec3 albedoTex = texture(albedoMap, uv0).rgb;
-    float depth = texture(albedoMap, uv0).a;
-    albedoTex = pow(albedoTex.rgb, vec3(2.2));
-    float metallicTex = texture(normalMap, uv0).a;
-    float roughnessTex = texture(albedoMap, uv0).a;
-    float aoTex = texture(aoMap, uv0).a;
-    vec3 N = texture(normalMap, uv0).rgb;
+    vec3 albedo = texture(albedoMap, uv0).rgb;
+    float roughness = texture(albedoMap, uv0).a;
+    //albedoTex = pow(albedoTex.rgb, vec3(2.2));
+    float ao = texture(aoMap, uv0).a;
+    vec3 N = normalize(texture(normalMap, uv0).rgb);
+    float metallic = texture(normalMap, uv0).a;
     vec3 pos = texture(positionMap, uv0).rgb;
+    float depth = texture(positionMap, uv0).a;
 
     //If depth is 0 discard
     if(depth == 0)
         discard;
-
-    //Get textures and values combined
-    vec3 albedo = albedoTex + albedoValue.rgb;
-    float metallic = metallicTex + metallicValue;
-    float roughness = roughnessTex + roughnessValue;
-    float ao = aoTex + aoValue;  
 
     vec3 V = normalize(camPos - pos);
     vec3 R = reflect(-V,N);

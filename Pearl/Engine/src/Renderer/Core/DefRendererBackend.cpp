@@ -139,9 +139,18 @@ namespace PrRenderer::Core
 			}));
 		//---------------------------------
 
+		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]()
+			{
+				m_renderData.postProccesBuff->Bind();
+				LowRenderer::EnableDepth(false);
+				LowRenderer::EnableCullFace(false);
+				LowRenderer::Clear(ColorBuffer | DepthBuffer);
+				m_renderData.postProccesBuff->Unbind();
+			}));
 
 		//Draw Cubemap
-		m_commandQueue.push_back(CreateRC<RenderCubeMapRC>(m_frame->cubemapObject->material, &m_renderData));
+		if(m_frame->cubemapObject)
+			m_commandQueue.push_back(CreateRC<RenderCubeMapRC>(m_frame->cubemapObject->material, &m_renderData));
 
 		//PBR Light Pass
 		m_commandQueue.push_back(CreateRC<RenderLightRC>(m_pbrLightShader, &m_frame->lights, &m_renderData));
@@ -180,12 +189,11 @@ namespace PrRenderer::Core
 	void DefRendererBackend::RenderToGBuffer(RenderObjectPtr p_object, const RenderData* p_renderData)
 	{
 		//Temporary
-		//auto shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/gBuffer.shader");
-		//auto materialgBuffer = PrRenderer::Resources::Material(shader);
-		//materialgBuffer.CopyPropertiesFrom(*p_object->material);
+		auto shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/gBuffer.shader");
+		auto materialgBuffer = std::make_shared<Resources::Material>(PrRenderer::Resources::Material(shader));
+		materialgBuffer->CopyPropertiesFrom(*p_object->material);
 		//
 
-		auto materialgBuffer = p_object->material;
 		auto mesh = p_object->mesh;
 
 		p_renderData->gBuffer.buffer->Bind();
@@ -446,9 +454,6 @@ namespace PrRenderer::Core
 	void DefRendererBackend::RenderCubeMap(Resources::MaterialPtr p_material, const RenderData* p_renderData)
 	{
 		p_renderData->postProccesBuff->Bind();
-		LowRenderer::EnableDepth(false);
-		LowRenderer::EnableCullFace(false);
-		LowRenderer::Clear(ColorBuffer | DepthBuffer);
 
 		p_material->SetProperty("view", p_renderData->camera->GetViewMatrix());
 		p_material->SetProperty("proj", p_renderData->camera->GetProjectionMatrix());

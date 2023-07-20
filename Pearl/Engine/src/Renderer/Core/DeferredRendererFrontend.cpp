@@ -104,14 +104,14 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 	//Preapre data
 	auto meshComponent = p_entity.GetComponent<ECS::MeshRendererComponent>();
 	auto mesh = meshComponent->mesh;
-	auto oldmaterial = meshComponent->material;
+	auto material = meshComponent->material;
 	auto transformComponent = p_entity.GetComponent<ECS::TransformComponent>();
 	auto worldMatrix = transformComponent->GetWorldMatrix();
 	auto camera = m_currentFrame->camera;
 
 	//Temporary shader replacement
-	auto material = std::make_shared<Resources::Material>(m_instancingShader);
-	material->CopyPropertiesFrom(*oldmaterial);
+	//auto material = std::make_shared<Resources::Material>(m_instancingShader);
+	//material->CopyPropertiesFrom(*oldmaterial);
 	//
 
 	//Frustrum culling
