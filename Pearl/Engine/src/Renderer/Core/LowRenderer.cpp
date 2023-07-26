@@ -102,3 +102,8 @@ void LowRenderer::SetCullFaceMode(CullFaceMode p_mode)
 {
 	m_rendererAPI->SetCullFaceMode(p_mode);
 }
+
+void LowRenderer::BlitFrameBuffers(Buffers::FramebuffferPtr p_readBuffer, Buffers::FramebuffferPtr p_drawBuffer, Buffers::FramebufferMask p_mask)
+{
+	m_rendererAPI->BlitFrameBuffers(p_readBuffer, p_drawBuffer, p_mask);
+}

@@ -2,6 +2,7 @@
 
 #include"Renderer/Core/RendererAPI.h"
 #include"Renderer/Core/RenderCommand.h"
+#include"Renderer/Buffers/Framebuffer.h"
 
 namespace PrRenderer::Core {
 
@@ -55,7 +56,8 @@ namespace PrRenderer::Core {
 		static void EnableCullFace(bool p_enable);
 		static void SetCullFaceMode(CullFaceMode p_mode);
 
-
+		//Utils
+		static void BlitFrameBuffers(Buffers::FramebuffferPtr p_readBuffer, Buffers::FramebuffferPtr p_drawBuffer = nullptr, Buffers::FramebufferMask p_mask = Buffers::FramebufferMask::ColorBufferBit);
 
 		//Commands
 		REGISTER_RENDER_COMMAND(Clear, Clear, ClearFlag);
@@ -78,6 +80,7 @@ namespace PrRenderer::Core {
 		REGISTER_RENDER_COMMAND(EnableCullFace, EnableCullFace, bool);
 		REGISTER_RENDER_COMMAND(SetCullFaceMode, SetCullFaceMode, CullFaceMode);
 
+		REGISTER_RENDER_COMMAND(BlitFrameBuffers, BlitFrameBuffers, Buffers::FramebuffferPtr, Buffers::FramebuffferPtr, Buffers::FramebufferMask);
 
 	private:
 		inline static RendererAPI* m_rendererAPI = nullptr;

@@ -180,10 +180,10 @@ void DefferedRendererFrontend::PrepareFrame()
 void DefferedRendererFrontend::BuildFrame()
 {
 	//Instanciate opaque
-	m_currentFrame->opaqueObjects.sort();
+	m_currentFrame->opaqueObjects.sort(NormalSort());
 	InstanciateObjects(m_currentFrame->opaqueObjects);
 
-	m_currentFrame->transpatrentObjects.sort();
+	m_currentFrame->transpatrentObjects.sort(TransparentSort());
 	InstanciateObjects(m_currentFrame->transpatrentObjects);
 
 	m_rendererBackend->SetFrame(m_currentFrame);
@@ -232,8 +232,14 @@ void DefferedRendererFrontend::InstanciateObjects(RenderObjectVector& p_renderOb
 
 				//Create material for instanced group
 				auto instancedMesh = instnaceFront->mesh;
-				auto instancedMat = std::make_shared<Resources::Material>(m_instancingShader);
-				instancedMat->CopyPropertiesFrom(*instnaceFront->material);
+				Resources::MaterialPtr instancedMat;
+				if (instnaceFront->material->GetRenderType() == Resources::RenderType::Opaque)
+				{
+					instancedMat = std::make_shared<Resources::Material>(m_instancingShader);
+					instancedMat->CopyPropertiesFrom(*instnaceFront->material);
+				}
+				else
+					instancedMat = std::make_shared<Resources::Material>(*instnaceFront->material);
 
 				instancedMat->SetPropertyArray("modelMatrixArray[0]", matrices.data(), matrices.size());
 				instancedMat->SetProperty("instancedCount", (int)matrices.size());

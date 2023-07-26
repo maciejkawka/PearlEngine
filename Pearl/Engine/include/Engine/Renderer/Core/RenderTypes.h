@@ -6,6 +6,7 @@
 namespace PrRenderer::Core {
 
 #define SHADOW_CASCADES_COUNT 4
+#define MAX_LIGHT_COUNT 200
 
 	struct RenderObject;
 
@@ -106,16 +107,24 @@ namespace PrRenderer::Core {
 		{
 			return this->sortingHash == rhs.sortingHash;
 		}
-
-		struct NormalSort {
-			bool operator()(const RenderObject& a, const RenderObject& b) const
-			{
-				return a < b;
-			}
-		};
 	};
 
 	using RenderObjectPtr = std::shared_ptr<RenderObject>;
+
+	struct NormalSort {
+		bool operator()(const RenderObjectPtr& a, const RenderObjectPtr& b) const
+		{
+			return *a < *b;
+		}
+	};
+
+	struct TransparentSort
+	{
+		bool operator()(const RenderObjectPtr& a, const RenderObjectPtr& b) const
+		{
+			return a->sortingHash.GetDepth() > b->sortingHash.GetDepth();
+		}
+	};
 
 	///////////////////////////////////////
 

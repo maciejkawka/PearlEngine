@@ -71,6 +71,9 @@ namespace PrRenderer::Core {
 
 		static void RenderPostProcess(Resources::ShaderPtr p_postProcessShader, const RenderData* p_renderData);
 		REGISTER_RENDER_COMMAND(RenderPostProcess, RenderPostProcess, Resources::ShaderPtr, const RenderData*);
+
+		static void RenderTransparent(RenderObjectPtr p_object, const RenderData* p_renderData);
+		REGISTER_RENDER_COMMAND(RenderTransparent, RenderTransparent, RenderObjectPtr, RenderData*);
 		//--------------
 
 		//Shadow Mapping

@@ -119,3 +119,24 @@ void GLRenderer::SetCullFaceMode(Core::CullFaceMode p_mode)
 {
 	glCullFace(CullFaceToGL(p_mode));
 }
+
+void GLRenderer::BlitFrameBuffers(Buffers::FramebuffferPtr p_readBuffer, Buffers::FramebuffferPtr p_drawBuffer, Buffers::FramebufferMask p_mask)
+{
+	PR_ASSERT(p_readBuffer != nullptr, "Read buffer is nullptr");
+
+	auto& readSettings = p_readBuffer->GetSettings();
+	const int readWidth = readSettings.globalWidth;
+	const int readHeigth = readSettings.globalHeight;
+
+	int drawWidth = readWidth;
+	int drawHeigth = readHeigth;
+	if(p_drawBuffer)
+	{
+		drawWidth = p_drawBuffer->GetSettings().globalWidth;
+		drawHeigth = p_drawBuffer->GetSettings().globalHeight;;
+	}
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, p_readBuffer ? p_readBuffer->GetID() : 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, p_drawBuffer ? p_drawBuffer->GetID() : 0);
+	glBlitFramebuffer(0, 0, readWidth, readHeigth, 0, 0, drawWidth, drawHeigth, FramebufferMaskToGL(p_mask), GL_NEAREST);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}

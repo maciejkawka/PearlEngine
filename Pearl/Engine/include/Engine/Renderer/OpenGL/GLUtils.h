@@ -1,5 +1,6 @@
 #pragma once
 #include"Renderer/Resources/Texture.h"
+#include"Renderer/Buffers/Framebuffer.h"
 #include"Renderer/Core/RendererAPI.h"
 
 namespace PrRenderer::OpenGL {
@@ -10,6 +11,9 @@ namespace PrRenderer::OpenGL {
 	unsigned int TextureWrapToGL(Resources::TextureWrapMode p_wrap);
 	unsigned int TextureFilterToGL(Resources::TextureFiltering p_filter);
 	unsigned int TextureFormatToDataTypeGL(Resources::TextureFormat p_format);
+
+	//Buffers
+	unsigned int FramebufferMaskToGL(Buffers::FramebufferMask p_mask);
 
 	//Renderer
 	unsigned int PrimitiveToGL(Core::Primitives p_primitives);

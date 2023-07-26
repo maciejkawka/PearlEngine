@@ -3,6 +3,7 @@
 #include"Renderer/Core/Color.h"
 
 #include"Renderer/Buffers/VertexArray.h"
+#include"Renderer/Buffers/Framebuffer.h"
 
 namespace PrRenderer::Core {
 
@@ -83,6 +84,8 @@ namespace PrRenderer::Core {
 		virtual void DrawInstanced(Buffers::VertexArrayPtr p_vertexArray, size_t p_instanceCount, Primitives p_primitives = Primitives::Triangles) = 0;
 		virtual void EnableCullFace(bool p_enable) = 0;
 		virtual void SetCullFaceMode(CullFaceMode p_mode) = 0;
+
+		virtual void BlitFrameBuffers(Buffers::FramebuffferPtr p_readBuffer, Buffers::FramebuffferPtr p_drawBuffer, Buffers::FramebufferMask p_mask) = 0;
 
 		inline static GraphicsAPI GetGraphicsAPI() { return m_graphicsAPI; }
 

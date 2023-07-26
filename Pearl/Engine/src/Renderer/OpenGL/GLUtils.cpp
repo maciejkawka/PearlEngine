@@ -163,6 +163,21 @@ unsigned int PrRenderer::OpenGL::TextureFormatToDataTypeGL(Resources::TextureFor
 	}
 }
 
+unsigned int PrRenderer::OpenGL::FramebufferMaskToGL(Buffers::FramebufferMask p_mask)
+{
+	switch(p_mask)
+	{
+	case Buffers::FramebufferMask::ColorBufferBit:
+		return GL_COLOR_BUFFER_BIT;
+	case Buffers::FramebufferMask::DepthBufferBit:
+		return GL_DEPTH_BUFFER_BIT;
+	case Buffers::FramebufferMask::StencilBufferBit:
+		return GL_STENCIL_BUFFER_BIT;
+	default: 
+		return 0;
+	}
+}
+
 unsigned int PrRenderer::OpenGL::PrimitiveToGL(Core::Primitives p_primitives)
 {
 	switch (p_primitives)

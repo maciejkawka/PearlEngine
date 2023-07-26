@@ -9,6 +9,14 @@ namespace PrRenderer::Buffers {
 	class Framebufffer;
 	typedef std::shared_ptr<Framebufffer> FramebuffferPtr;
 
+	enum class FramebufferMask
+	{
+		ColorBufferBit,
+		DepthBufferBit,
+		StencilBufferBit,
+		None
+	};
+
 	struct FramebufferTexture {
 
 		FramebufferTexture() = default;

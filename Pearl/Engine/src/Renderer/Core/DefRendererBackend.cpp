@@ -139,6 +139,7 @@ namespace PrRenderer::Core
 			}));
 		//---------------------------------
 
+		//Clear Postprocess buffer
 		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]()
 			{
 				m_renderData.postProccesBuff->Bind();
@@ -147,16 +148,37 @@ namespace PrRenderer::Core
 				LowRenderer::Clear(ColorBuffer | DepthBuffer);
 				m_renderData.postProccesBuff->Unbind();
 			}));
+		//---------------------------------
 
 		//Draw Cubemap
 		if(m_frame->cubemapObject)
 			m_commandQueue.push_back(CreateRC<RenderCubeMapRC>(m_frame->cubemapObject->material, &m_renderData));
 
+		//Copy depth buffer to postprocess buffer
+		m_commandQueue.push_back(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderData.gBuffer.buffer, m_renderData.postProccesBuff, Buffers::FramebufferMask::DepthBufferBit));
+
 		//PBR Light Pass
 		m_commandQueue.push_back(CreateRC<RenderLightRC>(m_pbrLightShader, &m_frame->lights, &m_renderData));
 
-		//Transparent Pass
-
+		//Transparent Forward Pass
+		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]()
+			{
+				m_renderData.postProccesBuff->Bind();
+				LowRenderer::EnableDepth(true);
+				LowRenderer::EnableCullFace(true);
+				LowRenderer::EnableBlending(true);
+				LowRenderer::SetBlendingAlgorythm(BlendingAlgorithm::SourceAlpha, BlendingAlgorithm::OneMinusSourceAlpha);
+			}));
+		for (auto object : m_frame->transpatrentObjects)
+			m_commandQueue.push_back(CreateRC<RenderTransparentRC>(object, &m_renderData));
+		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]()
+			{
+				m_renderData.postProccesBuff->Unbind();
+				LowRenderer::EnableDepth(false);
+				LowRenderer::EnableCullFace(false);
+				LowRenderer::EnableBlending(false);
+			}));
+		//---------------------------------
 
 		//Post process and render to back buffer
 		m_commandQueue.push_back(CreateRC<RenderPostProcessRC>(m_postProcesShdr, &m_renderData));
@@ -413,11 +435,15 @@ namespace PrRenderer::Core
 		Buffers::FramebufferTexture postProcessColor;
 		postProcessColor.format = Resources::TextureFormat::RGBA16F;
 
+		Buffers::FramebufferTexture postProcessDepth;
+		postProcessDepth.format = Resources::TextureFormat::Depth32;
+
 		Buffers::FramebufferSettings postProcessSettings;
 		postProcessSettings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
 		postProcessSettings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();;
 		postProcessSettings.mipMaped = false;
 		postProcessSettings.colorTextureAttachments = postProcessColor;
+		postProcessSettings.depthStencilAttachment = postProcessDepth;
 
 		m_renderData.postProccesBuff = Buffers::Framebufffer::Create(postProcessSettings);
 		m_renderData.postProccesTex = m_renderData.postProccesBuff->GetTexturePtr(0);
@@ -485,6 +511,43 @@ namespace PrRenderer::Core
 		p_renderData->gBuffer.albedoTex->Unbind(0);
 		p_renderData->m_quadMesh->Unbind();
 		p_postProcessShader->Unbind();
+	}
+
+	void DefRendererBackend::RenderTransparent(RenderObjectPtr p_object, const RenderData* p_renderData)
+	{
+		auto material = p_object->material;
+		auto mesh = p_object->mesh;
+
+		material->SetProperty("VPMatrix", p_renderData->camera->GetCameraMatrix());
+		material->SetProperty("camPos", p_renderData->camera->GetPosition());
+
+		if (p_renderData->IRMap && p_renderData->prefilterMap && p_renderData->brdfLUT)
+		{
+			material->SetTexture("irradianceMap", p_renderData->IRMap);
+			material->SetTexture("prefilterMap", p_renderData->prefilterMap);
+			material->SetTexture("brdfLUT", p_renderData->brdfLUT);
+		}
+
+		if (p_object->type == RenderObjectType::Mesh)
+		{
+			material->SetProperty("modelMatrix", p_object->worldMat);
+			material->SetProperty("instancedCount", 0);
+			material->Bind();
+			mesh->Bind();
+			LowRenderer::Draw(mesh->GetVertexArray());
+			mesh->Unbind();
+		}
+		else if (p_object->type == RenderObjectType::InstancedMesh)
+		{
+			material->SetPropertyArray("modelMatrixArray[0]", p_object->worldMatrices.data(), p_object->worldMatrices.size());
+			material->SetProperty("instancedCount", (int)p_object->instanceSize);
+			material->Bind();
+			mesh->Bind();
+			LowRenderer::DrawInstanced(mesh->GetVertexArray(), p_object->instanceSize);
+			mesh->Unbind();
+		}
+
+		material->Unbind();
 	}
 
 	void DefRendererBackend::RenderLight(Resources::ShaderPtr p_lightShdr, std::vector<LightObject>* p_lightMats, const RenderData* p_renderData)
