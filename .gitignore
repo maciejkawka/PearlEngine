@@ -10,3 +10,5 @@ Bin-int/
 #Resources
 Resources/*
 !Resources/Shader
+!Resources/Material
+!Resources/Scene

@@ -1,0 +1,19 @@
+{
+  "materialVersion": 0.1,
+  "name": "cubeMaterialNew",
+  "shader": "cubemapShader.shader",
+  "RenderOrder": 0,
+  "RenderType": 0,
+  "color": {
+    "r": 1,
+    "g": 1,
+    "b": 1,
+    "a": 1
+  },
+  "cubemap": [
+    {
+    "texName" : "skybox",
+    "texPath" : "SkyBox/skybox.cubemap"
+  }
+  ]
+}
