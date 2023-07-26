@@ -1,6 +1,6 @@
 {
   "materialVersion": 0.1,
-  "name": "PBRMaterial",
+  "name": "PBRMaterialDeferred",
   "shader": "Deferred/transparentPass.shader",
   "RenderOrder": 0,
   "RenderType": 0,
