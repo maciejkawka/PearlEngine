@@ -145,6 +145,7 @@ namespace PrRenderer::Core {
 		RerenderAll = 1,
 		RerenderLight = 2,
 		RerenderCubeMap = 4,
+		RecalculateProjectionMatrix = 8
 	};
 	DEFINE_ENUM_FLAG_OPERATORS(RendererFlag);
 
@@ -160,7 +161,7 @@ namespace PrRenderer::Core {
 
 		//CSM
 		float  cascadeShadowBorders[SHADOW_CASCADES_COUNT];
-		size_t cascadeShadowMapSize = 1024;
+		size_t cascadeShadowMapSize = 4096;
 	};
 
 	///////////////////////////////////////
@@ -182,6 +183,7 @@ namespace PrRenderer::Core {
 
 	struct FrameData {
 		//Renderables
+		RenderObjectVector            shadowCasters;
 		RenderObjectVector            opaqueObjects;
 		RenderObjectVector            transpatrentObjects;
 		RenderObjectPtr	              cubemapObject;

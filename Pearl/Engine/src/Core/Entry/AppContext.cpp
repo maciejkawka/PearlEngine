@@ -54,7 +54,6 @@ PrCore::Entry::AppContext::AppContext()
 	m_rendererContext = new PrRenderer::OpenGL::GLContext();
 	m_rendererContext->Init();
 
-	PrRenderer::Core::Renderer3D::Init();
 	PrRenderer::Core::DefferedRendererFrontend::Init(PrRenderer::Core::RendererSettings());
 	m_rendererBackend = PrRenderer::Core::DefferedRendererFrontend::GetInstance().GetRendererBackend();
 
@@ -69,7 +68,6 @@ PrCore::Entry::AppContext::~AppContext()
 
 	ECS::SceneManager::Terminate();
 	Input::InputManager::Terminate();
-	PrRenderer::Core::Renderer3D::Terminate();
 	PrRenderer::Core::DefferedRendererFrontend::Terminate();
 	delete m_rendererContext;
 	delete m_window;

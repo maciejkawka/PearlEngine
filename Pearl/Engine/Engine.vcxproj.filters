@@ -243,9 +243,6 @@
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLVertexBuffer.h">
       <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Core\Renderer3D.h">
-      <Filter>Renderer\Core</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Resources\Light.h">
       <Filter>Renderer\Core</Filter>
     </ClInclude>
@@ -366,6 +363,9 @@
     <ClInclude Include="include\Engine\Renderer\Core\DefRendererBackend.h">
       <Filter>Renderer\Core</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Core\CascadeShadowMapper.h">
+      <Filter>Renderer\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -476,9 +476,6 @@
     <ClCompile Include="src\Renderer\OpenGL\GLVertexBuffer.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Core\Renderer3D.cpp">
-      <Filter>Renderer\Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\Resources\Light.cpp">
       <Filter>Renderer\Core</Filter>
     </ClCompile>
@@ -545,9 +542,6 @@
     <ClCompile Include="src\Renderer\Core\BoundingVolume.cpp">
       <Filter>Renderer\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Core\RenderCommand.cpp">
-      <Filter>Renderer\Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\Core\DeferredRendererFrontend.cpp">
       <Filter>Renderer\Core</Filter>
     </ClCompile>
@@ -555,6 +549,9 @@
       <Filter>Renderer\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Core\DefRendererBackend.cpp">
+      <Filter>Renderer\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Core\CascadeShadowMapper.cpp">
       <Filter>Renderer\Core</Filter>
     </ClCompile>
   </ItemGroup>

@@ -100,6 +100,15 @@ PrRenderer::Resources::TexturePtr GLFramebuffer::GetTexturePtr(unsigned int p_in
 	return m_colorTextures[p_index];
 }
 
+PrRenderer::Resources::TexturePtr PrRenderer::OpenGL::GLFramebuffer::GetDepthTexturePtr()
+{
+	if (m_depthTexture)
+		return m_depthTexture;
+
+	GenerateDepthTexture();
+	return m_depthTexture;
+}
+
 PrRenderer::RendererID GLFramebuffer::GetTextureID(unsigned int p_index)
 {
 	if (p_index >= m_colorTextureAttachments.size())
@@ -256,6 +265,7 @@ void GLFramebuffer::UpdateDepthTexture()
 	//Create texture2D
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_depthTextureID);
 	glBindTexture(GL_TEXTURE_2D, m_depthTextureID);
+	m_trackedAttachments.insert(m_depthTextureID);
 
 	//Use global size if the attachment does not have set
 	size_t width;
@@ -336,6 +346,35 @@ void GLFramebuffer::GenerateTexture(unsigned int p_index)
 	m_colorTextures[p_index] = texture;
 }
 
+void GLFramebuffer::GenerateDepthTexture()
+{
+	const auto& textureSettings = m_depthStencilTextureAttachment;
+
+	//Use global size if the attachment does not have set
+	size_t width;
+	size_t height;
+	if (textureSettings.width == 0 && textureSettings.height == 0)
+	{
+		width = m_settings.globalWidth;
+		height = m_settings.globalHeight;
+	}
+	else
+	{
+		width = textureSettings.width;
+		height = textureSettings.height;
+	}
+
+	Resources::TexturePtr texture = std::make_shared<GLTexture2D>(m_depthTextureID, width, height, textureSettings.format);
+
+	texture->SetMagFiltering(textureSettings.filteringMag);
+	texture->SetMinFiltering(textureSettings.filteringMin);
+
+	texture->SetWrapModeU(textureSettings.wrapModeU);
+	texture->SetWrapModeV(textureSettings.wrapModeV);
+
+	m_depthTexture = texture;
+}
+
 void GLFramebuffer::DeleteTextures()
 {
 	//Delete only textures that were not taken from the framebuffer
@@ -344,9 +383,7 @@ void GLFramebuffer::DeleteTextures()
 		if (m_trackedAttachments.find(m_colorTextureIDs[i]) != m_trackedAttachments.end())
 			glDeleteTextures(1, &m_colorTextureIDs[i]);
 	}
-
-	glDeleteTextures(1, &m_depthTextureID);
-
+	
 	//Clear all vectors
 	m_colorTextureAttachments.clear();
 	m_depthStencilTextureAttachment.format = Resources::TextureFormat::None;

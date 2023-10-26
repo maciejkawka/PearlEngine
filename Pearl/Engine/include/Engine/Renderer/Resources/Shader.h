@@ -44,8 +44,8 @@ namespace PrRenderer::Resources {
 		virtual void SetUniformVec3(const std::string& p_name, const PrCore::Math::vec3& p_value) = 0;
 		virtual void SetUniformVec2(const std::string& p_name, const PrCore::Math::vec2& p_value) = 0;
 
-		virtual void SetUniformFloatArray(const std::string& p_name, float* p_value, unsigned int p_count) = 0;
-		virtual void SetUniformIntArray(const std::string& p_name, int* p_value, unsigned int p_count) = 0;
+		virtual void SetUniformFloatArray(const std::string& p_name, const float* p_value, unsigned int p_count) = 0;
+		virtual void SetUniformIntArray(const std::string& p_name, const int* p_value, unsigned int p_count) = 0;
 		virtual void SetUniformMat4Array(const std::string& p_name, const PrCore::Math::mat4* p_value, unsigned int p_count) = 0;
 		virtual void SetUniformMat3Array(const std::string& p_name, const PrCore::Math::mat3* p_value, unsigned int p_count) = 0;
 		virtual void SetUniformVec4Array(const std::string& p_name, const PrCore::Math::vec4* p_value, unsigned int p_count) = 0;

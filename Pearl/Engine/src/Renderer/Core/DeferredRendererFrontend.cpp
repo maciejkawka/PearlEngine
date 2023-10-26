@@ -109,17 +109,6 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 	auto worldMatrix = transformComponent->GetWorldMatrix();
 	auto camera = m_currentFrame->camera;
 
-	//Temporary shader replacement
-	//auto material = std::make_shared<Resources::Material>(m_instancingShader);
-	//material->CopyPropertiesFrom(*oldmaterial);
-	//
-
-	//Frustrum culling
-	//diabled for now
-	const auto frustrum = Frustrum(camera->GetProjectionMatrix(), camera->GetViewMatrix());
-	const auto bundingBox = BoxVolume(mesh->GetVertices());
-	//if (!bundingBox.IsOnFrustrum(frustrum, worldMatrix))
-		//return;
 
 	//Create renderObject
 	RenderObjectPtr object = std::make_shared<RenderObject>();
@@ -134,6 +123,17 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 	SortingHash hash(*object);
 	hash.SetDepth(RenderUtils::CalculateDepthValue(transformComponent->GetPosition(), camera));
 	object->sortingHash = hash;
+
+	//Add always add shadowcasters
+	if(meshComponent->shadowCaster && material->GetRenderType() == Resources::RenderType::Opaque)
+		m_currentFrame->shadowCasters.push_back(object);
+
+	//Frustrum culling
+	//Discard objects that are not visable in the main camera
+	const auto frustrum = Frustrum(camera->GetProjectionMatrix(), camera->GetViewMatrix());
+	const auto bundingBox = BoxVolume(mesh->GetVertices());
+	if (!bundingBox.IsOnFrustrum(frustrum, worldMatrix))
+		return;
 
 	//Add object to the correct list
 	if (material->GetRenderType() == Resources::RenderType::Opaque)
@@ -166,6 +166,7 @@ void DefferedRendererFrontend::PrepareFrame()
 
 	//Clean new current Frame
 	m_currentFrame->opaqueObjects.clear();
+	m_currentFrame->shadowCasters.clear();
 	m_currentFrame->transpatrentObjects.clear();
 	m_currentFrame->lights.clear();
 	m_currentFrame->mainDirectLight = nullptr;
@@ -183,6 +184,7 @@ void DefferedRendererFrontend::BuildFrame()
 	m_currentFrame->opaqueObjects.sort(NormalSort());
 	InstanciateObjects(m_currentFrame->opaqueObjects);
 
+	//Instanciate transparent
 	m_currentFrame->transpatrentObjects.sort(TransparentSort());
 	InstanciateObjects(m_currentFrame->transpatrentObjects);
 
@@ -232,14 +234,7 @@ void DefferedRendererFrontend::InstanciateObjects(RenderObjectVector& p_renderOb
 
 				//Create material for instanced group
 				auto instancedMesh = instnaceFront->mesh;
-				Resources::MaterialPtr instancedMat;
-				if (instnaceFront->material->GetRenderType() == Resources::RenderType::Opaque)
-				{
-					instancedMat = std::make_shared<Resources::Material>(m_instancingShader);
-					instancedMat->CopyPropertiesFrom(*instnaceFront->material);
-				}
-				else
-					instancedMat = std::make_shared<Resources::Material>(*instnaceFront->material);
+				auto instancedMat = std::make_shared<Resources::Material>(*instnaceFront->material);
 
 				instancedMat->SetPropertyArray("modelMatrixArray[0]", matrices.data(), matrices.size());
 				instancedMat->SetProperty("instancedCount", (int)matrices.size());

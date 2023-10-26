@@ -1,6 +1,7 @@
 #pragma once
 #include "Renderer/Core/IRendererBackend.h"
 #include "Renderer/Core/RenderCommand.h"
+#include "Renderer/Core/CascadeShadowMapper.h"
 
 #include "Renderer/Buffers/Framebuffer.h"
 #include <list>
@@ -46,8 +47,11 @@ namespace PrRenderer::Core {
 			Buffers::FramebuffferPtr m_shadowMapPoint;
 			//One light uses one subpart of the texture
 			Buffers::FramebuffferPtr m_shadowMapOther;
-			//This texture is for main directional sun light
+
+			//Main light shadow mapping objects
+			std::unique_ptr<CascadeShadowMapper>  CSM;
 			Buffers::FramebuffferPtr m_cascadeShadow;
+			Resources::TexturePtr     m_CSMShadowMap;
 
 			//Aux
 			Resources::MeshPtr m_quadMesh;
@@ -63,8 +67,8 @@ namespace PrRenderer::Core {
 		static void RenderToCascadeShadowMap(Resources::ShaderPtr p_cascadesShadowsShdr, PrCore::Math::mat4& p_lightMatrix, std::list<RenderObjectPtr>* p_objects, const RenderData* p_renderData);
 		REGISTER_RENDER_COMMAND(RenderToCascadeShadowMap, RenderToCascadeShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, std::list<RenderObjectPtr>*, RenderData*);
 
-		static void RenderLight(Resources::ShaderPtr p_lightShdr, std::vector<LightObject>* p_lightMats, const RenderData* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderLight, RenderLight, Resources::ShaderPtr, std::vector<LightObject>*, const RenderData*);
+		static void RenderLight(Resources::ShaderPtr p_lightShdr, LightObjectPtr mianDirectLight, std::vector<LightObject>* p_lightMats, const RenderData* p_renderData);
+		REGISTER_RENDER_COMMAND(RenderLight, RenderLight, Resources::ShaderPtr, LightObjectPtr, std::vector<LightObject>*, const RenderData*);
 
 		static void RenderCubeMap(Resources::MaterialPtr p_material, const RenderData* p_renderData);
 		REGISTER_RENDER_COMMAND(RenderCubeMap, RenderCubeMap, Resources::MaterialPtr, const RenderData*);
@@ -74,12 +78,6 @@ namespace PrRenderer::Core {
 
 		static void RenderTransparent(RenderObjectPtr p_object, const RenderData* p_renderData);
 		REGISTER_RENDER_COMMAND(RenderTransparent, RenderTransparent, RenderObjectPtr, RenderData*);
-		//--------------
-
-		//Shadow Mapping
-		PrCore::Math::mat4 CalculateCSMFrusturmCorners(const PrCore::Math::vec3& p_lightDir, const PrCore::Math::mat4& p_cameraProjMat);
-		PrCore::Math::vec4 CalculateShadowMapCoords(size_t p_index, size_t p_mapSize, size_t p_combinedMapSize);
-
 
 		void GenerategBuffers();
 		void GenerateShadowMaps();

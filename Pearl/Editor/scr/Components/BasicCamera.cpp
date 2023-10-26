@@ -16,7 +16,7 @@ BasicCamera::BasicCamera(PrRenderer::Core::CameraType p_cameraType):
 	m_camera(nullptr)
 {	
 	m_camera = new PrRenderer::Core::Camera(p_cameraType);
-	m_camera->SetFar(10000.f);
+	m_camera->SetFar(200.0f);
 	m_camera->SetPosition({ 0,0,4 });
 	PrRenderer::Core::Camera::SetMainCamera(m_camera);
 }

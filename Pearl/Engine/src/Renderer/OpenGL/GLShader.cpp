@@ -74,13 +74,13 @@ void GLShader::SetUniformVec2(const std::string& p_name, const PrCore::Math::vec
 	glUniform2f(location, p_value.x, p_value.y);
 }
 
-void GLShader::SetUniformFloatArray(const std::string& p_name, float* p_value, unsigned int p_count)
+void GLShader::SetUniformFloatArray(const std::string& p_name, const float* p_value, unsigned int p_count)
 {
 	auto location = GetUniformLocation(p_name);
 	glUniform1fv(location, p_count, p_value);
 }
 
-void GLShader::SetUniformIntArray(const std::string& p_name, int* p_value, unsigned int p_count)
+void GLShader::SetUniformIntArray(const std::string& p_name, const int* p_value, unsigned int p_count)
 {
 	auto location = GetUniformLocation(p_name);
 	glUniform1iv(location, p_count, p_value);

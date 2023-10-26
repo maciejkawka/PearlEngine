@@ -48,9 +48,94 @@ uniform mat4 lightMat[4];
 uniform int lightNumber = 0;
 uniform vec3 ambientColor; //To be add in future
 
+//CSM
+const int CSMCount = 4;
+uniform mat4 mainDirLightMat;
+uniform bool hasMainDirLight = false;
+uniform mat4 CSMViewMat[4];
+uniform float CSMBorder[4];
+uniform int CSMMapSize;
+uniform sampler2D CSMMap;
+
+
 //Additional
 uniform vec3 camPos;
 uniform bool normalMapping;
+
+vec2 CSM_CalculateSubTexUV(int index, vec2 UVs)
+{
+    float u_min = 0.0f;
+    float v_min = 0.0f;
+    float u_max = 0.0f;
+    float v_max = 0.0f;
+
+    //Select UVs
+    if (index == 0) 
+    {
+        u_min = 0.0;
+        v_min = 0.0;
+        u_max = 0.5;
+        v_max = 0.5;
+    } 
+    else if(index == 1) 
+    {
+        u_min = 0.5;
+        v_min = 0.0;
+        u_max = 1.0;
+        v_max = 0.5;
+    } 
+    else if(index == 2) 
+    {
+        u_min = 0.0;
+        v_min = 0.5;
+        u_max = 0.5;
+        v_max = 1.0;
+    } 
+    else if(index == 3) 
+    {
+        u_min = 0.5;
+        v_min = 0.5;
+        u_max = 1.0;
+        v_max = 1.0;
+    }
+
+    //Lerp UVs
+    return  mix(vec2(u_min, v_min), vec2(u_max, v_max), UVs);
+}
+
+//CDM Debug
+vec3 DebugCDM(int cascadeIndex)
+{
+    vec3 CascadeIndicator = vec3(0.0f);
+    if (cascadeIndex == 0) 
+        CascadeIndicator = vec3(1.0, 0.0, 0.0);
+    else if (cascadeIndex == 1)
+        CascadeIndicator = vec3(0.0, 1.0, 0.0);
+    else if (cascadeIndex == 2)
+        CascadeIndicator = vec3(0.0, 0.0, 1.0);
+    else if (cascadeIndex ==3)
+        CascadeIndicator = vec3(1.0, 1.0, 1.0);
+    return CascadeIndicator;
+}
+
+//Something is wrong here
+float CalcShadowFactor(int cascadeIndex, vec4 LightSpacePos)
+{
+   vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
+ 
+    // Convert [-1, 1] to [0, 1]
+    ProjCoords = 0.5 * ProjCoords + 0.5;
+    float z = ProjCoords.z;
+
+    //Calculate subtexture cords
+    vec2 UVCoords = CSM_CalculateSubTexUV(cascadeIndex, ProjCoords.xy);
+    float Depth = texture(CSMMap, UVCoords).x;
+    //return vec2(Depth,z);
+    if(Depth + 0.0001f < z)
+       return 0.0;
+    else
+       return 1.0;
+}
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
@@ -121,6 +206,7 @@ void main()
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
 
+    // Normal light calculations
     vec3 Lo = vec3(0.0);
     int clampedLightNumber = clamp(lightNumber, 0, MAX_LIGHT_NUM);
     for (int i = 0; i < clampedLightNumber; i++)
@@ -178,6 +264,55 @@ void main()
 
         float NdotL = max(dot(N, L), 0.0);
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+    }
+
+    //CSM Shadow + Main Direct Light Calculations
+    if(hasMainDirLight == true)
+    { 
+        //Light variables
+        mat4 light = mainDirLightMat;
+        int lightType = int(light[0].w);
+        vec3 lightPos = light[0].xyz;
+        vec3 lightColor = vec3(light[2].xyz);
+        vec3 lightDir = normalize(-light[1].xyz);
+
+        // Light has to be a dir type if not leave this part
+        if(lightType == 0) //Directional Light
+        {
+            vec3 L = lightDir;
+            float attenuation = 1.0f;
+
+            vec3 radiance = lightColor * attenuation;
+            vec3 H = normalize(V + L);
+
+            float NDF = DistributionGGX(N, H, roughness);
+            float G = GeometrySmith(N, V, L, roughness);
+            vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0); 
+
+            vec3 numerator = NDF * G * F;
+            float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot( N, L),0.0) + 0.0001;
+            vec3 specular = numerator / denominator;
+
+            vec3 kS = F;
+            vec3 kD = vec3(1.0) - kS;
+            kD *= 1.0 - metallic;
+
+            float NdotL = max(dot(N, L), 0.0);
+
+            //Calculate CSM Shadow Factor  
+            float shadowFactor = 0.0f;       
+            for(int i = 0; i < 4 ; i++)
+            {
+                if(depth < CSMBorder[i])
+                {
+                    shadowFactor = CalcShadowFactor(i, CSMViewMat[i] * vec4(pos, 1.0f));
+                    //Lo = DebugCDM(i) * shadowFactor;
+                    break;
+                }
+            }
+
+            Lo += (kD * albedo / PI + specular) * radiance * NdotL * shadowFactor;
+        }
     }
 
 

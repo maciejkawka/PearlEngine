@@ -21,6 +21,7 @@ namespace PrCore::ECS {
 		MeshRendererComponent() = default;
 		~MeshRendererComponent() override = default;
 
+		bool shadowCaster = true;
 		std::shared_ptr<PrRenderer::Resources::Mesh> mesh;
 		std::shared_ptr<PrRenderer::Resources::Material> material;
 

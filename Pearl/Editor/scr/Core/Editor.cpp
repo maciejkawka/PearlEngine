@@ -22,7 +22,6 @@ Editor::Editor()
 	m_testFeatures = new Components::TestFeatures();
 	m_basicCamera = new Components::BasicCamera(PrRenderer::Core::CameraType::Perspective);
 	m_basicCamera->GetCamera()->SetSize(5.0f);
-	PrRenderer::Core::Renderer3D::GetInstance().SetMainCamera(m_basicCamera->GetCamera());
 }
 
 Editor::~Editor()
@@ -36,7 +35,6 @@ void Editor::PreFrame()
 {
 	m_appContext->m_window->PollEvents();
 	PrRenderer::Core::DefferedRendererFrontend::GetInstance().PrepareFrame();
-	PrRenderer::Core::Renderer3D::GetInstance().Begin();
 
 	//Exit
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
@@ -104,8 +102,6 @@ void Editor::PostFrame()
 	m_appContext->m_rendererBackend->Render();
 	m_appContext->m_rendererBackend->PostRender();
 
-	PrRenderer::Core::Renderer3D::GetInstance().Render();
-	PrRenderer::Core::Renderer3D::GetInstance().Flush();
 	m_appContext->m_window->SwapBuffers();
 	PrCore::Input::InputManager::GetInstance().ResetFlags();
 	

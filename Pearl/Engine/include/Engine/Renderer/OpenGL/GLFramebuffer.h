@@ -17,6 +17,7 @@ namespace PrRenderer::OpenGL {
 		virtual void ClearAttachmentColor(unsigned int p_attachment, Core::Color p_color) override;
 
 		virtual Resources::TexturePtr GetTexturePtr(unsigned int p_index = 0) override;
+		virtual Resources::TexturePtr GetDepthTexturePtr() override;
 
 		//Unprotected function call only if you know what to do with the texture
 		//Texture has to be deleted manually
@@ -30,12 +31,14 @@ namespace PrRenderer::OpenGL {
 		void UpdateDepthTexture();
 
 		void GenerateTexture(unsigned int p_index);
+		void GenerateDepthTexture();
 
 		void DeleteTextures();
 
 		std::vector<Buffers::FramebufferTexture> m_colorTextureAttachments;
 		std::set<RendererID> m_trackedAttachments;
 		std::vector<Resources::TexturePtr> m_colorTextures;
+		Resources::TexturePtr m_depthTexture;
 		Buffers::FramebufferTexture m_depthStencilTextureAttachment;
 	};
 
