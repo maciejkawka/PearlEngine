@@ -72,5 +72,11 @@
         "y": 0
       }
     }
+  ],
+   "boolproperties": [
+    {
+      "name": "normalMapping",
+      "value": true
+    }
   ]
 }

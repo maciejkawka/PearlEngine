@@ -20,6 +20,30 @@ CascadeShadowMapper::~CascadeShadowMapper()
 	delete[] m_cameraProjs;
 }
 
+void CascadeShadowMapper::SetCameraProj(const PrCore::Math::mat4& p_proj, size_t p_index)
+{
+	PR_ASSERT(p_index < m_cascadeLayers, "Index bigger than cascade layer");
+	m_cameraProjs[p_index] = p_proj;
+}
+
+void CascadeShadowMapper::SetBorder(float p_border, size_t p_index)
+{
+	PR_ASSERT(p_index < m_cascadeLayers, "Index bigger than cascade layer");
+	m_borders[p_index] = p_border;
+}
+
+const PrCore::Math::mat4& CascadeShadowMapper::GetCameraProj(size_t p_index) const
+{
+	PR_ASSERT(p_index < m_cascadeLayers, "Index bigger than cascade layer");
+	return m_cameraProjs[p_index];
+}
+
+const PrCore::Math::mat4& CascadeShadowMapper::GetLightProj(size_t p_index) const
+{
+	PR_ASSERT(p_index < m_cascadeLayers, "Index bigger than cascade layer");
+	return m_lightMats[p_index];
+}
+
 PrCore::Math::mat4 CascadeShadowMapper::ClaculateFrustrums(const PrCore::Math::vec3& p_lightDir, const PrCore::Math::mat4& p_cameraView, size_t p_index) const
 {
 	using namespace PrCore;

@@ -10,31 +10,12 @@ namespace PrRenderer::Core {
 		CascadeShadowMapper(size_t p_cascadeLayers, size_t p_mapSize);
 		~CascadeShadowMapper();
 
-		void SetCameraProj(const PrCore::Math::mat4& p_proj, size_t p_index)
-		{
-			PR_ASSERT(p_index < m_cascadeLayers, "Index bigger than cascade layer");
-			m_cameraProjs[p_index] = p_proj;
-		}
-
-		void SetBorder(float p_border, size_t p_index)
-		{
-			PR_ASSERT(p_index < m_cascadeLayers, "Index bigger than cascade layer");
-			m_borders[p_index] = p_border;
-		}
-
+		void SetCameraProj(const PrCore::Math::mat4& p_proj, size_t p_index);
+		void SetBorder(float p_border, size_t p_index);
 		void SetMapSize(size_t p_size) { m_mapSize = p_size; }
 
-		inline const PrCore::Math::mat4& GetCameraProj(size_t p_index) const
-		{
-			PR_ASSERT(p_index < m_cascadeLayers, "Index bigger than cascade layer");
-			return m_cameraProjs[p_index];
-		}
-
-		inline const PrCore::Math::mat4& GetLightProj(size_t p_index)
-		{
-			PR_ASSERT(p_index < m_cascadeLayers, "Index bigger than cascade layer");
-			return m_lightMats[p_index];
-		}
+		const PrCore::Math::mat4& GetCameraProj(size_t p_index) const;
+		const PrCore::Math::mat4& GetLightProj(size_t p_index) const;
 
 		inline size_t                    GetMapSize() const { return m_mapSize; }
 		inline const PrCore::Math::mat4* GetProjMats() const { return m_cameraProjs; }

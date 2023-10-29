@@ -24,7 +24,7 @@ namespace PrRenderer::Core
 		//Cascade Shadow Mapping
 		m_settings.cascadeShadowBorders[0] = 0.1f;
 		m_settings.cascadeShadowBorders[1] = 0.2f;
-		m_settings.cascadeShadowBorders[2] = 0.3f;
+		m_settings.cascadeShadowBorders[2] = 0.5f;
 		m_settings.cascadeShadowBorders[3] = 1.0f;
 		m_settings.cascadeShadowMapSize = 4096;
 		m_renderData.CSM = std::make_unique<CascadeShadowMapper>(SHADOW_CASCADES_COUNT, m_settings.cascadeShadowMapSize);
@@ -83,7 +83,6 @@ namespace PrRenderer::Core
 			{
 				for (int i = 0; i < SHADOW_CASCADES_COUNT; i++)
 					m_renderData.CSM->SetBorder(m_settings.cascadeShadowBorders[i] * camera->GetFar(), i);
-
 				m_renderData.CSM->SetCameraProj(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetNear(), camera->GetFar() * m_settings.cascadeShadowBorders[0]), 0);
 				m_renderData.CSM->SetCameraProj(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings.cascadeShadowBorders[0], camera->GetFar() * m_settings.cascadeShadowBorders[1]), 1);
 				m_renderData.CSM->SetCameraProj(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings.cascadeShadowBorders[1], camera->GetFar() * m_settings.cascadeShadowBorders[2]), 2);
@@ -94,7 +93,6 @@ namespace PrRenderer::Core
 			{
 				auto lightMat = m_renderData.CSM->ClaculateFrustrums(lightDir, camera->GetViewMatrix(), i);
 				auto viewport = m_renderData.CSM->CalculateShadowMapCoords(i);
-
 				m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
 				m_commandQueue.push_back(CreateRC<RenderToCascadeShadowMapRC>(m_shadowMappingShader, lightMat, &m_frame->shadowCasters, &m_renderData));
 			}
@@ -103,7 +101,6 @@ namespace PrRenderer::Core
 				{
 					m_renderData.m_cascadeShadow->Unbind();
 				}));
-
 			m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(PrCore::Windowing::Window::GetMainWindow().GetWidth(),
 				PrCore::Windowing::Window::GetMainWindow().GetHeight(), 0, 0));
 		}
@@ -503,39 +500,39 @@ namespace PrRenderer::Core
 		if (p_renderData->IRMap && p_renderData->prefilterMap && p_renderData->brdfLUT)
 		{
 			p_renderData->IRMap->Bind(4);
-			p_lightShdr->SetUniformInt("irradianceMap", 4);
+			p_lightShdr->SetUniformInt("PBR_irradianceMap", 4);
 
 			p_renderData->prefilterMap->Bind(5);
-			p_lightShdr->SetUniformInt("prefilterMap", 5);
+			p_lightShdr->SetUniformInt("PBR_prefilterMap", 5);
 
 			p_renderData->brdfLUT->Bind(6);
-			p_lightShdr->SetUniformInt("brdfLUT", 6);
+			p_lightShdr->SetUniformInt("PBR_brdfLUT", 6);
 		}
 
 		p_lightShdr->SetUniformVec3("camPos", p_renderData->camera->GetPosition());
-		p_lightShdr->SetUniformMat4("VPMatrix", p_renderData->camera->GetCameraMatrix());
 
+
+		if (mianDirectLight && p_renderData->m_CSMShadowMap)
+		{
+			p_lightShdr->SetUniformMat4("CSM_mainLight", mianDirectLight->lightMat);
+			p_lightShdr->SetUniformBool("CSM_hasMainLight", true);
+			p_lightShdr->SetUniformMat4Array("CSM_viewMats[0]", p_renderData->CSM->GetLightMats(), 4);
+			p_lightShdr->SetUniformFloatArray("CSM_borders[0]", p_renderData->CSM->GetBorders(), 4);
+			p_lightShdr->SetUniformInt("CSM_mapSize", p_renderData->CSM->GetMapSize());
+
+			p_renderData->m_CSMShadowMap->Bind(7);
+			p_lightShdr->SetUniformInt("CSM_map", 7);
+		}
+		else
+			p_lightShdr->SetUniformBool("CSM_hasMainLight", false);
 
 		std::vector<PrCore::Math::mat4> lightMat;
 		for (auto light : *p_lightMats)
 			lightMat.push_back(light.lightMat);
 
-		if (mianDirectLight && p_renderData->m_CSMShadowMap)
-		{
-			p_lightShdr->SetUniformMat4("mainDirLightMat", mianDirectLight->lightMat);
-			p_lightShdr->SetUniformMat4Array("CSMViewMat[0]", p_renderData->CSM->GetLightMats(), 4);
-			p_lightShdr->SetUniformFloatArray("CSMBorder[0]", p_renderData->CSM->GetBorders(), 4);
-			p_lightShdr->SetUniformInt("CSMMapSize", p_renderData->CSM->GetMapSize());
-			p_lightShdr->SetUniformBool("hasMainDirLight", true);
-
-			p_renderData->m_CSMShadowMap->Bind(7);
-			p_lightShdr->SetUniformInt("CSMMap", 7);
-		}
-		else
-			p_lightShdr->SetUniformBool("hasMainDirLight", false);
-
 		p_lightShdr->SetUniformMat4Array("lightMat[0]", lightMat.data(), lightMat.size());
 		p_lightShdr->SetUniformInt("lightNumber", lightMat.size());
+
 
 		p_renderData->m_quadMesh->Bind();
 		LowRenderer::Draw(p_renderData->m_quadMesh->GetVertexArray());
