@@ -386,6 +386,7 @@ void main()
     data.albedo = albedo;
     data.roughness = roughness;
     data.metallic = metallic;
+    data.pos = pos;
     data.V = V;
     data.R = R;
     data.N = N;
