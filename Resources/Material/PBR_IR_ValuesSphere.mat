@@ -34,5 +34,11 @@
         "w": 1.0
       }
     }
+  ],
+  "boolproperties": [
+    {
+      "name": "normalMapping",
+      "value": false
+    }
   ]
 }

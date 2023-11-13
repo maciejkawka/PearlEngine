@@ -133,9 +133,10 @@ namespace PrRenderer::Core {
 	///////////////////////////////////////
 
 	struct LightObject {
-		PrCore::Math::mat4        lightMat;
-		size_t                    shadowMapPos;
-		size_t                    id;
+		PrCore::Math::mat4                     lightMat;
+		PrCore::Math::mat4                     lightViewMat;
+		size_t                                 shadowMapPos;
+		size_t                                 id;
 	};
 
 	using LightObjectPtr = std::shared_ptr<LightObject>;

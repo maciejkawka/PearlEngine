@@ -41,10 +41,17 @@ uniform sampler2D aoMap;
 //Lighting and shadowing
 const int     maxLightNum = 200;
 
-uniform mat4  lightMat[4];
-uniform int   lightNumber = 0;
-uniform vec3  ambientColor; //To be add in future
+uniform mat4      lightMat[maxLightNum];
+uniform mat4      lightViewMatrices[maxLightNum];
+uniform int       lightID[10];
+uniform int       lightNumber = 0;
+uniform vec3      ambientColor; //To be add in future
 
+uniform int       pointLightMapSize;
+uniform int       SDLightMapSize;
+uniform int       shadowMapSize;
+uniform sampler2D pointLightShadowMap;
+uniform sampler2D SDLightShadowMap;
 
 // IBL
 uniform samplerCube PBR_irradianceMap;
@@ -140,7 +147,7 @@ float rand(vec4 co){
 }
 
 
-//--------------------Cascade Shadow Mapping---------------------------
+//--------------------Cascade Shadow Mapping-------------------------
 vec2 CSM_CalculateSubTexUV(int index, vec2 UVs)
 {
     float u_min = 0.0f;
@@ -226,7 +233,7 @@ float CSM_CalculateShadowFactor(int cascadeIndex, vec4 LightSpacePos)
 //--------------------------------------------------------------------
 
 
-//--------------------PBR Functions-----------------------------------
+//--------------------PBR Functions----------------------------------
 float PBR_DistributionGGX(vec3 N, vec3 H, float roughness)
 {
     float a = roughness*roughness;
@@ -294,7 +301,8 @@ vec3 PBR_Light(mat4 light, PBR_Data data)
     vec3 lightPos = light[0].xyz;
     vec3 lightColor = vec3(light[2].xyz);
     vec3 lightDir = normalize(-light[1].xyz);
- 
+    float lightRange = light[3].w;
+
     vec3 L = vec3(0);
     float attenuation = 0;
 
@@ -320,6 +328,9 @@ vec3 PBR_Light(mat4 light, PBR_Data data)
         
         float distance = length(lightPos - pos);
         attenuation = 1.0 / (distance * distance);
+
+        if(distance >= lightRange)
+            return vec3(0.0f);
     }
     if(lightType == 2) //Spot Light
     {
@@ -354,10 +365,159 @@ vec3 PBR_Light(mat4 light, PBR_Data data)
 
     return Lo;
 }
-//--------------------------------------------------------------------
+//-------------------------------------------------------------------
+
+//--------------------Shadow Calculations----------------------------
+vec2 SHDW_CalculateLightUVs(int id, int subShadowTexSize, vec2 UVs)
+{
+    // clamp UVs not to exceed the [0,1] boundary
+    UVs = clamp(UVs, 0.0f, 1.0f);
+
+    int subTexPerRow = int(shadowMapSize / subShadowTexSize);
+    int subTexRow = int(id / subTexPerRow);
+    int subTexCol = id - subTexRow * subTexPerRow;
+
+    // Add offset to avoid black seam between cubemap faces
+    float offset = 1.0f / subShadowTexSize;
+    vec2 subTexUVsStart = vec2(subTexCol + offset, subTexRow + offset) / subTexPerRow;
+    vec2 subTexUVsEnd = vec2(subTexCol + 1 - offset, subTexRow + 1 - offset) / subTexPerRow;
+    return mix(subTexUVsStart, subTexUVsEnd, UVs);
+}
+
+float SHDW_SampleMap(vec2 UVs, int lightID, sampler2D map)
+{
+    return texture(map, SHDW_CalculateLightUVs(lightID, pointLightMapSize, UVs)).x;
+}
+
+vec3 SHDW_PointMapFaceDebug(mat4 light, vec3 fragPos, int lightIndex)
+{
+    vec3 lightPos = light[0].xyz;
+    vec3 fragToLight = fragPos - lightPos;
+    vec3 fragToLightDir = normalize(fragToLight);
+
+    vec3 absLightDirection = abs(fragToLightDir);
+    int faceIndex = -1;
+    if (absLightDirection.x > absLightDirection.y && absLightDirection.x > absLightDirection.z)
+        faceIndex = fragToLightDir.x > 0.0 ? 0 : 1;
+    else if (absLightDirection.y > absLightDirection.z)
+        faceIndex = fragToLightDir.y > 0.0 ? 2 : 3;
+    else
+        faceIndex = fragToLightDir.z > 0.0 ? 4 : 5;
+
+    if (faceIndex == 0)
+        return vec3(1, 0, 0);
+    else if (faceIndex == 1)
+        return vec3(0.2f, 0, 0);
+    else if (faceIndex == 2)
+        return vec3(0, 1, 0);
+    else if (faceIndex == 3)
+        return vec3(0, 0.2f, 0);
+    else if (faceIndex == 4)
+        return vec3(0, 0, 1);
+    else
+        return vec3(0, 0, 0.2f);
+}
+
+vec2 SHDW_DebugMapUVs(mat4 light, vec3 fragPos, int lightIndex)
+{
+    vec3 lightPos = light[0].xyz;
+    float lightRange = light[3].w;
+    vec3 fragToLight = fragPos - lightPos;
+    vec3 fragToLightDir = normalize(fragToLight);
+    int  lightIDs = lightID[lightIndex];
+
+    vec3 absLightDirection = abs(fragToLightDir);
+    int faceIndex = -1;
+    if (absLightDirection.x > absLightDirection.y && absLightDirection.x > absLightDirection.z)
+        faceIndex = fragToLightDir.x > 0.0 ? 0 : 1;
+    else if (absLightDirection.y > absLightDirection.z)
+        faceIndex = fragToLightDir.y > 0.0 ? 2 : 3;
+    else
+        faceIndex = fragToLightDir.z > 0.0 ? 4 : 5;
+
+    vec2 depth = vec2(0.0f);
+    if (faceIndex == 0)
+    {
+        vec2 UVs = vec2(-fragToLightDir.z, -fragToLightDir.y) * 0.5 / absLightDirection.x + 0.5;
+        depth = SHDW_CalculateLightUVs(lightIDs, pointLightMapSize, UVs);
+    }
+    else if (faceIndex == 1)
+    {
+        vec2 UVs = vec2(fragToLightDir.z, -fragToLightDir.y) * 0.5 / absLightDirection.x + 0.5;
+        depth = SHDW_CalculateLightUVs(lightIDs + 1, pointLightMapSize, UVs);
+    }
+    else if (faceIndex == 2)
+    {
+        vec2 UVs = vec2(fragToLightDir.x, fragToLightDir.z) * 0.5 / absLightDirection.y + 0.5;
+        depth = SHDW_CalculateLightUVs(lightIDs + 2, pointLightMapSize, UVs);
+    }
+    else if (faceIndex == 3)
+    {
+        vec2 UVs = vec2(fragToLightDir.x, -fragToLightDir.z) * 0.5 / absLightDirection.y + 0.5;
+        depth = SHDW_CalculateLightUVs(lightIDs + 3, pointLightMapSize, UVs);
+    }
+    else if (faceIndex == 4)
+    {
+        vec2 UVs = vec2(fragToLightDir.x, -fragToLightDir.y) * 0.5 / absLightDirection.z + 0.5;
+        depth = SHDW_CalculateLightUVs(lightIDs + 4, pointLightMapSize, UVs);
+    }
+    else
+    {
+        vec2 UVs = vec2(-fragToLightDir.x, -fragToLightDir.y) * 0.5 / absLightDirection.z + 0.5;
+        depth = SHDW_CalculateLightUVs(lightIDs + 5, pointLightMapSize, UVs);
+    }
+
+    return depth;
+}
+
+float SHDW_CalculatePointFactor(mat4 light, vec3 fragPos, int lightIndex)
+{
+    vec3 lightPos = light[0].xyz;
+    float lightRange = light[3].w;
+    vec3 fragToLight = fragPos - lightPos;
+    vec3 fragToLightDir = normalize(fragToLight);
+    int  lightIDs = lightID[lightIndex];
+
+    // check if frag is out of range
+    if (length(fragToLight) >= lightRange)
+        return 1.0f;
+
+    // Determine which face to sample based on the maximum component of the direction vector
+    vec3 absLightDirection = abs(fragToLightDir);
+    int faceIndex = -1;
+    if (absLightDirection.x > absLightDirection.y && absLightDirection.x > absLightDirection.z)
+        faceIndex = fragToLightDir.x > 0.0 ? 0 : 1;
+    else if (absLightDirection.y > absLightDirection.z)
+        faceIndex = fragToLightDir.y > 0.0 ? 2 : 3;
+    else
+        faceIndex = fragToLightDir.z > 0.0 ? 4 : 5;
+
+    // Sample correct cubemap face
+    vec2 UVs = vec2(0.0f);
+    if (faceIndex == 0)
+        UVs = vec2(-fragToLightDir.z, -fragToLightDir.y) * 0.5 / absLightDirection.x + 0.5;
+    else if (faceIndex == 1)
+        UVs = vec2(fragToLightDir.z, -fragToLightDir.y) * 0.5 / absLightDirection.x + 0.5;
+    else if (faceIndex == 2)
+        UVs = vec2(fragToLightDir.x, fragToLightDir.z) * 0.5 / absLightDirection.y + 0.5;
+    else if (faceIndex == 3)
+        UVs = vec2(fragToLightDir.x, -fragToLightDir.z) * 0.5 / absLightDirection.y + 0.5;
+    else if (faceIndex == 4)
+        UVs = vec2(fragToLightDir.x, -fragToLightDir.y) * 0.5 / absLightDirection.z + 0.5;
+    else
+        UVs = vec2(-fragToLightDir.x, -fragToLightDir.y) * 0.5 / absLightDirection.z + 0.5;
+
+    float depth = SHDW_SampleMap(UVs, lightIDs + faceIndex, pointLightShadowMap);
+    if (depth + 0.5f < length(fragToLight))
+        return 0.0f;
+    else
+        return 1.0f;
+}
+
+//-------------------------------------------------------------------
 
 
-//-----------------------------MAIN-----------------------------------
+//-----------------------------MAIN----------------------------------
 void main()
 {
     //Sample Textures
@@ -416,9 +576,17 @@ void main()
     for (int i = 0; i < clampedLightNumber; i++)
     {
         //Shadow Calculations in future
+        float shadowFactor = SHDW_CalculatePointFactor(lightMat[i], pos, i);
 
-        vec3 lightAmmount = PBR_Light(lightMat[i], data);
+        vec3 lightAmmount = PBR_Light(lightMat[i], data) * shadowFactor;
         Lo += lightAmmount;
+
+        //Lo = SHDW_PointMapFaceDebug(lightMat[i], pos, i);
+       
+        //vec2 debugUVs = SHDW_DebugMapUVs(lightMat[i], pos, i);
+        //Lo = vec3(debugUVs.x, debugUVs.y, 1.0f) * shadowFactor;
+
+       // Lo = vec3(shadowFactor);
     }
 
 

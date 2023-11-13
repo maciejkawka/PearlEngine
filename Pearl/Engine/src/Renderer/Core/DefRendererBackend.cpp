@@ -16,6 +16,7 @@ namespace PrRenderer::Core
 		m_shadowMappingShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Shadows/ShadowMapping.shader");
 		m_postProcesShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/RenderFront.shader");
 		m_pbrLightShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/lightPass.shader");
+		m_pointshadowMappingShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Shadows/PointShadowMapping.shader");
 
 		m_renderData.m_quadMesh = Resources::Mesh::CreatePrimitive(Resources::Quad);
 		GenerategBuffers();
@@ -106,6 +107,94 @@ namespace PrRenderer::Core
 		}
 
 		//Shadow Mapping
+
+		//Render to point lights shadow map
+		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]
+			{
+				m_renderData.m_shadowMapPoint->Bind();
+				LowRenderer::Clear(ColorBuffer | DepthBuffer);
+			}));
+
+
+		PrCore::Math::vec3 lightDirs[6] = {
+			PrCore::Math::vec3(1,0,0),
+			PrCore::Math::vec3(-1,0,0),
+			PrCore::Math::vec3(0,1,0),
+			PrCore::Math::vec3(0,-1,0),
+			PrCore::Math::vec3(0,0,1),
+			PrCore::Math::vec3(0,0,-1)
+		};
+
+		for (auto& light : m_frame->lights)
+		{
+			//auto lightProjMatrix = PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetNear(), light.lightMat[3].w * 1.5f);
+			//auto lightPos = PrCore::Math::vec3(light.lightMat[0].x, light.lightMat[0].y, light.lightMat[0].z);
+			//auto forward = glm::vec3(1.0f, 0.0f, 0.0f);
+			//auto lookAtMat = PrCore::Math::lookAt(lightPos, lightPos + forward, PrCore::Math::vec3(0.0f, 1.0f, 0.0f));
+			//light.lightViewMat = lightProjMatrix * lookAtMat;
+
+			//for (int i = 0; i < 6; i++)
+			//{
+			//	auto viewport = CalculatePointLightTexture(light.shadowMapPos + i);
+			//	m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
+
+			//	auto rotation = PrCore::Math::rotation(forward, lightDirs[i]);
+			//	auto rotationMatrix = PrCore::Math::mat4_cast(rotation);
+			//	auto lightViewMatrix = lookAtMat * rotationMatrix;
+			//	auto lightTransformMatrix = lightProjMatrix * lightViewMatrix;
+
+			//	m_commandQueue.push_back(CreateRC<RenderToCascadeShadowMapRC>(m_shadowMappingShader, lightTransformMatrix, &m_frame->shadowCasters, &m_renderData));
+			//}
+
+			auto lightProjMatrix = PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetNear(), light.lightMat[3].w * 1.2f);
+			auto lightPos = PrCore::Math::vec3(light.lightMat[0].x, light.lightMat[0].y, light.lightMat[0].z);
+
+			auto lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(1.0f, 0.0f, 0.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
+			auto viewport = CalculatePointLightTexture(light.shadowMapPos + 0);
+			m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
+			m_commandQueue.push_back(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShader, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderData));
+
+			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(-1.0f, 0.0f, 0.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
+			viewport = CalculatePointLightTexture(light.shadowMapPos + 1);
+			m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
+			m_commandQueue.push_back(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShader, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderData));
+
+			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, 1.0f, 0.0), PrCore::Math::vec3(0.0f, 0.0f, 1.0f));
+			viewport = CalculatePointLightTexture(light.shadowMapPos + 2);
+			m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
+			m_commandQueue.push_back(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShader, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderData));
+
+			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, -1.0f, 0.0f), PrCore::Math::vec3(0.0f, 0.0f, -1.0f));
+			viewport = CalculatePointLightTexture(light.shadowMapPos + 3);
+			m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
+			m_commandQueue.push_back(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShader, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderData));
+
+			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, 0.0f, 1.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
+			viewport = CalculatePointLightTexture(light.shadowMapPos + 4);
+			m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
+			m_commandQueue.push_back(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShader, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderData));
+
+			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, 0.0f, -1.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
+			viewport = CalculatePointLightTexture(light.shadowMapPos + 5);
+			m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
+			m_commandQueue.push_back(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShader, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderData));
+		}
+
+		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]
+			{
+				m_renderData.m_shadowMapPoint->Unbind();
+				LowRenderer::Clear(ColorBuffer | DepthBuffer);
+			}));
+		m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(PrCore::Windowing::Window::GetMainWindow().GetWidth(),
+			PrCore::Windowing::Window::GetMainWindow().GetHeight(), 0, 0));
+
+
+		//Iterate Direct and Stop Lights
+
+
+
+
+
 		//m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]()
 		//	{
 		//		LowRenderer::EnableCullFace(true);
@@ -319,6 +408,35 @@ namespace PrRenderer::Core
 		p_cascadesShadowsShdr->Unbind();
 	}
 
+	void DefRendererBackend::RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightMatrix, PrCore::Math::vec3& p_lightPos, std::list<RenderObjectPtr>* p_objects, const RenderData* p_renderData)
+	{
+		p_pointShadowMapShader->Bind();
+		p_pointShadowMapShader->SetUniformMat4("lightMatrix", p_lightMatrix);
+		p_pointShadowMapShader->SetUniformVec3("lightPos", p_lightPos);
+
+		for (auto object : *p_objects)
+		{
+			if (object->type == RenderObjectType::Mesh)
+			{
+				p_pointShadowMapShader->SetUniformMat4("modelMatrix", object->worldMat);
+				p_pointShadowMapShader->SetUniformInt("instancedCount", 0);
+				object->mesh->Bind();
+				LowRenderer::Draw(object->mesh->GetVertexArray());
+				object->mesh->Unbind();
+			}
+			else if (object->type == RenderObjectType::InstancedMesh)
+			{
+				p_pointShadowMapShader->SetUniformMat4Array("modelMatrixArray[0]", object->worldMatrices.data(), object->worldMatrices.size());
+				p_pointShadowMapShader->SetUniformInt("instancedCount", object->instanceSize);
+				object->mesh->Bind();
+				LowRenderer::DrawInstanced(object->mesh->GetVertexArray(), object->instanceSize);
+				object->mesh->Unbind();
+			}
+		}
+
+		p_pointShadowMapShader->Unbind();
+	}
+
 	void DefRendererBackend::GenerategBuffers()
 	{
 		//Explicitly reset old one
@@ -380,6 +498,7 @@ namespace PrRenderer::Core
 	void DefRendererBackend::GenerateShadowMaps()
 	{
 		//Normal shadow mapping
+		//Other Lights Mapping
 		Buffers::FramebufferTexture gDepth;
 		gDepth.format = Resources::TextureFormat::Depth32;
 
@@ -390,7 +509,19 @@ namespace PrRenderer::Core
 		settings.depthStencilAttachment = gDepth;
 
 		m_renderData.m_shadowMapOther = Buffers::Framebufffer::Create(settings);
-		m_renderData.m_shadowMapPoint = Buffers::Framebufffer::Create(settings);
+
+		//Point Lights Mapping
+		Buffers::FramebufferTexture distColor;
+		distColor.format = Resources::TextureFormat::RGBA16F;
+
+		Buffers::FramebufferSettings settingsPoint;
+		settingsPoint.globalWidth = m_settings.comboShadowMap;
+		settingsPoint.globalHeight = m_settings.comboShadowMap;;
+		settingsPoint.mipMaped = false;
+		settingsPoint.colorTextureAttachments = distColor;
+		settingsPoint.depthStencilAttachment = gDepth;
+		m_renderData.m_shadowMapPoint = Buffers::Framebufffer::Create(settingsPoint);
+		m_renderData.m_shadowMapPointTex = m_renderData.m_shadowMapPoint->GetTexturePtr(0);
 		
 
 		//Cascade shadow mapping
@@ -511,7 +642,7 @@ namespace PrRenderer::Core
 
 		p_lightShdr->SetUniformVec3("camPos", p_renderData->camera->GetPosition());
 
-
+		// Render Main CSM Light
 		if (mianDirectLight && p_renderData->m_CSMShadowMap)
 		{
 			p_lightShdr->SetUniformMat4("CSM_mainLight", mianDirectLight->lightMat);
@@ -526,11 +657,28 @@ namespace PrRenderer::Core
 		else
 			p_lightShdr->SetUniformBool("CSM_hasMainLight", false);
 
+		// Render Shadows
+		{
+			p_lightShdr->SetUniformInt("pointLightMapSize", 512);
+			p_lightShdr->SetUniformInt("shadowMapSize", 8192);
+
+			p_renderData->m_shadowMapPointTex->Bind(8);
+			p_lightShdr->SetUniformInt("pointLightShadowMap", 8);
+		}
+		
 		std::vector<PrCore::Math::mat4> lightMat;
+		std::vector<PrCore::Math::mat4> lightViewMat;
+		std::vector<int> lightIDs;
 		for (auto light : *p_lightMats)
+		{
 			lightMat.push_back(light.lightMat);
+			lightViewMat.push_back(light.lightViewMat);
+			lightIDs.push_back(light.shadowMapPos);
+		}
 
 		p_lightShdr->SetUniformMat4Array("lightMat[0]", lightMat.data(), lightMat.size());
+		p_lightShdr->SetUniformMat4Array("lightViewMatrices", lightViewMat.data(), lightViewMat.size());
+		p_lightShdr->SetUniformIntArray("lightID", lightIDs.data(), lightIDs.size());
 		p_lightShdr->SetUniformInt("lightNumber", lightMat.size());
 
 
@@ -689,5 +837,17 @@ namespace PrRenderer::Core
 		framebuffer->Unbind();
 
 		PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<Resources::Shader>("LUTMap.shader");
+	}
+
+	PrCore::Math::vec4 DefRendererBackend::CalculatePointLightTexture(size_t p_lightID)
+	{
+		size_t width = m_settings.comboShadowMap;
+		size_t height = m_settings.comboShadowMap;
+
+		size_t rowCount = width / m_settings.pointLightShadowMapSize;
+		size_t row = p_lightID % rowCount;
+		size_t column = p_lightID / rowCount;
+
+		return { m_settings.pointLightShadowMapSize, m_settings.pointLightShadowMapSize, row * m_settings.pointLightShadowMapSize, column * m_settings.pointLightShadowMapSize };
 	}
 }

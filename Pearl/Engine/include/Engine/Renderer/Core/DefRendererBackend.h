@@ -45,6 +45,7 @@ namespace PrRenderer::Core {
 			//Shadow mapping
 			//One point light uses 6 subparts of the texture, so number of lights = TextureSize / (ShadowMapTexture * 6)
 			Buffers::FramebuffferPtr m_shadowMapPoint;
+			Resources::TexturePtr    m_shadowMapPointTex;
 			//One light uses one subpart of the texture
 			Buffers::FramebuffferPtr m_shadowMapOther;
 
@@ -67,6 +68,9 @@ namespace PrRenderer::Core {
 		static void RenderToCascadeShadowMap(Resources::ShaderPtr p_cascadesShadowsShdr, PrCore::Math::mat4& p_lightMatrix, std::list<RenderObjectPtr>* p_objects, const RenderData* p_renderData);
 		REGISTER_RENDER_COMMAND(RenderToCascadeShadowMap, RenderToCascadeShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, std::list<RenderObjectPtr>*, RenderData*);
 
+		static void RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightMatrix, PrCore::Math::vec3& p_lightPos, std::list<RenderObjectPtr>* p_objects, const RenderData* p_renderData);
+		REGISTER_RENDER_COMMAND(RenderToPointShadowMap, RenderToPointShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, PrCore::Math::vec3, std::list<RenderObjectPtr>*, RenderData*);
+
 		static void RenderLight(Resources::ShaderPtr p_lightShdr, LightObjectPtr mianDirectLight, std::vector<LightObject>* p_lightMats, const RenderData* p_renderData);
 		REGISTER_RENDER_COMMAND(RenderLight, RenderLight, Resources::ShaderPtr, LightObjectPtr, std::vector<LightObject>*, const RenderData*);
 
@@ -86,7 +90,8 @@ namespace PrRenderer::Core {
 		void GeneratePrefilterMap();
 		void GenerateLUTMap();
 
-		//Cascade shadow mapping
+		//Shadow Mapping
+		PrCore::Math::vec4 CalculatePointLightTexture(size_t p_lightID);
 		//std::vector<glm::vec4> lightFrustrumCorners(const PrCore::Math::mat4& p_projectionMat);
 
 		//Main Data
@@ -97,6 +102,7 @@ namespace PrRenderer::Core {
 		Resources::ShaderPtr m_postProcesShdr;
 		Resources::ShaderPtr m_pbrLightShader;
 		Resources::ShaderPtr m_shadowMappingShader;
+		Resources::ShaderPtr m_pointshadowMappingShader;
 		
 	};
 
