@@ -659,7 +659,7 @@ namespace PrRenderer::Core
 
 		// Render Shadows
 		{
-			p_lightShdr->SetUniformInt("pointLightMapSize", 512);
+			p_lightShdr->SetUniformInt("pointLightMapSize", 1024);
 			p_lightShdr->SetUniformInt("shadowMapSize", 8192);
 
 			p_renderData->m_shadowMapPointTex->Bind(8);

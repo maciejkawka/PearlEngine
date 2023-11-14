@@ -156,7 +156,7 @@ namespace PrRenderer::Core {
 
 
 		//Shadows
-		size_t pointLightShadowMapSize = 512;
+		size_t pointLightShadowMapSize = 1024;
 		size_t lightShadowMapSize = 1024;
 		size_t comboShadowMap = 8192;
 

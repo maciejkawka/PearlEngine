@@ -387,7 +387,7 @@ vec2 SHDW_CalculateLightUVs(int id, int subShadowTexSize, vec2 UVs)
 
 float SHDW_PenumbraSize(float zReciever, float zBlocker)
 {
-    return abs(zReciever - zBlocker) / zBlocker;
+    return (zReciever - zBlocker) / zBlocker;
 }
 
 float SHDW_FindBlockers(vec2 UVs, float lightFragLength, sampler2D map, int id)
@@ -397,7 +397,7 @@ float SHDW_FindBlockers(vec2 UVs, float lightFragLength, sampler2D map, int id)
     float texelSize = 1.0f / float(pointLightMapSize);
 
     for (int i = 0; i < 64; i++) {
-        vec2 coord = UVs + CDM_poissonDisk[i] * texelSize * 10.0f;
+        vec2 coord = UVs + CDM_poissonDisk[i] * texelSize * clamp(20.0f - lightFragLength, 10.0f, 20.0f);
         float smap = texture(map, SHDW_CalculateLightUVs(id, pointLightMapSize, coord)).x;
         if (smap < lightFragLength) {
             blockerSum += smap;
@@ -414,7 +414,7 @@ float SHDW_PCF(vec2 UVs, int lightID, sampler2D map, float filterRadius, float l
     mat2 rotation = mat2(vec2(cos(theta), sin(theta)), vec2(-sin(theta), cos(theta)));
     float texelSize = 1.0f / pointLightMapSize;
     for (int i = 0; i < 64; i++) {
-        vec2 offset = rotation * CDM_poissonDisk[i] * texelSize * clamp(filterRadius, 5.0f, 25.0f);
+        vec2 offset = rotation * CDM_poissonDisk[i] * texelSize * clamp(filterRadius, 2.0f, 50.0f);
         vec2 texOffset = UVs + offset;
 
         vec2 UVCoords = SHDW_CalculateLightUVs(lightID, pointLightMapSize, texOffset);
@@ -434,7 +434,7 @@ float SHDW_PCSS(vec2 UVs, int lightID, sampler2D map, float lightFragLength)
     float blockers = SHDW_FindBlockers(UVs, lightFragLength, map, lightID);
 
     float penumbraRatio = SHDW_PenumbraSize(lightFragLength, blockers);
-    float filterRadius = penumbraRatio * 0.1f;
+    float filterRadius = penumbraRatio * 5.0f;
 
     return SHDW_PCF(UVs, lightID, map, filterRadius, lightFragLength);
 }
