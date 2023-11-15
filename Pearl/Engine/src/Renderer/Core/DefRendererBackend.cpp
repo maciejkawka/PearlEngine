@@ -19,15 +19,11 @@ namespace PrRenderer::Core
 		m_pointshadowMappingShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Shadows/PointShadowMapping.shader");
 
 		m_renderData.m_quadMesh = Resources::Mesh::CreatePrimitive(Resources::Quad);
+
 		GenerategBuffers();
 		GenerateShadowMaps();
 
 		//Cascade Shadow Mapping
-		m_settings.cascadeShadowBorders[0] = 0.1f;
-		m_settings.cascadeShadowBorders[1] = 0.2f;
-		m_settings.cascadeShadowBorders[2] = 0.5f;
-		m_settings.cascadeShadowBorders[3] = 1.0f;
-		m_settings.cascadeShadowMapSize = 4096;
 		m_renderData.CSM = std::make_unique<CascadeShadowMapper>(SHADOW_CASCADES_COUNT, m_settings.cascadeShadowMapSize);
 
 		//Set events
@@ -106,46 +102,15 @@ namespace PrRenderer::Core
 				PrCore::Windowing::Window::GetMainWindow().GetHeight(), 0, 0));
 		}
 
-		//Shadow Mapping
-
-		//Render to point lights shadow map
+		//Point Lights
 		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]
 			{
 				m_renderData.m_shadowMapPoint->Bind();
 				LowRenderer::Clear(ColorBuffer | DepthBuffer);
 			}));
 
-
-		PrCore::Math::vec3 lightDirs[6] = {
-			PrCore::Math::vec3(1,0,0),
-			PrCore::Math::vec3(-1,0,0),
-			PrCore::Math::vec3(0,1,0),
-			PrCore::Math::vec3(0,-1,0),
-			PrCore::Math::vec3(0,0,1),
-			PrCore::Math::vec3(0,0,-1)
-		};
-
 		for (auto& light : m_frame->lights)
 		{
-			//auto lightProjMatrix = PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetNear(), light.lightMat[3].w * 1.5f);
-			//auto lightPos = PrCore::Math::vec3(light.lightMat[0].x, light.lightMat[0].y, light.lightMat[0].z);
-			//auto forward = glm::vec3(1.0f, 0.0f, 0.0f);
-			//auto lookAtMat = PrCore::Math::lookAt(lightPos, lightPos + forward, PrCore::Math::vec3(0.0f, 1.0f, 0.0f));
-			//light.lightViewMat = lightProjMatrix * lookAtMat;
-
-			//for (int i = 0; i < 6; i++)
-			//{
-			//	auto viewport = CalculatePointLightTexture(light.shadowMapPos + i);
-			//	m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-
-			//	auto rotation = PrCore::Math::rotation(forward, lightDirs[i]);
-			//	auto rotationMatrix = PrCore::Math::mat4_cast(rotation);
-			//	auto lightViewMatrix = lookAtMat * rotationMatrix;
-			//	auto lightTransformMatrix = lightProjMatrix * lightViewMatrix;
-
-			//	m_commandQueue.push_back(CreateRC<RenderToCascadeShadowMapRC>(m_shadowMappingShader, lightTransformMatrix, &m_frame->shadowCasters, &m_renderData));
-			//}
-
 			auto lightProjMatrix = PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetNear(), light.lightMat[3].w * 1.2f);
 			auto lightPos = PrCore::Math::vec3(light.lightMat[0].x, light.lightMat[0].y, light.lightMat[0].z);
 
@@ -189,34 +154,8 @@ namespace PrRenderer::Core
 			PrCore::Windowing::Window::GetMainWindow().GetHeight(), 0, 0));
 
 
-		//Iterate Direct and Stop Lights
+		//Directional and Spot Lights
 
-
-
-
-
-		//m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]()
-		//	{
-		//		LowRenderer::EnableCullFace(true);
-		//		LowRenderer::EnableDepth(true);
-		//
-		//		m_renderData.m_shadowMapOther->Bind();
-		//		LowRenderer::Clear(ColorBuffer | DepthBuffer);
-		//		m_renderData.m_shadowMapPoint->Bind();
-		//		LowRenderer::Clear(ColorBuffer | DepthBuffer);
-		//	}));
-		//for(auto& light : m_frame->lights)
-		//{
-		//	//Chceck if light cast shadows
-		//	if (light.shadowMapPos != SIZE_MAX)
-		//	{
-		//		auto viewport = CalculateShadowMapCoords(light.shadowMapPos, m_settings.lightShadowMapSize, m_settings.lightShadowMapSize);
-		//		m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-		//
-		//		m_commandQueue.push_back(CreateRC<RenderToShadowMapRC>(m_shadowMappingShader, light, &m_frame->opaqueObjects, &m_renderData));
-		//	}
-		//}
-		//---------------------------------
 
 
 		//gBuffer Pass
@@ -615,7 +554,8 @@ namespace PrRenderer::Core
 		p_renderData->postProccesBuff->Bind();
 
 		p_lightShdr->Bind();
-		//Bind Textures
+
+		// Set PBR Textures
 		p_renderData->gBuffer.albedoTex->Bind(0);
 		p_lightShdr->SetUniformInt("albedoMap", 0);
 
@@ -642,7 +582,7 @@ namespace PrRenderer::Core
 
 		p_lightShdr->SetUniformVec3("camPos", p_renderData->camera->GetPosition());
 
-		// Render Main CSM Light
+		// Set Main CSM Light
 		if (mianDirectLight && p_renderData->m_CSMShadowMap)
 		{
 			p_lightShdr->SetUniformMat4("CSM_mainLight", mianDirectLight->lightMat);
@@ -657,15 +597,16 @@ namespace PrRenderer::Core
 		else
 			p_lightShdr->SetUniformBool("CSM_hasMainLight", false);
 
-		// Render Shadows
+		// Set Shadows
 		{
-			p_lightShdr->SetUniformInt("pointLightMapSize", 1024);
-			p_lightShdr->SetUniformInt("shadowMapSize", 8192);
+			p_lightShdr->SetUniformInt("SHDW_PointLightMapSize", 1024);
+			p_lightShdr->SetUniformInt("SHDW_CombineShadowMapSize", 8192);
 
 			p_renderData->m_shadowMapPointTex->Bind(8);
-			p_lightShdr->SetUniformInt("pointLightShadowMap", 8);
+			p_lightShdr->SetUniformInt("SHDW_PointLightMap", 8);
 		}
-		
+
+		//Set Lights
 		std::vector<PrCore::Math::mat4> lightMat;
 		std::vector<PrCore::Math::mat4> lightViewMat;
 		std::vector<int> lightIDs;

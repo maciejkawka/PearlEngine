@@ -38,32 +38,9 @@ uniform sampler2D positionMap;
 uniform sampler2D aoMap;
 
 
-//Lighting and shadowing
-const int         maxLightNum = 200;
-const float       filterSize = 1.0f;
-
-uniform mat4      lightMat[maxLightNum];
-uniform mat4      lightViewMatrices[maxLightNum];
-uniform int       lightID[10];
-uniform int       lightNumber = 0;
-uniform vec3      ambientColor; //To be add in future
-
-uniform int       pointLightMapSize;
-uniform int       SDLightMapSize;
-uniform int       shadowMapSize;
-uniform sampler2D pointLightShadowMap;
-uniform sampler2D SDLightShadowMap;
-
-// IBL
-uniform samplerCube PBR_irradianceMap;
-uniform samplerCube PBR_prefilterMap;
-uniform sampler2D   PBR_brdfLUT;
-
-
-//Cascade Shadow Mapping
-const int          CSM_PCFFilterSize = 64;
-const int          CSM_cascadesCount = 4;
-const vec2         CDM_poissonDisk[64] = {
+//Lighting
+const int         poissonDiskSize = 64;
+const vec2        poissonDisk[64] = {
     vec2(-0.04117257f, -0.1597612f),
     vec2(0.06731031f, -0.4353096f),
     vec2(-0.206701f, -0.4089882f),
@@ -129,6 +106,31 @@ const vec2         CDM_poissonDisk[64] = {
     vec2(-0.2554315f, 0.8326268f),
     vec2(-0.5080366f, 0.8539945f)
 };
+const int         maxLightNum = 150;
+
+uniform mat4      lightMat[maxLightNum];
+uniform mat4      lightViewMatrices[maxLightNum];
+uniform int       lightID[maxLightNum];
+uniform int       lightNumber = 0;
+uniform vec3      ambientColor; //To be add in future
+
+// Shadows
+float             SHDW_LightSize = 5.0f;
+uniform int       SHDW_CombineShadowMapSize;
+uniform sampler2D SHDW_PointLightMap;
+uniform int       SHDW_PointLightMapSize;
+uniform sampler2D SHDW_OtherLightShadowMap;
+uniform int       SHDW_OtherLightShadowMapSize;
+
+
+// IBL
+uniform samplerCube PBR_irradianceMap;
+uniform samplerCube PBR_prefilterMap;
+uniform sampler2D   PBR_brdfLUT;
+
+
+//Cascade Shadow Mapping
+const int          CSM_cascadesCount = 4;
 
 uniform mat4       CSM_mainLight;
 uniform bool       CSM_hasMainLight = false;
@@ -216,8 +218,8 @@ float CSM_CalculateShadowFactor(int cascadeIndex, vec4 LightSpacePos)
     float texelSize = 1.0f / float(CSM_mapSize * 4.0f);
 	float theta = rand(vec4(ProjCoords.xy, gl_FragCoord.xy));
 	mat2 rotation = mat2(vec2(cos(theta), sin(theta)), vec2(-sin(theta), cos(theta)));
-	for (int i = 0; i < CSM_PCFFilterSize; i++) {
-		vec2 offset = rotation * CDM_poissonDisk[i] * 20.0f * texelSize / (cascadeIndex + 1.0f);
+	for (int i = 0; i < poissonDiskSize; i++) {
+		vec2 offset = rotation * poissonDisk[i] * 20.0f * texelSize / (cascadeIndex + 1.0f);
 		vec2 texOffset = ProjCoords.xy + offset;
 
         vec2 UVCoords = CSM_CalculateSubTexUV(cascadeIndex, clamp(texOffset, 0.0f, 1.0f));
@@ -229,7 +231,7 @@ float CSM_CalculateShadowFactor(int cascadeIndex, vec4 LightSpacePos)
             sum += 1.0f;
 	}
 
-	return sum / CSM_PCFFilterSize;
+	return sum / poissonDiskSize;
 }
 //--------------------------------------------------------------------
 
@@ -369,17 +371,17 @@ vec3 PBR_Light(mat4 light, PBR_Data data)
 //-------------------------------------------------------------------
 
 //--------------------Shadow Calculations----------------------------
-vec2 SHDW_CalculateLightUVs(int id, int subShadowTexSize, vec2 UVs)
+vec2 SHDW_CalculateLightUVs(int id, int subTexSize, vec2 UVs)
 {
     // clamp UVs not to exceed the [0,1] boundary
     UVs = clamp(UVs, 0.0f, 1.0f);
 
-    int subTexPerRow = int(shadowMapSize / subShadowTexSize);
+    int subTexPerRow = int(SHDW_CombineShadowMapSize / subTexSize);
     int subTexRow = int(id / subTexPerRow);
     int subTexCol = id - subTexRow * subTexPerRow;
 
     // Add offset to avoid black seam between cubemap faces
-    float offset = 1.0f / subShadowTexSize;
+    float offset = 1.0f / subTexSize;
     vec2 subTexUVsStart = vec2(subTexCol + offset, subTexRow + offset) / subTexPerRow;
     vec2 subTexUVsEnd = vec2(subTexCol + 1 - offset, subTexRow + 1 - offset) / subTexPerRow;
     return mix(subTexUVsStart, subTexUVsEnd, UVs);
@@ -390,16 +392,16 @@ float SHDW_PenumbraSize(float zReciever, float zBlocker)
     return (zReciever - zBlocker) / zBlocker;
 }
 
-float SHDW_FindBlockers(vec2 UVs, float lightFragLength, sampler2D map, int id)
+float SHDW_FindBlockers(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int mapSize)
 {
     float blockerSum = 0.0f;
     float numBlockers = 0.0f;
-    float texelSize = 1.0f / float(pointLightMapSize);
+    float texelSize = 1.0f / float(mapSize);
 
     for (int i = 0; i < 64; i++) {
-        vec2 coord = UVs + CDM_poissonDisk[i] * texelSize * clamp(20.0f - lightFragLength, 10.0f, 20.0f);
-        float smap = texture(map, SHDW_CalculateLightUVs(id, pointLightMapSize, coord)).x;
-        if (smap < lightFragLength) {
+        vec2 coord = UVs + poissonDisk[i] * texelSize * clamp(20.0f - lightFragDist, 10.0f, 20.0f);
+        float smap = texture(map, SHDW_CalculateLightUVs(lightId, mapSize, coord)).x;
+        if (smap < lightFragDist) {
             blockerSum += smap;
             numBlockers++;
         }
@@ -407,41 +409,36 @@ float SHDW_FindBlockers(vec2 UVs, float lightFragLength, sampler2D map, int id)
     return blockerSum / numBlockers;
 }
 
-float SHDW_PCF(vec2 UVs, int lightID, sampler2D map, float filterRadius, float lightFragLength)
+float SHDW_PCF(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int mapSize, float filterRadius)
 {
     float sum = 0;
     float theta = rand(vec4(UVs, gl_FragCoord.xy));
     mat2 rotation = mat2(vec2(cos(theta), sin(theta)), vec2(-sin(theta), cos(theta)));
-    float texelSize = 1.0f / pointLightMapSize;
-    for (int i = 0; i < 64; i++) {
-        vec2 offset = rotation * CDM_poissonDisk[i] * texelSize * clamp(filterRadius, 2.0f, 50.0f);
+    float texelSize = 1.0f / float(mapSize);
+    for (int i = 0; i < poissonDiskSize; i++) {
+        vec2 offset = rotation * poissonDisk[i] * texelSize * clamp(filterRadius, 2.0f, 50.0f);
         vec2 texOffset = UVs + offset;
 
-        vec2 UVCoords = SHDW_CalculateLightUVs(lightID, pointLightMapSize, texOffset);
+        vec2 UVCoords = SHDW_CalculateLightUVs(lightId, mapSize, texOffset);
         float depth = texture(map, UVCoords).x;
 
-        if (depth + 0.5f < lightFragLength)
+        if (depth + 0.2f < lightFragDist)
             sum += 0.0f;
         else
             sum += 1.0f;
     }
 
-    return sum / CSM_PCFFilterSize;
+    return sum / poissonDiskSize;
 }
 
-float SHDW_PCSS(vec2 UVs, int lightID, sampler2D map, float lightFragLength)
+float SHDW_PCSS(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int mapSize)
 {
-    float blockers = SHDW_FindBlockers(UVs, lightFragLength, map, lightID);
+    float blockers = SHDW_FindBlockers(lightId, UVs, lightFragDist, map, mapSize);
 
-    float penumbraRatio = SHDW_PenumbraSize(lightFragLength, blockers);
-    float filterRadius = penumbraRatio * 5.0f;
+    float penumbraRatio = SHDW_PenumbraSize(lightFragDist, blockers);
+    float filterRadius = penumbraRatio * SHDW_LightSize;
 
-    return SHDW_PCF(UVs, lightID, map, filterRadius, lightFragLength);
-}
-
-float SHDW_SampleMap(vec2 UVs, int lightID, sampler2D map)
-{
-    return texture(map, SHDW_CalculateLightUVs(lightID, pointLightMapSize, UVs)).x;
+    return SHDW_PCF(lightId, UVs, lightFragDist, map, mapSize, filterRadius);
 }
 
 vec3 SHDW_PointMapFaceDebug(mat4 light, vec3 fragPos, int lightIndex)
@@ -510,7 +507,7 @@ float SHDW_CalculatePointFactor(mat4 light, vec3 fragPos, int lightIndex)
     else
         UVs = vec2(-fragToLightDir.x, -fragToLightDir.y) * 0.5 / absLightDirection.z + 0.5;
 
-    return SHDW_PCSS(UVs, lightIDs + faceIndex, pointLightShadowMap, length(fragToLight));
+    return SHDW_PCSS(lightIDs + faceIndex, UVs, length(fragToLight), SHDW_PointLightMap, SHDW_PointLightMapSize);
 }
 //-------------------------------------------------------------------
 
@@ -574,17 +571,22 @@ void main()
     for (int i = 0; i < clampedLightNumber; i++)
     {
         //Shadow Calculations in future
-        float shadowFactor = SHDW_CalculatePointFactor(lightMat[i], pos, i);
+        float shadowFactor = 1.0f;
+        int lightType = int(lightMat[i][0].w);
+        if (lightType == 0) //Dir Light
+        {
+        }
+        else if(lightType == 1) //Point Light
+            shadowFactor = SHDW_CalculatePointFactor(lightMat[i], pos, i);
+        else if (lightType == 2) // Spot Light
+        {
+        }
+        
 
         vec3 lightAmmount = PBR_Light(lightMat[i], data) * shadowFactor;
         Lo += lightAmmount;
 
         //Lo = SHDW_PointMapFaceDebug(lightMat[i], pos, i);
-       
-        //vec2 debugUVs = SHDW_DebugMapUVs(lightMat[i], pos, i);
-        //Lo = vec3(debugUVs.x, debugUVs.y, 1.0f) * shadowFactor;
-
-       // Lo = vec3(shadowFactor);
     }
 
 

@@ -28,7 +28,15 @@ DefferedRendererFrontend::DefferedRendererFrontend(const RendererSettings& p_set
 	m_nextPointLightID = 0;
 	m_nextOtherLightsID = 0;
 
-	m_rendererBackend = std::make_shared<DefRendererBackend>(p_settings);
+
+	//Manual Settings Set
+	m_renderSettings.cascadeShadowBorders[0] = 0.1f;
+	m_renderSettings.cascadeShadowBorders[1] = 0.2f;
+	m_renderSettings.cascadeShadowBorders[2] = 0.5f;
+	m_renderSettings.cascadeShadowBorders[3] = 1.0f;
+	m_renderSettings.cascadeShadowMapSize = 4096;
+
+	m_rendererBackend = std::make_shared<DefRendererBackend>(m_renderSettings);
 
 	//Temporary
 	m_instancingShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/gBuffer.shader");
@@ -37,7 +45,7 @@ DefferedRendererFrontend::DefferedRendererFrontend(const RendererSettings& p_set
 
 void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id)
 {
-	//Main light
+	//If Main light
 	if(p_lightComponent->mainDirectLight)
 	{
 		if (m_currentFrame->mainDirectLight)
@@ -53,7 +61,7 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 		return;
 	}
 
-	//It this is normal light
+	//If this is normal light
 	if (m_pointLightNumber >m_maxPShadowLights)
 	{
 		PRLOG_WARN("FrontendRenderer: Discarding point light, max limit exceeded");

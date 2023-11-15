@@ -98,14 +98,14 @@
                     },
                     "Scale": {
                         "x": 2.0,
-                        "y": 2.0,
+                        "y": 20.0,
                         "z": 2.0
                     },
                     "componentType": "class PrCore::ECS::TransformComponent"
                 },
                 {
                     "Material": "Deferred/PBR_IR_ValuesSphere.mat",
-                    "Mesh": "Primitive_Sphere",
+                    "Mesh": "Primitive_Capsule",
                     "componentType": "class PrCore::ECS::MeshRendererComponent"
                 }
             ]
@@ -223,9 +223,82 @@
                     "componentType": "class PrCore::ECS::MeshRendererComponent"
                 }
             ]
+        },
+         {
+            "ID": 8589934593,
+            "components": [
+                {
+                    "UUID": 7034654973230566852,
+                    "componentType": "class PrCore::ECS::UUIDComponent"
+                },
+                {
+                    "componentType": "class PrCore::ECS::NameComponent",
+                    "name": "Light1"
+                },
+                {
+                    "componentType": "class PrCore::ECS::TagComponent",
+                    "tag": "Untagged"
+                },
+                {
+                    "LocalPosition": {
+                        "x": 0.0,
+                        "y": 2.0,
+                        "z": 10.0
+                    },
+                    "LocalRotation": {
+                        "w": 1.0,
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "LocalScale": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    },
+                    "Position": {
+                        "x": 0.0,
+                        "y": 10.0,
+                        "z": 0.0
+                    },
+                    "Rotation": {
+                        "w": 1.0,
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "Scale": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    },
+                    "componentType": "class PrCore::ECS::TransformComponent"
+                },
+                {
+                    "Color": {
+                        "a": 1.0,
+                        "b": 500.0,
+                        "g": 500.0,
+                        "r": 500.0
+                    },
+                    "ConstantAttenuation": 0.0,
+                    "Direction": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    },
+                    "InnerCone": 0.0,
+                    "LinearAttenuation": 0.5,
+                    "OutterCone": 0.0,
+                    "QuadraticAttenuation": 0.5,
+                    "Range": 100.0,
+                    "Type": 1,
+                    "componentType": "class PrCore::ECS::LightComponent"
+                }
+            ]
         }
     ],
-    "entitiesCount": 8,
+    "entitiesCount": 9,
     "name": "TESTSCENE",
     "path": "Scene/TESTSCENE",
     "systems": [
