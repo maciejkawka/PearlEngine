@@ -19,5 +19,6 @@ namespace PrCore::ECS {
 
 	private:
 		PrRenderer::Core::Camera* m_camera;
+		int lightID = 0;
 	};
 }

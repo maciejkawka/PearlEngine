@@ -42,30 +42,74 @@ void MeshRendererSystem::OnUpdate(float p_dt)
 		break;
 	}
 
-	DefferedRendererFrontend::GetInstance().AddCubemap(Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("skymapHDRMaterial.mat"));
+	//DefferedRendererFrontend::GetInstance().AddCubemap(Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("skymapHDRMaterial.mat"));
+
+	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(Input::PrKey::L))
+		lightID = (++lightID) % 5;
 
 	for (auto entity : m_entityViewer.EntitesWithComponents<LightComponent, TransformComponent>())
 	{
 		auto transform = entity.GetComponent<TransformComponent>();
 		auto light = entity.GetComponent<LightComponent>();
 
-		auto rotation = transform->GetLocalEulerRotation();
-		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::UP))
-			rotation.x += 20 * p_dt;
-		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::DOWN))
-			rotation.x -= 20 * p_dt;
-		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::LEFT))
-			rotation.y += 20 * p_dt;
-		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::RIGHT))
-			rotation.y -= 20 * p_dt;
+		if (entity.GetComponent<NameComponent>()->name == "MainLight")
+		{
+			auto rotation = transform->GetLocalEulerRotation();
+			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::KP_8))
+				rotation.x += 20 * p_dt;
+			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::KP_2))
+				rotation.x -= 20 * p_dt;
+			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::KP_4))
+				rotation.y += 20 * p_dt;
+			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::KP_6))
+				rotation.y -= 20 * p_dt;
 
-		transform->SetLocalRotation(Math::quat(Math::radians(rotation)));
+			transform->SetLocalRotation(Math::quat(Math::radians(rotation)));
+		}
+
+
+
+		if(entity.GetComponent<NameComponent>()->name == "Light" + std::to_string(lightID + 1))
+		{
+			auto position = transform->GetPosition();
+			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::UP))
+				position.x += 20 * p_dt;
+			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::DOWN))
+				position.x -= 20 * p_dt;
+			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::LEFT))
+				position.z -= 20 * p_dt;
+			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::RIGHT))
+				position.z += 20 * p_dt;
+			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::PAGE_UP))
+				position.y += 20 * p_dt;
+			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::PAGE_DOWN))
+				position.y -= 20 * p_dt;
+
+			transform->SetPosition(position);
+			transform->GenerateWorldMatrix();
+		}
 
 		DefferedRendererFrontend::GetInstance().AddLight(light, transform, entity.GetID().GetID());
 	}
 
 	for(auto entity: m_entityViewer.EntitesWithComponents<MeshRendererComponent, TransformComponent>())
 	{
+
+		if(entity.GetComponent<NameComponent>()->name == "Gun")
+		{
+			auto position = entity.GetComponent<TransformComponent>()->GetPosition();
+
+			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::U))
+				position.z += 10 * p_dt;
+			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::J))
+				position.z -= 10 * p_dt;
+
+			entity.GetComponent<TransformComponent>()->SetPosition(position);
+		}
+
+		if (entity.GetComponent<NameComponent>()->name == "Light1")
+			DefferedRendererFrontend::GetInstance().AddMesh(entity);
+			
 		DefferedRendererFrontend::GetInstance().AddMesh(entity);
 	}
 }

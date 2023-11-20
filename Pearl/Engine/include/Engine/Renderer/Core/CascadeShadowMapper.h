@@ -34,4 +34,14 @@ namespace PrRenderer::Core {
 		PrCore::Math::mat4* m_cameraProjs;
 
 	};
+
+
+	struct CascadeShadowUtility
+	{
+		PrCore::Math::mat4               ClaculateFrustrums(size_t p_index, const PrCore::Math::vec3& p_lightDir, const PrCore::Math::mat4& p_cameraView, size_t mapSize, float ZExtend = 10.0f) const;
+		PrCore::Math::vec4               CalculateShadowMapCoords(size_t p_index, size_t subMapSize, size_t mapSize) const;
+
+		std::vector<PrCore::Math::mat4> m_cameraProjs;
+		std::vector<float>              m_borders;
+	};
 }

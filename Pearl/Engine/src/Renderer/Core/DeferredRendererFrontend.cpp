@@ -25,8 +25,9 @@ DefferedRendererFrontend::DefferedRendererFrontend(const RendererSettings& p_set
 		(m_renderSettings.pointLightShadowMapSize * m_renderSettings.pointLightShadowMapSize * 6);
 	m_maxSDShadowLights = (m_renderSettings.comboShadowMap * m_renderSettings.comboShadowMap) / 
 		(m_renderSettings.lightShadowMapSize * m_renderSettings.lightShadowMapSize);
-	m_nextPointLightID = 0;
-	m_nextOtherLightsID = 0;
+	m_nextPointLightPos = 0;
+	m_nextSpotLightPos = 0;
+	m_nextDirLightPos = 0;
 
 
 	//Manual Settings Set
@@ -34,7 +35,6 @@ DefferedRendererFrontend::DefferedRendererFrontend(const RendererSettings& p_set
 	m_renderSettings.cascadeShadowBorders[1] = 0.2f;
 	m_renderSettings.cascadeShadowBorders[2] = 0.5f;
 	m_renderSettings.cascadeShadowBorders[3] = 1.0f;
-	m_renderSettings.cascadeShadowMapSize = 4096;
 
 	m_rendererBackend = std::make_shared<DefRendererBackend>(m_renderSettings);
 
@@ -67,7 +67,7 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 		PRLOG_WARN("FrontendRenderer: Discarding point light, max limit exceeded");
 		return;
 	}
-	if(m_otherLightNumber > m_maxSDShadowLights)
+	if(m_spotLightNumber > m_maxSDShadowLights)
 	{
 		PRLOG_WARN("FrontendRenderer: Discarding light, max limit exceeded");
 		return;
@@ -80,17 +80,23 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 	object.id = p_id;
 	if (p_lightComponent->m_shadowCast)
 	{
-		if(light->GetType() == Resources::LightType::Point)
+		if (light->GetType() == Resources::LightType::Directional)
 		{
-			object.shadowMapPos = m_nextPointLightID;
-			m_nextPointLightID += 6;
+			object.shadowMapPos = m_nextDirLightPos;
+			m_nextDirLightPos++;
+			m_dirLightNumber++;
+		}
+		else if (light->GetType() == Resources::LightType::Point)
+		{
+			object.shadowMapPos = m_nextPointLightPos;
+			m_nextPointLightPos += 6;
 			m_pointLightNumber++;
 		}
-		else
+		else if (light->GetType() == Resources::LightType::Spot)
 		{
-			object.shadowMapPos = m_nextOtherLightsID;
-			m_nextOtherLightsID++;
-			m_otherLightNumber++;
+			object.shadowMapPos = m_nextSpotLightPos;
+			m_nextSpotLightPos++;
+			m_spotLightNumber++;
 		}
 	}
 	else
@@ -179,10 +185,12 @@ void DefferedRendererFrontend::PrepareFrame()
 	m_currentFrame->lights.clear();
 	m_currentFrame->mainDirectLight = nullptr;
 	m_currentFrame->renderFlag = RendererFlag::None;
-	m_nextPointLightID = 0;
-	m_nextOtherLightsID = 0;
+	m_nextDirLightPos = 0;
+	m_nextPointLightPos = 0;
+	m_nextSpotLightPos = 0;
+	m_dirLightNumber = 0;
 	m_pointLightNumber = 0;
-	m_otherLightNumber = 0;
+	m_spotLightNumber = 0;
 
 }
 
@@ -191,6 +199,10 @@ void DefferedRendererFrontend::BuildFrame()
 	//Instanciate opaque
 	m_currentFrame->opaqueObjects.sort(NormalSort());
 	InstanciateObjects(m_currentFrame->opaqueObjects);
+
+	//Instanciate shadowCasters
+	m_currentFrame->shadowCasters.sort(NormalSort());
+	InstanciateObjects(m_currentFrame->shadowCasters);
 
 	//Instanciate transparent
 	m_currentFrame->transpatrentObjects.sort(TransparentSort());

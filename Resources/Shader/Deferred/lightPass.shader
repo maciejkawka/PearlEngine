@@ -106,27 +106,14 @@ const vec2        poissonDisk[64] = {
     vec2(-0.2554315f, 0.8326268f),
     vec2(-0.5080366f, 0.8539945f)
 };
-const int         maxLightNum = 150;
+const int         maxLightNum = 50;
+const int         maxDirLightNum = 8;
 
-uniform mat4      lightMat[maxLightNum];
-uniform mat4      lightViewMatrices[maxLightNum];
-uniform int       lightID[maxLightNum];
-uniform int       lightNumber = 0;
+//uniform mat4      lightMat[maxLightNum];
+//uniform mat4      dupsko[maxLightNum];
+//uniform int       lightID[maxLightNum];
+//uniform int       lightNumber = 0;
 uniform vec3      ambientColor; //To be add in future
-
-// Shadows
-float             SHDW_LightSize = 5.0f;
-uniform int       SHDW_CombineShadowMapSize;
-uniform sampler2D SHDW_PointLightMap;
-uniform int       SHDW_PointLightMapSize;
-uniform sampler2D SHDW_OtherLightShadowMap;
-uniform int       SHDW_OtherLightShadowMapSize;
-
-
-// IBL
-uniform samplerCube PBR_irradianceMap;
-uniform samplerCube PBR_prefilterMap;
-uniform sampler2D   PBR_brdfLUT;
 
 
 //Cascade Shadow Mapping
@@ -138,6 +125,44 @@ uniform mat4       CSM_viewMats[4];
 uniform float      CSM_borders[4];
 uniform int        CSM_mapSize;
 uniform sampler2D  CSM_map;
+
+
+// Shadows
+float             SHDW_LightSize = 5.0f;
+uniform int       SHDW_CombineShadowMapSize;
+
+uniform sampler2D SHDW_PointLightMap;
+uniform int       SHDW_PointLightMapSize;
+uniform int       SHDW_PointCombineLightMapSize;
+uniform mat4      SHDW_PointLightMat[maxLightNum];
+uniform int       SHDW_PointLightID[maxLightNum];
+uniform int       SHDW_PointLightNumber;
+
+uniform sampler2D SHDW_SpotLightMap;
+uniform int       SHDW_SpotLightMapSize;
+uniform int       SHDW_SpotLightCombineMapSize;
+uniform mat4      SHDW_SpotLightViewMat[maxLightNum];
+uniform mat4      SHDW_SpotLightMat[maxLightNum];
+uniform int       SHDW_SpotLightID[maxLightNum];
+uniform int       SHDW_SpotLightNumber;
+
+
+uniform sampler2D SHDW_DirLightMap;
+uniform int       SHDW_DirLightMapSize;
+uniform int       SHDW_DirLightCombineShadowMapSize;
+uniform mat4      SHDW_DirLightViewMat[maxDirLightNum * 4];
+uniform mat4      SHDW_DirLightMat[maxDirLightNum];
+uniform int       SHDW_DirLightID[maxDirLightNum];
+uniform int       SHDW_DirLightNumber;
+
+
+// IBL
+uniform samplerCube PBR_irradianceMap;
+uniform samplerCube PBR_prefilterMap;
+uniform sampler2D   PBR_brdfLUT;
+
+
+
 
 
 // pseudorandom number generator
@@ -344,6 +369,9 @@ vec3 PBR_Light(mat4 light, PBR_Data data)
         float epsilon = light[1].w - light[2].w;
         float intensity = clamp((theta - light[2].w) / epsilon, 0.0, 1.0);
 
+        if (intensity == 0)
+            return vec3(0.0f);
+
         attenuation =  1.0 / (distance * distance);
         attenuation = attenuation * intensity;
     }     
@@ -397,9 +425,10 @@ float SHDW_FindBlockers(int lightId, vec2 UVs, float lightFragDist, sampler2D ma
     float blockerSum = 0.0f;
     float numBlockers = 0.0f;
     float texelSize = 1.0f / float(mapSize);
-
+    float theta = rand(vec4(UVs, gl_FragCoord.xy));
+    mat2 rotation = mat2(vec2(cos(theta), sin(theta)), vec2(-sin(theta), cos(theta)));
     for (int i = 0; i < 64; i++) {
-        vec2 coord = UVs + poissonDisk[i] * texelSize * clamp(20.0f - lightFragDist, 10.0f, 20.0f);
+        vec2 coord = UVs + rotation * poissonDisk[i] * texelSize * 20.f;
         float smap = texture(map, SHDW_CalculateLightUVs(lightId, mapSize, coord)).x;
         if (smap < lightFragDist) {
             blockerSum += smap;
@@ -409,7 +438,7 @@ float SHDW_FindBlockers(int lightId, vec2 UVs, float lightFragDist, sampler2D ma
     return blockerSum / numBlockers;
 }
 
-float SHDW_PCF(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int mapSize, float filterRadius)
+float SHDW_PCF(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int mapSize, float filterRadius, float bias)
 {
     float sum = 0;
     float theta = rand(vec4(UVs, gl_FragCoord.xy));
@@ -422,7 +451,7 @@ float SHDW_PCF(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int ma
         vec2 UVCoords = SHDW_CalculateLightUVs(lightId, mapSize, texOffset);
         float depth = texture(map, UVCoords).x;
 
-        if (depth + 0.2f < lightFragDist)
+        if (depth + bias < lightFragDist)
             sum += 0.0f;
         else
             sum += 1.0f;
@@ -431,14 +460,14 @@ float SHDW_PCF(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int ma
     return sum / poissonDiskSize;
 }
 
-float SHDW_PCSS(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int mapSize)
+float SHDW_PCSS(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int mapSize, float bias, float lightSize)
 {
     float blockers = SHDW_FindBlockers(lightId, UVs, lightFragDist, map, mapSize);
 
     float penumbraRatio = SHDW_PenumbraSize(lightFragDist, blockers);
-    float filterRadius = penumbraRatio * SHDW_LightSize;
+    float filterRadius = penumbraRatio * lightSize;
 
-    return SHDW_PCF(lightId, UVs, lightFragDist, map, mapSize, filterRadius);
+    return SHDW_PCF(lightId, UVs, lightFragDist, map, mapSize, filterRadius, bias);
 }
 
 vec3 SHDW_PointMapFaceDebug(mat4 light, vec3 fragPos, int lightIndex)
@@ -476,7 +505,7 @@ float SHDW_CalculatePointFactor(mat4 light, vec3 fragPos, int lightIndex)
     float lightRange = light[3].w;
     vec3 fragToLight = fragPos - lightPos;
     vec3 fragToLightDir = normalize(fragToLight);
-    int  lightIDs = lightID[lightIndex];
+    int  lightIDs = SHDW_PointLightID[lightIndex];
 
     // Check if frag is out of range
     if (length(fragToLight) >= lightRange)
@@ -507,7 +536,39 @@ float SHDW_CalculatePointFactor(mat4 light, vec3 fragPos, int lightIndex)
     else
         UVs = vec2(-fragToLightDir.x, -fragToLightDir.y) * 0.5 / absLightDirection.z + 0.5;
 
-    return SHDW_PCSS(lightIDs + faceIndex, UVs, length(fragToLight), SHDW_PointLightMap, SHDW_PointLightMapSize);
+    return SHDW_PCSS(lightIDs + faceIndex, UVs, length(fragToLight), SHDW_PointLightMap, SHDW_PointLightMapSize, 0.2f, SHDW_LightSize);
+}
+
+float SHDW_CalculateSpotLightFactor(vec3 fragPos, int lightIndex)
+{
+    vec4 lightSpacePos = SHDW_SpotLightViewMat[lightIndex] * vec4(fragPos, 1.0f);
+    vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+    // Convert [-1, 1] to [0, 1]
+    projCoords = 0.5 * projCoords + 0.5;
+    float fragToLight = projCoords.z;
+
+    return SHDW_PCSS(SHDW_SpotLightID[lightIndex], projCoords.xy, fragToLight, SHDW_SpotLightMap, SHDW_SpotLightMapSize, 0.001f, 1.0f);
+}
+
+float SHDW_CalculateDirectLightFactor(float depth, vec3 fragPos, int lightIndex)
+{
+    float shadowFactor = 1.0f;
+    for (int i = 0; i < CSM_cascadesCount; i++)
+    {
+        if (depth < CSM_borders[i])
+        {
+            vec4 lightSpacePos = SHDW_DirLightViewMat[lightIndex * CSM_cascadesCount + i] * vec4(fragPos, 1.0f);
+            vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+            // Convert [-1, 1] to [0, 1]
+            projCoords = 0.5 * projCoords + 0.5;
+            float fragToLight = projCoords.z;
+
+            shadowFactor = SHDW_PCSS(SHDW_DirLightID[lightIndex] * CSM_cascadesCount + i, projCoords.xy, fragToLight, SHDW_DirLightMap, SHDW_DirLightMapSize, 0.003f, 5.0f / (1.0f + i));
+            //Lo = CSM_DebugCascades(i) * shadowFactor;
+            break;
+        }
+    }
+    return shadowFactor;
 }
 //-------------------------------------------------------------------
 
@@ -558,7 +619,7 @@ void main()
             if(depth < CSM_borders[i])
             {
                 shadowFactor = CSM_CalculateShadowFactor(i, CSM_viewMats[i] * vec4(pos, 1.0f));
-                //Lo = DebugCDM(i) * shadowFactor;
+                //Lo = CSM_DebugCascades(i) * shadowFactor;
                 break;
             }
         }
@@ -566,28 +627,56 @@ void main()
         Lo += PBR_Light(CSM_mainLight, data) * shadowFactor;
     }
 
-    //Other Lights
-    int clampedLightNumber = clamp(lightNumber, 0, maxLightNum);
-    for (int i = 0; i < clampedLightNumber; i++)
+    //Directional Light
+    for (int i = 0; i < SHDW_DirLightNumber; i++)
     {
-        //Shadow Calculations in future
-        float shadowFactor = 1.0f;
-        int lightType = int(lightMat[i][0].w);
-        if (lightType == 0) //Dir Light
-        {
-        }
-        else if(lightType == 1) //Point Light
-            shadowFactor = SHDW_CalculatePointFactor(lightMat[i], pos, i);
-        else if (lightType == 2) // Spot Light
-        {
-        }
-        
-
-        vec3 lightAmmount = PBR_Light(lightMat[i], data) * shadowFactor;
+        float shadowFactor = SHDW_CalculateDirectLightFactor(depth, pos, i);
+        vec3 lightAmmount = PBR_Light(SHDW_DirLightMat[i], data) * shadowFactor;
         Lo += lightAmmount;
-
-        //Lo = SHDW_PointMapFaceDebug(lightMat[i], pos, i);
     }
+    
+    //Point Light
+    for (int i = 0; i < SHDW_PointLightNumber; i++)
+    {
+        float shadowFactor = SHDW_CalculatePointFactor(SHDW_PointLightMat[i], pos, i);
+        vec3 lightAmmount = PBR_Light(SHDW_PointLightMat[i], data) * shadowFactor;
+        Lo += lightAmmount;
+    }
+
+    //Spot Light
+    for (int i = 0; i < SHDW_SpotLightNumber; i++)
+    {
+        float shadowFactor = SHDW_CalculateSpotLightFactor(pos, i);
+        vec3 lightAmmount = PBR_Light(SHDW_SpotLightMat[i], data) * shadowFactor;
+        Lo += lightAmmount;
+    }
+
+
+
+
+    //Other Lights
+    //int clampedLightNumber = clamp(lightNumber, 0, maxLightNum);
+    //for (int i = 0; i < clampedLightNumber; i++)
+    //{
+    //    //Shadow Calculations in future
+    //    float shadowFactor = 1.0f;
+    //    int lightType = int(lightMat[i][0].w);
+    //    if (lightType == 0) //Dir Light
+    //    {
+    //        //shadowFactor = SHDW_CalculateDirectLightFactor(lightMat[i], pos, i);
+    //    }
+    //    else if (lightType == 1) //Point Light
+    //        continue;
+    //    //    shadowFactor = SHDW_CalculatePointFactor(lightMat[i], pos, i);
+    //    else if (lightType == 2) // Spot Light
+    //        continue;
+    //    //    shadowFactor = SHDW_CalculateSpotLightFactor(lightMat[i], pos, i);        
+
+    //    vec3 lightAmmount = PBR_Light(lightMat[i], data) * shadowFactor;
+    //    Lo += lightAmmount;
+
+    //    //Lo = SHDW_PointMapFaceDebug(lightMat[i], pos, i);
+    //}
 
 
     //IR diffuse 

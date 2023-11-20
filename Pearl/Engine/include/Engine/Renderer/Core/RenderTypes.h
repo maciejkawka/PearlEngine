@@ -134,7 +134,7 @@ namespace PrRenderer::Core {
 
 	struct LightObject {
 		PrCore::Math::mat4                     lightMat;
-		PrCore::Math::mat4                     lightViewMat;
+		std::vector<PrCore::Math::mat4>        lightViewMats;
 		size_t                                 shadowMapPos;
 		size_t                                 id;
 	};
@@ -151,18 +151,26 @@ namespace PrRenderer::Core {
 	DEFINE_ENUM_FLAG_OPERATORS(RendererFlag);
 
 	struct RendererSettings {
-		//Add Renderer settings
-
-
 
 		//Shadows
+		size_t dirLightShadowsMapSize = 2048;
+		size_t dirLightCombineMapSize = 8192;
+
 		size_t pointLightShadowMapSize = 1024;
+		size_t pointLightCombineShadowMapSize = 8192;
+
+		size_t spotLightShadowMapSize = 1024;
+		size_t spotLightCombineShadowMapSize = 8192;
+
+		size_t mainLightShadowMapSize = 2048;
+		size_t mainLightShadowCombineMapSize = 4096;
+
 		size_t lightShadowMapSize = 1024;
 		size_t comboShadowMap = 8192;
 
 		//CSM
 		float  cascadeShadowBorders[SHADOW_CASCADES_COUNT];
-		size_t cascadeShadowMapSize = 4096;
+		float  cascadeShadowBordersCamSpace[SHADOW_CASCADES_COUNT];
 	};
 
 	///////////////////////////////////////

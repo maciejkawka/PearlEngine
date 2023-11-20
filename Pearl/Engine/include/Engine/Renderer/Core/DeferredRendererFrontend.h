@@ -26,10 +26,12 @@ namespace PrRenderer::Core {
 		//Lighting
 		size_t m_maxPShadowLights;
 		size_t m_maxSDShadowLights;
-		size_t m_nextPointLightID;
-		size_t m_nextOtherLightsID;
+		size_t m_nextPointLightPos;
+		size_t m_nextSpotLightPos;
+		size_t m_nextDirLightPos;
 
 		size_t m_pointLightNumber = 0;
-		size_t m_otherLightNumber = 0;
+		size_t m_spotLightNumber = 0;
+		size_t m_dirLightNumber = 0;
 	};
 }
