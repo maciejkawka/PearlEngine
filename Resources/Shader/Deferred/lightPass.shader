@@ -28,8 +28,10 @@ in vec2 uv0;
 //General consts
 const float      PI = 3.14159265359;
 
+
 //Main Uniforms
 uniform vec3     camPos;
+
 
 //gBuff textures
 uniform sampler2D albedoMap;
@@ -39,7 +41,7 @@ uniform sampler2D aoMap;
 
 
 //Lighting
-const int         poissonDiskSize = 64;
+const int         poissonDiskSize = 24;
 const vec2        poissonDisk[64] = {
     vec2(-0.04117257f, -0.1597612f),
     vec2(0.06731031f, -0.4353096f),
@@ -106,51 +108,45 @@ const vec2        poissonDisk[64] = {
     vec2(-0.2554315f, 0.8326268f),
     vec2(-0.5080366f, 0.8539945f)
 };
-const int         maxLightNum = 50;
 const int         maxDirLightNum = 8;
+const int         maxPointLightNum = 16;
+const int         maxSpotLightNum = 16;
 
-//uniform mat4      lightMat[maxLightNum];
-//uniform mat4      dupsko[maxLightNum];
-//uniform int       lightID[maxLightNum];
-//uniform int       lightNumber = 0;
 uniform vec3      ambientColor; //To be add in future
 
 
-//Cascade Shadow Mapping
-const int          CSM_cascadesCount = 4;
-
-uniform mat4       CSM_mainLight;
-uniform bool       CSM_hasMainLight = false;
-uniform mat4       CSM_viewMats[4];
-uniform float      CSM_borders[4];
-uniform int        CSM_mapSize;
-uniform sampler2D  CSM_map;
-
-
 // Shadows
+const int         SHDW_cascadesCount = 4;
+
+uniform float     SHDW_borders[4];
 float             SHDW_LightSize = 5.0f;
-uniform int       SHDW_CombineShadowMapSize;
+
+uniform sampler2D SHDW_MainDirLightMap;
+uniform int       SHDW_MainDirLightMapSize;
+uniform int       SHDW_MainDirLightCombineMapSize;
+uniform mat4      SHDW_MainDirLightViewMat[4];
+uniform mat4      SHDW_MainDirLightMat;
+uniform bool      SHDW_HasMainDirLight = false;
 
 uniform sampler2D SHDW_PointLightMap;
 uniform int       SHDW_PointLightMapSize;
 uniform int       SHDW_PointCombineLightMapSize;
-uniform mat4      SHDW_PointLightMat[maxLightNum];
-uniform int       SHDW_PointLightID[maxLightNum];
+uniform mat4      SHDW_PointLightMat[maxPointLightNum];
+uniform int       SHDW_PointLightID[maxPointLightNum];
 uniform int       SHDW_PointLightNumber;
 
 uniform sampler2D SHDW_SpotLightMap;
 uniform int       SHDW_SpotLightMapSize;
 uniform int       SHDW_SpotLightCombineMapSize;
-uniform mat4      SHDW_SpotLightViewMat[maxLightNum];
-uniform mat4      SHDW_SpotLightMat[maxLightNum];
-uniform int       SHDW_SpotLightID[maxLightNum];
+uniform mat4      SHDW_SpotLightViewMat[maxSpotLightNum];
+uniform mat4      SHDW_SpotLightMat[maxSpotLightNum];
+uniform int       SHDW_SpotLightID[maxSpotLightNum];
 uniform int       SHDW_SpotLightNumber;
-
 
 uniform sampler2D SHDW_DirLightMap;
 uniform int       SHDW_DirLightMapSize;
 uniform int       SHDW_DirLightCombineShadowMapSize;
-uniform mat4      SHDW_DirLightViewMat[maxDirLightNum * 4];
+uniform mat4      SHDW_DirLightViewMat[maxDirLightNum * SHDW_cascadesCount];
 uniform mat4      SHDW_DirLightMat[maxDirLightNum];
 uniform int       SHDW_DirLightID[maxDirLightNum];
 uniform int       SHDW_DirLightNumber;
@@ -162,9 +158,6 @@ uniform samplerCube PBR_prefilterMap;
 uniform sampler2D   PBR_brdfLUT;
 
 
-
-
-
 // pseudorandom number generator
 float rand(vec2 co){
 	return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
@@ -174,92 +167,20 @@ float rand(vec4 co){
 	return fract(sin(dot_product) * 43758.5453);
 }
 
-
 //--------------------Cascade Shadow Mapping-------------------------
-vec2 CSM_CalculateSubTexUV(int index, vec2 UVs)
-{
-    float u_min = 0.0f;
-    float v_min = 0.0f;
-    float u_max = 0.0f;
-    float v_max = 0.0f;
-
-    //Select UVs
-    if (index == 0) 
-    {
-        u_min = 0.0;
-        v_min = 0.0;
-        u_max = 0.5;
-        v_max = 0.5;
-    } 
-    else if(index == 1) 
-    {
-        u_min = 0.5;
-        v_min = 0.0;
-        u_max = 1.0;
-        v_max = 0.5;
-    } 
-    else if(index == 2) 
-    {
-        u_min = 0.0;
-        v_min = 0.5;
-        u_max = 0.5;
-        v_max = 1.0;
-    } 
-    else if(index == 3) 
-    {
-        u_min = 0.5;
-        v_min = 0.5;
-        u_max = 1.0;
-        v_max = 1.0;
-    }
-
-    //Lerp UVs
-    return  mix(vec2(u_min, v_min), vec2(u_max, v_max), UVs);
-}
-
 vec3 CSM_DebugCascades(int cascadeIndex)
 {
     vec3 CascadeIndicator = vec3(0.0f);
-    if (cascadeIndex == 0) 
+    if (cascadeIndex == 0)
         CascadeIndicator = vec3(1.0, 0.0, 0.0);
     else if (cascadeIndex == 1)
         CascadeIndicator = vec3(0.0, 1.0, 0.0);
     else if (cascadeIndex == 2)
         CascadeIndicator = vec3(0.0, 0.0, 1.0);
-    else if (cascadeIndex ==3)
+    else if (cascadeIndex == 3)
         CascadeIndicator = vec3(1.0, 1.0, 1.0);
     return CascadeIndicator;
 }
-
-float CSM_CalculateShadowFactor(int cascadeIndex, vec4 LightSpacePos)
-{
-   vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
- 
-    // Convert [-1, 1] to [0, 1]
-    ProjCoords = 0.5 * ProjCoords + 0.5;
-    float z = ProjCoords.z;
-
-    float sum = 0;
-    float texelSize = 1.0f / float(CSM_mapSize * 4.0f);
-	float theta = rand(vec4(ProjCoords.xy, gl_FragCoord.xy));
-	mat2 rotation = mat2(vec2(cos(theta), sin(theta)), vec2(-sin(theta), cos(theta)));
-	for (int i = 0; i < poissonDiskSize; i++) {
-		vec2 offset = rotation * poissonDisk[i] * 20.0f * texelSize / (cascadeIndex + 1.0f);
-		vec2 texOffset = ProjCoords.xy + offset;
-
-        vec2 UVCoords = CSM_CalculateSubTexUV(cascadeIndex, clamp(texOffset, 0.0f, 1.0f));
-		float Depth = texture(CSM_map, UVCoords).x;
-
-        if(Depth + 0.0003f< z)
-            sum += 0.0f;
-        else
-            sum += 1.0f;
-	}
-
-	return sum / poissonDiskSize;
-}
-//--------------------------------------------------------------------
-
 
 //--------------------PBR Functions----------------------------------
 float PBR_DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -399,12 +320,12 @@ vec3 PBR_Light(mat4 light, PBR_Data data)
 //-------------------------------------------------------------------
 
 //--------------------Shadow Calculations----------------------------
-vec2 SHDW_CalculateLightUVs(int id, int subTexSize, vec2 UVs)
+vec2 SHDW_CalculateLightUVs(int id, int subTexSize, int comboTexSize, vec2 UVs)
 {
     // clamp UVs not to exceed the [0,1] boundary
     UVs = clamp(UVs, 0.0f, 1.0f);
 
-    int subTexPerRow = int(SHDW_CombineShadowMapSize / subTexSize);
+    int subTexPerRow = int(comboTexSize / subTexSize);
     int subTexRow = int(id / subTexPerRow);
     int subTexCol = id - subTexRow * subTexPerRow;
 
@@ -420,7 +341,7 @@ float SHDW_PenumbraSize(float zReciever, float zBlocker)
     return (zReciever - zBlocker) / zBlocker;
 }
 
-float SHDW_FindBlockers(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int mapSize)
+float SHDW_FindBlockers(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int mapSize, int mapCombineSize)
 {
     float blockerSum = 0.0f;
     float numBlockers = 0.0f;
@@ -429,7 +350,7 @@ float SHDW_FindBlockers(int lightId, vec2 UVs, float lightFragDist, sampler2D ma
     mat2 rotation = mat2(vec2(cos(theta), sin(theta)), vec2(-sin(theta), cos(theta)));
     for (int i = 0; i < 64; i++) {
         vec2 coord = UVs + rotation * poissonDisk[i] * texelSize * 20.f;
-        float smap = texture(map, SHDW_CalculateLightUVs(lightId, mapSize, coord)).x;
+        float smap = texture(map, SHDW_CalculateLightUVs(lightId, mapSize, mapCombineSize, coord)).x;
         if (smap < lightFragDist) {
             blockerSum += smap;
             numBlockers++;
@@ -438,7 +359,7 @@ float SHDW_FindBlockers(int lightId, vec2 UVs, float lightFragDist, sampler2D ma
     return blockerSum / numBlockers;
 }
 
-float SHDW_PCF(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int mapSize, float filterRadius, float bias)
+float SHDW_PCF(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int mapSize, int mapComboSize, float filterRadius, float bias)
 {
     float sum = 0;
     float theta = rand(vec4(UVs, gl_FragCoord.xy));
@@ -448,7 +369,7 @@ float SHDW_PCF(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int ma
         vec2 offset = rotation * poissonDisk[i] * texelSize * clamp(filterRadius, 2.0f, 50.0f);
         vec2 texOffset = UVs + offset;
 
-        vec2 UVCoords = SHDW_CalculateLightUVs(lightId, mapSize, texOffset);
+        vec2 UVCoords = SHDW_CalculateLightUVs(lightId, mapSize, mapComboSize, texOffset);
         float depth = texture(map, UVCoords).x;
 
         if (depth + bias < lightFragDist)
@@ -460,14 +381,14 @@ float SHDW_PCF(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int ma
     return sum / poissonDiskSize;
 }
 
-float SHDW_PCSS(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int mapSize, float bias, float lightSize)
+float SHDW_PCSS(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int mapSize, int mapComboSize, float bias, float lightSize)
 {
-    float blockers = SHDW_FindBlockers(lightId, UVs, lightFragDist, map, mapSize);
+    float blockers = SHDW_FindBlockers(lightId, UVs, lightFragDist, map, mapSize, mapComboSize);
 
     float penumbraRatio = SHDW_PenumbraSize(lightFragDist, blockers);
     float filterRadius = penumbraRatio * lightSize;
 
-    return SHDW_PCF(lightId, UVs, lightFragDist, map, mapSize, filterRadius, bias);
+    return SHDW_PCF(lightId, UVs, lightFragDist, map, mapSize, mapComboSize, filterRadius, bias);
 }
 
 vec3 SHDW_PointMapFaceDebug(mat4 light, vec3 fragPos, int lightIndex)
@@ -536,7 +457,7 @@ float SHDW_CalculatePointFactor(mat4 light, vec3 fragPos, int lightIndex)
     else
         UVs = vec2(-fragToLightDir.x, -fragToLightDir.y) * 0.5 / absLightDirection.z + 0.5;
 
-    return SHDW_PCSS(lightIDs + faceIndex, UVs, length(fragToLight), SHDW_PointLightMap, SHDW_PointLightMapSize, 0.2f, SHDW_LightSize);
+    return SHDW_PCSS(lightIDs + faceIndex, UVs, length(fragToLight), SHDW_PointLightMap, SHDW_PointLightMapSize, SHDW_PointCombineLightMapSize, 0.2f, SHDW_LightSize);
 }
 
 float SHDW_CalculateSpotLightFactor(vec3 fragPos, int lightIndex)
@@ -547,23 +468,44 @@ float SHDW_CalculateSpotLightFactor(vec3 fragPos, int lightIndex)
     projCoords = 0.5 * projCoords + 0.5;
     float fragToLight = projCoords.z;
 
-    return SHDW_PCSS(SHDW_SpotLightID[lightIndex], projCoords.xy, fragToLight, SHDW_SpotLightMap, SHDW_SpotLightMapSize, 0.001f, 1.0f);
+    return SHDW_PCSS(SHDW_SpotLightID[lightIndex], projCoords.xy, fragToLight, SHDW_SpotLightMap, SHDW_SpotLightMapSize, SHDW_SpotLightCombineMapSize, 0.001f, 1.0f);
 }
 
 float SHDW_CalculateDirectLightFactor(float depth, vec3 fragPos, int lightIndex)
 {
     float shadowFactor = 1.0f;
-    for (int i = 0; i < CSM_cascadesCount; i++)
+    for (int i = 0; i < SHDW_cascadesCount; i++)
     {
-        if (depth < CSM_borders[i])
+        if (depth < SHDW_borders[i])
         {
-            vec4 lightSpacePos = SHDW_DirLightViewMat[lightIndex * CSM_cascadesCount + i] * vec4(fragPos, 1.0f);
+            vec4 lightSpacePos = SHDW_DirLightViewMat[lightIndex * SHDW_cascadesCount + i] * vec4(fragPos, 1.0f);
             vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
             // Convert [-1, 1] to [0, 1]
             projCoords = 0.5 * projCoords + 0.5;
             float fragToLight = projCoords.z;
 
-            shadowFactor = SHDW_PCSS(SHDW_DirLightID[lightIndex] * CSM_cascadesCount + i, projCoords.xy, fragToLight, SHDW_DirLightMap, SHDW_DirLightMapSize, 0.003f, 5.0f / (1.0f + i));
+            shadowFactor = SHDW_PCSS(SHDW_DirLightID[lightIndex] * SHDW_cascadesCount + i, projCoords.xy, fragToLight, SHDW_DirLightMap, SHDW_DirLightMapSize, SHDW_DirLightCombineShadowMapSize, 0.003f / (i + 1), 10.0f / (1.0f + i));
+            //Lo = CSM_DebugCascades(i) * shadowFactor;
+            break;
+        }
+    }
+    return shadowFactor;
+}
+
+float SHDW_CalculateMainDirectLightFactor(float depth, vec3 fragPos)
+{
+    float shadowFactor = 1.0f;
+    for (int i = 0; i < SHDW_cascadesCount; i++)
+    {
+        if (depth < SHDW_borders[i])
+        {
+            vec4 lightSpacePos = SHDW_MainDirLightViewMat[i] * vec4(fragPos, 1.0f);
+            vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+            // Convert [-1, 1] to [0, 1]
+            projCoords = 0.5 * projCoords + 0.5;
+            float fragToLight = projCoords.z;
+
+            shadowFactor = SHDW_PCSS(i, projCoords.xy, fragToLight, SHDW_MainDirLightMap, SHDW_MainDirLightMapSize, SHDW_MainDirLightCombineMapSize, 0.003f / (i + 1), 5.0f / (1.0f + i));
             //Lo = CSM_DebugCascades(i) * shadowFactor;
             break;
         }
@@ -611,73 +553,47 @@ void main()
     vec3 Lo = vec3(0.0);
 
     //Main CSM Directional Light
-    if(CSM_hasMainLight == true)
+    if(SHDW_HasMainDirLight == true)
     { 
-        float shadowFactor = 0.0f;       
-        for(int i = 0; i < CSM_cascadesCount ; i++)
+        float shadowFactor = SHDW_CalculateMainDirectLightFactor(depth, pos);
+        if (shadowFactor > 0.0f)
         {
-            if(depth < CSM_borders[i])
-            {
-                shadowFactor = CSM_CalculateShadowFactor(i, CSM_viewMats[i] * vec4(pos, 1.0f));
-                //Lo = CSM_DebugCascades(i) * shadowFactor;
-                break;
-            }
+            Lo += PBR_Light(SHDW_MainDirLightMat, data) * shadowFactor;
         }
-
-        Lo += PBR_Light(CSM_mainLight, data) * shadowFactor;
     }
 
     //Directional Light
     for (int i = 0; i < SHDW_DirLightNumber; i++)
     {
         float shadowFactor = SHDW_CalculateDirectLightFactor(depth, pos, i);
-        vec3 lightAmmount = PBR_Light(SHDW_DirLightMat[i], data) * shadowFactor;
-        Lo += lightAmmount;
+        if (shadowFactor > 0.0f)
+        {
+            vec3 lightAmmount = PBR_Light(SHDW_DirLightMat[i], data) * shadowFactor;
+            Lo += lightAmmount;
+        }
     }
     
     //Point Light
     for (int i = 0; i < SHDW_PointLightNumber; i++)
     {
         float shadowFactor = SHDW_CalculatePointFactor(SHDW_PointLightMat[i], pos, i);
-        vec3 lightAmmount = PBR_Light(SHDW_PointLightMat[i], data) * shadowFactor;
-        Lo += lightAmmount;
+        if (shadowFactor > 0.0f)
+        {
+            vec3 lightAmmount = PBR_Light(SHDW_PointLightMat[i], data) * shadowFactor;
+            Lo += lightAmmount;
+        }
     }
 
     //Spot Light
     for (int i = 0; i < SHDW_SpotLightNumber; i++)
     {
         float shadowFactor = SHDW_CalculateSpotLightFactor(pos, i);
-        vec3 lightAmmount = PBR_Light(SHDW_SpotLightMat[i], data) * shadowFactor;
-        Lo += lightAmmount;
+        if (shadowFactor > 0.0f)
+        {
+            vec3 lightAmmount = PBR_Light(SHDW_SpotLightMat[i], data) * shadowFactor;
+            Lo += lightAmmount;
+        }
     }
-
-
-
-
-    //Other Lights
-    //int clampedLightNumber = clamp(lightNumber, 0, maxLightNum);
-    //for (int i = 0; i < clampedLightNumber; i++)
-    //{
-    //    //Shadow Calculations in future
-    //    float shadowFactor = 1.0f;
-    //    int lightType = int(lightMat[i][0].w);
-    //    if (lightType == 0) //Dir Light
-    //    {
-    //        //shadowFactor = SHDW_CalculateDirectLightFactor(lightMat[i], pos, i);
-    //    }
-    //    else if (lightType == 1) //Point Light
-    //        continue;
-    //    //    shadowFactor = SHDW_CalculatePointFactor(lightMat[i], pos, i);
-    //    else if (lightType == 2) // Spot Light
-    //        continue;
-    //    //    shadowFactor = SHDW_CalculateSpotLightFactor(lightMat[i], pos, i);        
-
-    //    vec3 lightAmmount = PBR_Light(lightMat[i], data) * shadowFactor;
-    //    Lo += lightAmmount;
-
-    //    //Lo = SHDW_PointMapFaceDebug(lightMat[i], pos, i);
-    //}
-
 
     //IR diffuse 
     vec3 F = PBR_FresnelSchlickRoughness(max(dot(N,V), 0.0), F0, roughness);

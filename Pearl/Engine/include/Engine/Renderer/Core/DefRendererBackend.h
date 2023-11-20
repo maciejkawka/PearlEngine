@@ -64,11 +64,8 @@ namespace PrRenderer::Core {
 		static void RenderToGBuffer(RenderObjectPtr p_object, const RenderData* p_renderData);
 		REGISTER_RENDER_COMMAND(RenderToGBuffer, RenderToGBuffer, RenderObjectPtr, RenderData*);
 
-		static void RenderToShadowMap(Resources::ShaderPtr p_shadowsShdr, const LightObject& p_lightObject, const std::list<RenderObjectPtr>* p_objects, const RenderData* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderToShadowMap, RenderToShadowMap, Resources::ShaderPtr, LightObject, std::list<RenderObjectPtr>*, RenderData*);
-
-		static void RenderToCascadeShadowMap(Resources::ShaderPtr p_cascadesShadowsShdr, PrCore::Math::mat4& p_lightMatrix, std::list<RenderObjectPtr>* p_objects, const RenderData* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderToCascadeShadowMap, RenderToCascadeShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, std::list<RenderObjectPtr>*, RenderData*);
+		static void RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, std::list<RenderObjectPtr>* p_objects, const RenderData* p_renderData);
+		REGISTER_RENDER_COMMAND(RenderToShadowMap, RenderToShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, std::list<RenderObjectPtr>*, RenderData*);
 
 		static void RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightMatrix, PrCore::Math::vec3& p_lightPos, std::list<RenderObjectPtr>* p_objects, const RenderData* p_renderData);
 		REGISTER_RENDER_COMMAND(RenderToPointShadowMap, RenderToPointShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, PrCore::Math::vec3, std::list<RenderObjectPtr>*, RenderData*);
@@ -93,8 +90,7 @@ namespace PrRenderer::Core {
 		void GenerateLUTMap();
 
 		//Shadow Mapping
-		PrCore::Math::vec4 CalculatePointLightTexture(size_t p_lightID);
-		PrCore::Math::vec4 CalculateLightTexture(size_t p_lightID, size_t p_lightMapSize);
+		PrCore::Math::vec4 CalculateLightTexture(size_t p_lightID, size_t p_lightMapSize, size_t p_comboMapSize);
 
 		//Main Data
 		//---------

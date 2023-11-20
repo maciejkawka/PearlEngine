@@ -153,20 +153,20 @@ namespace PrRenderer::Core {
 	struct RendererSettings {
 
 		//Shadows
+		size_t dirLightMaxShadows = 8;
 		size_t dirLightShadowsMapSize = 2048;
-		size_t dirLightCombineMapSize = 8192;
+		size_t dirLightCombineMapSize = 12288;
 
+		size_t pointLightMaxShadows = 16;
 		size_t pointLightShadowMapSize = 1024;
-		size_t pointLightCombineShadowMapSize = 8192;
+		size_t pointLightCombineShadowMapSize = 10240;
 
+		size_t spotLightMaxShadows = 16;
 		size_t spotLightShadowMapSize = 1024;
-		size_t spotLightCombineShadowMapSize = 8192;
+		size_t spotLightCombineShadowMapSize = 4096;
 
-		size_t mainLightShadowMapSize = 2048;
-		size_t mainLightShadowCombineMapSize = 4096;
-
-		size_t lightShadowMapSize = 1024;
-		size_t comboShadowMap = 8192;
+		size_t mainLightShadowMapSize = 4096;
+		size_t mainLightShadowCombineMapSize = 8196;
 
 		//CSM
 		float  cascadeShadowBorders[SHADOW_CASCADES_COUNT];

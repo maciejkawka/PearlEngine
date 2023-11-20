@@ -20,12 +20,7 @@ namespace PrRenderer::Core {
 	private:
 		void InstanciateObjects(RenderObjectVector& p_renderObjects);
 
-		//Temporary
-		Resources::ShaderPtr m_instancingShader;
-
 		//Lighting
-		size_t m_maxPShadowLights;
-		size_t m_maxSDShadowLights;
 		size_t m_nextPointLightPos;
 		size_t m_nextSpotLightPos;
 		size_t m_nextDirLightPos;

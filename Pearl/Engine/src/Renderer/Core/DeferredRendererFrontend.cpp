@@ -20,15 +20,9 @@ DefferedRendererFrontend::DefferedRendererFrontend(const RendererSettings& p_set
 	m_previousFrame = m_frameData[1];
 	m_currentFrameIndex = 0;
 
-	//Prepare Lights
-	m_maxPShadowLights = (m_renderSettings.comboShadowMap * m_renderSettings.comboShadowMap) / 
-		(m_renderSettings.pointLightShadowMapSize * m_renderSettings.pointLightShadowMapSize * 6);
-	m_maxSDShadowLights = (m_renderSettings.comboShadowMap * m_renderSettings.comboShadowMap) / 
-		(m_renderSettings.lightShadowMapSize * m_renderSettings.lightShadowMapSize);
 	m_nextPointLightPos = 0;
 	m_nextSpotLightPos = 0;
 	m_nextDirLightPos = 0;
-
 
 	//Manual Settings Set
 	m_renderSettings.cascadeShadowBorders[0] = 0.1f;
@@ -37,10 +31,6 @@ DefferedRendererFrontend::DefferedRendererFrontend(const RendererSettings& p_set
 	m_renderSettings.cascadeShadowBorders[3] = 1.0f;
 
 	m_rendererBackend = std::make_shared<DefRendererBackend>(m_renderSettings);
-
-	//Temporary
-	m_instancingShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/gBuffer.shader");
-	PR_ASSERT(m_instancingShader != nullptr, "Instance shader was not found");
 }
 
 void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id)
@@ -62,14 +52,19 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 	}
 
 	//If this is normal light
-	if (m_pointLightNumber >m_maxPShadowLights)
+	if (m_pointLightNumber >m_renderSettings.pointLightMaxShadows)
 	{
 		PRLOG_WARN("FrontendRenderer: Discarding point light, max limit exceeded");
 		return;
 	}
-	if(m_spotLightNumber > m_maxSDShadowLights)
+	if(m_spotLightNumber > m_renderSettings.spotLightMaxShadows)
 	{
-		PRLOG_WARN("FrontendRenderer: Discarding light, max limit exceeded");
+		PRLOG_WARN("FrontendRenderer: Discarding spot light, max limit exceeded");
+		return;
+	}
+	if (m_dirLightNumber > m_renderSettings.dirLightMaxShadows)
+	{
+		PRLOG_WARN("FrontendRenderer: Discarding directional light, max limit exceeded");
 		return;
 	}
 
