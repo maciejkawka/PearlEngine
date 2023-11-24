@@ -4,7 +4,7 @@
 
 using namespace PrRenderer::Core;
 
-PrCore::Math::mat4 CascadeShadowUtility::ClaculateFrustrums(size_t p_index, const PrCore::Math::vec3& p_lightDir,
+PrCore::Math::mat4 CascadeShadowUtility::ClaculateFrustrums(float& p_cascadeShadowRadiusRatio, size_t p_index, const PrCore::Math::vec3& p_lightDir,
 	const PrCore::Math::mat4& p_cameraView, size_t p_mapSize, float ZExtend) const
 {
 	using namespace PrCore;
@@ -60,5 +60,6 @@ PrCore::Math::mat4 CascadeShadowUtility::ClaculateFrustrums(size_t p_index, cons
 	auto viewMat = Math::lookAt(eye, center, Math::vec3(0.0f, 1.0f, 0.0f));
 	auto projMat = Math::ortho(-radius, radius,-radius, radius, -radius * ZExtend, radius * ZExtend);
 
+	p_cascadeShadowRadiusRatio = radius;
 	return projMat * viewMat;
 }

@@ -71,7 +71,8 @@ uniform vec3      ambientColor; //To be add in future
 const int         SHDW_cascadesCount = 4;
 
 uniform float     SHDW_borders[4];
-float             SHDW_LightSize = 5.0f;
+uniform float     SHDW_RadiusRatio[4];
+uniform float     SHDW_BorderBlend = 5.0f;
 
 uniform sampler2D SHDW_MainDirLightMap;
 uniform int       SHDW_MainDirLightMapSize;
@@ -79,6 +80,8 @@ uniform int       SHDW_MainDirLightCombineMapSize;
 uniform mat4      SHDW_MainDirLightViewMat[4];
 uniform mat4      SHDW_MainDirLightMat;
 uniform bool      SHDW_HasMainDirLight = false;
+uniform float     SHDW_MainDirLightSize = 3.0f;
+uniform float     SHDW_MainDirLightBias = 0.005f;
 
 uniform sampler2D SHDW_PointLightMap;
 uniform int       SHDW_PointLightMapSize;
@@ -86,6 +89,8 @@ uniform int       SHDW_PointCombineLightMapSize;
 uniform mat4      SHDW_PointLightMat[maxPointLightNum];
 uniform int       SHDW_PointLightID[maxPointLightNum];
 uniform int       SHDW_PointLightNumber;
+uniform float     SHDW_PointLightSize = 5.0f;
+uniform float     SHDW_PointLightBias = 0.2f;
 
 uniform sampler2D SHDW_SpotLightMap;
 uniform int       SHDW_SpotLightMapSize;
@@ -94,6 +99,8 @@ uniform mat4      SHDW_SpotLightViewMat[maxSpotLightNum];
 uniform mat4      SHDW_SpotLightMat[maxSpotLightNum];
 uniform int       SHDW_SpotLightID[maxSpotLightNum];
 uniform int       SHDW_SpotLightNumber;
+uniform float     SHDW_SpotLightSize = 1.0f;
+uniform float     SHDW_SpotLightBias = 0.005f;
 
 uniform sampler2D SHDW_DirLightMap;
 uniform int       SHDW_DirLightMapSize;
@@ -102,6 +109,8 @@ uniform mat4      SHDW_DirLightViewMat[maxDirLightNum * SHDW_cascadesCount];
 uniform mat4      SHDW_DirLightMat[maxDirLightNum];
 uniform int       SHDW_DirLightID[maxDirLightNum];
 uniform int       SHDW_DirLightNumber;
+uniform float     SHDW_DirLightSize = 3.0f;
+uniform float     SHDW_DirLightBias = 0.005f;
 
 
 // IBL
@@ -293,6 +302,10 @@ vec2 SHDW_CalculateLightUVs(int id, int subTexSize, int comboTexSize, vec2 UVs)
     return returnUVs;
 }
 
+float SHDW_CalculateBias(vec3 N, vec3 lightDir, float bias) {
+    return max(bias * (1.0f - dot(N, lightDir)), bias);
+}
+
 float SHDW_PenumbraSize(float zReciever, float zBlocker)
 {
     return (zReciever - zBlocker) / zBlocker;
@@ -302,11 +315,10 @@ float SHDW_FindBlockers(int lightId, vec2 UVs, float lightFragDist, sampler2D ma
 {
     float blockerSum = 0.0f;
     float numBlockers = 0.0f;
-    float texelSize = 1.0f / float(mapSize);
     float theta = rand(vec4(UVs, gl_FragCoord.xy));
     mat2 rotation = mat2(vec2(cos(theta), sin(theta)), vec2(-sin(theta), cos(theta)));
     for (int i = 0; i < poissonDiskSize; i++) {
-        vec2 coord = UVs + rotation * poissonDisk[i] * texelSize * 20.f;
+        vec2 coord = UVs + rotation * poissonDisk[i] / 800.0f;
         float smap = texture(map, SHDW_CalculateLightUVs(lightId, mapSize, mapCombineSize, coord)).x;
         if (smap < lightFragDist) {
             blockerSum += smap;
@@ -321,9 +333,8 @@ float SHDW_PCF(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int ma
     float sum = 0;
     float theta = rand(vec4(UVs, gl_FragCoord.xy));
     mat2 rotation = mat2(vec2(cos(theta), sin(theta)), vec2(-sin(theta), cos(theta)));
-    float texelSize = 1.0f / float(mapSize);
     for (int i = 0; i < poissonDiskSize; i++) {
-        vec2 offset = rotation * poissonDisk[i] * texelSize * clamp(filterRadius, 2.0f, 50.0f);
+        vec2 offset = rotation * poissonDisk[i] / 900.0f * filterRadius;
         vec2 texOffset = UVs + offset;
 
         vec2 UVCoords = SHDW_CalculateLightUVs(lightId, mapSize, mapComboSize, texOffset);
@@ -340,12 +351,8 @@ float SHDW_PCF(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int ma
 
 float SHDW_PCSS(int lightId, vec2 UVs, float lightFragDist, sampler2D map, int mapSize, int mapComboSize, float bias, float lightSize)
 {
-    float blockers = SHDW_FindBlockers(lightId, UVs, lightFragDist, map, mapSize, mapComboSize);
-
-    float penumbraRatio = SHDW_PenumbraSize(lightFragDist, blockers);
-    float filterRadius = penumbraRatio * lightSize;
-
-    return SHDW_PCF(lightId, UVs, lightFragDist, map, mapSize, mapComboSize, filterRadius, bias);
+    //PCSS not used, PCF calculated directly
+    return SHDW_PCF(lightId, UVs, lightFragDist, map, mapSize, mapComboSize, lightSize, bias);
 }
 
 vec3 SHDW_PointMapFaceDebug(mat4 light, vec3 fragPos, int lightIndex)
@@ -414,7 +421,7 @@ float SHDW_CalculatePointFactor(mat4 light, vec3 fragPos, int lightIndex)
     else
         UVs = vec2(-fragToLightDir.x, -fragToLightDir.y) * 0.5 / absLightDirection.z + 0.5;
 
-    return SHDW_PCSS(lightIDs + faceIndex, UVs, length(fragToLight), SHDW_PointLightMap, SHDW_PointLightMapSize, SHDW_PointCombineLightMapSize, 0.2f, SHDW_LightSize);
+    return SHDW_PCSS(lightIDs + faceIndex, UVs, length(fragToLight), SHDW_PointLightMap, SHDW_PointLightMapSize, SHDW_PointCombineLightMapSize, SHDW_PointLightBias, SHDW_PointLightSize);
 }
 
 float SHDW_CalculateSpotLightFactor(vec3 fragPos, int lightIndex)
@@ -425,23 +432,43 @@ float SHDW_CalculateSpotLightFactor(vec3 fragPos, int lightIndex)
     projCoords = 0.5 * projCoords + 0.5;
     float fragToLight = projCoords.z;
 
-    return SHDW_PCSS(SHDW_SpotLightID[lightIndex], projCoords.xy, fragToLight, SHDW_SpotLightMap, SHDW_SpotLightMapSize, SHDW_SpotLightCombineMapSize, 0.001f, 1.0f);
+    return SHDW_PCSS(SHDW_SpotLightID[lightIndex], projCoords.xy, fragToLight, SHDW_SpotLightMap, SHDW_SpotLightMapSize, SHDW_SpotLightCombineMapSize, SHDW_SpotLightBias, SHDW_SpotLightSize);
 }
 
-float SHDW_CalculateDirectLightFactor(float depth, vec3 fragPos, int lightIndex)
+float SHDW_CalculateDirectLightFactor(float depth, vec3 fragPos, int lightIndex, vec3 normal, vec3 lightDir)
 {
     float shadowFactor = 1.0f;
     for (int i = 0; i < SHDW_cascadesCount; i++)
     {
-        if (depth < SHDW_borders[i])
+        //Blending between two layers 
+        if (abs(depth - SHDW_borders[i]) < SHDW_BorderBlend)
+        {
+           vec4 lightSpacePosA = SHDW_DirLightViewMat[lightIndex * SHDW_cascadesCount + i] * vec4(fragPos, 1.0f);
+           vec3 projCoordsA = lightSpacePosA.xyz / lightSpacePosA.w;
+           projCoordsA = 0.5 * projCoordsA + 0.5;
+
+           vec4 lightSpacePosB = SHDW_DirLightViewMat[lightIndex * SHDW_cascadesCount + i + 1] * vec4(fragPos, 1.0f);
+           vec3 projCoordsB = lightSpacePosB.xyz / lightSpacePosB.w;
+           projCoordsB = 0.5 * projCoordsB + 0.5;
+
+           float distToTransition = depth - SHDW_borders[i];
+           float blendValue = (distToTransition / SHDW_BorderBlend) * 0.5f + 0.5f;
+
+           float blendA = SHDW_PCSS(SHDW_DirLightID[lightIndex] * SHDW_cascadesCount + i, projCoordsA.xy, projCoordsA.z, SHDW_DirLightMap, SHDW_DirLightMapSize, SHDW_DirLightCombineShadowMapSize, SHDW_DirLightBias * SHDW_RadiusRatio[i], SHDW_DirLightSize * SHDW_RadiusRatio[i]);
+           float blendB = SHDW_PCSS(SHDW_DirLightID[lightIndex] * SHDW_cascadesCount + i + 1, projCoordsB.xy, projCoordsB.z, SHDW_DirLightMap, SHDW_DirLightMapSize, SHDW_DirLightCombineShadowMapSize, SHDW_DirLightBias * SHDW_RadiusRatio[i + 1], SHDW_DirLightSize * SHDW_RadiusRatio[i + 1]);
+
+           shadowFactor = mix(blendA, blendB, blendValue);
+            break;
+        }
+        //Normal Shadow
+        else if (depth < SHDW_borders[i])
         {
             vec4 lightSpacePos = SHDW_DirLightViewMat[lightIndex * SHDW_cascadesCount + i] * vec4(fragPos, 1.0f);
             vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
             // Convert [-1, 1] to [0, 1]
             projCoords = 0.5 * projCoords + 0.5;
             float fragToLight = projCoords.z;
-
-            shadowFactor = SHDW_PCSS(SHDW_DirLightID[lightIndex] * SHDW_cascadesCount + i, projCoords.xy, fragToLight, SHDW_DirLightMap, SHDW_DirLightMapSize, SHDW_DirLightCombineShadowMapSize, 0.003f / (i + 1), 10.0f / (1.0f + i));
+            shadowFactor = SHDW_PCSS(SHDW_DirLightID[lightIndex] * SHDW_cascadesCount + i, projCoords.xy, fragToLight, SHDW_DirLightMap, SHDW_DirLightMapSize, SHDW_DirLightCombineShadowMapSize, SHDW_DirLightBias * SHDW_RadiusRatio[i], SHDW_DirLightSize * SHDW_RadiusRatio[i]);
             //Lo = CSM_DebugCascades(i) * shadowFactor;
             break;
         }
@@ -454,7 +481,28 @@ float SHDW_CalculateMainDirectLightFactor(float depth, vec3 fragPos)
     float shadowFactor = 1.0f;
     for (int i = 0; i < SHDW_cascadesCount; i++)
     {
-        if (depth < SHDW_borders[i])
+        //Blending between two layers 
+        if (abs(depth - SHDW_borders[i]) < SHDW_BorderBlend )
+        {
+            vec4 lightSpacePosA = SHDW_MainDirLightViewMat[i] * vec4(fragPos, 1.0f);
+            vec3 projCoordsA = lightSpacePosA.xyz / lightSpacePosA.w;
+            projCoordsA = 0.5 * projCoordsA + 0.5;
+
+            vec4 lightSpacePosB = SHDW_MainDirLightViewMat[i + 1] * vec4(fragPos, 1.0f);
+            vec3 projCoordsB = lightSpacePosB.xyz / lightSpacePosB.w;
+            projCoordsB = 0.5 * projCoordsB + 0.5;
+
+            float distToTransition = depth - SHDW_borders[i];
+            float blendValue = (distToTransition / SHDW_BorderBlend) * 0.5f + 0.5f;
+
+            float blendA = SHDW_PCSS(i, projCoordsA.xy, projCoordsA.z, SHDW_MainDirLightMap, SHDW_MainDirLightMapSize, SHDW_MainDirLightCombineMapSize, SHDW_DirLightBias * SHDW_RadiusRatio[i], SHDW_DirLightSize * SHDW_RadiusRatio[i]);
+            float blendB = SHDW_PCSS(i + 1, projCoordsB.xy, projCoordsB.z, SHDW_MainDirLightMap, SHDW_MainDirLightMapSize, SHDW_MainDirLightCombineMapSize, SHDW_MainDirLightBias * SHDW_RadiusRatio[i + 1], SHDW_MainDirLightSize * SHDW_RadiusRatio[i + 1]);
+
+            shadowFactor = mix(blendA, blendB, blendValue);
+            break;
+        }
+        //Normal Shadow
+        else if (depth < SHDW_borders[i])
         {
             vec4 lightSpacePos = SHDW_MainDirLightViewMat[i] * vec4(fragPos, 1.0f);
             vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
@@ -462,7 +510,7 @@ float SHDW_CalculateMainDirectLightFactor(float depth, vec3 fragPos)
             projCoords = 0.5 * projCoords + 0.5;
             float fragToLight = projCoords.z;
 
-            shadowFactor = SHDW_PCSS(i, projCoords.xy, fragToLight, SHDW_MainDirLightMap, SHDW_MainDirLightMapSize, SHDW_MainDirLightCombineMapSize, 0.003f / (i + 1), 5.0f / (1.0f + i));
+            shadowFactor = SHDW_PCSS(i, projCoords.xy, fragToLight, SHDW_MainDirLightMap, SHDW_MainDirLightMapSize, SHDW_MainDirLightCombineMapSize, SHDW_MainDirLightBias * SHDW_RadiusRatio[i], SHDW_MainDirLightSize * SHDW_RadiusRatio[i]);
             //Lo = CSM_DebugCascades(i) * shadowFactor;
             break;
         }
@@ -522,7 +570,8 @@ void main()
     //Directional Light
     for (int i = 0; i < SHDW_DirLightNumber; i++)
     {
-        float shadowFactor = SHDW_CalculateDirectLightFactor(depth, pos, i);
+        vec3 lightDir = normalize(-SHDW_DirLightMat[i][1].xyz);
+        float shadowFactor = SHDW_CalculateDirectLightFactor(depth, pos, i, N, lightDir);
         if (shadowFactor > 0.0f)
         {
             vec3 lightAmmount = PBR_Light(SHDW_DirLightMat[i], data) * shadowFactor;

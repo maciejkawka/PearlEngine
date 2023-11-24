@@ -58,13 +58,19 @@ namespace PrRenderer::Core
 
 		//Shadow Mapping
 		//---------------------------------
-		for (int i = 0; i < SHADOW_CASCADES_COUNT; i++)
-			m_settings.cascadeShadowBordersCamSpace[i] = m_settings.cascadeShadowBorders[i] * camera->GetFar();
+		static bool calculateProjs = true;
+		if(calculateProjs)
+		{
+			for (int i = 0; i < SHADOW_CASCADES_COUNT; i++)
+				m_settings.cascadeShadowBordersCamSpace[i] = m_settings.cascadeShadowBorders[i] * camera->GetFar();
 
-		m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetNear(), camera->GetFar() * m_settings.cascadeShadowBorders[0]));
-		m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings.cascadeShadowBorders[0], camera->GetFar() * m_settings.cascadeShadowBorders[1]));
-		m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings.cascadeShadowBorders[1], camera->GetFar() * m_settings.cascadeShadowBorders[2]));
-		m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings.cascadeShadowBorders[2], camera->GetFar() * m_settings.cascadeShadowBorders[3]));
+			m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetNear(), camera->GetFar() * m_settings.cascadeShadowBorders[0]));
+			m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings.cascadeShadowBorders[0], camera->GetFar() * m_settings.cascadeShadowBorders[1]));
+			m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings.cascadeShadowBorders[1], camera->GetFar() * m_settings.cascadeShadowBorders[2]));
+			m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings.cascadeShadowBorders[2], camera->GetFar() * m_settings.cascadeShadowBorders[3]));
+
+			calculateProjs = false;
+		}
 
 
 		//Main Directional Light
@@ -81,7 +87,7 @@ namespace PrRenderer::Core
 
 			for (int i = 0; i < SHADOW_CASCADES_COUNT; i++)
 			{
-				auto lightMat = m_CSMUtility.ClaculateFrustrums(i, lightDir, camera->GetViewMatrix(), 0);
+				auto lightMat = m_CSMUtility.ClaculateFrustrums(m_settings.cascadeShadowRadiusRatio[i] ,i, lightDir, camera->GetViewMatrix(), 4096.0f, 4.0f);
 				auto viewport = CalculateLightTexture(i, m_settings.mainLightShadowMapSize, m_settings.mainLightShadowCombineMapSize);
 				m_frame->mainDirectLight->lightViewMats.push_back(lightMat);
 
@@ -107,13 +113,18 @@ namespace PrRenderer::Core
 
 			for (int i = 0; i < SHADOW_CASCADES_COUNT; i++)
 			{
-				auto lightMat = m_CSMUtility.ClaculateFrustrums(i, lightDir, camera->GetViewMatrix(), 0, 3.0f);
+				auto lightMat = m_CSMUtility.ClaculateFrustrums(m_settings.cascadeShadowRadiusRatio[i], i, lightDir, camera->GetViewMatrix(), 2048.0f, 6.0f);
 				auto viewport = CalculateLightTexture(light.shadowMapPos * SHADOW_CASCADES_COUNT + i, m_settings.dirLightShadowsMapSize, m_settings.dirLightCombineMapSize);
 				light.lightViewMats.push_back(lightMat);
 
 				m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
 				m_commandQueue.push_back(CreateRC<RenderToShadowMapRC>(m_shadowMappingShader, lightMat, &m_frame->shadowCasters, &m_renderData));
 			}
+
+			m_settings.cascadeShadowRadiusRatio[1] = m_settings.cascadeShadowRadiusRatio[0] / m_settings.cascadeShadowRadiusRatio[1];
+			m_settings.cascadeShadowRadiusRatio[2] = m_settings.cascadeShadowRadiusRatio[0] / m_settings.cascadeShadowRadiusRatio[2];
+			m_settings.cascadeShadowRadiusRatio[3] = m_settings.cascadeShadowRadiusRatio[0] / m_settings.cascadeShadowRadiusRatio[3];
+			m_settings.cascadeShadowRadiusRatio[0] = 1.0f;
 		}
 
 
@@ -595,6 +606,7 @@ namespace PrRenderer::Core
 		// Set Shadows
 		// Main Directional Light
 		p_lightShdr->SetUniformFloatArray("SHDW_borders", p_settings->cascadeShadowBordersCamSpace, 4);
+		p_lightShdr->SetUniformFloatArray("SHDW_RadiusRatio", p_settings->cascadeShadowRadiusRatio, 4);
 
 		if (mianDirectLight && p_renderData->m_shadowMapMainDirTex)
 		{

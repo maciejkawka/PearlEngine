@@ -171,6 +171,7 @@ namespace PrRenderer::Core {
 		//CSM
 		float  cascadeShadowBorders[SHADOW_CASCADES_COUNT];
 		float  cascadeShadowBordersCamSpace[SHADOW_CASCADES_COUNT];
+		float  cascadeShadowRadiusRatio[SHADOW_CASCADES_COUNT];
 	};
 
 	///////////////////////////////////////
