@@ -5,7 +5,7 @@
 using namespace PrRenderer::Core;
 
 PrCore::Math::mat4 CascadeShadowUtility::ClaculateFrustrums(size_t p_index, const PrCore::Math::vec3& p_lightDir,
-	const PrCore::Math::mat4& p_cameraView, size_t mapSize, float ZExtend) const
+	const PrCore::Math::mat4& p_cameraView, size_t p_mapSize, float ZExtend) const
 {
 	using namespace PrCore;
 
@@ -38,34 +38,27 @@ PrCore::Math::mat4 CascadeShadowUtility::ClaculateFrustrums(size_t p_index, cons
 		center += glm::vec3(v);
 	}
 	center /= boundingVertices.size();
-	Math::mat4 lightView = Math::lookAt(center - p_lightDir, center, Math::vec3(0.0f, 1.0f, 0.0f));
 
-	Math::vec3 boxA{ lightView * boundingVertices[0] };
-	Math::vec3 boxB{ lightView * boundingVertices[0] };
+	float radius = Math::length(boundingVertices[2] - boundingVertices[5]) / 2.0f;
+	float texelsPerUnit = p_mapSize / (2.0f * radius);
+	auto scale = Math::scale(Math::mat4(1.0f), Math::vec3(texelsPerUnit));
 
-	for (int i = 1; i < boundingVertices.size(); i++)
-	{
-		auto WorldVert = lightView * boundingVertices[i];
+	auto lookView = Math::lookAt(Math::vec3(0.0f) - p_lightDir, Math::vec3(0.0f), Math::vec3(0.0f, 1.0f, 0.0f));
+	lookView = scale * lookView;
+	auto lookViewInv = Math::inverse(lookView);
 
-		boxA.x = std::min(WorldVert.x, boxA.x);
-		boxB.x = std::max(WorldVert.x, boxB.x);
-		boxA.y = std::min(WorldVert.y, boxA.y);
-		boxB.y = std::max(WorldVert.y, boxB.y);
-		boxA.z = std::min(WorldVert.z, boxA.z);
-		boxB.z = std::max(WorldVert.z, boxB.z);
-	}
+	Math::vec4 centerVec4 = lookView * Math::vec4(center, 1.0f);
+	center = centerVec4 / centerVec4.w;
+	center.x = Math::floor(center.x);
+	center.y = Math::floor(center.y);
 
-	// Tune this parameter according to the scene
-	if (boxA.z < 0)
-		boxA.z *= ZExtend;
-	else
-		boxA.z /= ZExtend;
+	centerVec4 = lookViewInv * Math::vec4(center, 1.0f);
+	center = centerVec4 / centerVec4.w;
 
-	if (boxB.z < 0)
-		boxB.z /= ZExtend;
-	else
-		boxB.z *= ZExtend;
+	Math::vec3 eye = center - (p_lightDir * radius * 2.0f);
 
-	auto projMat = Math::ortho(boxA.x, boxB.x, boxA.y, boxB.y, boxA.z, boxB.z);
-	return projMat * lightView;
+	auto viewMat = Math::lookAt(eye, center, Math::vec3(0.0f, 1.0f, 0.0f));
+	auto projMat = Math::ortho(-radius, radius,-radius, radius, -radius * ZExtend, radius * ZExtend);
+
+	return projMat * viewMat;
 }
