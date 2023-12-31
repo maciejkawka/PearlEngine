@@ -12,6 +12,11 @@
 
 using namespace PrRenderer::OpenGL;
 
+GLTexture2D::GLTexture2D()
+{
+	glGenTextures(1, &m_ID);
+}
+
 GLTexture2D::GLTexture2D(RendererID p_rendererID, size_t p_width, size_t p_height, Resources::TextureFormat p_format)
 {
 	m_ID = p_rendererID;
@@ -45,8 +50,22 @@ void GLTexture2D::GenerateMipMaps()
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void GLTexture2D::IsMipMapped(bool p_mipmap)
+void GLTexture2D::Apply()
 {
+	PR_ASSERT(m_rawData != nullptr, "Texture's data is nullptr. Texture ID: " + std::to_string(m_ID));
+	PR_ASSERT(m_ID != 0, "Texture ID is 0");
+
+	glBindTexture(GL_TEXTURE_2D, m_ID);
+	glTexImage2D(GL_TEXTURE_2D, 0, TextureFormatToInternalGL(m_format), m_width, m_height, 0, TextureFormatToGL(m_format), TextureFormatToDataTypeGL(m_format), m_rawData);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, TextureWrapToGL(m_wrapU));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, TextureWrapToGL(m_wrapV));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, TextureFilterToGL(m_minFiltering));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, TextureFilterToGL(m_magFiltering));
+
+	if(m_mipmap)
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void GLTexture2D::IsReadable(bool p_readable)
@@ -79,6 +98,18 @@ void GLTexture2D::SetWrapModeV(Resources::TextureWrapMode p_wrapV)
 	glBindTexture(GL_TEXTURE_2D, m_ID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, TextureWrapToGL(p_wrapV));
 	m_wrapV = p_wrapV;
+}
+
+void GLTexture2D::SetData(void* p_data)
+{
+	PR_ASSERT(p_data != nullptr, "Texture data is nullptr. Texture ID " + std::to_string(m_ID));
+
+	if (m_rawData)
+	{
+		PRLOG_WARN("Texture ID: {0}. Raw data already initalized. Deleting previous data and assigning new one.", m_ID);
+	}
+
+	m_rawData = p_data;
 }
 
 void GLTexture2D::PreLoadImpl()
@@ -151,7 +182,6 @@ void GLTexture2D::LoadUnitTexture(Core::Color p_unitColor)
 	m_readable = false;
 	m_mipmap = false;
 
-	glGenTextures(1, &m_ID);
 	glBindTexture(GL_TEXTURE_2D, m_ID);
 	glTexImage2D(GL_TEXTURE_2D, 0, TextureFormatToInternalGL(m_format), m_width, m_height, 0, TextureFormatToGL(m_format), TextureFormatToDataTypeGL(m_format), rawImage);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, TextureWrapToGL(m_wrapU));

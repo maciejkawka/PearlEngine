@@ -42,7 +42,7 @@ void MeshRendererSystem::OnUpdate(float p_dt)
 		break;
 	}
 
-	//DefferedRendererFrontend::GetInstance().AddCubemap(Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("skymapHDRMaterial.mat"));
+	DefferedRendererFrontend::GetInstance().AddCubemap(Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("skymapHDRMaterial.mat"));
 
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(Input::PrKey::L))
 		lightID = (++lightID) % 5;

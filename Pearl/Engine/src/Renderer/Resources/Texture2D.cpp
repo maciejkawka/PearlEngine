@@ -25,6 +25,23 @@ TexturePtr Texture2D::GenerateUnitTexture(Core::Color p_color)
 	return std::static_pointer_cast<Texture>(texture);
 }
 
+Texture2DPtr Texture2D::Create()
+{
+	Resources::Texture2DPtr texture;
+	switch (Core::RendererAPI::GetGraphicsAPI())
+	{
+	case Core::GraphicsAPI::OpenGL: texture = std::make_shared<OpenGL::GLTexture2D>(); break;
+
+	default:
+	{
+		PRLOG_ERROR("No such Graphics API");
+		break;
+	}
+	}
+
+	return texture;
+}
+
 TexturePtr Texture2D::GenerateBlackTexture()
 {
 	return GenerateUnitTexture(Core::Color::Black);

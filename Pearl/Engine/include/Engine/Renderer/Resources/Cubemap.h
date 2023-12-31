@@ -25,6 +25,8 @@ namespace PrRenderer::Resources{
 			m_minFiltering = TextureFiltering::Linear;
 		}
 
+		virtual void Apply() {}
+
 		inline void SetFace(int p_index, const std::string& p_name) { m_facesNames[p_index] = p_name; }
 		inline void Faces(std::vector<std::string> p_names) { m_facesNames = p_names; }
 

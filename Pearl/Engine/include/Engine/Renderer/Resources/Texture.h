@@ -76,6 +76,7 @@ namespace PrRenderer::Resources {
 		virtual void Unbind(unsigned int p_slot = 0) = 0;
 
 		virtual void GenerateMipMaps() = 0;
+		virtual void Apply() = 0;
 
 		inline virtual void IsMipMapped(bool p_mipmap) { m_mipmap = p_mipmap; }
 		inline virtual void IsReadable(bool p_readable) { m_readable = p_readable; }
@@ -84,6 +85,9 @@ namespace PrRenderer::Resources {
 		inline virtual void SetMagFiltering(TextureFiltering p_magfiltering) { m_magFiltering = p_magfiltering; }
 		inline virtual void SetWrapModeU(TextureWrapMode p_wrapU) { m_wrapU = p_wrapU; }
 		inline virtual void SetWrapModeV(TextureWrapMode p_wrapV) { m_wrapV = p_wrapV; }
+		inline void SetHeight(size_t p_height) { m_height = p_height; }
+		inline void SetWidth(size_t p_width) { m_width = p_width; }
+		inline void SetFormat(TextureFormat p_format) { m_format = p_format; }
 
 		inline RendererID GetRendererID() { return m_ID; }
 		inline size_t GetHeight() { return m_height; }
@@ -112,7 +116,7 @@ namespace PrRenderer::Resources {
 		TextureWrapMode m_wrapU;
 		TextureWrapMode m_wrapV;
 
-		unsigned char* m_rawData;
+		void* m_rawData;
 	};
 
 	typedef std::shared_ptr<Texture> TexturePtr;

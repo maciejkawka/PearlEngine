@@ -5,8 +5,7 @@ namespace PrRenderer::OpenGL {
 
 	class GLTexture2D : public Resources::Texture2D {
 	public:
-		GLTexture2D() = default;
-
+		GLTexture2D();
 		GLTexture2D(RendererID p_rendererID, size_t p_width, size_t p_height, Resources::TextureFormat p_format);
 
 		//Constructor for managed resource
@@ -20,9 +19,9 @@ namespace PrRenderer::OpenGL {
 		void Unbind(unsigned int p_slot = 0) override;
 
 		void GenerateMipMaps() override;
+		void Apply() override;
 
 		//To implent in future
-		virtual void IsMipMapped(bool p_mipmap) override;
 		virtual void IsReadable(bool p_readable) override;
 		
 		virtual void SetMinFiltering(Resources::TextureFiltering p_minfiltering) override;
@@ -30,6 +29,7 @@ namespace PrRenderer::OpenGL {
 		virtual void SetWrapModeU(Resources::TextureWrapMode p_wrapU) override;
 		virtual void SetWrapModeV(Resources::TextureWrapMode p_wrapV) override;
 
+		virtual void SetData(void* p_data) override;
 	protected:
 		void LoadUnitTexture(Core::Color p_unitColor) override;
 

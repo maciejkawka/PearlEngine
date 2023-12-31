@@ -6,6 +6,9 @@
 #include "Core/Resources/ResourceLoader.h"
 #include "Core/Windowing/Window.h"
 #include <Core/Events/EventManager.h>
+#include <random>
+
+#include "Core/Input/InputManager.h"
 
 namespace PrRenderer::Core
 {
@@ -17,12 +20,15 @@ namespace PrRenderer::Core
 		m_postProcesShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/RenderFront.shader");
 		m_pbrLightShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/lightPass.shader");
 		m_pointshadowMappingShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Shadows/PointShadowMapping.shader");
+		m_SSAOShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/SSAO.shader");
+		m_SSAOBlurShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/SSAO_Blur.shader");
 
 		m_renderData.m_quadMesh = Resources::Mesh::CreatePrimitive(Resources::Quad);
 
 		GenerategBuffers();
 		GenerateShadowMaps();
-		
+		GenerateSSAO();
+
 		//Set events
 		PrCore::Events::EventListener windowResizedListener;
 		windowResizedListener.connect<&DefRendererBackend::OnWindowResize>(this);
@@ -230,7 +236,6 @@ namespace PrRenderer::Core
 				LowRenderer::EnableDepth(false);
 				LowRenderer::EnableCullFace(false);
 				LowRenderer::Clear(ColorBuffer | DepthBuffer);
-				m_renderData.postProccesBuff->Unbind();
 			}));
 		//---------------------------------
 
@@ -240,6 +245,15 @@ namespace PrRenderer::Core
 
 		//Copy depth buffer to postprocess buffer
 		m_commandQueue.push_back(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderData.gBuffer.buffer, m_renderData.postProccesBuff, Buffers::FramebufferMask::DepthBufferBit));
+
+		//SSAO Pass
+		static bool enableSSAO = false;
+		if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::T))
+			enableSSAO = !enableSSAO;
+
+		if(enableSSAO)
+			m_commandQueue.push_back(CreateRC<RenderSSAORC>(m_SSAOShader, m_SSAOBlurShader, &m_renderData));
+
 
 		//PBR Light Pass
 		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]() { m_renderData.postProccesBuff->Bind(); }));
@@ -382,6 +396,76 @@ namespace PrRenderer::Core
 		}
 
 		p_pointShadowMapShader->Unbind();
+	}
+
+	void DefRendererBackend::GenerateSSAO()
+	{
+		//Generate Kernel
+		std::uniform_real_distribution<float> randomFloats(0.0, 1.0); // generates random floats between 0.0 and 1.0
+		std::default_random_engine generator;
+		std::vector<PrCore::Math::vec3> ssaoKernel;
+		for (unsigned int i = 0; i < 64; ++i)
+		{
+			glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
+			sample = PrCore::Math::normalize(sample);
+			sample *= randomFloats(generator);
+			float scale = float(i) / 64.0f;
+
+			// scale samples s.t. they're more aligned to center of kernel
+			scale = 0.1f + scale * scale * (1.0f - 0.1f);
+			sample *= scale;
+			ssaoKernel.push_back(sample);
+		}
+		m_renderData.m_ssaoKernel = ssaoKernel;
+
+		//Generate Noise
+		std::vector<float> ssaoNoise;
+		for (unsigned int i = 0; i < 16; i++)
+		{
+			glm::vec3 noise(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, 0.0f); // rotate around z-axis (in tangent space)
+			ssaoNoise.push_back(noise.x);
+			ssaoNoise.push_back(noise.y);
+			ssaoNoise.push_back(noise.z);
+		}
+
+		auto noiseTex = Resources::Texture2D::Create();
+		noiseTex->SetHeight(4);
+		noiseTex->SetWidth(4);
+		noiseTex->SetFormat(Resources::TextureFormat::RGB16F);
+		noiseTex->SetWrapModeU(Resources::TextureWrapMode::Repeat);
+		noiseTex->SetWrapModeV(Resources::TextureWrapMode::Repeat);
+		noiseTex->SetMagFiltering(Resources::TextureFiltering::Nearest);
+		noiseTex->SetMinFiltering(Resources::TextureFiltering::Nearest);
+		noiseTex->SetData(ssaoNoise.data());
+		noiseTex->IsMipMapped(false);
+		noiseTex->Apply();
+		m_renderData.m_SSAONoiseTex = noiseTex;
+
+		//Generate SSAO Framebuffer
+		m_renderData.m_SSAOBuff.reset();
+
+		Buffers::FramebufferTexture ssaoTex;
+		ssaoTex.format = Resources::TextureFormat::R8;
+		ssaoTex.filteringMag = Resources::TextureFiltering::Nearest;
+		ssaoTex.filteringMin = Resources::TextureFiltering::Nearest;
+
+		//Buffers::FramebufferTexture debugssaoTex;
+		//debugssaoTex.format = Resources::TextureFormat::RGB16F;
+		//debugssaoTex.filteringMag = Resources::TextureFiltering::Nearest;
+		//debugssaoTex.filteringMin = Resources::TextureFiltering::Nearest;
+
+		Buffers::FramebufferTexture depthTex;
+		depthTex.format = Resources::TextureFormat::Depth32;
+
+		Buffers::FramebufferSettings settings;
+		settings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
+		settings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();;
+		settings.mipMaped = false;
+		settings.colorTextureAttachments = { ssaoTex };
+		settings.depthStencilAttachment = depthTex;
+
+		m_renderData.m_SSAOBuff = Buffers::Framebufffer::Create(settings);
+		m_renderData.m_SSAOTex = m_renderData.m_SSAOBuff->GetTexturePtr();
 	}
 
 	void DefRendererBackend::GenerategBuffers()
@@ -566,6 +650,53 @@ namespace PrRenderer::Core
 		}
 
 		material->Unbind();
+	}
+
+	void DefRendererBackend::RenderSSAO(Resources::ShaderPtr p_SSAOShader, Resources::ShaderPtr p_BlurSSAOShader, const RenderData* p_renderData)
+	{
+		p_renderData->m_SSAOBuff->Bind();
+		p_SSAOShader->Bind();
+
+		LowRenderer::Clear(ColorBuffer | DepthBuffer);
+		LowRenderer::EnableDepth(false);
+		LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::Less);
+		LowRenderer::EnableBlending(false);
+
+		p_renderData->gBuffer.positionTex->Bind(0);
+		p_SSAOShader->SetUniformInt("positionMap", 0);
+
+		p_renderData->gBuffer.normalsTex->Bind(1);
+		p_SSAOShader->SetUniformInt("normalMap", 1);
+
+		p_renderData->m_SSAONoiseTex->Bind(2);
+		p_SSAOShader->SetUniformInt("texNoise", 2);
+
+		p_SSAOShader->SetUniformMat4("projectionMat", p_renderData->camera->GetProjectionMatrix());
+		p_SSAOShader->SetUniformMat4("viewMat", p_renderData->camera->GetViewMatrix());
+		p_SSAOShader->SetUniformVec3Array("samples", p_renderData->m_ssaoKernel.data(), p_renderData->m_ssaoKernel.size());
+		p_SSAOShader->SetUniformVec2("screenSize", PrCore::Math::vec2{ PrCore::Windowing::Window::GetMainWindow().GetWidth(), PrCore::Windowing::Window::GetMainWindow().GetHeight() });
+		p_renderData->m_quadMesh->Bind();
+		LowRenderer::Draw(p_renderData->m_quadMesh->GetVertexArray());
+		p_renderData->m_quadMesh->Unbind();
+
+		p_SSAOShader->Unbind();
+		LowRenderer::EnableDepth(false);
+		p_renderData->m_SSAOBuff->Unbind();
+
+
+		//Blur the SSAO
+		p_renderData->gBuffer.buffer->Bind();
+		p_BlurSSAOShader->Bind();
+
+		p_renderData->m_SSAOTex->Bind(0);
+		p_SSAOShader->SetUniformInt("ssaoInput", 0);
+
+		p_renderData->m_quadMesh->Bind();
+		LowRenderer::Draw(p_renderData->m_quadMesh->GetVertexArray());
+		p_renderData->m_quadMesh->Unbind();
+
+		p_BlurSSAOShader->Unbind();
+		p_renderData->gBuffer.buffer->Unbind();
 	}
 
 	void DefRendererBackend::RenderLight(Resources::ShaderPtr p_lightShdr, LightObjectPtr mianDirectLight, std::vector<LightObject>* p_lightMats, const RenderData* p_renderData, const RendererSettings* p_settings)
