@@ -22,12 +22,14 @@ namespace PrRenderer::Core
 		m_pointshadowMappingShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Shadows/PointShadowMapping.shader");
 		m_SSAOShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/SSAO.shader");
 		m_SSAOBlurShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/SSAO_Blur.shader");
+		m_FXAAShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/FXAA.shader");
 
 		m_renderData.m_quadMesh = Resources::Mesh::CreatePrimitive(Resources::Quad);
 
 		GenerategBuffers();
 		GenerateShadowMaps();
 		GenerateSSAO();
+		GenerateFXAA();
 
 		//Set events
 		PrCore::Events::EventListener windowResizedListener;
@@ -278,6 +280,17 @@ namespace PrRenderer::Core
 			}));
 		//---------------------------------
 
+		// FXAA Anti-Aliasing
+		static bool enableFXAA = false;
+		if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::R))
+			enableFXAA = !enableFXAA;
+
+		if (enableFXAA)
+		{
+			m_commandQueue.push_back(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderData.postProccesBuff, m_renderData.m_FXAABuff, Buffers::FramebufferMask::ColorBufferBit));
+			m_commandQueue.push_back(CreateRC<RenderFXAARC>(m_FXAAShader, &m_renderData));
+		}
+
 		//Post process and render to back buffer
 		m_commandQueue.push_back(CreateRC<RenderPostProcessRC>(m_postProcesShdr, &m_renderData));
 	}
@@ -303,6 +316,8 @@ namespace PrRenderer::Core
 		m_screenHeight = windowResizeEvent->m_height;
 
 		GenerategBuffers();
+		GenerateSSAO();
+		GenerateFXAA();
 		m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(m_screenWidth, m_screenHeight, 0, 0));
 	}
 
@@ -400,6 +415,9 @@ namespace PrRenderer::Core
 
 	void DefRendererBackend::GenerateSSAO()
 	{
+		m_renderData.m_SSAOBuff.reset();
+		m_renderData.m_SSAOTex.reset();
+
 		//Generate Kernel
 		std::uniform_real_distribution<float> randomFloats(0.0, 1.0); // generates random floats between 0.0 and 1.0
 		std::default_random_engine generator;
@@ -466,6 +484,30 @@ namespace PrRenderer::Core
 
 		m_renderData.m_SSAOBuff = Buffers::Framebufffer::Create(settings);
 		m_renderData.m_SSAOTex = m_renderData.m_SSAOBuff->GetTexturePtr();
+	}
+
+	void DefRendererBackend::GenerateFXAA()
+	{
+		m_renderData.m_FXAABuff.reset();
+		m_renderData.m_FXAATex.reset();
+
+		Buffers::FramebufferTexture fxaaTex;
+		fxaaTex.format = Resources::TextureFormat::RGBA32;
+		fxaaTex.filteringMag = Resources::TextureFiltering::Linear;
+		fxaaTex.filteringMin = Resources::TextureFiltering::Linear;
+
+		Buffers::FramebufferTexture depthTex;
+		depthTex.format = Resources::TextureFormat::Depth16;
+
+		Buffers::FramebufferSettings settings;
+		settings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
+		settings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();;
+		settings.mipMaped = false;
+		settings.colorTextureAttachments = { fxaaTex };
+		settings.depthStencilAttachment = depthTex;
+
+		m_renderData.m_FXAABuff = Buffers::Framebufffer::Create(settings);
+		m_renderData.m_FXAATex = m_renderData.m_FXAABuff->GetTexturePtr();
 	}
 
 	void DefRendererBackend::GenerategBuffers()
@@ -697,6 +739,28 @@ namespace PrRenderer::Core
 
 		p_BlurSSAOShader->Unbind();
 		p_renderData->gBuffer.buffer->Unbind();
+	}
+
+	void DefRendererBackend::RenderFXAA(Resources::ShaderPtr p_FXAAShader, const RenderData* p_renderData)
+	{
+		p_renderData->postProccesBuff->Bind();
+		p_FXAAShader->Bind();
+
+		LowRenderer::Clear(ColorBuffer | DepthBuffer);
+		LowRenderer::EnableDepth(false);
+		LowRenderer::EnableBlending(false);
+
+		p_renderData->m_FXAATex->Bind(0);
+		p_FXAAShader->SetUniformInt("screenTexture", 0);
+
+		p_FXAAShader->SetUniformVec2("inverseScreenSize", PrCore::Math::vec2{ 1.0f / PrCore::Windowing::Window::GetMainWindow().GetWidth(), 1.0f / PrCore::Windowing::Window::GetMainWindow().GetHeight() });
+
+		p_renderData->m_quadMesh->Bind();
+		LowRenderer::Draw(p_renderData->m_quadMesh->GetVertexArray());
+		p_renderData->m_quadMesh->Unbind();
+
+		p_renderData->postProccesBuff->Unbind();
+		p_FXAAShader->Unbind();
 	}
 
 	void DefRendererBackend::RenderLight(Resources::ShaderPtr p_lightShdr, LightObjectPtr mianDirectLight, std::vector<LightObject>* p_lightMats, const RenderData* p_renderData, const RendererSettings* p_settings)

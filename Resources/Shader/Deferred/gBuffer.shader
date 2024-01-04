@@ -121,8 +121,9 @@ void main()
         normals = normalize(IN.normals);
     }
 
+    //IMPORTANT all vectors are in world space
     gPosition = vec4(IN.pos, LinearizeDepth(gl_FragCoord.z));
     gAlbedo = vec4(albedo, roughness);
     gNormal = vec4(normals, metallic);
-    gAO = vec4(vec3(0,0,0), ao);
+    gAO = vec4(vec3(0,0,0), 1.0f);
 }

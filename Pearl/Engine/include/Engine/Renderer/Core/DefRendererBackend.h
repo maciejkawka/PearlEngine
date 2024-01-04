@@ -48,6 +48,10 @@ namespace PrRenderer::Core {
 			Resources::TexturePtr               m_SSAONoiseTex;
 			std::vector<PrCore::Math::vec3>		m_ssaoKernel;
 
+			//FXAA
+			Buffers::FramebuffferPtr            m_FXAABuff;
+			Resources::TexturePtr               m_FXAATex;
+
 			//Shadow mapping
 			//One point light uses 6 subparts of the texture, so number of lights = TextureSize / (ShadowMapTexture * 6)
 			Buffers::FramebuffferPtr m_shadowMapPointBuff;
@@ -91,7 +95,11 @@ namespace PrRenderer::Core {
 		static void RenderSSAO(Resources::ShaderPtr p_SSAOShader, Resources::ShaderPtr p_BlurSSAOShader, const RenderData* p_renderData);
 		REGISTER_RENDER_COMMAND(RenderSSAO, RenderSSAO, Resources::ShaderPtr, Resources::ShaderPtr, RenderData*);
 
+		static void RenderFXAA(Resources::ShaderPtr p_FXAAShader, const RenderData* p_renderData);
+		REGISTER_RENDER_COMMAND(RenderFXAA, RenderFXAA, Resources::ShaderPtr, RenderData*);
+
 		void GenerateSSAO();
+		void GenerateFXAA();
 		void GenerategBuffers();
 		void GenerateShadowMaps();
 
@@ -113,6 +121,7 @@ namespace PrRenderer::Core {
 		Resources::ShaderPtr m_pointshadowMappingShader;
 		Resources::ShaderPtr m_SSAOShader;
 		Resources::ShaderPtr m_SSAOBlurShader;
+		Resources::ShaderPtr m_FXAAShader;
 
 		CascadeShadowUtility m_CSMUtility;
 	};
