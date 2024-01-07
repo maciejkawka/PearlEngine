@@ -84,6 +84,11 @@ void GLRenderer::SetBlendingAlgorythm(Core::BlendingAlgorithm p_source, Core::Bl
 	glBlendFunc(BlendingToGL(p_source), BlendingToGL(p_dest));
 }
 
+void GLRenderer::SetColorMask(bool p_red, bool p_green, bool p_blue, bool p_alpha)
+{
+	glColorMask(BoolToGL(p_red), BoolToGL(p_green), BoolToGL(p_blue), BoolToGL(p_alpha));
+}
+
 void GLRenderer::Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives)
 {
 	auto indices = p_vertexArray->GetIndexBuffer();

@@ -23,6 +23,7 @@ namespace PrRenderer::Core
 		m_SSAOShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/SSAO.shader");
 		m_SSAOBlurShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/SSAO_Blur.shader");
 		m_FXAAShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/FXAA.shader");
+		m_fogShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/Fog.shader");
 
 		m_renderData.m_quadMesh = Resources::Mesh::CreatePrimitive(Resources::Quad);
 
@@ -212,7 +213,7 @@ namespace PrRenderer::Core
 			PrCore::Windowing::Window::GetMainWindow().GetHeight(), 0, 0));
 
 
-		//gBuffer Pass
+		//Pipeline Gbuffer Lit
 		//---------------------------------
 		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]()
 			{
@@ -256,7 +257,6 @@ namespace PrRenderer::Core
 		if(enableSSAO)
 			m_commandQueue.push_back(CreateRC<RenderSSAORC>(m_SSAOShader, m_SSAOBlurShader, &m_renderData));
 
-
 		//PBR Light Pass
 		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]() { m_renderData.postProccesBuff->Bind(); }));
 		m_commandQueue.push_back(CreateRC<RenderLightRC>(m_pbrLightShader, m_frame->mainDirectLight, &m_frame->lights, &m_renderData, &m_settings));
@@ -291,7 +291,19 @@ namespace PrRenderer::Core
 			m_commandQueue.push_back(CreateRC<RenderFXAARC>(m_FXAAShader, &m_renderData));
 		}
 
-		//Post process and render to back buffer
+		//Fog
+		static bool enableFog = false;
+		if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::F))
+			enableFog = !enableFog;
+
+		if (enableFog)
+		{
+			m_commandQueue.push_back(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderData.postProccesBuff, m_renderData.m_FXAABuff, Buffers::FramebufferMask::ColorBufferBit));
+			m_commandQueue.push_back(CreateRC<RenderFogRC>(m_fogShader, &m_renderData));
+		}
+
+
+		//Render to back buffer
 		m_commandQueue.push_back(CreateRC<RenderPostProcessRC>(m_postProcesShdr, &m_renderData));
 	}
 
@@ -323,37 +335,34 @@ namespace PrRenderer::Core
 
 	void DefRendererBackend::RenderToGBuffer(RenderObjectPtr p_object, const RenderData* p_renderData)
 	{
-		//Temporary
-		auto shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/gBuffer.shader");
-		auto materialgBuffer = std::make_shared<Resources::Material>(PrRenderer::Resources::Material(shader));
-		materialgBuffer->CopyPropertiesFrom(*p_object->material);
-		//
-
 		auto mesh = p_object->mesh;
+		auto material = p_object->material;
+		auto shader = p_object->material->GetShader();
 
 		p_renderData->gBuffer.buffer->Bind();
-		materialgBuffer->SetProperty("VPMatrix", p_renderData->camera->GetCameraMatrix());
-		materialgBuffer->SetProperty("nearPlane", p_renderData->camera->GetNear());
-		materialgBuffer->SetProperty("farPlane", p_renderData->camera->GetFar());
+
+		material->Bind();
+		shader->SetUniformMat4("PIPELINE_VP_MAT", p_renderData->camera->GetCameraMatrix());
+		shader->SetUniformFloat("PIPELINE_NEAR", p_renderData->camera->GetNear());
+		shader->SetUniformFloat("PIPELINE_FAR", p_renderData->camera->GetFar());
 
 		if (p_object->type == RenderObjectType::Mesh)
 		{
-			materialgBuffer->SetProperty("modelMatrix", p_object->worldMat);
+			shader->SetUniformMat4("PIPELINE_MODEL_MAT", p_object->worldMat);
 
-			materialgBuffer->Bind();
 			mesh->Bind();
 			LowRenderer::Draw(mesh->GetVertexArray());
-			materialgBuffer->Unbind();
-			mesh->Unbind();
 		}
 		else if(p_object->type == RenderObjectType::InstancedMesh)
 		{
-			materialgBuffer->Bind();
+			shader->SetUniformMat4Array("PIPELINE_MODEL_MAT_ARRAY[0]", p_object->worldMatrices.data(), p_object->worldMatrices.size());
+			shader->SetUniformInt("PIPELINE_INTANCE_COUNT", p_object->instanceSize);
+
 			mesh->Bind();
 			LowRenderer::DrawInstanced(mesh->GetVertexArray(), p_object->instanceSize);
-			materialgBuffer->Unbind();
-			mesh->Unbind();
 		}
+
+			mesh->Unbind();
 	}
 
 	void DefRendererBackend::RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, std::list<RenderObjectPtr>* p_objects, const RenderData* p_renderData)
@@ -729,6 +738,7 @@ namespace PrRenderer::Core
 		//Blur the SSAO
 		p_renderData->gBuffer.buffer->Bind();
 		p_BlurSSAOShader->Bind();
+		LowRenderer::SetColorMask(false, false, false, true);
 
 		p_renderData->m_SSAOTex->Bind(0);
 		p_SSAOShader->SetUniformInt("ssaoInput", 0);
@@ -737,6 +747,7 @@ namespace PrRenderer::Core
 		LowRenderer::Draw(p_renderData->m_quadMesh->GetVertexArray());
 		p_renderData->m_quadMesh->Unbind();
 
+		LowRenderer::SetColorMask(true, true, true, true);
 		p_BlurSSAOShader->Unbind();
 		p_renderData->gBuffer.buffer->Unbind();
 	}
@@ -761,6 +772,31 @@ namespace PrRenderer::Core
 
 		p_renderData->postProccesBuff->Unbind();
 		p_FXAAShader->Unbind();
+	}
+
+	void DefRendererBackend::RenderFog(Resources::ShaderPtr p_fogShader, const RenderData* p_renderData)
+	{
+		p_renderData->postProccesBuff->Bind();
+		p_fogShader->Bind();
+		LowRenderer::Clear(ColorBuffer | DepthBuffer);
+
+
+		p_renderData->m_FXAATex->Bind(0);
+		p_fogShader->SetUniformInt("screenTexture", 0);
+
+		p_renderData->gBuffer.positionTex->Bind(1);
+		p_fogShader->SetUniformInt("positionMap", 1);
+
+		p_fogShader->SetUniformVec3("fogColor", PrCore::Math::vec3(0.604f, 0.700f, 0.800f));
+		p_fogShader->SetUniformFloat("maxDistance", 20.0f);
+		p_fogShader->SetUniformFloat("densityFactor", 1.0f);
+
+		p_renderData->m_quadMesh->Bind();
+		LowRenderer::Draw(p_renderData->m_quadMesh->GetVertexArray());
+		p_renderData->m_quadMesh->Unbind();
+
+		p_renderData->postProccesBuff->Unbind();
+		p_fogShader->Unbind();
 	}
 
 	void DefRendererBackend::RenderLight(Resources::ShaderPtr p_lightShdr, LightObjectPtr mianDirectLight, std::vector<LightObject>* p_lightMats, const RenderData* p_renderData, const RendererSettings* p_settings)

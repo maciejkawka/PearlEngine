@@ -79,6 +79,8 @@ namespace PrRenderer::Core {
 		virtual void EnableBlending(bool p_enable) = 0;
 		virtual void SetBlendingAlgorythm(BlendingAlgorithm p_source, BlendingAlgorithm p_dest) = 0;
 
+		virtual void SetColorMask(bool p_red, bool p_green, bool p_blue, bool p_alpha) = 0;
+
 		virtual void Draw(Buffers::VertexArrayPtr p_vertexArray, Primitives p_primitives = Primitives::Triangles) = 0;
 		virtual void DrawArray(Buffers::VertexBufferPtr p_vertexArray, Primitives p_primitives = Primitives::Triangles) = 0;
 		virtual void DrawInstanced(Buffers::VertexArrayPtr p_vertexArray, size_t p_instanceCount, Primitives p_primitives = Primitives::Triangles) = 0;

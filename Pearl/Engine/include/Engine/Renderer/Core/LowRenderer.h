@@ -44,7 +44,7 @@ namespace PrRenderer::Core {
 		static void SetBlendingAlgorythm(BlendingAlgorithm p_source, BlendingAlgorithm p_dest);
 
 		//Color Masks
-		// static void SetColorMask()
+		static void SetColorMask(bool p_red, bool p_green, bool p_blue, bool p_alpha);
 		// static void SetColorMask() 
 		
 		//Draw

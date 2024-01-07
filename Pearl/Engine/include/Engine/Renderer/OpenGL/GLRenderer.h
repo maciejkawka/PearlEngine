@@ -23,6 +23,8 @@ namespace PrRenderer::OpenGL {
 		void EnableBlending(bool p_enable) override;
 		void SetBlendingAlgorythm(Core::BlendingAlgorithm p_source, Core::BlendingAlgorithm p_dest) override;
 
+		void SetColorMask(bool p_red, bool p_green, bool p_blue, bool p_alpha) override;
+
 		void Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles) override;
 		void DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles) override;
 		void DrawInstanced(Buffers::VertexArrayPtr p_vertexArray, size_t p_instanceCount, Core::Primitives p_primitives) override;

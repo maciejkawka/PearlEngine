@@ -98,6 +98,9 @@ namespace PrRenderer::Core {
 		static void RenderFXAA(Resources::ShaderPtr p_FXAAShader, const RenderData* p_renderData);
 		REGISTER_RENDER_COMMAND(RenderFXAA, RenderFXAA, Resources::ShaderPtr, RenderData*);
 
+		static void RenderFog(Resources::ShaderPtr p_fogShader, const RenderData* p_renderData);
+		REGISTER_RENDER_COMMAND(RenderFog, RenderFog, Resources::ShaderPtr, RenderData*);
+
 		void GenerateSSAO();
 		void GenerateFXAA();
 		void GenerategBuffers();
@@ -122,6 +125,7 @@ namespace PrRenderer::Core {
 		Resources::ShaderPtr m_SSAOShader;
 		Resources::ShaderPtr m_SSAOBlurShader;
 		Resources::ShaderPtr m_FXAAShader;
+		Resources::ShaderPtr m_fogShader;
 
 		CascadeShadowUtility m_CSMUtility;
 	};

@@ -528,6 +528,7 @@ void main()
     float roughness = texture(albedoMap, uv0).a;
     //albedoTex = pow(albedoTex.rgb, vec3(2.2));
     float ao = texture(aoMap, uv0).a;
+    vec3 emission = texture(aoMap, uv0).rgb;
     vec3 N = normalize(texture(normalMap, uv0).rgb);
     float metallic = texture(normalMap, uv0).a;
     vec3 pos = texture(positionMap, uv0).rgb;
@@ -616,7 +617,7 @@ void main()
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
     vec3 ambient = (kD * diffuse + specular) * ao;
     
-    vec3 color = ambient + Lo;
+    vec3 color = ambient + Lo + emission;
 
     //tone maping    
     color = color/(color + vec3(1.0));

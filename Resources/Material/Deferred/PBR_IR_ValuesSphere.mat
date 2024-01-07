@@ -1,7 +1,7 @@
 {
   "materialVersion": 0.1,
   "name": "PBRMaterialDeferred",
-  "shader": "Deferred/gBuffer.shader",
+  "shader": "Deferred/StandardLit.shader",
   "RenderOrder": 0,
   "RenderType": 0,
   "color": {

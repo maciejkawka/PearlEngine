@@ -249,10 +249,11 @@ void DefferedRendererFrontend::InstanciateObjects(RenderObjectVector& p_renderOb
 
 				//Create material for instanced group
 				auto instancedMesh = instnaceFront->mesh;
-				auto instancedMat = std::make_shared<Resources::Material>(*instnaceFront->material);
+				auto instancedMat = instnaceFront->material;
+				//auto instancedMat = std::make_shared<Resources::Material>(*instnaceFront->material);
 
-				instancedMat->SetPropertyArray("modelMatrixArray[0]", matrices.data(), matrices.size());
-				instancedMat->SetProperty("instancedCount", (int)matrices.size());
+				//instancedMat->SetPropertyArray("modelMatrixArray[0]", matrices.data(), matrices.size());
+				//instancedMat->SetProperty("instancedCount", (int)matrices.size());
 				RenderObjectPtr instncedObj = std::make_shared<RenderObject>();
 				instncedObj->material = instancedMat;
 				instncedObj->mesh = instancedMesh;

@@ -78,6 +78,11 @@ void LowRenderer::SetBlendingAlgorythm(BlendingAlgorithm p_source, BlendingAlgor
 	m_rendererAPI->SetBlendingAlgorythm(p_source, p_dest);
 }
 
+void LowRenderer::SetColorMask(bool p_red, bool p_green, bool p_blue, bool p_alpha)
+{
+	m_rendererAPI->SetColorMask(p_red, p_green, p_blue, p_alpha);
+}
+
 void LowRenderer::Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives)
 {
 	m_rendererAPI->Draw(p_vertexArray, p_primitives);
