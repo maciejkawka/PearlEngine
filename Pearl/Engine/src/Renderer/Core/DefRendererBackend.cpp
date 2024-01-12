@@ -16,21 +16,22 @@ namespace PrRenderer::Core
 		IRendererBackend(p_settings)
 	{
 		//Prepare shaders
-		m_shadowMappingShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Shadows/ShadowMapping.shader");
-		m_postProcesShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/RenderFront.shader");
-		m_pbrLightShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/lightPass.shader");
-		m_pointshadowMappingShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Shadows/PointShadowMapping.shader");
-		m_SSAOShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/SSAO.shader");
-		m_SSAOBlurShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/SSAO_Blur.shader");
-		m_FXAAShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/FXAA.shader");
-		m_fogShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/Fog.shader");
+		m_shadowMappingShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Shadows/ShadowMapping.shader");
+		m_backBuffShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/RenderFront.shader");
+		m_pbrLightShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/lightPass.shader");
+		m_pointshadowMappingShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Shadows/PointShadowMapping.shader");
+		m_SSAOShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/SSAO.shader");
+		m_SSAOBlurShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/SSAO_Blur.shader");
+		m_FXAAShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/FXAA.shader");
+		m_fogShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/Fog.shader");
 
-		m_renderData.m_quadMesh = Resources::Mesh::CreatePrimitive(Resources::Quad);
+		m_renderContext.m_quadMesh = Resources::Mesh::CreatePrimitive(Resources::Quad);
+		m_renderContext.m_settings = &m_settings;
 
-		GenerategBuffers();
+		GenerategGBuffersContext();
 		GenerateShadowMaps();
-		GenerateSSAO();
-		GenerateFXAA();
+		GenerateSSAOContext();
+		GeneratePostprocessContext();
 
 		//Set events
 		PrCore::Events::EventListener windowResizedListener;
@@ -44,17 +45,15 @@ namespace PrRenderer::Core
 		const auto camera = m_frame->camera;
 
 		//Prepare camera
-		m_renderData.camera = camera;
-		m_renderData.camera->RecalculateMatrices();
+		m_renderContext.camera = camera;
+		m_renderContext.camera->RecalculateMatrices();
 
-		//Rendering
-		//---------------------------------
-
-		//Clear back buffer
-		m_commandQueue.push_back(CreateRC<LowRenderer::EnableDepthRC>(true));
-		m_commandQueue.push_back(CreateRC<LowRenderer::EnableBlendingRC>(false));
-		m_commandQueue.push_back(CreateRC<LowRenderer::EnableCullFaceRC>(true));
-		m_commandQueue.push_back(CreateRC<LowRenderer::ClearRC>(ColorBuffer | DepthBuffer));
+		//Pipeline
+		//Clear Back Buffer
+		PushCommand(CreateRC<LowRenderer::EnableDepthRC>(true));
+		PushCommand(CreateRC<LowRenderer::EnableBlendingRC>(false));
+		PushCommand(CreateRC<LowRenderer::EnableCullFaceRC>(true));
+		PushCommand(CreateRC<LowRenderer::ClearRC>(ColorBuffer | DepthBuffer));
 
 		//Calculate PBR Reflection if cubemap changed
 		if((m_frame->renderFlag & RendererFlag::RerenderCubeMap) == RendererFlag::RerenderCubeMap && m_frame->cubemapObject)
@@ -64,6 +63,21 @@ namespace PrRenderer::Core
 			GenerateLUTMap();
 		}
 
+		// Reset global reflections if cubemap removed
+		if (m_frame->cubemapObject == nullptr &&
+			m_renderContext.IRMap != nullptr &&
+			m_renderContext.prefilterMap != nullptr &&
+			m_renderContext.brdfLUT != nullptr
+			)
+		{
+			m_renderContext.IRMap->Unbind(4);
+			m_renderContext.prefilterMap->Unbind(5);
+			m_renderContext.brdfLUT->Unbind(6);
+
+			m_renderContext.IRMap.reset();
+			m_renderContext.prefilterMap.reset();
+			m_renderContext.brdfLUT.reset();
+		}
 
 		//Shadow Mapping
 		//---------------------------------
@@ -81,35 +95,33 @@ namespace PrRenderer::Core
 			calculateProjs = false;
 		}
 
-
 		//Main Directional Light
 		if(m_frame->mainDirectLight)
 		{
 			auto mainLightMath = m_frame->mainDirectLight->lightMat;
 			auto lightDir = PrCore::Math::vec3(mainLightMath[1][0], mainLightMath[1][1], mainLightMath[1][2]);
 
-			m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]
+			PushCommand(CreateRC<LambdaFunctionRC>([&]
 				{
-					m_renderData.m_shadowMapMainDirBuff->Bind();
+					m_renderContext.shadowMapMainDirBuff->Bind();
 					LowRenderer::Clear(ColorBuffer | DepthBuffer);
 				}));
 
 			for (int i = 0; i < SHADOW_CASCADES_COUNT; i++)
 			{
-				auto lightMat = m_CSMUtility.ClaculateFrustrums(m_settings.cascadeShadowRadiusRatio[i] ,i, lightDir, camera->GetViewMatrix(), 4096.0f, 4.0f);
+				auto lightMat = m_CSMUtility.ClaculateFrustrums(m_settings.cascadeShadowRadiusRatio[i] ,i, lightDir, camera->GetViewMatrix(), m_settings.mainLightShadowMapSize, m_settings.mainLightCascadeExtend);
 				auto viewport = CalculateLightTexture(i, m_settings.mainLightShadowMapSize, m_settings.mainLightShadowCombineMapSize);
 				m_frame->mainDirectLight->lightViewMats.push_back(lightMat);
 
-				m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-				m_commandQueue.push_back(CreateRC<RenderToShadowMapRC>(m_shadowMappingShader, lightMat, &m_frame->shadowCasters, &m_renderData));
+				PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
+				PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr, lightMat, &m_frame->shadowCasters, &m_renderContext));
 			}
 		}
 
-
 		//Directional Light
-		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]
+		PushCommand(CreateRC<LambdaFunctionRC>([&]
 			{
-				m_renderData.m_shadowMapDirBuff->Bind();
+				m_renderContext.shadowMapDirBuff->Bind();
 				LowRenderer::Clear(ColorBuffer | DepthBuffer);
 			}));
 
@@ -122,12 +134,12 @@ namespace PrRenderer::Core
 
 			for (int i = 0; i < SHADOW_CASCADES_COUNT; i++)
 			{
-				auto lightMat = m_CSMUtility.ClaculateFrustrums(m_settings.cascadeShadowRadiusRatio[i], i, lightDir, camera->GetViewMatrix(), 2048.0f, 6.0f);
+				auto lightMat = m_CSMUtility.ClaculateFrustrums(m_settings.cascadeShadowRadiusRatio[i], i, lightDir, camera->GetViewMatrix(), m_settings.dirLightCombineMapSize, m_settings.dirLightCascadeExtend);
 				auto viewport = CalculateLightTexture(light.shadowMapPos * SHADOW_CASCADES_COUNT + i, m_settings.dirLightShadowsMapSize, m_settings.dirLightCombineMapSize);
 				light.lightViewMats.push_back(lightMat);
 
-				m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-				m_commandQueue.push_back(CreateRC<RenderToShadowMapRC>(m_shadowMappingShader, lightMat, &m_frame->shadowCasters, &m_renderData));
+				PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
+				PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr, lightMat, &m_frame->shadowCasters, &m_renderContext));
 			}
 
 			m_settings.cascadeShadowRadiusRatio[1] = m_settings.cascadeShadowRadiusRatio[0] / m_settings.cascadeShadowRadiusRatio[1];
@@ -138,9 +150,9 @@ namespace PrRenderer::Core
 
 
 		//Point Lights
-		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]
+		PushCommand(CreateRC<LambdaFunctionRC>([&]
 			{
-				m_renderData.m_shadowMapPointBuff->Bind();
+				m_renderContext.shadowMapPointBuff->Bind();
 				LowRenderer::Clear(ColorBuffer | DepthBuffer);
 			}));
 
@@ -154,40 +166,40 @@ namespace PrRenderer::Core
 
 			auto lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(1.0f, 0.0f, 0.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
 			auto viewport = CalculateLightTexture(light.shadowMapPos + 0, m_settings.pointLightShadowMapSize, m_settings.pointLightCombineShadowMapSize);
-			m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			m_commandQueue.push_back(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShader, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderData));
+			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(-1.0f, 0.0f, 0.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
 			viewport = CalculateLightTexture(light.shadowMapPos + 1, m_settings.pointLightShadowMapSize, m_settings.pointLightCombineShadowMapSize);
-			m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			m_commandQueue.push_back(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShader, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderData));
+			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, 1.0f, 0.0), PrCore::Math::vec3(0.0f, 0.0f, 1.0f));
 			viewport = CalculateLightTexture(light.shadowMapPos + 2, m_settings.pointLightShadowMapSize, m_settings.pointLightCombineShadowMapSize);
-			m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			m_commandQueue.push_back(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShader, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderData));
+			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, -1.0f, 0.0f), PrCore::Math::vec3(0.0f, 0.0f, -1.0f));
 			viewport = CalculateLightTexture(light.shadowMapPos + 3, m_settings.pointLightShadowMapSize, m_settings.pointLightCombineShadowMapSize);
-			m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			m_commandQueue.push_back(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShader, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderData));
+			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, 0.0f, 1.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
 			viewport = CalculateLightTexture(light.shadowMapPos + 4, m_settings.pointLightShadowMapSize, m_settings.pointLightCombineShadowMapSize);
-			m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			m_commandQueue.push_back(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShader, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderData));
+			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, 0.0f, -1.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
 			viewport = CalculateLightTexture(light.shadowMapPos + 5, m_settings.pointLightShadowMapSize, m_settings.pointLightCombineShadowMapSize);
-			m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			m_commandQueue.push_back(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShader, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderData));
+			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
 		}
 		
 
 		//Spot Lights
-		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]
+		PushCommand(CreateRC<LambdaFunctionRC>([&]
 			{
-				m_renderData.m_shadowMapSpotBuff->Bind();
+				m_renderContext.shadowMapSpotBuff->Bind();
 				LowRenderer::Clear(ColorBuffer | DepthBuffer);
 			}));
 
@@ -205,106 +217,94 @@ namespace PrRenderer::Core
 			light.lightViewMats.push_back(lightProjMatrix* lightViewMatrix);
 
 			auto viewport = CalculateLightTexture(light.shadowMapPos, m_settings.pointLightShadowMapSize, m_settings.spotLightCombineShadowMapSize);
-			m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			m_commandQueue.push_back(CreateRC<RenderToShadowMapRC>(m_shadowMappingShader, lightProjMatrix * lightViewMatrix, &m_frame->shadowCasters, &m_renderData));
+			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
+			PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr, lightProjMatrix * lightViewMatrix, &m_frame->shadowCasters, &m_renderContext));
 		}
 
-		m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(PrCore::Windowing::Window::GetMainWindow().GetWidth(),
+		PushCommand(CreateRC<LowRenderer::SetViewportRC>(PrCore::Windowing::Window::GetMainWindow().GetWidth(),
 			PrCore::Windowing::Window::GetMainWindow().GetHeight(), 0, 0));
-
-
-		//Pipeline Gbuffer Lit
 		//---------------------------------
-		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]()
+
+		// Opaque Objects
+		PushCommand(CreateRC<LambdaFunctionRC>([&]()
 			{
-				m_renderData.gBuffer.buffer->Bind();
+				m_renderContext.gBuffer.buffer->Bind();
 				LowRenderer::Clear(ColorBuffer | DepthBuffer);
 				LowRenderer::EnableCullFace(true);
 				LowRenderer::EnableDepth(true);
 			}));
 
 		for (auto object : m_frame->opaqueObjects)
-			m_commandQueue.push_back(CreateRC<RenderToGBufferRC>(object, &m_renderData));
+			PushCommand(CreateRC<RenderOpaqueRC>(object, &m_renderContext));
 
-		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]()
+		PushCommand(CreateRC<LambdaFunctionRC>([&]()
 			{
-				m_renderData.gBuffer.buffer->Unbind();
+				m_renderContext.gBuffer.buffer->Unbind();
 			}));
-		//---------------------------------
 
-		//Clear Postprocess buffer
-		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]()
+		//Clear output buffer
+		PushCommand(CreateRC<LambdaFunctionRC>([&]()
 			{
-				m_renderData.postProccesBuff->Bind();
+				m_renderContext.otuputBuff->Bind();
 				LowRenderer::EnableDepth(false);
 				LowRenderer::EnableCullFace(false);
-				LowRenderer::Clear(ColorBuffer | DepthBuffer);
 			}));
-		//---------------------------------
 
-		//Draw Cubemap
+		// Clear Sky Color
+		PushCommand(CreateRC<LowRenderer::ClearColorFloatRC>(m_settings.skyColor.x, m_settings.skyColor.y, m_settings.skyColor.z, 1.0f));
+		PushCommand(CreateRC<LowRenderer::ClearRC>(ColorBuffer));
+		PushCommand(CreateRC<LowRenderer::ClearColorFloatRC>(0.0f, 0.0f, 0.0f, 0.0f));
+
+		// Draw Cubemap
 		if(m_frame->cubemapObject)
-			m_commandQueue.push_back(CreateRC<RenderCubeMapRC>(m_frame->cubemapObject->material, &m_renderData));
+			PushCommand(CreateRC<RenderCubeMapRC>(m_frame->cubemapObject->material, &m_renderContext));
 
-		//Copy depth buffer to postprocess buffer
-		m_commandQueue.push_back(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderData.gBuffer.buffer, m_renderData.postProccesBuff, Buffers::FramebufferMask::DepthBufferBit));
+		// Copy depth buffer to postprocess buffer
+		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.gBuffer.buffer, m_renderContext.otuputBuff, Buffers::FramebufferMask::DepthBufferBit));
 
-		//SSAO Pass
-		static bool enableSSAO = false;
-		if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::T))
-			enableSSAO = !enableSSAO;
+		// SSAO
+		if(m_settings.enableSSAO)
+			PushCommand(CreateRC<RenderSSAORC>(m_SSAOShdr, m_SSAOBlurShdr, &m_renderContext));
 
-		if(enableSSAO)
-			m_commandQueue.push_back(CreateRC<RenderSSAORC>(m_SSAOShader, m_SSAOBlurShader, &m_renderData));
-
-		//PBR Light Pass
-		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]() { m_renderData.postProccesBuff->Bind(); }));
-		m_commandQueue.push_back(CreateRC<RenderLightRC>(m_pbrLightShader, m_frame->mainDirectLight, &m_frame->lights, &m_renderData, &m_settings));
+		// PBR Light Pass
+		PushCommand(CreateRC<RenderLightRC>(m_pbrLightShdr, m_frame->mainDirectLight, &m_frame->lights, &m_renderContext));
 
 		//Transparent Forward Pass
-		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]()
+		PushCommand(CreateRC<LambdaFunctionRC>([&]()
 			{
+				m_renderContext.otuputBuff->Bind();
 				LowRenderer::EnableDepth(true);
 				LowRenderer::EnableCullFace(true);
 				LowRenderer::EnableBlending(true);
 				LowRenderer::SetBlendingAlgorythm(BlendingAlgorithm::SourceAlpha, BlendingAlgorithm::OneMinusSourceAlpha);
 			}));
 		for (auto object : m_frame->transpatrentObjects)
-			m_commandQueue.push_back(CreateRC<RenderTransparentRC>(object, &m_renderData));
-		m_commandQueue.push_back(CreateRC<LambdaFunctionRC>([&]()
+			PushCommand(CreateRC<RenderTransparentRC>(object, &m_renderContext));
+		PushCommand(CreateRC<LambdaFunctionRC>([&]()
 			{
-				m_renderData.postProccesBuff->Unbind();
+				m_renderContext.otuputBuff->Unbind();
 				LowRenderer::EnableDepth(false);
 				LowRenderer::EnableCullFace(false);
 				LowRenderer::EnableBlending(false);
 			}));
 		//---------------------------------
 
+		// Fog
+		if (m_settings.enableFog)
+		{
+			PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
+			PushCommand(CreateRC<RenderFogRC>(m_fogShdr, &m_renderContext));
+		}
+
 		// FXAA Anti-Aliasing
-		static bool enableFXAA = false;
-		if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::R))
-			enableFXAA = !enableFXAA;
-
-		if (enableFXAA)
+		if (m_settings.enableFXAAA)
 		{
-			m_commandQueue.push_back(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderData.postProccesBuff, m_renderData.m_FXAABuff, Buffers::FramebufferMask::ColorBufferBit));
-			m_commandQueue.push_back(CreateRC<RenderFXAARC>(m_FXAAShader, &m_renderData));
+			PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
+			PushCommand(CreateRC<RenderFXAARC>(m_FXAAShdr, &m_renderContext));
 		}
 
-		//Fog
-		static bool enableFog = false;
-		if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::F))
-			enableFog = !enableFog;
-
-		if (enableFog)
-		{
-			m_commandQueue.push_back(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderData.postProccesBuff, m_renderData.m_FXAABuff, Buffers::FramebufferMask::ColorBufferBit));
-			m_commandQueue.push_back(CreateRC<RenderFogRC>(m_fogShader, &m_renderData));
-		}
-
-
-		//Render to back buffer
-		m_commandQueue.push_back(CreateRC<RenderPostProcessRC>(m_postProcesShdr, &m_renderData));
+		// Render to Back Buffer
+		PushCommand(CreateRC<RenderBackBufferRC>(m_backBuffShdr, &m_renderContext));
 	}
 
 	void DefRendererBackend::Render()
@@ -327,28 +327,31 @@ namespace PrRenderer::Core
 		m_screenWidth = windowResizeEvent->m_width;
 		m_screenHeight = windowResizeEvent->m_height;
 
-		GenerategBuffers();
-		GenerateSSAO();
-		GenerateFXAA();
-		m_commandQueue.push_back(CreateRC<LowRenderer::SetViewportRC>(m_screenWidth, m_screenHeight, 0, 0));
+		//Regenerate Buffers;
+		GenerategGBuffersContext();
+		GenerateSSAOContext();
+		GeneratePostprocessContext();
+
+		PushCommand(CreateRC<LowRenderer::SetViewportRC>(m_screenWidth, m_screenHeight, 0, 0));
 	}
 
-	void DefRendererBackend::RenderToGBuffer(RenderObjectPtr p_object, const RenderData* p_renderData)
+	void DefRendererBackend::RenderOpaque(RenderObjectPtr p_object, const RenderContext* p_renderContext)
 	{
 		auto mesh = p_object->mesh;
 		auto material = p_object->material;
 		auto shader = p_object->material->GetShader();
 
-		p_renderData->gBuffer.buffer->Bind();
+		p_renderContext->gBuffer.buffer->Bind();
 
 		material->Bind();
-		shader->SetUniformMat4("PIPELINE_VP_MAT", p_renderData->camera->GetCameraMatrix());
-		shader->SetUniformFloat("PIPELINE_NEAR", p_renderData->camera->GetNear());
-		shader->SetUniformFloat("PIPELINE_FAR", p_renderData->camera->GetFar());
+		shader->SetUniformMat4("PIPELINE_VP_MAT", p_renderContext->camera->GetCameraMatrix());
+		shader->SetUniformFloat("PIPELINE_NEAR", p_renderContext->camera->GetNear());
+		shader->SetUniformFloat("PIPELINE_FAR", p_renderContext->camera->GetFar());
 
 		if (p_object->type == RenderObjectType::Mesh)
 		{
 			shader->SetUniformMat4("PIPELINE_MODEL_MAT", p_object->worldMat);
+			shader->SetUniformInt("PIPELINE_INTANCE_COUNT", 0);
 
 			mesh->Bind();
 			LowRenderer::Draw(mesh->GetVertexArray());
@@ -362,28 +365,28 @@ namespace PrRenderer::Core
 			LowRenderer::DrawInstanced(mesh->GetVertexArray(), p_object->instanceSize);
 		}
 
-			mesh->Unbind();
+		mesh->Unbind();
 	}
 
-	void DefRendererBackend::RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, std::list<RenderObjectPtr>* p_objects, const RenderData* p_renderData)
+	void DefRendererBackend::RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
 	{
 		p_shaderPtr->Bind();
-		p_shaderPtr->SetUniformMat4("lightMatrix", p_lightMatrix);
+		p_shaderPtr->SetUniformMat4("PIPELINE_LIGHT_MAT", p_lightMatrix);
 
 		for (auto object : *p_objects)
 		{
 			if (object->type == RenderObjectType::Mesh)
 			{
-				p_shaderPtr->SetUniformMat4("modelMatrix", object->worldMat);
-				p_shaderPtr->SetUniformInt("instancedCount", 0);
+				p_shaderPtr->SetUniformMat4("PIPELINE_MODEL_MAT", object->worldMat);
+				p_shaderPtr->SetUniformInt("PIPELINE_INTANCE_COUNT", 0);
 				object->mesh->Bind();
 				LowRenderer::Draw(object->mesh->GetVertexArray());
 				object->mesh->Unbind();
 			}
 			else if (object->type == RenderObjectType::InstancedMesh)
 			{
-				p_shaderPtr->SetUniformMat4Array("modelMatrixArray[0]", object->worldMatrices.data(), object->worldMatrices.size());
-				p_shaderPtr->SetUniformInt("instancedCount", object->instanceSize);
+				p_shaderPtr->SetUniformMat4Array("PIPELINE_MODEL_MAT_ARRAY[0]", object->worldMatrices.data(), object->worldMatrices.size());
+				p_shaderPtr->SetUniformInt("PIPELINE_INTANCE_COUNT", object->instanceSize);
 				object->mesh->Bind();
 				LowRenderer::DrawInstanced(object->mesh->GetVertexArray(), object->instanceSize);
 				object->mesh->Unbind();
@@ -393,26 +396,26 @@ namespace PrRenderer::Core
 		p_shaderPtr->Unbind();
 	}
 
-	void DefRendererBackend::RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightMatrix, PrCore::Math::vec3& p_lightPos, std::list<RenderObjectPtr>* p_objects, const RenderData* p_renderData)
+	void DefRendererBackend::RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightMatrix, PrCore::Math::vec3& p_lightPos, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
 	{
 		p_pointShadowMapShader->Bind();
-		p_pointShadowMapShader->SetUniformMat4("lightMatrix", p_lightMatrix);
-		p_pointShadowMapShader->SetUniformVec3("lightPos", p_lightPos);
+		p_pointShadowMapShader->SetUniformMat4("PIPELINE_LIGHT_MAT", p_lightMatrix);
+		p_pointShadowMapShader->SetUniformVec3("PIPELINE_LIGHT_POS", p_lightPos);
 
 		for (auto object : *p_objects)
 		{
 			if (object->type == RenderObjectType::Mesh)
 			{
-				p_pointShadowMapShader->SetUniformMat4("modelMatrix", object->worldMat);
-				p_pointShadowMapShader->SetUniformInt("instancedCount", 0);
+				p_pointShadowMapShader->SetUniformMat4("PIPELINE_MODEL_MAT", object->worldMat);
+				p_pointShadowMapShader->SetUniformInt("PIPELINE_INTANCE_COUNT", 0);
 				object->mesh->Bind();
 				LowRenderer::Draw(object->mesh->GetVertexArray());
 				object->mesh->Unbind();
 			}
 			else if (object->type == RenderObjectType::InstancedMesh)
 			{
-				p_pointShadowMapShader->SetUniformMat4Array("modelMatrixArray[0]", object->worldMatrices.data(), object->worldMatrices.size());
-				p_pointShadowMapShader->SetUniformInt("instancedCount", object->instanceSize);
+				p_pointShadowMapShader->SetUniformMat4Array("PIPELINE_MODEL_MAT_ARRAY[0]", object->worldMatrices.data(), object->worldMatrices.size());
+				p_pointShadowMapShader->SetUniformInt("PIPELINE_INTANCE_COUNT", object->instanceSize);
 				object->mesh->Bind();
 				LowRenderer::DrawInstanced(object->mesh->GetVertexArray(), object->instanceSize);
 				object->mesh->Unbind();
@@ -422,10 +425,10 @@ namespace PrRenderer::Core
 		p_pointShadowMapShader->Unbind();
 	}
 
-	void DefRendererBackend::GenerateSSAO()
+	void DefRendererBackend::GenerateSSAOContext()
 	{
-		m_renderData.m_SSAOBuff.reset();
-		m_renderData.m_SSAOTex.reset();
+		m_renderContext.SSAOBuff.reset();
+		m_renderContext.SSAOTex.reset();
 
 		//Generate Kernel
 		std::uniform_real_distribution<float> randomFloats(0.0, 1.0); // generates random floats between 0.0 and 1.0
@@ -443,7 +446,7 @@ namespace PrRenderer::Core
 			sample *= scale;
 			ssaoKernel.push_back(sample);
 		}
-		m_renderData.m_ssaoKernel = ssaoKernel;
+		m_renderContext.ssaoKernel = ssaoKernel;
 
 		//Generate Noise
 		std::vector<float> ssaoNoise;
@@ -466,20 +469,15 @@ namespace PrRenderer::Core
 		noiseTex->SetData(ssaoNoise.data());
 		noiseTex->IsMipMapped(false);
 		noiseTex->Apply();
-		m_renderData.m_SSAONoiseTex = noiseTex;
+		m_renderContext.SSAONoiseTex = noiseTex;
 
 		//Generate SSAO Framebuffer
-		m_renderData.m_SSAOBuff.reset();
+		m_renderContext.SSAOBuff.reset();
 
 		Buffers::FramebufferTexture ssaoTex;
 		ssaoTex.format = Resources::TextureFormat::R8;
 		ssaoTex.filteringMag = Resources::TextureFiltering::Nearest;
 		ssaoTex.filteringMin = Resources::TextureFiltering::Nearest;
-
-		//Buffers::FramebufferTexture debugssaoTex;
-		//debugssaoTex.format = Resources::TextureFormat::RGB16F;
-		//debugssaoTex.filteringMag = Resources::TextureFiltering::Nearest;
-		//debugssaoTex.filteringMin = Resources::TextureFiltering::Nearest;
 
 		Buffers::FramebufferTexture depthTex;
 		depthTex.format = Resources::TextureFormat::Depth32;
@@ -491,19 +489,19 @@ namespace PrRenderer::Core
 		settings.colorTextureAttachments = { ssaoTex };
 		settings.depthStencilAttachment = depthTex;
 
-		m_renderData.m_SSAOBuff = Buffers::Framebufffer::Create(settings);
-		m_renderData.m_SSAOTex = m_renderData.m_SSAOBuff->GetTexturePtr();
+		m_renderContext.SSAOBuff = Buffers::Framebufffer::Create(settings);
+		m_renderContext.SSAOTex = m_renderContext.SSAOBuff->GetTexturePtr();
 	}
 
-	void DefRendererBackend::GenerateFXAA()
+	void DefRendererBackend::GeneratePostprocessContext()
 	{
-		m_renderData.m_FXAABuff.reset();
-		m_renderData.m_FXAATex.reset();
+		m_renderContext.postprocessBuff.reset();
+		m_renderContext.postprocessTex.reset();
 
-		Buffers::FramebufferTexture fxaaTex;
-		fxaaTex.format = Resources::TextureFormat::RGBA32;
-		fxaaTex.filteringMag = Resources::TextureFiltering::Linear;
-		fxaaTex.filteringMin = Resources::TextureFiltering::Linear;
+		Buffers::FramebufferTexture texture;
+		texture.format = Resources::TextureFormat::RGB16F;
+		texture.filteringMag = Resources::TextureFiltering::Linear;
+		texture.filteringMin = Resources::TextureFiltering::Linear;
 
 		Buffers::FramebufferTexture depthTex;
 		depthTex.format = Resources::TextureFormat::Depth16;
@@ -512,21 +510,20 @@ namespace PrRenderer::Core
 		settings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
 		settings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();;
 		settings.mipMaped = false;
-		settings.colorTextureAttachments = { fxaaTex };
+		settings.colorTextureAttachments = { texture };
 		settings.depthStencilAttachment = depthTex;
 
-		m_renderData.m_FXAABuff = Buffers::Framebufffer::Create(settings);
-		m_renderData.m_FXAATex = m_renderData.m_FXAABuff->GetTexturePtr();
+		m_renderContext.postprocessBuff = Buffers::Framebufffer::Create(settings);
+		m_renderContext.postprocessTex = m_renderContext.postprocessBuff->GetTexturePtr();
 	}
 
-	void DefRendererBackend::GenerategBuffers()
+	void DefRendererBackend::GenerategGBuffersContext()
 	{
-		//Explicitly reset old one
-		m_renderData.gBuffer.positionTex.reset();
-		m_renderData.gBuffer.albedoTex.reset();
-		m_renderData.gBuffer.normalsTex.reset();
-		m_renderData.gBuffer.aoTex.reset();
-		m_renderData.gBuffer.buffer.reset();
+		m_renderContext.gBuffer.positionTex.reset();
+		m_renderContext.gBuffer.albedoTex.reset();
+		m_renderContext.gBuffer.normalsTex.reset();
+		m_renderContext.gBuffer.aoTex.reset();
+		m_renderContext.gBuffer.buffer.reset();
 
 		//Create new one
 		Buffers::FramebufferTexture gPos;
@@ -552,29 +549,29 @@ namespace PrRenderer::Core
 		settings.depthStencilAttachment = gDepth;
 
 		auto framebuffer = Buffers::Framebufffer::Create(settings);
-		m_renderData.gBuffer.positionTex = framebuffer->GetTexturePtr(0);
-		m_renderData.gBuffer.albedoTex = framebuffer->GetTexturePtr(1);
-		m_renderData.gBuffer.normalsTex = framebuffer->GetTexturePtr(2);
-		m_renderData.gBuffer.aoTex = framebuffer->GetTexturePtr(3);
-		m_renderData.gBuffer.buffer = framebuffer;
+		m_renderContext.gBuffer.positionTex = framebuffer->GetTexturePtr(0);
+		m_renderContext.gBuffer.albedoTex = framebuffer->GetTexturePtr(1);
+		m_renderContext.gBuffer.normalsTex = framebuffer->GetTexturePtr(2);
+		m_renderContext.gBuffer.aoTex = framebuffer->GetTexturePtr(3);
+		m_renderContext.gBuffer.buffer = framebuffer;
 
 
-		//Combine post process framebuffer
-		Buffers::FramebufferTexture postProcessColor;
-		postProcessColor.format = Resources::TextureFormat::RGBA16F;
+		//Output framebuffer
+		Buffers::FramebufferTexture outputTex;
+		outputTex.format = Resources::TextureFormat::RGBA16F;
 
-		Buffers::FramebufferTexture postProcessDepth;
-		postProcessDepth.format = Resources::TextureFormat::Depth32;
+		Buffers::FramebufferTexture outputDepth;
+		outputDepth.format = Resources::TextureFormat::Depth32;
 
-		Buffers::FramebufferSettings postProcessSettings;
-		postProcessSettings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
-		postProcessSettings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();;
-		postProcessSettings.mipMaped = false;
-		postProcessSettings.colorTextureAttachments = postProcessColor;
-		postProcessSettings.depthStencilAttachment = postProcessDepth;
+		Buffers::FramebufferSettings outputSettings;
+		outputSettings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
+		outputSettings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();;
+		outputSettings.mipMaped = false;
+		outputSettings.colorTextureAttachments = outputTex;
+		outputSettings.depthStencilAttachment = outputDepth;
 
-		m_renderData.postProccesBuff = Buffers::Framebufffer::Create(postProcessSettings);
-		m_renderData.postProccesTex = m_renderData.postProccesBuff->GetTexturePtr(0);
+		m_renderContext.otuputBuff = Buffers::Framebufffer::Create(outputSettings);
+		m_renderContext.outputTex = m_renderContext.otuputBuff->GetTexturePtr(0);
 	}
 
 	void DefRendererBackend::GenerateShadowMaps()
@@ -589,8 +586,8 @@ namespace PrRenderer::Core
 		spotLightSettings.mipMaped = false;
 		spotLightSettings.depthStencilAttachment = spotDepthTex;
 
-		m_renderData.m_shadowMapSpotBuff = Buffers::Framebufffer::Create(spotLightSettings);
-		m_renderData.m_shadowMapSpotTex = m_renderData.m_shadowMapSpotBuff->GetDepthTexturePtr();
+		m_renderContext.shadowMapSpotBuff = Buffers::Framebufffer::Create(spotLightSettings);
+		m_renderContext.shadowMapSpotTex = m_renderContext.shadowMapSpotBuff->GetDepthTexturePtr();
 
 		//Directional Light Mapping
 		Buffers::FramebufferTexture dirDepthTex;
@@ -601,8 +598,8 @@ namespace PrRenderer::Core
 		dirLightSettings.globalHeight = m_settings.dirLightCombineMapSize;
 		dirLightSettings.mipMaped = false;
 		dirLightSettings.depthStencilAttachment = dirDepthTex;
-		m_renderData.m_shadowMapDirBuff = Buffers::Framebufffer::Create(dirLightSettings);
-		m_renderData.m_shadowMapDirTex = m_renderData.m_shadowMapDirBuff->GetDepthTexturePtr();
+		m_renderContext.shadowMapDirBuff = Buffers::Framebufffer::Create(dirLightSettings);
+		m_renderContext.shadowMapDirTex = m_renderContext.shadowMapDirBuff->GetDepthTexturePtr();
 
 
 		//Point Lights Mapping
@@ -617,8 +614,8 @@ namespace PrRenderer::Core
 		pointLightSettings.mipMaped = false;
 		pointLightSettings.colorTextureAttachments = pointTex;
 		pointLightSettings.depthStencilAttachment = pointDepthTex;
-		m_renderData.m_shadowMapPointBuff = Buffers::Framebufffer::Create(pointLightSettings);
-		m_renderData.m_shadowMapPointTex = m_renderData.m_shadowMapPointBuff->GetTexturePtr(0);
+		m_renderContext.shadowMapPointBuff = Buffers::Framebufffer::Create(pointLightSettings);
+		m_renderContext.shadowMapPointTex = m_renderContext.shadowMapPointBuff->GetTexturePtr(0);
 		
 
 		//Main Directional Light
@@ -630,61 +627,63 @@ namespace PrRenderer::Core
 		mainDirSettings.globalHeight = m_settings.mainLightShadowCombineMapSize;
 		mainDirSettings.mipMaped = false;
 		mainDirSettings.depthStencilAttachment = mainDirDepthTex;
-		m_renderData.m_shadowMapMainDirBuff = Buffers::Framebufffer::Create(mainDirSettings);
-		m_renderData.m_shadowMapMainDirTex = m_renderData.m_shadowMapMainDirBuff->GetDepthTexturePtr();
+		m_renderContext.shadowMapMainDirBuff = Buffers::Framebufffer::Create(mainDirSettings);
+		m_renderContext.shadowMapMainDirTex = m_renderContext.shadowMapMainDirBuff->GetDepthTexturePtr();
 	}
 
-	void DefRendererBackend::RenderCubeMap(Resources::MaterialPtr p_material, const RenderData* p_renderData)
+	void DefRendererBackend::RenderCubeMap(Resources::MaterialPtr p_material, const RenderContext* p_renderContext)
 	{
-		p_material->SetProperty("view", p_renderData->camera->GetViewMatrix());
-		p_material->SetProperty("proj", p_renderData->camera->GetProjectionMatrix());
-
 		LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::LessEqual);
 
+		p_material->SetProperty("view", p_renderContext->camera->GetViewMatrix());
+		p_material->SetProperty("proj", p_renderContext->camera->GetProjectionMatrix());
+
 		p_material->Bind();
-		p_renderData->m_quadMesh->Bind();
-		LowRenderer::Draw(p_renderData->m_quadMesh->GetVertexArray(), Primitives::TriangleStrip);
-		p_renderData->m_quadMesh->Unbind();
+		p_renderContext->m_quadMesh->Bind();
+		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray(), Primitives::TriangleStrip);
+
+		p_renderContext->m_quadMesh->Unbind();
 		p_material->Unbind();
 		LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::Less);
 	}
 
-	void DefRendererBackend::RenderPostProcess(Resources::ShaderPtr p_postProcessShader, const RenderData* p_renderData)
+	void DefRendererBackend::RenderBackBuffer(Resources::ShaderPtr p_postProcessShader, const RenderContext* p_renderContext)
 	{
+		p_renderContext->outputTex->Bind();
 		LowRenderer::EnableDepth(false);
 		LowRenderer::EnableCullFace(false);
 
 		p_postProcessShader->Bind();
-		p_renderData->postProccesTex->Bind(0);
-		p_postProcessShader->SetUniformInt("lightTex", 0);
-		p_renderData->m_quadMesh->Bind();
+		p_renderContext->outputTex->Bind(0);
+		p_postProcessShader->SetUniformInt("backTex", 0);
 
-		LowRenderer::Draw(p_renderData->m_quadMesh->GetVertexArray());
+		p_renderContext->m_quadMesh->Bind();
+		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
 
-		p_renderData->gBuffer.albedoTex->Unbind(0);
-		p_renderData->m_quadMesh->Unbind();
+		p_renderContext->m_quadMesh->Unbind();
 		p_postProcessShader->Unbind();
+		p_renderContext->outputTex->Unbind();
 	}
 
-	void DefRendererBackend::RenderTransparent(RenderObjectPtr p_object, const RenderData* p_renderData)
+	void DefRendererBackend::RenderTransparent(RenderObjectPtr p_object, const RenderContext* p_renderContext)
 	{
 		auto material = p_object->material;
 		auto mesh = p_object->mesh;
 
-		material->SetProperty("VPMatrix", p_renderData->camera->GetCameraMatrix());
-		material->SetProperty("camPos", p_renderData->camera->GetPosition());
+		material->SetProperty("PIPELINE_VP_MAT", p_renderContext->camera->GetCameraMatrix());
+		material->SetProperty("PIPELINE_CAMPOS", p_renderContext->camera->GetPosition());
 
-		if (p_renderData->IRMap && p_renderData->prefilterMap && p_renderData->brdfLUT)
+		if (p_renderContext->IRMap && p_renderContext->prefilterMap && p_renderContext->brdfLUT)
 		{
-			material->SetTexture("irradianceMap", p_renderData->IRMap);
-			material->SetTexture("prefilterMap", p_renderData->prefilterMap);
-			material->SetTexture("brdfLUT", p_renderData->brdfLUT);
+			material->SetTexture("PIPELINE_IRRADIANCE_MAP", p_renderContext->IRMap);
+			material->SetTexture("PIPELINE_PREFILTER_MAP", p_renderContext->prefilterMap);
+			material->SetTexture("PIPELINE_BRDF_LUT", p_renderContext->brdfLUT);
 		}
 
 		if (p_object->type == RenderObjectType::Mesh)
 		{
-			material->SetProperty("modelMatrix", p_object->worldMat);
-			material->SetProperty("instancedCount", 0);
+			material->SetProperty("PIPELINE_MODEL_MAT", p_object->worldMat);
+			material->SetProperty("PIPELINE_INTANCE_COUNT", 0);
 			material->Bind();
 			mesh->Bind();
 			LowRenderer::Draw(mesh->GetVertexArray());
@@ -692,8 +691,8 @@ namespace PrRenderer::Core
 		}
 		else if (p_object->type == RenderObjectType::InstancedMesh)
 		{
-			material->SetPropertyArray("modelMatrixArray[0]", p_object->worldMatrices.data(), p_object->worldMatrices.size());
-			material->SetProperty("instancedCount", (int)p_object->instanceSize);
+			material->SetPropertyArray("PIPELINE_MODEL_MAT_ARRAY[0]", p_object->worldMatrices.data(), p_object->worldMatrices.size());
+			material->SetProperty("PIPELINE_INTANCE_COUNT", (int)p_object->instanceSize);
 			material->Bind();
 			mesh->Bind();
 			LowRenderer::DrawInstanced(mesh->GetVertexArray(), p_object->instanceSize);
@@ -703,9 +702,9 @@ namespace PrRenderer::Core
 		material->Unbind();
 	}
 
-	void DefRendererBackend::RenderSSAO(Resources::ShaderPtr p_SSAOShader, Resources::ShaderPtr p_BlurSSAOShader, const RenderData* p_renderData)
+	void DefRendererBackend::RenderSSAO(Resources::ShaderPtr p_SSAOShader, Resources::ShaderPtr p_BlurSSAOShader, const RenderContext* p_renderContext)
 	{
-		p_renderData->m_SSAOBuff->Bind();
+		p_renderContext->SSAOBuff->Bind();
 		p_SSAOShader->Bind();
 
 		LowRenderer::Clear(ColorBuffer | DepthBuffer);
@@ -713,140 +712,159 @@ namespace PrRenderer::Core
 		LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::Less);
 		LowRenderer::EnableBlending(false);
 
-		p_renderData->gBuffer.positionTex->Bind(0);
+		p_renderContext->gBuffer.positionTex->Bind(0);
 		p_SSAOShader->SetUniformInt("positionMap", 0);
 
-		p_renderData->gBuffer.normalsTex->Bind(1);
+		p_renderContext->gBuffer.normalsTex->Bind(1);
 		p_SSAOShader->SetUniformInt("normalMap", 1);
 
-		p_renderData->m_SSAONoiseTex->Bind(2);
+		p_renderContext->SSAONoiseTex->Bind(2);
 		p_SSAOShader->SetUniformInt("texNoise", 2);
 
-		p_SSAOShader->SetUniformMat4("projectionMat", p_renderData->camera->GetProjectionMatrix());
-		p_SSAOShader->SetUniformMat4("viewMat", p_renderData->camera->GetViewMatrix());
-		p_SSAOShader->SetUniformVec3Array("samples", p_renderData->m_ssaoKernel.data(), p_renderData->m_ssaoKernel.size());
+		p_SSAOShader->SetUniformMat4("projectionMat", p_renderContext->camera->GetProjectionMatrix());
+		p_SSAOShader->SetUniformMat4("viewMat", p_renderContext->camera->GetViewMatrix());
+		p_SSAOShader->SetUniformVec3Array("samples", p_renderContext->ssaoKernel.data(), p_renderContext->ssaoKernel.size());
 		p_SSAOShader->SetUniformVec2("screenSize", PrCore::Math::vec2{ PrCore::Windowing::Window::GetMainWindow().GetWidth(), PrCore::Windowing::Window::GetMainWindow().GetHeight() });
-		p_renderData->m_quadMesh->Bind();
-		LowRenderer::Draw(p_renderData->m_quadMesh->GetVertexArray());
-		p_renderData->m_quadMesh->Unbind();
+
+		p_SSAOShader->SetUniformFloat("kernelSize", p_renderContext->m_settings->SSAOKenrelSize);
+		p_SSAOShader->SetUniformFloat("radius", p_renderContext->m_settings->SSAORadius);
+		p_SSAOShader->SetUniformFloat("bias", p_renderContext->m_settings->SSAObias);
+		p_SSAOShader->SetUniformFloat("magnitude", p_renderContext->m_settings->SSAOMagnitude);
+
+		p_renderContext->m_quadMesh->Bind();
+		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->m_quadMesh->Unbind();
 
 		p_SSAOShader->Unbind();
 		LowRenderer::EnableDepth(false);
-		p_renderData->m_SSAOBuff->Unbind();
+		p_renderContext->SSAOBuff->Unbind();
 
 
 		//Blur the SSAO
-		p_renderData->gBuffer.buffer->Bind();
+		p_renderContext->gBuffer.buffer->Bind();
 		p_BlurSSAOShader->Bind();
 		LowRenderer::SetColorMask(false, false, false, true);
 
-		p_renderData->m_SSAOTex->Bind(0);
+		p_renderContext->SSAOTex->Bind(0);
 		p_SSAOShader->SetUniformInt("ssaoInput", 0);
+		p_SSAOShader->SetUniformInt("SSAOBlureSize", p_renderContext->m_settings->SSAOBlureSize);
 
-		p_renderData->m_quadMesh->Bind();
-		LowRenderer::Draw(p_renderData->m_quadMesh->GetVertexArray());
-		p_renderData->m_quadMesh->Unbind();
+		p_renderContext->m_quadMesh->Bind();
+		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->m_quadMesh->Unbind();
 
 		LowRenderer::SetColorMask(true, true, true, true);
 		p_BlurSSAOShader->Unbind();
-		p_renderData->gBuffer.buffer->Unbind();
+		p_renderContext->gBuffer.buffer->Unbind();
 	}
 
-	void DefRendererBackend::RenderFXAA(Resources::ShaderPtr p_FXAAShader, const RenderData* p_renderData)
+	void DefRendererBackend::RenderFXAA(Resources::ShaderPtr p_FXAAShader, const RenderContext* p_renderContext)
 	{
-		p_renderData->postProccesBuff->Bind();
+		p_renderContext->otuputBuff->Bind();
 		p_FXAAShader->Bind();
 
 		LowRenderer::Clear(ColorBuffer | DepthBuffer);
 		LowRenderer::EnableDepth(false);
 		LowRenderer::EnableBlending(false);
 
-		p_renderData->m_FXAATex->Bind(0);
+		p_renderContext->postprocessTex->Bind(0);
 		p_FXAAShader->SetUniformInt("screenTexture", 0);
 
 		p_FXAAShader->SetUniformVec2("inverseScreenSize", PrCore::Math::vec2{ 1.0f / PrCore::Windowing::Window::GetMainWindow().GetWidth(), 1.0f / PrCore::Windowing::Window::GetMainWindow().GetHeight() });
+		p_FXAAShader->SetUniformFloat("edge_threshold_min", p_renderContext->m_settings->FXAAThreasholdMin);
+		p_FXAAShader->SetUniformFloat("edge_threshold_max", p_renderContext->m_settings->FXAAThreasholdMax);
+		p_FXAAShader->SetUniformFloat("edge_iterations", p_renderContext->m_settings->FXAAEdgeIterations);
+		p_FXAAShader->SetUniformFloat("subpixel_quality", p_renderContext->m_settings->FXAASubpixelQuiality);
 
-		p_renderData->m_quadMesh->Bind();
-		LowRenderer::Draw(p_renderData->m_quadMesh->GetVertexArray());
-		p_renderData->m_quadMesh->Unbind();
+		p_renderContext->m_quadMesh->Bind();
+		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->m_quadMesh->Unbind();
 
-		p_renderData->postProccesBuff->Unbind();
+		p_renderContext->otuputBuff->Unbind();
 		p_FXAAShader->Unbind();
 	}
 
-	void DefRendererBackend::RenderFog(Resources::ShaderPtr p_fogShader, const RenderData* p_renderData)
+	void DefRendererBackend::RenderFog(Resources::ShaderPtr p_fogShader, const RenderContext* p_renderContext)
 	{
-		p_renderData->postProccesBuff->Bind();
+		p_renderContext->otuputBuff->Bind();
 		p_fogShader->Bind();
 		LowRenderer::Clear(ColorBuffer | DepthBuffer);
+						LowRenderer::EnableBlending(true);
 
-
-		p_renderData->m_FXAATex->Bind(0);
+		p_renderContext->postprocessTex->Bind(0);
 		p_fogShader->SetUniformInt("screenTexture", 0);
 
-		p_renderData->gBuffer.positionTex->Bind(1);
+		p_renderContext->gBuffer.positionTex->Bind(1);
 		p_fogShader->SetUniformInt("positionMap", 1);
 
-		p_fogShader->SetUniformVec3("fogColor", PrCore::Math::vec3(0.604f, 0.700f, 0.800f));
-		p_fogShader->SetUniformFloat("maxDistance", 20.0f);
-		p_fogShader->SetUniformFloat("densityFactor", 1.0f);
+		p_fogShader->SetUniformVec3("fogColor", p_renderContext->m_settings->fogColor);
+		p_fogShader->SetUniformFloat("maxDistance", p_renderContext->m_settings->fogMaxDistance);
+		p_fogShader->SetUniformFloat("densityFactor", p_renderContext->m_settings->fogDencity);
 
-		p_renderData->m_quadMesh->Bind();
-		LowRenderer::Draw(p_renderData->m_quadMesh->GetVertexArray());
-		p_renderData->m_quadMesh->Unbind();
+		p_renderContext->m_quadMesh->Bind();
+		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->m_quadMesh->Unbind();
 
-		p_renderData->postProccesBuff->Unbind();
+		p_renderContext->otuputBuff->Unbind();
 		p_fogShader->Unbind();
 	}
 
-	void DefRendererBackend::RenderLight(Resources::ShaderPtr p_lightShdr, LightObjectPtr mianDirectLight, std::vector<LightObject>* p_lightMats, const RenderData* p_renderData, const RendererSettings* p_settings)
+	void DefRendererBackend::RenderLight(Resources::ShaderPtr p_lightShdr, LightObjectPtr mianDirectLight, std::vector<LightObject>* p_lightMats, const RenderContext* p_renderContext)
 	{
-		p_renderData->postProccesBuff->Bind();
+		p_renderContext->otuputBuff->Bind();
 
 		p_lightShdr->Bind();
 
 		// Set PBR Textures
-		p_renderData->gBuffer.albedoTex->Bind(0);
+		p_renderContext->gBuffer.albedoTex->Bind(0);
 		p_lightShdr->SetUniformInt("albedoMap", 0);
 
-		p_renderData->gBuffer.normalsTex->Bind(1);
+		p_renderContext->gBuffer.normalsTex->Bind(1);
 		p_lightShdr->SetUniformInt("normalMap", 1);
 
-		p_renderData->gBuffer.positionTex->Bind(2);
+		p_renderContext->gBuffer.positionTex->Bind(2);
 		p_lightShdr->SetUniformInt("positionMap", 2);
 
-		p_renderData->gBuffer.aoTex->Bind(3);
+		p_renderContext->gBuffer.aoTex->Bind(3);
 		p_lightShdr->SetUniformInt("aoMap", 3);
 
-		if (p_renderData->IRMap && p_renderData->prefilterMap && p_renderData->brdfLUT)
+		if (p_renderContext->IRMap && p_renderContext->prefilterMap && p_renderContext->brdfLUT)
 		{
-			p_renderData->IRMap->Bind(4);
+			p_renderContext->IRMap->Bind(4);
 			p_lightShdr->SetUniformInt("PBR_irradianceMap", 4);
 
-			p_renderData->prefilterMap->Bind(5);
+			p_renderContext->prefilterMap->Bind(5);
 			p_lightShdr->SetUniformInt("PBR_prefilterMap", 5);
 
-			p_renderData->brdfLUT->Bind(6);
+			p_renderContext->brdfLUT->Bind(6);
 			p_lightShdr->SetUniformInt("PBR_brdfLUT", 6);
 		}
+		else
+		{
+			p_lightShdr->SetUniformInt("PBR_irradianceMap", -1);
+			p_lightShdr->SetUniformInt("PBR_prefilterMap", -1);
+			p_lightShdr->SetUniformInt("PBR_brdfLUT", -1);
+		}
 
-		p_lightShdr->SetUniformVec3("camPos", p_renderData->camera->GetPosition());
-
-
+		p_lightShdr->SetUniformVec3("camPos", p_renderContext->camera->GetPosition());
+		p_lightShdr->SetUniformVec3("ambientColor", p_renderContext->m_settings->ambientColor);
 
 		// Set Shadows
 		// Main Directional Light
-		p_lightShdr->SetUniformFloatArray("SHDW_borders", p_settings->cascadeShadowBordersCamSpace, 4);
-		p_lightShdr->SetUniformFloatArray("SHDW_RadiusRatio", p_settings->cascadeShadowRadiusRatio, 4);
+		p_lightShdr->SetUniformFloatArray("SHDW_borders", p_renderContext->m_settings->cascadeShadowBordersCamSpace, 4);
+		p_lightShdr->SetUniformFloatArray("SHDW_RadiusRatio", p_renderContext->m_settings->cascadeShadowRadiusRatio, 4);
 
-		if (mianDirectLight && p_renderData->m_shadowMapMainDirTex)
+		if (mianDirectLight && p_renderContext->shadowMapMainDirTex)
 		{
 			p_lightShdr->SetUniformMat4("SHDW_MainDirLightMat", mianDirectLight->lightMat);
 			p_lightShdr->SetUniformBool("SHDW_HasMainDirLight", true);
 			p_lightShdr->SetUniformMat4Array("SHDW_MainDirLightViewMat", mianDirectLight->lightViewMats.data(), mianDirectLight->lightViewMats.size());
-			p_lightShdr->SetUniformInt("SHDW_MainDirLightMapSize", p_settings->mainLightShadowMapSize);
-			p_lightShdr->SetUniformInt("SHDW_MainDirLightCombineMapSize", p_settings->mainLightShadowCombineMapSize);
-			p_renderData->m_shadowMapMainDirTex->Bind(7);
+			p_lightShdr->SetUniformInt("SHDW_MainDirLightMapSize", p_renderContext->m_settings->mainLightShadowMapSize);
+			p_lightShdr->SetUniformInt("SHDW_MainDirLightCombineMapSize", p_renderContext->m_settings->mainLightShadowCombineMapSize);
+			p_lightShdr->SetUniformFloat("SHDW_BorderBlend", p_renderContext->m_settings->mainLightBlendDist);
+			p_lightShdr->SetUniformFloat("SHDW_MainDirLightBias", p_renderContext->m_settings->mainLightShadowBias);
+
+			p_renderContext->shadowMapMainDirTex->Bind(7);
 			p_lightShdr->SetUniformInt("SHDW_MainDirLightMap", 7);
 		}
 		else
@@ -865,6 +883,7 @@ namespace PrRenderer::Core
 		std::vector<PrCore::Math::mat4> spotLightMat;
 		std::vector<PrCore::Math::mat4> spotLightViewMat;
 		std::vector<int>                spotLightIDs;
+
 		for (auto light : *p_lightMats)
 		{
 			// Light does not cast shadow
@@ -896,18 +915,20 @@ namespace PrRenderer::Core
 		p_lightShdr->SetUniformMat4Array("SHDW_DirLightMat", dirLightMat.data(), dirLightMat.size());
 		p_lightShdr->SetUniformMat4Array("SHDW_DirLightViewMat", dirLightViewMat.data(), dirLightViewMat.size());
 		p_lightShdr->SetUniformIntArray("SHDW_DirLightID", dirLightIDs.data(), dirLightIDs.size());
-		p_lightShdr->SetUniformInt("SHDW_DirLightMapSize", p_settings->dirLightShadowsMapSize);
-		p_lightShdr->SetUniformInt("SHDW_DirLightCombineShadowMapSize", p_settings->dirLightCombineMapSize);
-		p_renderData->m_shadowMapDirTex->Bind(8);
+		p_lightShdr->SetUniformInt("SHDW_DirLightMapSize", p_renderContext->m_settings->dirLightShadowsMapSize);
+		p_lightShdr->SetUniformInt("SHDW_DirLightCombineShadowMapSize", p_renderContext->m_settings->dirLightCombineMapSize);
+		p_lightShdr->SetUniformFloat("SHDW_DirLightBias", p_renderContext->m_settings->dirLightShadowBias);
+		p_renderContext->shadowMapDirTex->Bind(8);
 		p_lightShdr->SetUniformInt("SHDW_DirLightMap", 8);
 
 		//Point Light
 		p_lightShdr->SetUniformInt("SHDW_PointLightNumber", pointlightMat.size());
 		p_lightShdr->SetUniformMat4Array("SHDW_PointLightMat", pointlightMat.data(), pointlightMat.size());
 		p_lightShdr->SetUniformIntArray("SHDW_PointLightID", pointLighttexPos.data(), pointLighttexPos.size());
-		p_lightShdr->SetUniformInt("SHDW_PointLightMapSize", p_settings->pointLightShadowMapSize);
-		p_lightShdr->SetUniformInt("SHDW_PointCombineLightMapSize", p_settings->pointLightCombineShadowMapSize);
-		p_renderData->m_shadowMapPointTex->Bind(9);
+		p_lightShdr->SetUniformInt("SHDW_PointLightMapSize", p_renderContext->m_settings->pointLightShadowMapSize);
+		p_lightShdr->SetUniformInt("SHDW_PointCombineLightMapSize", p_renderContext->m_settings->pointLightCombineShadowMapSize);
+		p_lightShdr->SetUniformFloat("SHDW_PointLightBias", p_renderContext->m_settings->pointLightShadowBias);
+		p_renderContext->shadowMapPointTex->Bind(9);
 		p_lightShdr->SetUniformInt("SHDW_PointLightMap", 9);
 
 		//Spot Light
@@ -915,21 +936,24 @@ namespace PrRenderer::Core
 		p_lightShdr->SetUniformMat4Array("SHDW_SpotLightMat", spotLightMat.data(), spotLightMat.size());
 		p_lightShdr->SetUniformMat4Array("SHDW_SpotLightViewMat", spotLightViewMat.data(), spotLightViewMat.size());
 		p_lightShdr->SetUniformIntArray("SHDW_SpotLightID", spotLightIDs.data(), spotLightIDs.size());
-		p_lightShdr->SetUniformInt("SHDW_SpotLightMapSize", p_settings->spotLightShadowMapSize);
-		p_lightShdr->SetUniformInt("SHDW_SpotLightCombineMapSize", p_settings->spotLightCombineShadowMapSize);
-		p_renderData->m_shadowMapSpotTex->Bind(10);
+		p_lightShdr->SetUniformInt("SHDW_SpotLightMapSize", p_renderContext->m_settings->spotLightShadowMapSize);
+		p_lightShdr->SetUniformInt("SHDW_SpotLightCombineMapSize", p_renderContext->m_settings->spotLightCombineShadowMapSize);
+		p_lightShdr->SetUniformFloat("SHDW_SpotLightBias", p_renderContext->m_settings->spotLightShadowBias);
+		p_renderContext->shadowMapSpotTex->Bind(10);
 		p_lightShdr->SetUniformInt("SHDW_SpotLightMap", 10);
 
-		p_renderData->m_quadMesh->Bind();
-		LowRenderer::Draw(p_renderData->m_quadMesh->GetVertexArray());
-		p_renderData->m_quadMesh->Unbind();
+		p_renderContext->m_quadMesh->Bind();
+		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->m_quadMesh->Unbind();
 
 		p_lightShdr->Unbind();
-		p_renderData->postProccesBuff->Unbind();
+		p_renderContext->otuputBuff->Unbind();
 	}
 
 	void DefRendererBackend::GenerateIRMap()
 	{
+		m_renderContext.IRMap.reset();
+
 		Buffers::FramebufferTexture texture;
 		texture.format = Resources::TextureFormat::RGB16F;
 		texture.cubeTexture = true;
@@ -972,7 +996,7 @@ namespace PrRenderer::Core
 			LowRenderer::Draw(cube->GetVertexArray());
 		}
 
-		m_renderData.IRMap = std::static_pointer_cast<Resources::Cubemap>(framebuffer->GetTexturePtr(0));
+		m_renderContext.IRMap = std::static_pointer_cast<Resources::Cubemap>(framebuffer->GetTexturePtr(0));
 
 		shader->Unbind();
 		cubemap->Unbind();
@@ -985,6 +1009,8 @@ namespace PrRenderer::Core
 
 	void DefRendererBackend::GeneratePrefilterMap()
 	{
+		m_renderContext.prefilterMap.reset();
+
 		Buffers::FramebufferTexture texture;
 		texture.format = Resources::TextureFormat::RGB16F;
 		texture.filteringMin = Resources::TextureFiltering::LinearMipMapLinear;
@@ -1035,7 +1061,7 @@ namespace PrRenderer::Core
 			}
 		}
 
-		m_renderData.prefilterMap = std::static_pointer_cast<Resources::Cubemap>(framebuffer->GetTexturePtr());
+		m_renderContext.prefilterMap = std::static_pointer_cast<Resources::Cubemap>(framebuffer->GetTexturePtr());
 
 		shader->Unbind();
 		cubemap->Unbind();
@@ -1048,6 +1074,8 @@ namespace PrRenderer::Core
 
 	void DefRendererBackend::GenerateLUTMap()
 	{
+		m_renderContext.brdfLUT.reset();
+
 		Buffers::FramebufferTexture texture;
 		texture.format = Resources::TextureFormat::RG16;
 
@@ -1068,7 +1096,7 @@ namespace PrRenderer::Core
 		LowRenderer::Clear(ClearFlag::ColorBuffer | ClearFlag::DepthBuffer);
 		LowRenderer::Draw(quad->GetVertexArray());
 
-		m_renderData.brdfLUT = framebuffer->GetTexturePtr();
+		m_renderContext.brdfLUT = framebuffer->GetTexturePtr();
 
 		shader->Unbind();
 		quad->Unbind();

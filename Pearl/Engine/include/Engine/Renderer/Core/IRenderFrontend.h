@@ -45,8 +45,8 @@ namespace PrRenderer::Core {
 		inline const FrameData& GetCurrFrameData() const { return *m_currentFrame; }
 		inline const FrameData& GetPreviousFrameData() const { return *m_previousFrame; }
 
-		void SetRendererSettings(const RendererSettings& p_settings) const { m_rendererBackend->SetSettings(p_settings); }
-		const RendererSettings& GetRendererSettings() const { return  m_rendererBackend->GetSettings(); }
+		RendererSettings& GetRendererSettings() { return  m_rendererBackend->GetSettings(); }
+		RendererSettings GetRendererSettings() const { return  m_rendererBackend->GetSettings(); }
 
 		//More advanced functions
 		void PushCommand(RenderCommandPtr p_command) const { m_rendererBackend->PushCommand(p_command); }

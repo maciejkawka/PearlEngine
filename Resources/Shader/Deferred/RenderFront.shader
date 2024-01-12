@@ -20,11 +20,11 @@ void main()
 out vec4 FragColor;
 in vec2 TexCoords;
 
-uniform sampler2D lightTex;
+uniform sampler2D backTex;
 
 void main()
 {
-    vec3 color = texture(lightTex, TexCoords).rgb;
+    vec3 color = texture(backTex, TexCoords).rgb;
 
     FragColor = vec4(color, 1.0f);
 }

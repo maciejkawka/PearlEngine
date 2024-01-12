@@ -1,7 +1,7 @@
 {
   "materialVersion": 0.1,
   "name": "PBRMaterialDeferred",
-  "shader": "Deferred/StandardTransparent.shader",
+  "shader": "Deferred/StandardUnlit.shader",
   "RenderOrder": 0,
   "RenderType": 0,
   "color": {
@@ -29,8 +29,8 @@
       "name": "albedoValue",
       "value": {
         "x": 1,
-        "y": 0.65,
-        "z": 0.0,
+        "y": 0.0,
+        "z": 1.0,
         "w": 1.0
       }
     }

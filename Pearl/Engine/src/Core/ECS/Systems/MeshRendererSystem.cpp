@@ -42,7 +42,24 @@ void MeshRendererSystem::OnUpdate(float p_dt)
 		break;
 	}
 
-	DefferedRendererFrontend::GetInstance().AddCubemap(Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("skymapHDRMaterial.mat"));
+	static bool cubemap = true;
+	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::G))
+		cubemap = !cubemap;
+	if (cubemap)
+		DefferedRendererFrontend::GetInstance().AddCubemap(Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("skymapHDRMaterial.mat"));
+	else
+		DefferedRendererFrontend::GetInstance().AddCubemap(nullptr);
+
+	auto& settings = DefferedRendererFrontend::GetInstance().GetRendererSettings();
+
+	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::F))
+		settings.enableFog = !settings.enableFog;
+
+	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::R))
+		settings.enableFXAAA = !settings.enableFXAAA;
+
+	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::T))
+		settings.enableSSAO = !settings.enableSSAO;
 
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(Input::PrKey::L))
 		lightID = (++lightID) % 5;

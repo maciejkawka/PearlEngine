@@ -21,8 +21,8 @@ namespace PrRenderer::Core {
 		inline void SetFrame(FrameDataPtr p_frame) { m_frame = p_frame; }
 		inline void PushCommand(RenderCommandPtr p_command) { m_commandQueue.push_back(p_command); }
 
+		inline RendererSettings& GetSettings() { return m_settings; }
 		inline RendererSettings GetSettings() const { return m_settings; }
-		inline void SetSettings(const RendererSettings p_settings) { m_settings = p_settings; }
 
 		virtual void PreRender() = 0;
 		virtual void Render() = 0;
@@ -30,9 +30,10 @@ namespace PrRenderer::Core {
 
 	protected:
 		using RenderCommandQueue = std::deque<RenderCommandPtr>;
-		RendererSettings m_settings;
+
 		RenderCommandQueue    m_commandQueue;
-		FrameDataPtr	 m_frame;
+		FrameDataPtr	      m_frame;
+		RendererSettings      m_settings;
 
 		float m_screenWidth;
 		float m_screenHeight;

@@ -26,86 +26,86 @@ namespace PrRenderer::Core {
 			Resources::TexturePtr positionTex; //Position (RGB) + Depth (A)
 			Resources::TexturePtr albedoTex; //Albedo (RGB) + Roughness (A)
 			Resources::TexturePtr normalsTex; // Normals (RGB) + Metalness (A)
-			Resources::TexturePtr aoTex; // To decide (RGB) + AO (A)
+			Resources::TexturePtr aoTex; // Emissive (RGB) + AO (A)
 		};
 
-		struct RenderData {
+		struct RenderContext {
 
-			gBuffer gBuffer;
+			gBuffer                             gBuffer;
 
-			//PBR Lighting
-			Buffers::FramebuffferPtr            postProccesBuff;
-			Resources::TexturePtr               postProccesTex;
+			// PBR Lighting
+			Buffers::FramebuffferPtr            otuputBuff;
+			Resources::TexturePtr               outputTex;
 			Resources::CubemapPtr               IRMap;
 			Resources::CubemapPtr               prefilterMap;
 			Resources::TexturePtr               brdfLUT;
 
-			Camera* camera;
+			// SSAO
+			Buffers::FramebuffferPtr            SSAOBuff;
+			Resources::TexturePtr               SSAOTex;
+			Resources::TexturePtr               SSAONoiseTex;
+			std::vector<PrCore::Math::vec3>     ssaoKernel;
 
-			//SSAO
-			Buffers::FramebuffferPtr            m_SSAOBuff;
-			Resources::TexturePtr               m_SSAOTex;
-			Resources::TexturePtr               m_SSAONoiseTex;
-			std::vector<PrCore::Math::vec3>		m_ssaoKernel;
+			// Postprocess 
+			Buffers::FramebuffferPtr            postprocessBuff;
+			Resources::TexturePtr               postprocessTex;
 
-			//FXAA
-			Buffers::FramebuffferPtr            m_FXAABuff;
-			Resources::TexturePtr               m_FXAATex;
+			// Shadow mapping
+			// One point light uses 6 subparts of the texture, so number of lights = TextureSize / (ShadowMapTexture * 6)
+			Buffers::FramebuffferPtr            shadowMapPointBuff;
+			Resources::TexturePtr               shadowMapPointTex;
 
-			//Shadow mapping
-			//One point light uses 6 subparts of the texture, so number of lights = TextureSize / (ShadowMapTexture * 6)
-			Buffers::FramebuffferPtr m_shadowMapPointBuff;
-			Resources::TexturePtr    m_shadowMapPointTex;
+			Buffers::FramebuffferPtr            shadowMapSpotBuff;
+			Resources::TexturePtr               shadowMapSpotTex;
 
-			Buffers::FramebuffferPtr m_shadowMapSpotBuff;
-			Resources::TexturePtr    m_shadowMapSpotTex;
+			Buffers::FramebuffferPtr            shadowMapDirBuff;
+			Resources::TexturePtr               shadowMapDirTex;
 
-			Buffers::FramebuffferPtr m_shadowMapDirBuff;
-			Resources::TexturePtr    m_shadowMapDirTex;
-
-			Buffers::FramebuffferPtr m_shadowMapMainDirBuff;
-			Resources::TexturePtr    m_shadowMapMainDirTex;
+			Buffers::FramebuffferPtr            shadowMapMainDirBuff;
+			Resources::TexturePtr               shadowMapMainDirTex;
 
 			//Aux
-			Resources::MeshPtr m_quadMesh;
+			Camera*                             camera;
+			Resources::MeshPtr                  m_quadMesh;
+			const RendererSettings*             m_settings;
 		};
 
 		//Render Commands
-		static void RenderToGBuffer(RenderObjectPtr p_object, const RenderData* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderToGBuffer, RenderToGBuffer, RenderObjectPtr, RenderData*);
+		static void RenderOpaque(RenderObjectPtr p_object, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderOpaque, RenderOpaque, RenderObjectPtr, RenderContext*);
 
-		static void RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, std::list<RenderObjectPtr>* p_objects, const RenderData* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderToShadowMap, RenderToShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, std::list<RenderObjectPtr>*, RenderData*);
+		static void RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData);
+		REGISTER_RENDER_COMMAND(RenderToShadowMap, RenderToShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, std::list<RenderObjectPtr>*, RenderContext*);
 
-		static void RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightMatrix, PrCore::Math::vec3& p_lightPos, std::list<RenderObjectPtr>* p_objects, const RenderData* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderToPointShadowMap, RenderToPointShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, PrCore::Math::vec3, std::list<RenderObjectPtr>*, RenderData*);
+		static void RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightMatrix, PrCore::Math::vec3& p_lightPos, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData);
+		REGISTER_RENDER_COMMAND(RenderToPointShadowMap, RenderToPointShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, PrCore::Math::vec3, std::list<RenderObjectPtr>*, RenderContext*);
 
-		static void RenderLight(Resources::ShaderPtr p_lightShdr, LightObjectPtr mianDirectLight, std::vector<LightObject>* p_lightMats, const RenderData* p_renderData, const RendererSettings* p_settings);
-		REGISTER_RENDER_COMMAND(RenderLight, RenderLight, Resources::ShaderPtr, LightObjectPtr, std::vector<LightObject>*, const RenderData*, const RendererSettings*);
+		static void RenderLight(Resources::ShaderPtr p_lightShdr, LightObjectPtr mianDirectLight, std::vector<LightObject>* p_lightMats, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderLight, RenderLight, Resources::ShaderPtr, LightObjectPtr, std::vector<LightObject>*, const RenderContext*);
 
-		static void RenderCubeMap(Resources::MaterialPtr p_material, const RenderData* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderCubeMap, RenderCubeMap, Resources::MaterialPtr, const RenderData*);
+		static void RenderCubeMap(Resources::MaterialPtr p_material, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderCubeMap, RenderCubeMap, Resources::MaterialPtr, const RenderContext*);
 
-		static void RenderPostProcess(Resources::ShaderPtr p_postProcessShader, const RenderData* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderPostProcess, RenderPostProcess, Resources::ShaderPtr, const RenderData*);
+		static void RenderBackBuffer(Resources::ShaderPtr p_postProcessShader, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderBackBuffer, RenderBackBuffer, Resources::ShaderPtr, const RenderContext*);
 
-		static void RenderTransparent(RenderObjectPtr p_object, const RenderData* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderTransparent, RenderTransparent, RenderObjectPtr, RenderData*);
+		static void RenderTransparent(RenderObjectPtr p_object, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderTransparent, RenderTransparent, RenderObjectPtr, RenderContext*);
 
-		static void RenderSSAO(Resources::ShaderPtr p_SSAOShader, Resources::ShaderPtr p_BlurSSAOShader, const RenderData* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderSSAO, RenderSSAO, Resources::ShaderPtr, Resources::ShaderPtr, RenderData*);
+		static void RenderSSAO(Resources::ShaderPtr p_SSAOShader, Resources::ShaderPtr p_BlurSSAOShader, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderSSAO, RenderSSAO, Resources::ShaderPtr, Resources::ShaderPtr, RenderContext*);
 
-		static void RenderFXAA(Resources::ShaderPtr p_FXAAShader, const RenderData* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderFXAA, RenderFXAA, Resources::ShaderPtr, RenderData*);
+		static void RenderFXAA(Resources::ShaderPtr p_FXAAShader, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderFXAA, RenderFXAA, Resources::ShaderPtr, RenderContext*);
 
-		static void RenderFog(Resources::ShaderPtr p_fogShader, const RenderData* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderFog, RenderFog, Resources::ShaderPtr, RenderData*);
+		static void RenderFog(Resources::ShaderPtr p_fogShader, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderFog, RenderFog, Resources::ShaderPtr, RenderContext*);
 
-		void GenerateSSAO();
-		void GenerateFXAA();
-		void GenerategBuffers();
+		void GenerateSSAOContext();
+		void GeneratePostprocessContext();
+		void GenerategGBuffersContext();
+
 		void GenerateShadowMaps();
-
 		void GenerateIRMap();
 		void GeneratePrefilterMap();
 		void GenerateLUTMap();
@@ -115,17 +115,17 @@ namespace PrRenderer::Core {
 
 		//Main Data
 		//---------
-		RenderData m_renderData;
+		RenderContext m_renderContext;
 
 		//Shaders
-		Resources::ShaderPtr m_postProcesShdr;
-		Resources::ShaderPtr m_pbrLightShader;
-		Resources::ShaderPtr m_shadowMappingShader;
-		Resources::ShaderPtr m_pointshadowMappingShader;
-		Resources::ShaderPtr m_SSAOShader;
-		Resources::ShaderPtr m_SSAOBlurShader;
-		Resources::ShaderPtr m_FXAAShader;
-		Resources::ShaderPtr m_fogShader;
+		Resources::ShaderPtr m_backBuffShdr;
+		Resources::ShaderPtr m_pbrLightShdr;
+		Resources::ShaderPtr m_shadowMappingShdr;
+		Resources::ShaderPtr m_pointshadowMappingShdr;
+		Resources::ShaderPtr m_SSAOShdr;
+		Resources::ShaderPtr m_SSAOBlurShdr;
+		Resources::ShaderPtr m_FXAAShdr;
+		Resources::ShaderPtr m_fogShdr;
 
 		CascadeShadowUtility m_CSMUtility;
 	};

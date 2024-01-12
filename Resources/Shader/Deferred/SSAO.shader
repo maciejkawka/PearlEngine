@@ -33,7 +33,7 @@ uniform sampler2D texNoise;
 
 uniform vec3 samples[64];
 
-uniform int kernelSize = 64;
+uniform int   kernelSize = 64;
 uniform float radius = 0.5f;
 uniform float bias = 0.1f;
 uniform float magnitude = 1.1f;

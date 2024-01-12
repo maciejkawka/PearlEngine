@@ -153,7 +153,11 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 
 void DefferedRendererFrontend::AddCubemap(Resources::MaterialPtr p_cubemapMat)
 {
-	if (m_previousFrame->cubemapObject == nullptr || reinterpret_cast<size_t>(p_cubemapMat.get()) != m_previousFrame->cubemapObject->id)
+	if(p_cubemapMat == nullptr)
+	{
+		m_currentFrame->cubemapObject = nullptr;
+	}
+	else if(m_previousFrame->cubemapObject == nullptr || reinterpret_cast<size_t>(p_cubemapMat.get()) != m_previousFrame->cubemapObject->id)
 	{
 		m_currentFrame->renderFlag = m_currentFrame->renderFlag | RendererFlag::RerenderCubeMap;
 		RenderObjectPtr object = std::make_shared<RenderObject>();

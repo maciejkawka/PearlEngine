@@ -40,5 +40,5 @@ void main()
     float fogFactor = exp(-distanceRatio * distanceRatio * densityFactor * densityFactor);
 
     vec3 color = texture(screenTexture, uv0).rgb;
-    FragColor = vec4(mix(fogColor, color, fogFactor), fogFactor);
+    FragColor = vec4(mix(fogColor, color, fogFactor), 1.0f);
 }

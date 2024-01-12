@@ -143,35 +143,64 @@ namespace PrRenderer::Core {
 
 	enum class RendererFlag {
 		None = 0,
-		RerenderAll = 1,
-		RerenderLight = 2,
-		RerenderCubeMap = 4,
-		RecalculateProjectionMatrix = 8
+		RerenderCubeMap = 1
 	};
 	DEFINE_ENUM_FLAG_OPERATORS(RendererFlag);
 
 	struct RendererSettings {
 
 		//Shadows
-		size_t dirLightMaxShadows = 8;
-		size_t dirLightShadowsMapSize = 2048;
-		size_t dirLightCombineMapSize = 12288;
+		size_t             dirLightMaxShadows = 8;
+		size_t             dirLightShadowsMapSize = 2048;
+		size_t             dirLightCombineMapSize = 12288;
+		float              dirLightShadowBias = 0.005f;
+		float              dirLightCascadeExtend = 6.0f;
 
-		size_t pointLightMaxShadows = 16;
-		size_t pointLightShadowMapSize = 1024;
-		size_t pointLightCombineShadowMapSize = 10240;
+		size_t             pointLightMaxShadows = 16;
+		size_t             pointLightShadowMapSize = 1024;
+		size_t             pointLightCombineShadowMapSize = 10240;
+		float              pointLightShadowBias = 0.4f;
 
-		size_t spotLightMaxShadows = 16;
-		size_t spotLightShadowMapSize = 1024;
-		size_t spotLightCombineShadowMapSize = 4096;
+		size_t             spotLightMaxShadows = 16;
+		size_t             spotLightShadowMapSize = 1024;
+		size_t             spotLightCombineShadowMapSize = 4096;
+		float              spotLightShadowBias = 0.005f;
 
-		size_t mainLightShadowMapSize = 4096;
-		size_t mainLightShadowCombineMapSize = 8196;
+		size_t             mainLightShadowMapSize = 4096;
+		size_t             mainLightShadowCombineMapSize = 8196;
+		float              mainLightShadowBias = 0.005f;
+		float              cascadeShadowBorders[SHADOW_CASCADES_COUNT];
+		float              cascadeShadowBordersCamSpace[SHADOW_CASCADES_COUNT];
+		float              cascadeShadowRadiusRatio[SHADOW_CASCADES_COUNT];
+		float              mainLightBlendDist = 5.0f;
+		float              mainLightCascadeExtend = 6.0f;
 
-		//CSM
-		float  cascadeShadowBorders[SHADOW_CASCADES_COUNT];
-		float  cascadeShadowBordersCamSpace[SHADOW_CASCADES_COUNT];
-		float  cascadeShadowRadiusRatio[SHADOW_CASCADES_COUNT];
+		// Ambient
+		PrCore::Math::vec3 ambientColor;
+		PrCore::Math::vec3 skyColor = { 0.5f, 0.5f, 0.5f };
+
+		// Fog
+		bool               enableFog = false;
+		PrCore::Math::vec3 fogColor = {0.5f, 0.5f, 0.5f};
+		float              fogDencity = 1.0f;
+		float              fogMaxDistance = 50.0f;
+
+		// FXAA
+		bool               enableFXAAA = false;
+		float              FXAAThreasholdMax = 0.0312f;
+		float              FXAAThreasholdMin = 0.125f;
+		float              FXAAEdgeIterations = 16;
+		float              FXAASubpixelQuiality = 0.75f;
+
+		// SSAO
+		bool               enableSSAO = false;
+		float              SSAOKenrelSize = 16;
+		float              SSAORadius = 0.5f;
+		float              SSAObias   = 0.1f;
+		float              SSAOMagnitude = 1.1f;
+		int                SSAOBlureSize = 4;
+
+		// Bloom
 	};
 
 	///////////////////////////////////////

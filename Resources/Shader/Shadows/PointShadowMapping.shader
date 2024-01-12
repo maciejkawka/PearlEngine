@@ -3,31 +3,31 @@
 
 layout (location = 0) in vec3 aPos;
 
-uniform mat4 modelMatrix;
-uniform mat4 lightMatrix;
+uniform mat4 PIPELINE_MODEL_MAT;
+uniform mat4 PIPELINE_LIGHT_MAT;
 
-uniform mat4 modelMatrixArray[200];
-uniform int instancedCount = 0;
+uniform mat4 PIPELINE_MODEL_MAT_ARRAY[200];
+uniform int PIPELINE_INTANCE_COUNT = 0;
 
 out vec3 fragPos;
 
 void main()
 {
     mat4 modelMat;
-    if(instancedCount != 0)
+    if(PIPELINE_INTANCE_COUNT != 0)
     {
         //Grab instanced modelMatrix
-        modelMat = modelMatrixArray[gl_InstanceID];
+        modelMat = PIPELINE_MODEL_MAT_ARRAY[gl_InstanceID];
     }
     else
     {
-        modelMat = modelMatrix;
+        modelMat = PIPELINE_MODEL_MAT;
     }
 
     vec4 worldPos = modelMat *  vec4(aPos, 1.0);
     fragPos = worldPos.xyz;
     
-    gl_Position = lightMatrix * worldPos;
+    gl_Position = PIPELINE_LIGHT_MAT * worldPos;
 }
 
 
@@ -36,11 +36,11 @@ void main()
 
 in vec3 fragPos;
 
-uniform vec3 lightPos;
+uniform vec3 PIPELINE_LIGHT_POS;
 
 out vec3 lightFragDist;
 
 void main()
 {
-    lightFragDist = vec3(length(fragPos - lightPos), 0, gl_FragCoord.z);
+    lightFragDist = vec3(length(fragPos - PIPELINE_LIGHT_POS), 0, gl_FragCoord.z);
 }

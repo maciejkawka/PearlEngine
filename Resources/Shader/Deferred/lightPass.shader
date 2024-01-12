@@ -529,7 +529,7 @@ void main()
     //albedoTex = pow(albedoTex.rgb, vec3(2.2));
     float ao = texture(aoMap, uv0).a;
     vec3 emission = texture(aoMap, uv0).rgb;
-    vec3 N = normalize(texture(normalMap, uv0).rgb);
+    vec3 N = texture(normalMap, uv0).rgb;
     float metallic = texture(normalMap, uv0).a;
     vec3 pos = texture(positionMap, uv0).rgb;
     float depth = texture(positionMap, uv0).a;
@@ -537,7 +537,14 @@ void main()
     //If depth is 0 discard
     if(depth == 0)
         discard;
-
+    // If N is vec3(0) it means we do not want to make a lighing on that fragment and copy albedo to the buffer
+    if(N == vec3(0.0f))
+      {
+        FragColor = vec4(albedo, 1.0f);
+        return;
+      }
+      
+    N = normalize(N);
     vec3 V = normalize(camPos - pos);
     vec3 R = reflect(-V,N);
 
