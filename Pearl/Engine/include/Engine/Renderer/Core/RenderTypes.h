@@ -155,20 +155,24 @@ namespace PrRenderer::Core {
 		size_t             dirLightCombineMapSize = 12288;
 		float              dirLightShadowBias = 0.005f;
 		float              dirLightCascadeExtend = 6.0f;
+		float              dirLightSize = 3.0f;
 
 		size_t             pointLightMaxShadows = 16;
 		size_t             pointLightShadowMapSize = 1024;
 		size_t             pointLightCombineShadowMapSize = 10240;
 		float              pointLightShadowBias = 0.4f;
+		float              pointLightSize = 6.0f;
 
 		size_t             spotLightMaxShadows = 16;
 		size_t             spotLightShadowMapSize = 1024;
 		size_t             spotLightCombineShadowMapSize = 4096;
 		float              spotLightShadowBias = 0.005f;
+		float              spotLightSize = 1.0f;
 
 		size_t             mainLightShadowMapSize = 4096;
 		size_t             mainLightShadowCombineMapSize = 8196;
 		float              mainLightShadowBias = 0.005f;
+		float              mainLightSize = 3.0f;
 		float              cascadeShadowBorders[SHADOW_CASCADES_COUNT];
 		float              cascadeShadowBordersCamSpace[SHADOW_CASCADES_COUNT];
 		float              cascadeShadowRadiusRatio[SHADOW_CASCADES_COUNT];
@@ -176,7 +180,7 @@ namespace PrRenderer::Core {
 		float              mainLightCascadeExtend = 6.0f;
 
 		// Ambient
-		PrCore::Math::vec3 ambientColor;
+		PrCore::Math::vec3 ambientColor = { 0.0f, 0.0f, 0.0f };
 		PrCore::Math::vec3 skyColor = { 0.5f, 0.5f, 0.5f };
 
 		// Fog

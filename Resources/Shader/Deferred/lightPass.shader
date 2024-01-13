@@ -617,6 +617,9 @@ void main()
     vec3 irradiance = texture(PBR_irradianceMap, N).rgb;
     vec3 diffuse = irradiance * albedo;
 
+    if(diffuse == vec3(0.0f))
+        diffuse = ambientColor * albedo;
+
     //Indirect lighting specular
     const float MAX_REFLECTION_LOD = 4.0;
     vec3 prefilteredColor = textureLod(PBR_prefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;    

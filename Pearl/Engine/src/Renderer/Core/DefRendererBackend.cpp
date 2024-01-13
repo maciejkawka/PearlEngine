@@ -161,7 +161,7 @@ namespace PrRenderer::Core
 			if(light.lightMat[0].w !=  1)
 				continue;
 
-			auto lightProjMatrix = PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetNear(), light.lightMat[3].w * 1.2f);
+			auto lightProjMatrix = PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, 0.001f, light.lightMat[3].w * 1.2f);
 			auto lightPos = PrCore::Math::vec3(light.lightMat[0].x, light.lightMat[0].y, light.lightMat[0].z);
 
 			auto lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(1.0f, 0.0f, 0.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
@@ -212,7 +212,6 @@ namespace PrRenderer::Core
 			auto lightDir = PrCore::Math::vec3(light.lightMat[1][0], light.lightMat[1][1], light.lightMat[1][2]);
 
 			auto lightProjMatrix = PrCore::Math::perspective(PrCore::Math::radians(120.0f), 1.0f, camera->GetNear(), camera->GetFar());
-			auto rotationQaut = PrCore::Math::quat(PrCore::Math::radians(lightDir));
 			auto lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + lightDir, PrCore::Math::vec3(0.0f, 0.0f, 1.0f));
 			light.lightViewMats.push_back(lightProjMatrix* lightViewMatrix);
 
@@ -839,12 +838,6 @@ namespace PrRenderer::Core
 			p_renderContext->brdfLUT->Bind(6);
 			p_lightShdr->SetUniformInt("PBR_brdfLUT", 6);
 		}
-		else
-		{
-			p_lightShdr->SetUniformInt("PBR_irradianceMap", -1);
-			p_lightShdr->SetUniformInt("PBR_prefilterMap", -1);
-			p_lightShdr->SetUniformInt("PBR_brdfLUT", -1);
-		}
 
 		p_lightShdr->SetUniformVec3("camPos", p_renderContext->camera->GetPosition());
 		p_lightShdr->SetUniformVec3("ambientColor", p_renderContext->m_settings->ambientColor);
@@ -863,6 +856,7 @@ namespace PrRenderer::Core
 			p_lightShdr->SetUniformInt("SHDW_MainDirLightCombineMapSize", p_renderContext->m_settings->mainLightShadowCombineMapSize);
 			p_lightShdr->SetUniformFloat("SHDW_BorderBlend", p_renderContext->m_settings->mainLightBlendDist);
 			p_lightShdr->SetUniformFloat("SHDW_MainDirLightBias", p_renderContext->m_settings->mainLightShadowBias);
+			p_lightShdr->SetUniformFloat("SHDW_MainDirLightSize", p_renderContext->m_settings->mainLightSize);
 
 			p_renderContext->shadowMapMainDirTex->Bind(7);
 			p_lightShdr->SetUniformInt("SHDW_MainDirLightMap", 7);
@@ -918,6 +912,7 @@ namespace PrRenderer::Core
 		p_lightShdr->SetUniformInt("SHDW_DirLightMapSize", p_renderContext->m_settings->dirLightShadowsMapSize);
 		p_lightShdr->SetUniformInt("SHDW_DirLightCombineShadowMapSize", p_renderContext->m_settings->dirLightCombineMapSize);
 		p_lightShdr->SetUniformFloat("SHDW_DirLightBias", p_renderContext->m_settings->dirLightShadowBias);
+		p_lightShdr->SetUniformFloat("SHDW_DirLightSize", p_renderContext->m_settings->dirLightSize);
 		p_renderContext->shadowMapDirTex->Bind(8);
 		p_lightShdr->SetUniformInt("SHDW_DirLightMap", 8);
 
@@ -928,6 +923,7 @@ namespace PrRenderer::Core
 		p_lightShdr->SetUniformInt("SHDW_PointLightMapSize", p_renderContext->m_settings->pointLightShadowMapSize);
 		p_lightShdr->SetUniformInt("SHDW_PointCombineLightMapSize", p_renderContext->m_settings->pointLightCombineShadowMapSize);
 		p_lightShdr->SetUniformFloat("SHDW_PointLightBias", p_renderContext->m_settings->pointLightShadowBias);
+		p_lightShdr->SetUniformFloat("SHDW_PointLightSize", p_renderContext->m_settings->pointLightSize);
 		p_renderContext->shadowMapPointTex->Bind(9);
 		p_lightShdr->SetUniformInt("SHDW_PointLightMap", 9);
 
@@ -939,6 +935,7 @@ namespace PrRenderer::Core
 		p_lightShdr->SetUniformInt("SHDW_SpotLightMapSize", p_renderContext->m_settings->spotLightShadowMapSize);
 		p_lightShdr->SetUniformInt("SHDW_SpotLightCombineMapSize", p_renderContext->m_settings->spotLightCombineShadowMapSize);
 		p_lightShdr->SetUniformFloat("SHDW_SpotLightBias", p_renderContext->m_settings->spotLightShadowBias);
+		p_lightShdr->SetUniformFloat("SHDW_SpotLightSize", p_renderContext->m_settings->spotLightSize);
 		p_renderContext->shadowMapSpotTex->Bind(10);
 		p_lightShdr->SetUniformInt("SHDW_SpotLightMap", 10);
 
