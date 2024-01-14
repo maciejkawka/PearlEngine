@@ -84,9 +84,9 @@ PrCore::Math::mat4 Light::CreatePackedMatrix(const PrCore::Math::vec3& p_positio
 	mat[2][2] = m_color.z;
 	mat[2][3] = PrCore::Math::cos(PrCore::Math::radians(m_outterCone));
 
-	mat[3][0] = m_quadraticAttenuation;
-	mat[3][1] = m_linearAttenuation;
-	mat[3][2] = m_constantAttenuation;
+	mat[3][0] = m_quadraticAttenuation; // Unused
+	mat[3][1] = m_linearAttenuation; // Unused
+	mat[3][2] = m_constantAttenuation; // Unused
 	mat[3][3] = m_range;
 
 	return mat;

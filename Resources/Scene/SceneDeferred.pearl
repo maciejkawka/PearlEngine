@@ -120,7 +120,7 @@
                     "LinearAttenuation": 0.5,
                     "OutterCone": 0.0,
                     "QuadraticAttenuation": 0.5,
-                    "Range": 500.0,
+                     "Range": 50.0,
                     "Type": 1,
                     "componentType": "class PrCore::ECS::LightComponent"
                 }
@@ -193,7 +193,7 @@
                     "LinearAttenuation": 0.5,
                     "OutterCone": 0.0,
                     "QuadraticAttenuation": 0.5,
-                    "Range": 500.0,
+                     "Range": 50.0,
                     "Type": 1,
                     "componentType": "class PrCore::ECS::LightComponent"
                 }
@@ -266,7 +266,7 @@
                     "LinearAttenuation": 0.5,
                     "OutterCone": 0.0,
                     "QuadraticAttenuation": 0.5,
-                    "Range": 500.0,
+                     "Range": 50.0,
                     "Type": 1,
                     "componentType": "class PrCore::ECS::LightComponent"
                 }
@@ -339,7 +339,7 @@
                     "LinearAttenuation": 0.5,
                     "OutterCone": 0.0,
                     "QuadraticAttenuation": 0.5,
-                    "Range": 500.0,
+                     "Range": 50.0,
                     "Type": 1,
                     "componentType": "class PrCore::ECS::LightComponent"
                 }
@@ -453,8 +453,8 @@
                     "componentType": "class PrCore::ECS::TransformComponent"
                 },
                 {
-                    "Material": "Deferred/PBR_IR_UniversalGun.mat",
-                    "Mesh": "yo.obj",
+                    "Material": "Deferred/PBR_IR_ValuesSphere.mat",
+                    "Mesh": "shaderball.obj",
                     "componentType": "class PrCore::ECS::MeshRendererComponent"
                 }
             ]

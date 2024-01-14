@@ -41,13 +41,12 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 		if (m_currentFrame->mainDirectLight)
 			PR_ASSERT(false, "FrontendRenderer: Main Direct light already added, cannot have more than one main lights in the scene");
 
-		//If this is main light add it to the frameData and return
-		auto lightobject = std::make_shared<LightObject>();
-		lightobject->id = p_id;
-		lightobject->lightMat = p_lightComponent->m_light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
-		lightobject->shadowMapPos = SIZE_MAX;
+		auto lightObject = std::make_shared<DirLightObject>();
+		lightObject->id = p_id;
+		lightObject->packedMat = p_lightComponent->m_light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
+		lightObject->shadowMapPos = SIZE_MAX; // ShadowMapPos is not inmportant in main light
 
-		m_currentFrame->mainDirectLight = lightobject;
+		m_currentFrame->mainDirectLight = lightObject;
 		return;
 	}
 
@@ -68,36 +67,63 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 		return;
 	}
 
-	//This functio rebuilts light mapping every frame atm, not very efficient but it is alright for now, to be changed in the future
-	auto light = p_lightComponent->m_light;
-	LightObject object;
-	object.lightMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
-	object.id = p_id;
-	if (p_lightComponent->m_shadowCast)
+	const auto& light = p_lightComponent->m_light;
+	LightObjectPtr lightObject = nullptr;
+	switch (light->GetType())
 	{
-		if (light->GetType() == Resources::LightType::Directional)
+	case Resources::LightType::Directional:
+	{
+		lightObject = std::make_shared<DirLightObject>();
+		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
+		lightObject->id = p_id;
+
+		if (p_lightComponent->m_shadowCast)
 		{
-			object.shadowMapPos = m_nextDirLightPos;
+			lightObject->castShadow = true;
+			lightObject->shadowMapPos = m_nextDirLightPos;
 			m_nextDirLightPos++;
 			m_dirLightNumber++;
 		}
-		else if (light->GetType() == Resources::LightType::Point)
+		break;
+	}
+	case Resources::LightType::Point:
+	{
+		lightObject = std::make_shared<LightObject>();
+		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
+		lightObject->id = p_id;
+
+		if (p_lightComponent->m_shadowCast)
 		{
-			object.shadowMapPos = m_nextPointLightPos;
+			lightObject->castShadow = true;
+			lightObject->shadowMapPos = m_nextPointLightPos;
 			m_nextPointLightPos += 6;
 			m_pointLightNumber++;
 		}
-		else if (light->GetType() == Resources::LightType::Spot)
+		break;
+	}
+	case Resources::LightType::Spot:
+	{
+		lightObject = std::make_shared<SpotLightObject>();
+		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
+		lightObject->id = p_id;
+
+		if (p_lightComponent->m_shadowCast)
 		{
-			object.shadowMapPos = m_nextSpotLightPos;
+			lightObject->castShadow = true;
+			lightObject->shadowMapPos = m_nextSpotLightPos;
 			m_nextSpotLightPos++;
 			m_spotLightNumber++;
 		}
+		break;
 	}
-	else
-		object.shadowMapPos = SIZE_MAX;
+	default:
+	{
+		PR_ASSERT(false, "Light type is invalid");
+		break;
+	}
+	}
 
-	m_currentFrame->lights.push_back(std::move(object));
+	m_currentFrame->lights.push_back(std::move(lightObject));
 }
 
 void DefferedRendererFrontend::AddCamera(ECS::CameraComponent* p_camera)

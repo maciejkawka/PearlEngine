@@ -2,6 +2,7 @@
 #include"Renderer/Resources/Material.h"
 #include"Renderer/Core/Camera.h"
 #include"Renderer/Resources/Mesh.h"
+#include"Renderer/Resources/Light.h"
 
 namespace PrRenderer::Core {
 
@@ -130,16 +131,69 @@ namespace PrRenderer::Core {
 
 
 	//Light
-	///////////////////////////////////////
-
+	//-------------------------------------
 	struct LightObject {
-		PrCore::Math::mat4                     lightMat;
-		std::vector<PrCore::Math::mat4>        lightViewMats;
-		size_t                                 shadowMapPos;
-		size_t                                 id;
-	};
+		// Light Matrix packed for a shader
+		PrCore::Math::mat4     packedMat; 
 
+		// Light ID taken from EntityID
+		size_t                 id; 
+
+		// Shadow map contain all lights, this is position in the texture
+		// Set to -1 by default to indicate that light does not cast a shadow
+		int                    shadowMapPos = -1; 
+
+		// Light can skip shadow casting
+		bool                   castShadow = false; 
+
+		const PrCore::Math::vec3& GetPosition()
+		{
+			return { packedMat[0][0], packedMat[0][1], packedMat[0][2] };
+		}
+
+		Resources::LightType GetType()
+		{
+			return static_cast<Resources::LightType>(packedMat[0][3]);
+		}
+
+		const PrCore::Math::vec3& GetDirection()
+		{
+			return { packedMat[1][0], packedMat[1][1], packedMat[1][2] };
+		}
+
+		float GetInnerCone()
+		{
+			return packedMat[1][3];
+		}
+
+		float GetOuterCone()
+		{
+			return packedMat[2][3];
+		}
+
+		const PrCore::Math::vec3& GetColor()
+		{
+			return { packedMat[2][0], packedMat[2][1], packedMat[2][2] };
+		}
+
+		float GetRange()
+		{
+			return packedMat[3][3];
+		}
+	};
 	using LightObjectPtr = std::shared_ptr<LightObject>;
+
+	struct DirLightObject : public LightObject {
+		std::vector<PrCore::Math::mat4>        viewMatrices; // Directional light uses CSM, it has the CSM cascades number
+	};
+	using DirLightObjectPtr = std::shared_ptr<DirLightObject>;
+
+	struct SpotLightObject : public LightObject {
+		PrCore::Math::mat4       viewMatrix; // Directional light uses CSM, it has the CSM cascades number
+	};
+	using SpotLightObjectPtr = std::shared_ptr<SpotLightObject>;
+
+	//-------------------------------------
 
 	enum class RendererFlag {
 		None = 0,
@@ -234,8 +288,8 @@ namespace PrRenderer::Core {
 		Camera*                       camera;
 
 		//Lighs and shadows
-		std::vector<LightObject>      lights;
-		LightObjectPtr                mainDirectLight;
+		std::vector<LightObjectPtr>  lights;
+		std::shared_ptr<DirLightObject> mainDirectLight;
 
 
 		//Aux

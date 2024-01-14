@@ -80,8 +80,8 @@ namespace PrRenderer::Core {
 		static void RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightMatrix, PrCore::Math::vec3& p_lightPos, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData);
 		REGISTER_RENDER_COMMAND(RenderToPointShadowMap, RenderToPointShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, PrCore::Math::vec3, std::list<RenderObjectPtr>*, RenderContext*);
 
-		static void RenderLight(Resources::ShaderPtr p_lightShdr, LightObjectPtr mianDirectLight, std::vector<LightObject>* p_lightMats, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderLight, RenderLight, Resources::ShaderPtr, LightObjectPtr, std::vector<LightObject>*, const RenderContext*);
+		static void RenderLight(Resources::ShaderPtr p_lightShdr, DirLightObjectPtr p_mianDirectLight, std::vector<LightObjectPtr>* p_lights, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderLight, RenderLight, Resources::ShaderPtr, DirLightObjectPtr, std::vector<LightObjectPtr>*, const RenderContext*);
 
 		static void RenderCubeMap(Resources::MaterialPtr p_material, const RenderContext* p_renderContext);
 		REGISTER_RENDER_COMMAND(RenderCubeMap, RenderCubeMap, Resources::MaterialPtr, const RenderContext*);

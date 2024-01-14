@@ -568,7 +568,11 @@ void main()
     //Main CSM Directional Light
     if(SHDW_HasMainDirLight == true)
     { 
-        float shadowFactor = SHDW_CalculateMainDirectLightFactor(depth, pos);
+        float shadowFactor = 1;
+        if(true)
+        {
+            shadowFactor = SHDW_CalculateMainDirectLightFactor(depth, pos);
+        }
         if (shadowFactor > 0.0f)
         {
             Lo += PBR_Light(SHDW_MainDirLightMat, data) * shadowFactor;
@@ -579,7 +583,12 @@ void main()
     for (int i = 0; i < SHDW_DirLightNumber; i++)
     {
         vec3 lightDir = normalize(-SHDW_DirLightMat[i][1].xyz);
-        float shadowFactor = SHDW_CalculateDirectLightFactor(depth, pos, i, N, lightDir);
+        float shadowFactor = 1;
+        if(SHDW_DirLightID[i] != -1)
+        {
+            shadowFactor = SHDW_CalculateDirectLightFactor(depth, pos, i, N, lightDir);
+        }
+    
         if (shadowFactor > 0.0f)
         {
             vec3 lightAmmount = PBR_Light(SHDW_DirLightMat[i], data) * shadowFactor;
@@ -590,7 +599,11 @@ void main()
     //Point Light
     for (int i = 0; i < SHDW_PointLightNumber; i++)
     {
-        float shadowFactor = SHDW_CalculatePointFactor(SHDW_PointLightMat[i], pos, i);
+        float shadowFactor = 1;
+        if(SHDW_PointLightID[i] != -1)
+        {
+            shadowFactor = SHDW_CalculatePointFactor(SHDW_PointLightMat[i], pos, i);
+        }
         if (shadowFactor > 0.0f)
         {
             vec3 lightAmmount = PBR_Light(SHDW_PointLightMat[i], data) * shadowFactor;
@@ -601,7 +614,11 @@ void main()
     //Spot Light
     for (int i = 0; i < SHDW_SpotLightNumber; i++)
     {
-        float shadowFactor = SHDW_CalculateSpotLightFactor(pos, i);
+        float shadowFactor = 1;
+        if(SHDW_SpotLightID[i] != -1)
+        {
+            shadowFactor = SHDW_CalculateSpotLightFactor(pos, i);
+        }
         if (shadowFactor > 0.0f)
         {
             vec3 lightAmmount = PBR_Light(SHDW_SpotLightMat[i], data) * shadowFactor;
