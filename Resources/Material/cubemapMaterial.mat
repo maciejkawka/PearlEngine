@@ -1,7 +1,7 @@
 {
   "materialVersion": 0.1,
   "name": "cubeMaterialNew",
-  "shader": "cubemapShader.shader",
+  "shader": "Cubemap/cubemapShader.shader",
   "RenderOrder": 0,
   "RenderType": 0,
   "color": {

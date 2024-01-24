@@ -42,12 +42,18 @@ void MeshRendererSystem::OnUpdate(float p_dt)
 		break;
 	}
 
-	static bool cubemap = true;
+	static int cubemap = 0;
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::G))
-		cubemap = !cubemap;
-	if (cubemap)
+	{
+		cubemap++;
+		if (cubemap > 2)
+			cubemap = 0;
+	}
+	if (cubemap == 0)
 		DefferedRendererFrontend::GetInstance().AddCubemap(Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("skymapHDRMaterial.mat"));
-	else
+	else if (cubemap == 1)
+		DefferedRendererFrontend::GetInstance().AddCubemap(Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("cubemapMaterial.mat"));
+	else if (cubemap == 2)
 		DefferedRendererFrontend::GetInstance().AddCubemap(nullptr);
 
 	auto& settings = DefferedRendererFrontend::GetInstance().GetRendererSettings();

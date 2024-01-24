@@ -145,7 +145,7 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 	auto camera = m_currentFrame->camera;
 
 
-	//Create renderObject
+	// Create renderObject
 	RenderObjectPtr object = std::make_shared<RenderObject>();
 	object->id = p_entity.GetID().GetID();
 	object->material = material;
@@ -153,13 +153,12 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 	object->type = RenderObjectType::Mesh;
 	object->worldMat = worldMatrix;
 
-	//Calculate sorting hash
-	std::uint32_t hashName = std::hash<std::string>{}(object->material->GetName());
+	// Calculate sorting hash
 	SortingHash hash(*object);
 	hash.SetDepth(RenderUtils::CalculateDepthValue(transformComponent->GetPosition(), camera));
 	object->sortingHash = hash;
 
-	//Add always add shadowcasters
+	// Always add to shadowcasters
 	if(meshComponent->shadowCaster && material->GetRenderType() == Resources::RenderType::Opaque)
 		m_currentFrame->shadowCasters.push_back(object);
 
@@ -221,18 +220,20 @@ void DefferedRendererFrontend::PrepareFrame()
 
 void DefferedRendererFrontend::BuildFrame()
 {
-	//Instanciate opaque
+	// Sort objects
 	m_currentFrame->opaqueObjects.sort(NormalSort());
-	InstanciateObjects(m_currentFrame->opaqueObjects);
-
-	//Instanciate shadowCasters
 	m_currentFrame->shadowCasters.sort(NormalSort());
-	InstanciateObjects(m_currentFrame->shadowCasters);
-
-	//Instanciate transparent
 	m_currentFrame->transpatrentObjects.sort(TransparentSort());
-	InstanciateObjects(m_currentFrame->transpatrentObjects);
 
+	//Instanciate objects
+	if(m_renderSettings.enableInstancing)
+	{
+		InstanciateObjects(m_currentFrame->opaqueObjects);
+		InstanciateObjects(m_currentFrame->shadowCasters);
+		InstanciateObjects(m_currentFrame->transpatrentObjects);
+	}
+
+	//Send objects to the backend renderer
 	m_rendererBackend->SetFrame(m_currentFrame);
 }
 

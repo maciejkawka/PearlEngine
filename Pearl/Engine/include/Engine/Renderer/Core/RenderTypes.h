@@ -78,7 +78,6 @@ namespace PrRenderer::Core {
 		TypeNum
 	};
 
-
 	struct RenderObject {
 		RenderObjectType       type;
 		size_t                 id;
@@ -259,6 +258,9 @@ namespace PrRenderer::Core {
 		int                SSAOBlureSize = 4;
 
 		// Bloom
+
+		// General
+		bool               enableInstancing = true;
 	};
 
 	///////////////////////////////////////
