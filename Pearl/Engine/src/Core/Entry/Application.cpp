@@ -17,17 +17,15 @@ Application::Application():
 
 void Application::Run()
 {
-	Utils::Clock gameClock;
-
 	while (!m_shouldClose)
 	{
 		PreFrame();
 		if (!m_minimalized)
-			OnFrame(gameClock.GetUnscaledDeltaTime());
+			OnFrame(Utils::Clock::GetInstance().GetUnscaledDeltaTime());
 		PostFrame();
 
 		//PRLOG_INFO("{0}", gameClock.GetRealTime());
-		gameClock.Tick();
+		Utils::Clock::GetInstance().Tick();
 	}
 }
 

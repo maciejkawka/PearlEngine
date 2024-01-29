@@ -196,10 +196,12 @@ namespace PrRenderer::Core {
 
 	enum class RendererFlag {
 		None = 0,
-		RerenderCubeMap = 1
+		RerenderCubeMap = 1,
+		ForceStripframe = 2,
 	};
 	DEFINE_ENUM_FLAG_OPERATORS(RendererFlag);
 
+	//Backend renderer is a settings owner, clinets can recieve reference only
 	struct RendererSettings {
 
 		//Shadows
@@ -262,6 +264,7 @@ namespace PrRenderer::Core {
 		// General
 		bool               enableInstancing = true;
 	};
+	using RendererSettingsPtr = std::shared_ptr<RendererSettings>;
 
 	///////////////////////////////////////
 
@@ -269,34 +272,69 @@ namespace PrRenderer::Core {
 	//Frame Types
 	///////////////////////////////////////
 	struct FrameInfo {
-		size_t frameID;
-		float  frameTimeStamp;
+		// Frame ID increased every frame
+		std::uint64_t                               frameID;
 
-		size_t drawCallsCount;
-		size_t instancedObjectsCount;
-		size_t instanceCount;
-		size_t culledObjectsCount;
+		// Time when frame is built
+		float                                       frameTimeStamp;
+
+		// Custom timings with name, time in ms
+		// Ex. SSAO 5ms dutation
+		std::list<std::pair<std::string, float>>    timeEvents;
+
+		// Number of drawcalls in a frame, only counts objects drawcalls
+		size_t                                      objectDrawCalls;
+
+		// Number of all drawcall in a frame, counts shadowmapping and postprocessing
+		size_t                                      drawCalls;
+
+		// Number of drawn objects in a frame
+		// Does not count shadow mapping drawcalls
+		size_t                                      drawObjects;
+
+		// Number of drawn triangles in a frame
+		size_t                                      drawTriangles;
+
+		// Number of instanced objects
+		// Ex. 100 Cubes reduced to 2 instanced calls == 100 instanced objects
+		size_t                                      instancedObjects;
+
+		// Number of discarded objects due to frustrum cullings
+		size_t                                      culledObjects;
+
+		void Reset()
+		{
+			frameID = 0;
+			frameTimeStamp = 0;
+			timeEvents.clear();
+			drawCalls = 0;
+			objectDrawCalls = 0;
+			drawObjects = 0;
+			drawTriangles = 0;
+			instancedObjects = 0;
+			culledObjects = 0;
+		}
 	};
 
 	using RenderObjectVector = std::list<RenderObjectPtr>;
 
 	struct FrameData {
 		//Renderables
-		RenderObjectVector            shadowCasters;
-		RenderObjectVector            opaqueObjects;
-		RenderObjectVector            transpatrentObjects;
-		RenderObjectPtr	              cubemapObject;
-		RenderObjectVector            debugObject;
-		Camera*                       camera;
+		RenderObjectVector              shadowCasters;
+		RenderObjectVector              opaqueObjects;
+		RenderObjectVector              transpatrentObjects;
+		RenderObjectPtr	                cubemapObject;
+		RenderObjectVector              debugObjects;
+		Camera*                         camera;
 
 		//Lighs and shadows
-		std::vector<LightObjectPtr>  lights;
+		std::vector<LightObjectPtr>     lights;
 		std::shared_ptr<DirLightObject> mainDirectLight;
 
 
 		//Aux
-		RendererFlag                  renderFlag;
-		FrameInfo                     frameInfo;
+		RendererFlag                    renderFlag;
+		FrameInfo                       frameInfo;
 		////Lock in future
 	};
 

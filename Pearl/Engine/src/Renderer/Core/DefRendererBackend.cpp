@@ -9,10 +9,11 @@
 #include <random>
 
 #include "Core/Input/InputManager.h"
+#include "Core/Utils/Clock.h"
 
 namespace PrRenderer::Core
 {
-	DefRendererBackend::DefRendererBackend(const RendererSettings& p_settings) :
+	DefRendererBackend::DefRendererBackend(RendererSettingsPtr& p_settings) :
 		IRendererBackend(p_settings)
 	{
 		//Prepare shaders
@@ -26,7 +27,7 @@ namespace PrRenderer::Core
 		m_fogShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/Fog.shader");
 
 		m_renderContext.m_quadMesh = Resources::Mesh::CreatePrimitive(Resources::Quad);
-		m_renderContext.m_settings = &m_settings;
+		m_renderContext.m_settings = m_settings;
 
 		GenerategGBuffersContext();
 		GenerateShadowMaps();
@@ -43,10 +44,11 @@ namespace PrRenderer::Core
 	{
 		//Temp variables
 		const auto camera = m_frame->camera;
-
+		m_renderContext.frameInfo = &m_frame->frameInfo;
 		//Prepare camera
 		m_renderContext.camera = camera;
 		m_renderContext.camera->RecalculateMatrices();
+		auto clock = PrCore::Utils::Clock::GetInstancePtr();
 
 		//Pipeline
 		//Clear Back Buffer
@@ -58,6 +60,9 @@ namespace PrRenderer::Core
 		//Calculate PBR Reflection if cubemap changed
 		if((m_frame->renderFlag & RendererFlag::RerenderCubeMap) == RendererFlag::RerenderCubeMap && m_frame->cubemapObject)
 		{
+			SCOPE_HIGH_TIMER_CALLBACK(
+				{ m_frame->frameInfo.timeEvents.push_back({ "CubeMapGeneration", time }); });
+
 			GenerateIRMap();
 			GeneratePrefilterMap();
 			GenerateLUTMap();
@@ -81,16 +86,18 @@ namespace PrRenderer::Core
 
 		// Shadow Mapping
 		//---------------------------------
+		TIME_RC_START(ShadowMapping);
+
 		static bool calculateProjs = true;
 		if(calculateProjs)
 		{
 			for (int i = 0; i < SHADOW_CASCADES_COUNT; i++)
-				m_settings.cascadeShadowBordersCamSpace[i] = m_settings.cascadeShadowBorders[i] * camera->GetFar();
+				m_settings->cascadeShadowBordersCamSpace[i] = m_settings->cascadeShadowBorders[i] * camera->GetFar();
 
-			m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetNear(), camera->GetFar() * m_settings.cascadeShadowBorders[0]));
-			m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings.cascadeShadowBorders[0], camera->GetFar() * m_settings.cascadeShadowBorders[1]));
-			m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings.cascadeShadowBorders[1], camera->GetFar() * m_settings.cascadeShadowBorders[2]));
-			m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings.cascadeShadowBorders[2], camera->GetFar() * m_settings.cascadeShadowBorders[3]));
+			m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetNear(), camera->GetFar() * m_settings->cascadeShadowBorders[0]));
+			m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings->cascadeShadowBorders[0], camera->GetFar() * m_settings->cascadeShadowBorders[1]));
+			m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings->cascadeShadowBorders[1], camera->GetFar() * m_settings->cascadeShadowBorders[2]));
+			m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings->cascadeShadowBorders[2], camera->GetFar() * m_settings->cascadeShadowBorders[3]));
 
 			calculateProjs = false;
 		}
@@ -109,8 +116,8 @@ namespace PrRenderer::Core
 
 			for (int i = 0; i < SHADOW_CASCADES_COUNT; i++)
 			{
-				auto lightMat = m_CSMUtility.ClaculateFrustrums(m_settings.cascadeShadowRadiusRatio[i] ,i, lightDir, camera->GetViewMatrix(), m_settings.mainLightShadowMapSize, m_settings.mainLightCascadeExtend);
-				auto viewport = CalculateLightTexture(i, m_settings.mainLightShadowMapSize, m_settings.mainLightShadowCombineMapSize);
+				auto lightMat = m_CSMUtility.ClaculateFrustrums(m_settings->cascadeShadowRadiusRatio[i] ,i, lightDir, camera->GetViewMatrix(), m_settings->mainLightShadowMapSize, m_settings->mainLightCascadeExtend);
+				auto viewport = CalculateLightTexture(i, m_settings->mainLightShadowMapSize, m_settings->mainLightShadowCombineMapSize);
 				mainLight->viewMatrices.push_back(lightMat);
 
 				PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
@@ -138,18 +145,18 @@ namespace PrRenderer::Core
 
 			for (int i = 0; i < SHADOW_CASCADES_COUNT; i++)
 			{
-				auto lightMat = m_CSMUtility.ClaculateFrustrums(m_settings.cascadeShadowRadiusRatio[i], i, lightDir, camera->GetViewMatrix(), m_settings.dirLightCombineMapSize, m_settings.dirLightCascadeExtend);
-				auto viewport = CalculateLightTexture(light->shadowMapPos * SHADOW_CASCADES_COUNT + i, m_settings.dirLightShadowsMapSize, m_settings.dirLightCombineMapSize);
+				auto lightMat = m_CSMUtility.ClaculateFrustrums(m_settings->cascadeShadowRadiusRatio[i], i, lightDir, camera->GetViewMatrix(), m_settings->dirLightCombineMapSize, m_settings->dirLightCascadeExtend);
+				auto viewport = CalculateLightTexture(light->shadowMapPos * SHADOW_CASCADES_COUNT + i, m_settings->dirLightShadowsMapSize, m_settings->dirLightCombineMapSize);
 				light->viewMatrices.push_back(lightMat);
 
 				PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
 				PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr, lightMat, &m_frame->shadowCasters, &m_renderContext));
 			}
 
-			m_settings.cascadeShadowRadiusRatio[1] = m_settings.cascadeShadowRadiusRatio[0] / m_settings.cascadeShadowRadiusRatio[1];
-			m_settings.cascadeShadowRadiusRatio[2] = m_settings.cascadeShadowRadiusRatio[0] / m_settings.cascadeShadowRadiusRatio[2];
-			m_settings.cascadeShadowRadiusRatio[3] = m_settings.cascadeShadowRadiusRatio[0] / m_settings.cascadeShadowRadiusRatio[3];
-			m_settings.cascadeShadowRadiusRatio[0] = 1.0f;
+			m_settings->cascadeShadowRadiusRatio[1] = m_settings->cascadeShadowRadiusRatio[0] / m_settings->cascadeShadowRadiusRatio[1];
+			m_settings->cascadeShadowRadiusRatio[2] = m_settings->cascadeShadowRadiusRatio[0] / m_settings->cascadeShadowRadiusRatio[2];
+			m_settings->cascadeShadowRadiusRatio[3] = m_settings->cascadeShadowRadiusRatio[0] / m_settings->cascadeShadowRadiusRatio[3];
+			m_settings->cascadeShadowRadiusRatio[0] = 1.0f;
 		}
 
 
@@ -173,32 +180,32 @@ namespace PrRenderer::Core
 			auto shadowMapPos = light->shadowMapPos;
 
 			auto lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(1.0f, 0.0f, 0.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
-			auto viewport = CalculateLightTexture(shadowMapPos + 0, m_settings.pointLightShadowMapSize, m_settings.pointLightCombineShadowMapSize);
+			auto viewport = CalculateLightTexture(shadowMapPos + 0, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
 			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(-1.0f, 0.0f, 0.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
-			viewport = CalculateLightTexture(shadowMapPos + 1, m_settings.pointLightShadowMapSize, m_settings.pointLightCombineShadowMapSize);
+			viewport = CalculateLightTexture(shadowMapPos + 1, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
 			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, 1.0f, 0.0), PrCore::Math::vec3(0.0f, 0.0f, 1.0f));
-			viewport = CalculateLightTexture(shadowMapPos + 2, m_settings.pointLightShadowMapSize, m_settings.pointLightCombineShadowMapSize);
+			viewport = CalculateLightTexture(shadowMapPos + 2, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
 			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, -1.0f, 0.0f), PrCore::Math::vec3(0.0f, 0.0f, -1.0f));
-			viewport = CalculateLightTexture(shadowMapPos + 3, m_settings.pointLightShadowMapSize, m_settings.pointLightCombineShadowMapSize);
+			viewport = CalculateLightTexture(shadowMapPos + 3, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
 			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, 0.0f, 1.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
-			viewport = CalculateLightTexture(shadowMapPos + 4, m_settings.pointLightShadowMapSize, m_settings.pointLightCombineShadowMapSize);
+			viewport = CalculateLightTexture(shadowMapPos + 4, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
 			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, 0.0f, -1.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
-			viewport = CalculateLightTexture(shadowMapPos + 5, m_settings.pointLightShadowMapSize, m_settings.pointLightCombineShadowMapSize);
+			viewport = CalculateLightTexture(shadowMapPos + 5, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
 			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
 		}
@@ -227,13 +234,16 @@ namespace PrRenderer::Core
 			auto lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + lightDir, PrCore::Math::vec3(0.0f, 0.0f, 1.0f));
 			light->viewMatrix = lightProjMatrix * lightViewMatrix;
 
-			auto viewport = CalculateLightTexture(light->shadowMapPos, m_settings.pointLightShadowMapSize, m_settings.spotLightCombineShadowMapSize);
+			auto viewport = CalculateLightTexture(light->shadowMapPos, m_settings->pointLightShadowMapSize, m_settings->spotLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
 			PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr, lightProjMatrix * lightViewMatrix, &m_frame->shadowCasters, &m_renderContext));
 		}
 
 		PushCommand(CreateRC<LowRenderer::SetViewportRC>(PrCore::Windowing::Window::GetMainWindow().GetWidth(),
 			PrCore::Windowing::Window::GetMainWindow().GetHeight(), 0, 0));
+
+		TIME_RC_STOP(ShadowMapping);
+
 		//---------------------------------
 
 		// Opaque Objects
@@ -245,8 +255,10 @@ namespace PrRenderer::Core
 				LowRenderer::EnableDepth(true);
 			}));
 
+		TIME_RC_START(OpaquePass);
 		for (auto object : m_frame->opaqueObjects)
 			PushCommand(CreateRC<RenderOpaqueRC>(object, &m_renderContext));
+		TIME_RC_STOP(OpaquePass);
 
 		PushCommand(CreateRC<LambdaFunctionRC>([&]()
 			{
@@ -262,7 +274,7 @@ namespace PrRenderer::Core
 			}));
 
 		// Clear Sky Color
-		PushCommand(CreateRC<LowRenderer::ClearColorFloatRC>(m_settings.skyColor.x, m_settings.skyColor.y, m_settings.skyColor.z, 1.0f));
+		PushCommand(CreateRC<LowRenderer::ClearColorFloatRC>(m_settings->skyColor.x, m_settings->skyColor.y, m_settings->skyColor.z, 1.0f));
 		PushCommand(CreateRC<LowRenderer::ClearRC>(ColorBuffer));
 		PushCommand(CreateRC<LowRenderer::ClearColorFloatRC>(0.0f, 0.0f, 0.0f, 0.0f));
 
@@ -274,13 +286,16 @@ namespace PrRenderer::Core
 		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.gBuffer.buffer, m_renderContext.otuputBuff, Buffers::FramebufferMask::DepthBufferBit));
 
 		// SSAO
-		if(m_settings.enableSSAO)
+		if(m_settings->enableSSAO)
 			PushCommand(CreateRC<RenderSSAORC>(m_SSAOShdr, m_SSAOBlurShdr, &m_renderContext));
 
 		// PBR Light Pass
+		TIME_RC_START(LightPass);
 		PushCommand(CreateRC<RenderLightRC>(m_pbrLightShdr, m_frame->mainDirectLight, &m_frame->lights, &m_renderContext));
+		TIME_RC_STOP(LightPass);
 
 		//Transparent Forward Pass
+		TIME_RC_START(TransparentPass);
 		PushCommand(CreateRC<LambdaFunctionRC>([&]()
 			{
 				m_renderContext.otuputBuff->Bind();
@@ -298,21 +313,27 @@ namespace PrRenderer::Core
 				LowRenderer::EnableCullFace(false);
 				LowRenderer::EnableBlending(false);
 			}));
+		TIME_RC_STOP(TransparentPass);
 		//---------------------------------
 
+		// Post Processing
+		TIME_RC_START(PostProcessPass);
+
 		// Fog
-		if (m_settings.enableFog)
+		if (m_settings->enableFog)
 		{
 			PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
 			PushCommand(CreateRC<RenderFogRC>(m_fogShdr, &m_renderContext));
 		}
 
 		// FXAA Anti-Aliasing
-		if (m_settings.enableFXAAA)
+		if (m_settings->enableFXAAA)
 		{
 			PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
 			PushCommand(CreateRC<RenderFXAARC>(m_FXAAShdr, &m_renderContext));
 		}
+
+		TIME_RC_STOP(PostProcessPass);
 
 		// Render to Back Buffer
 		PushCommand(CreateRC<RenderBackBufferRC>(m_backBuffShdr, &m_renderContext));
@@ -329,7 +350,6 @@ namespace PrRenderer::Core
 
 	void DefRendererBackend::PostRender()
 	{
-
 	}
 
 	void DefRendererBackend::OnWindowResize(PrCore::Events::EventPtr p_event)
@@ -366,6 +386,10 @@ namespace PrRenderer::Core
 
 			mesh->Bind();
 			LowRenderer::Draw(mesh->GetVertexArray());
+
+			p_renderContext->frameInfo->drawTriangles += mesh->GetIndicesCount() / 3;
+			p_renderContext->frameInfo->objectDrawCalls++;
+			p_renderContext->frameInfo->drawCalls++;
 		}
 		else if(p_object->type == RenderObjectType::InstancedMesh)
 		{
@@ -374,6 +398,10 @@ namespace PrRenderer::Core
 
 			mesh->Bind();
 			LowRenderer::DrawInstanced(mesh->GetVertexArray(), p_object->instanceSize);
+
+			p_renderContext->frameInfo->drawTriangles += mesh->GetIndicesCount() / 3 * p_object->instanceSize;
+			p_renderContext->frameInfo->objectDrawCalls++;
+			p_renderContext->frameInfo->drawCalls++;
 		}
 
 		mesh->Unbind();
@@ -392,6 +420,7 @@ namespace PrRenderer::Core
 				p_shaderPtr->SetUniformInt("PIPELINE_INTANCE_COUNT", 0);
 				object->mesh->Bind();
 				LowRenderer::Draw(object->mesh->GetVertexArray());
+				p_renderData->frameInfo->drawCalls++;
 				object->mesh->Unbind();
 			}
 			else if (object->type == RenderObjectType::InstancedMesh)
@@ -400,6 +429,7 @@ namespace PrRenderer::Core
 				p_shaderPtr->SetUniformInt("PIPELINE_INTANCE_COUNT", object->instanceSize);
 				object->mesh->Bind();
 				LowRenderer::DrawInstanced(object->mesh->GetVertexArray(), object->instanceSize);
+				p_renderData->frameInfo->drawCalls++;
 				object->mesh->Unbind();
 			}
 		}
@@ -592,8 +622,8 @@ namespace PrRenderer::Core
 		spotDepthTex.format = Resources::TextureFormat::Depth32;
 
 		Buffers::FramebufferSettings spotLightSettings;
-		spotLightSettings.globalWidth = m_settings.spotLightCombineShadowMapSize;
-		spotLightSettings.globalHeight = m_settings.spotLightCombineShadowMapSize;;
+		spotLightSettings.globalWidth = m_settings->spotLightCombineShadowMapSize;
+		spotLightSettings.globalHeight = m_settings->spotLightCombineShadowMapSize;;
 		spotLightSettings.mipMaped = false;
 		spotLightSettings.depthStencilAttachment = spotDepthTex;
 
@@ -605,8 +635,8 @@ namespace PrRenderer::Core
 		dirDepthTex.format = Resources::TextureFormat::Depth32;
 
 		Buffers::FramebufferSettings dirLightSettings;
-		dirLightSettings.globalWidth = m_settings.dirLightCombineMapSize;
-		dirLightSettings.globalHeight = m_settings.dirLightCombineMapSize;
+		dirLightSettings.globalWidth = m_settings->dirLightCombineMapSize;
+		dirLightSettings.globalHeight = m_settings->dirLightCombineMapSize;
 		dirLightSettings.mipMaped = false;
 		dirLightSettings.depthStencilAttachment = dirDepthTex;
 		m_renderContext.shadowMapDirBuff = Buffers::Framebufffer::Create(dirLightSettings);
@@ -620,8 +650,8 @@ namespace PrRenderer::Core
 		pointDepthTex.format = Resources::TextureFormat::Depth32;
 
 		Buffers::FramebufferSettings pointLightSettings;
-		pointLightSettings.globalWidth = m_settings.pointLightCombineShadowMapSize;
-		pointLightSettings.globalHeight = m_settings.pointLightCombineShadowMapSize;;
+		pointLightSettings.globalWidth = m_settings->pointLightCombineShadowMapSize;
+		pointLightSettings.globalHeight = m_settings->pointLightCombineShadowMapSize;;
 		pointLightSettings.mipMaped = false;
 		pointLightSettings.colorTextureAttachments = pointTex;
 		pointLightSettings.depthStencilAttachment = pointDepthTex;
@@ -634,8 +664,8 @@ namespace PrRenderer::Core
 		mainDirDepthTex.format = Resources::TextureFormat::Depth32;
 
 		Buffers::FramebufferSettings mainDirSettings;
-		mainDirSettings.globalWidth = m_settings.mainLightShadowCombineMapSize;
-		mainDirSettings.globalHeight = m_settings.mainLightShadowCombineMapSize;
+		mainDirSettings.globalWidth = m_settings->mainLightShadowCombineMapSize;
+		mainDirSettings.globalHeight = m_settings->mainLightShadowCombineMapSize;
 		mainDirSettings.mipMaped = false;
 		mainDirSettings.depthStencilAttachment = mainDirDepthTex;
 		m_renderContext.shadowMapMainDirBuff = Buffers::Framebufffer::Create(mainDirSettings);
@@ -652,6 +682,7 @@ namespace PrRenderer::Core
 		p_material->Bind();
 		p_renderContext->m_quadMesh->Bind();
 		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray(), Primitives::TriangleStrip);
+		p_renderContext->frameInfo->drawCalls++;
 
 		p_renderContext->m_quadMesh->Unbind();
 		p_material->Unbind();
@@ -670,6 +701,7 @@ namespace PrRenderer::Core
 
 		p_renderContext->m_quadMesh->Bind();
 		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->frameInfo->drawCalls++;
 
 		p_renderContext->m_quadMesh->Unbind();
 		p_postProcessShader->Unbind();
@@ -699,6 +731,10 @@ namespace PrRenderer::Core
 			mesh->Bind();
 			LowRenderer::Draw(mesh->GetVertexArray());
 			mesh->Unbind();
+
+			p_renderContext->frameInfo->drawTriangles += mesh->GetIndicesCount() / 3;
+			p_renderContext->frameInfo->objectDrawCalls++;
+			p_renderContext->frameInfo->drawCalls++;
 		}
 		else if (p_object->type == RenderObjectType::InstancedMesh)
 		{
@@ -708,6 +744,10 @@ namespace PrRenderer::Core
 			mesh->Bind();
 			LowRenderer::DrawInstanced(mesh->GetVertexArray(), p_object->instanceSize);
 			mesh->Unbind();
+
+			p_renderContext->frameInfo->drawTriangles += mesh->GetIndicesCount() / 3 * p_object->instanceSize;
+			p_renderContext->frameInfo->objectDrawCalls++;
+			p_renderContext->frameInfo->drawCalls++;
 		}
 
 		material->Unbind();
@@ -744,6 +784,8 @@ namespace PrRenderer::Core
 
 		p_renderContext->m_quadMesh->Bind();
 		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->frameInfo->drawCalls++;
+
 		p_renderContext->m_quadMesh->Unbind();
 
 		p_SSAOShader->Unbind();
@@ -762,6 +804,8 @@ namespace PrRenderer::Core
 
 		p_renderContext->m_quadMesh->Bind();
 		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->frameInfo->drawCalls++;
+
 		p_renderContext->m_quadMesh->Unbind();
 
 		LowRenderer::SetColorMask(true, true, true, true);
@@ -789,6 +833,8 @@ namespace PrRenderer::Core
 
 		p_renderContext->m_quadMesh->Bind();
 		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->frameInfo->drawCalls++;
+
 		p_renderContext->m_quadMesh->Unbind();
 
 		p_renderContext->otuputBuff->Unbind();
@@ -814,6 +860,8 @@ namespace PrRenderer::Core
 
 		p_renderContext->m_quadMesh->Bind();
 		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->frameInfo->drawCalls++;
+
 		p_renderContext->m_quadMesh->Unbind();
 
 		p_renderContext->otuputBuff->Unbind();
@@ -951,6 +999,8 @@ namespace PrRenderer::Core
 
 		p_renderContext->m_quadMesh->Bind();
 		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->frameInfo->drawCalls++;
+
 		p_renderContext->m_quadMesh->Unbind();
 
 		p_lightShdr->Unbind();

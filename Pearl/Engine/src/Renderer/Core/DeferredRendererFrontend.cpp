@@ -1,6 +1,7 @@
 #include "Core/Common/pearl_pch.h"
 
 #include"Core/ECS/ECS.h"
+#include"Core/Utils/Clock.h"
 
 #include "Renderer/Core/DeferredRendererFrontend.h"
 #include "Renderer/Core/DefRendererBackend.h"
@@ -12,7 +13,9 @@ using namespace PrRenderer::Core;
 #define MAX_INSTANCE_COUNT 200
 #define MIN_INSTANCE_COUNT 5
 
-DefferedRendererFrontend::DefferedRendererFrontend(const RendererSettings& p_settings) :
+static std::uint64_t m_frameID;
+
+DefferedRendererFrontend::DefferedRendererFrontend(RendererSettings& p_settings) :
 	IRendererFrontend(p_settings)
 {
 	//Prepare frame data
@@ -25,10 +28,10 @@ DefferedRendererFrontend::DefferedRendererFrontend(const RendererSettings& p_set
 	m_nextDirLightPos = 0;
 
 	//Manual Settings Set
-	m_renderSettings.cascadeShadowBorders[0] = 0.1f;
-	m_renderSettings.cascadeShadowBorders[1] = 0.2f;
-	m_renderSettings.cascadeShadowBorders[2] = 0.5f;
-	m_renderSettings.cascadeShadowBorders[3] = 1.0f;
+	m_renderSettings->cascadeShadowBorders[0] = 0.1f;
+	m_renderSettings->cascadeShadowBorders[1] = 0.2f;
+	m_renderSettings->cascadeShadowBorders[2] = 0.5f;
+	m_renderSettings->cascadeShadowBorders[3] = 1.0f;
 
 	m_rendererBackend = std::make_shared<DefRendererBackend>(m_renderSettings);
 }
@@ -51,17 +54,17 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 	}
 
 	//If this is normal light
-	if (m_pointLightNumber >m_renderSettings.pointLightMaxShadows)
+	if (m_pointLightNumber >m_renderSettings->pointLightMaxShadows)
 	{
 		PRLOG_WARN("FrontendRenderer: Discarding point light, max limit exceeded");
 		return;
 	}
-	if(m_spotLightNumber > m_renderSettings.spotLightMaxShadows)
+	if(m_spotLightNumber > m_renderSettings->spotLightMaxShadows)
 	{
 		PRLOG_WARN("FrontendRenderer: Discarding spot light, max limit exceeded");
 		return;
 	}
-	if (m_dirLightNumber > m_renderSettings.dirLightMaxShadows)
+	if (m_dirLightNumber > m_renderSettings->dirLightMaxShadows)
 	{
 		PRLOG_WARN("FrontendRenderer: Discarding directional light, max limit exceeded");
 		return;
@@ -167,7 +170,10 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 	const auto frustrum = Frustrum(camera->GetProjectionMatrix(), camera->GetViewMatrix());
 	const auto bundingBox = BoxVolume(mesh->GetVertices());
 	if (!bundingBox.IsOnFrustrum(frustrum, worldMatrix))
+	{
+		m_currentFrame->frameInfo.culledObjects++;
 		return;
+	}
 
 	//Add object to the correct list
 	if (material->GetRenderType() == Resources::RenderType::Opaque)
@@ -209,6 +215,8 @@ void DefferedRendererFrontend::PrepareFrame()
 	m_currentFrame->lights.clear();
 	m_currentFrame->mainDirectLight = nullptr;
 	m_currentFrame->renderFlag = RendererFlag::None;
+	m_currentFrame->frameInfo.Reset();
+
 	m_nextDirLightPos = 0;
 	m_nextPointLightPos = 0;
 	m_nextSpotLightPos = 0;
@@ -225,21 +233,30 @@ void DefferedRendererFrontend::BuildFrame()
 	m_currentFrame->shadowCasters.sort(NormalSort());
 	m_currentFrame->transpatrentObjects.sort(TransparentSort());
 
+	m_currentFrame->frameInfo.drawObjects += m_currentFrame->opaqueObjects.size();
+	m_currentFrame->frameInfo.drawObjects += m_currentFrame->transpatrentObjects.size();
+
 	//Instanciate objects
-	if(m_renderSettings.enableInstancing)
+	if(m_renderSettings->enableInstancing)
 	{
-		InstanciateObjects(m_currentFrame->opaqueObjects);
+		m_currentFrame->frameInfo.instancedObjects += InstanciateObjects(m_currentFrame->opaqueObjects);
+		m_currentFrame->frameInfo.instancedObjects += InstanciateObjects(m_currentFrame->transpatrentObjects);
+
+		// Do not count instanced shadow objects
 		InstanciateObjects(m_currentFrame->shadowCasters);
-		InstanciateObjects(m_currentFrame->transpatrentObjects);
 	}
 
 	//Send objects to the backend renderer
 	m_rendererBackend->SetFrame(m_currentFrame);
+
+	m_currentFrame->frameInfo.frameTimeStamp = Utils::Clock::GetInstance().GetRealTime();
+	m_currentFrame->frameInfo.frameID = m_frameID++;
 }
 
-void DefferedRendererFrontend::InstanciateObjects(RenderObjectVector& p_renderObjects)
+size_t DefferedRendererFrontend::InstanciateObjects(RenderObjectVector& p_renderObjects)
 {
 	RenderObjectVector instanciateCandidates;
+	size_t instancedObjects = 0;
 
 	for(auto objIt = p_renderObjects.begin(); objIt != p_renderObjects.end();)
 	{
@@ -302,8 +319,12 @@ void DefferedRendererFrontend::InstanciateObjects(RenderObjectVector& p_renderOb
 
 				matrices.clear();
 			}
+
+			instancedObjects += instancedCount;
 		}
 
 		instanciateCandidates.clear();
 	}
+
+	return instancedObjects;
 }

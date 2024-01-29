@@ -3,6 +3,7 @@
 #include"Core/Entry/AppContext.h"
 #include"Core/Events/EventManager.h"
 #include"Core/Utils/Logger.h"
+#include"Core/Utils/Clock.h"
 #include"Core/Filesystem/FileSystem.h"
 #include"Core/Filesystem/ConfigFile.h"
 #include"Core/Resources/ResourceLoader.h"
@@ -15,6 +16,7 @@
 PrCore::Entry::AppContext::AppContext()
 {
 	Utils::Logger::Init();
+	Utils::Clock::Init();
 	PRLOG_INFO("Building AppContext");
 
 	//Init Engine Subsystems
@@ -54,6 +56,7 @@ PrCore::Entry::AppContext::AppContext()
 	m_rendererContext = new PrRenderer::OpenGL::GLContext();
 	m_rendererContext->Init();
 
+	auto renderSettings = PrRenderer::Core::RendererSettings();
 	PrRenderer::Core::DefferedRendererFrontend::Init(PrRenderer::Core::RendererSettings());
 	m_rendererBackend = PrRenderer::Core::DefferedRendererFrontend::GetInstance().GetRendererBackend();
 
@@ -75,4 +78,5 @@ PrCore::Entry::AppContext::~AppContext()
 	Resources::ResourceLoader::Terminate();
 	Events::EventManager::Terminate();
 	Filesystem::FileSystem::Terminate();
+	Utils::Clock::Terminate();
 }

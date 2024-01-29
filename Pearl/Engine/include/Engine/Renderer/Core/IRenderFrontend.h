@@ -21,9 +21,9 @@ namespace PrRenderer::Core {
 
 	class IRendererFrontend {
 	public:
-		explicit IRendererFrontend(const RendererSettings& s_settings):
-			m_renderSettings(s_settings)
+		explicit IRendererFrontend(RendererSettings& s_settings)
 		{
+			m_renderSettings = std::make_shared<RendererSettings>(s_settings);
 			m_frameData[0] = std::make_shared<FrameData>();
 			m_frameData[1] = std::make_shared<FrameData>();
 			m_currentFrame = m_frameData[0];
@@ -40,13 +40,11 @@ namespace PrRenderer::Core {
 		///////////////////////////////////////
 
 		//Frame
-		inline const FrameInfo& GetCurrFrameInfo() const { return m_currentFrame->frameInfo; }
 		inline const FrameInfo& GetPreviousFrameInfo() const  { return m_previousFrame->frameInfo; }
-		inline const FrameData& GetCurrFrameData() const { return *m_currentFrame; }
 		inline const FrameData& GetPreviousFrameData() const { return *m_previousFrame; }
 
-		RendererSettings& GetRendererSettings() { return  m_rendererBackend->GetSettings(); }
-		RendererSettings GetRendererSettings() const { return  m_rendererBackend->GetSettings(); }
+		RendererSettingsPtr GetSettingsPtr() const { return  m_rendererBackend->GetSettingsPtr(); }
+		RendererSettings& GetSettings() const { return  m_rendererBackend->GetSettings(); }
 
 		//More advanced functions
 		void PushCommand(RenderCommandPtr p_command) const { m_rendererBackend->PushCommand(p_command); }
@@ -58,13 +56,14 @@ namespace PrRenderer::Core {
 
 		//Get Backend
 		RendererBackendPtr GetRendererBackend() { return m_rendererBackend; }
+
 		/// Debug
-		//void FrawGizmo();
+		//void DrawGizmo();
 		//void DrawLine();
 
 	protected:
 		RendererBackendPtr m_rendererBackend;
-		RendererSettings m_renderSettings;
+		RendererSettingsPtr m_renderSettings;
 
 		std::array<FrameDataPtr, 2> m_frameData;
 		FrameDataPtr m_currentFrame;

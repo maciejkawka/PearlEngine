@@ -56,16 +56,19 @@ void MeshRendererSystem::OnUpdate(float p_dt)
 	else if (cubemap == 2)
 		DefferedRendererFrontend::GetInstance().AddCubemap(nullptr);
 
-	auto& settings = DefferedRendererFrontend::GetInstance().GetRendererSettings();
+	auto settings = DefferedRendererFrontend::GetInstance().GetSettingsPtr();
+
+	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::I))
+		settings->enableInstancing = !settings->enableInstancing;
 
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::F))
-		settings.enableFog = !settings.enableFog;
+		settings->enableFog = !settings->enableFog;
 
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::R))
-		settings.enableFXAAA = !settings.enableFXAAA;
+		settings->enableFXAAA = !settings->enableFXAAA;
 
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::T))
-		settings.enableSSAO = !settings.enableSSAO;
+		settings->enableSSAO = !settings->enableSSAO;
 
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(Input::PrKey::L))
 		lightID = (++lightID) % 5;

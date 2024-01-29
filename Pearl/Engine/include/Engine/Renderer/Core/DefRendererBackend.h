@@ -10,7 +10,7 @@ namespace PrRenderer::Core {
 
 	class DefRendererBackend : public IRendererBackend {
 	public:
-		explicit DefRendererBackend(const RendererSettings& p_settings);
+		explicit DefRendererBackend(RendererSettingsPtr& p_settings);
 
 		~DefRendererBackend()  override = default;
 		void PreRender() override;
@@ -67,7 +67,8 @@ namespace PrRenderer::Core {
 			//Aux
 			Camera*                             camera;
 			Resources::MeshPtr                  m_quadMesh;
-			const RendererSettings*             m_settings;
+			RendererSettingsPtr                 m_settings;
+			FrameInfo*                          frameInfo;
 		};
 
 		//Render Commands

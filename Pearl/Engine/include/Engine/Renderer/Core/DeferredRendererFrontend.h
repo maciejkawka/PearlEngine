@@ -5,7 +5,7 @@ namespace PrRenderer::Core {
 
 	class DefferedRendererFrontend : public IRendererFrontend, public Utils::Singleton<DefferedRendererFrontend> {
 	public:
-		explicit DefferedRendererFrontend(const RendererSettings& p_settings);
+		explicit DefferedRendererFrontend(RendererSettings& p_settings);
 
 		void AddLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id) override;
 		void AddCamera(ECS::CameraComponent* p_camera) override;
@@ -18,7 +18,7 @@ namespace PrRenderer::Core {
 		void FillFrameWithColor() override {}
 
 	private:
-		void InstanciateObjects(RenderObjectVector& p_renderObjects);
+		size_t InstanciateObjects(RenderObjectVector& p_renderObjects);
 
 		//Lighting
 		size_t m_nextPointLightPos;
