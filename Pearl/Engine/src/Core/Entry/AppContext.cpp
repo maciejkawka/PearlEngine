@@ -10,8 +10,9 @@
 #include"Core/ECS/SceneManager.h"
 #include"Renderer/OpenGL/GLContext.h"
 #include"Renderer/Core/DeferredRendererFrontend.h"
-#include"Renderer/Core/DefRendererBackend.h"
 
+const std::string_view GraphicConfig{ "graphic.cfg" };
+const std::string_view RendererConfig{ "renderer.cfg" };
 
 PrCore::Entry::AppContext::AppContext()
 {
@@ -25,7 +26,7 @@ PrCore::Entry::AppContext::AppContext()
 
 	Resources::ResourceLoader::Init();
 
-	Filesystem::ConfigFile contexConfig("graphic.cfg");	
+	Filesystem::ConfigFile contexConfig(GraphicConfig.data());
 	Windowing::WindowContext context;
 	if (contexConfig.isValid())
 	{
@@ -56,8 +57,61 @@ PrCore::Entry::AppContext::AppContext()
 	m_rendererContext = new PrRenderer::OpenGL::GLContext();
 	m_rendererContext->Init();
 
-	auto renderSettings = PrRenderer::Core::RendererSettings();
-	PrRenderer::Core::DefferedRendererFrontend::Init(PrRenderer::Core::RendererSettings());
+	PrRenderer::Core::RendererSettings rendererSettings;
+	Filesystem::ConfigFile rendererConfig(RendererConfig.data());
+	if(rendererConfig.isValid())
+	{
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, dirLightMaxShadows);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, dirLightShadowsMapSize);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, dirLightCombineMapSize);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, dirLightShadowBias);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, dirLightCascadeExtend);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, dirLightSize);
+
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, pointLightMaxShadows);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, pointLightShadowMapSize);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, pointLightCombineShadowMapSize);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, pointLightShadowBias);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, pointLightSize);
+
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, spotLightMaxShadows);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, spotLightShadowMapSize);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, spotLightCombineShadowMapSize);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, spotLightShadowBias);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, spotLightSize);
+
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, mainLightShadowMapSize);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, mainLightShadowCombineMapSize);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, mainLightShadowBias);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, mainLightSize);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, mainLightBlendDist);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, mainLightCascadeExtend);
+
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, ambientColor);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, skyColor);
+
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, enableFog);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, fogColor);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, fogDencity);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, fogMaxDistance);
+
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, enableFXAAA);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, FXAAThreasholdMax);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, FXAAThreasholdMin);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, FXAAEdgeIterations);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, FXAASubpixelQuiality);
+
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, enableSSAO);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, SSAOKenrelSize);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, SSAORadius);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, SSAObias);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, SSAOMagnitude);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, SSAOBlureSize);
+
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, enableInstancing);
+	}
+
+	PrRenderer::Core::DefferedRendererFrontend::Init(rendererSettings);
 	m_rendererBackend = PrRenderer::Core::DefferedRendererFrontend::GetInstance().GetRendererBackend();
 
 	Input::InputManager::Init();
