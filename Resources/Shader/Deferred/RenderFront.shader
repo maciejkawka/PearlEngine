@@ -22,9 +22,41 @@ in vec2 TexCoords;
 
 uniform sampler2D backTex;
 
+// Uncharted looks fine :)
+vec3 Uncharted2ToneMapping(vec3 color)
+{
+  float A = 0.15f;
+  float B = 0.50f;
+  float C = 0.10f;
+  float D = 0.20f;
+  float E = 0.02f;
+  float F = 0.30f;
+  color = ((color * (A * color + C * B) + D * E) / (color * (A * color + B) + D * F)) - E / F;
+  return color;
+}
+
+// Tone Mapping Epic Games
+// https://64.github.io/tonemapping/
+vec3 tone_aces_approx(vec3 v)
+{
+    v *= 0.6f;
+    float a = 2.51f;
+    float b = 0.03f;
+    float c = 2.43f;
+    float d = 0.59f;
+    float e = 0.14f;
+    return clamp((v*(a*v+b))/(v*(c*v+d)+e), 0.0f, 1.0f);
+}
+
 void main()
 {
     vec3 color = texture(backTex, TexCoords).rgb;
+
+    color = Uncharted2ToneMapping(color * 1.0f);
+    vec3 white = vec3(1.0f) / Uncharted2ToneMapping(vec3(11.2f));
+    color = color * white;
+
+    color = pow(color, vec3(1.0f / 2.2f));
 
     FragColor = vec4(color, 1.0f);
 }

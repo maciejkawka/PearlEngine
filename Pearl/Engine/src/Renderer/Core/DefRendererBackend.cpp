@@ -541,8 +541,6 @@ namespace PrRenderer::Core
 
 		Buffers::FramebufferTexture texture;
 		texture.format = Resources::TextureFormat::RGB16F;
-		texture.filteringMag = Resources::TextureFiltering::Linear;
-		texture.filteringMin = Resources::TextureFiltering::Linear;
 
 		Buffers::FramebufferTexture depthTex;
 		depthTex.format = Resources::TextureFormat::Depth16;
@@ -569,18 +567,28 @@ namespace PrRenderer::Core
 		//Create new one
 		Buffers::FramebufferTexture gPos;
 		gPos.format = Resources::TextureFormat::RGBA16F;
+		gPos.filteringMag = Resources::TextureFiltering::Nearest;
+		gPos.filteringMin = Resources::TextureFiltering::Nearest;
 
 		Buffers::FramebufferTexture gAlbedo;
-		gAlbedo.format = Resources::TextureFormat::RGBA32;
+		gAlbedo.format = Resources::TextureFormat::RGBA16F;
+		gAlbedo.filteringMag = Resources::TextureFiltering::Nearest;
+		gAlbedo.filteringMin = Resources::TextureFiltering::Nearest;
 
 		Buffers::FramebufferTexture gNormal;
 		gNormal.format = Resources::TextureFormat::RGBA16F;
+		gNormal.filteringMag = Resources::TextureFiltering::Nearest;
+		gNormal.filteringMin = Resources::TextureFiltering::Nearest;
 
 		Buffers::FramebufferTexture gAo;
 		gAo.format = Resources::TextureFormat::RGBA16F;
+		gAo.filteringMag = Resources::TextureFiltering::Nearest;
+		gAo.filteringMin = Resources::TextureFiltering::Nearest;
 
 		Buffers::FramebufferTexture gDepth;
 		gDepth.format = Resources::TextureFormat::Depth32;
+		gDepth.filteringMag = Resources::TextureFiltering::Nearest;
+		gDepth.filteringMin = Resources::TextureFiltering::Nearest;
 
 		Buffers::FramebufferSettings settings;
 		settings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
@@ -600,9 +608,13 @@ namespace PrRenderer::Core
 		//Output framebuffer
 		Buffers::FramebufferTexture outputTex;
 		outputTex.format = Resources::TextureFormat::RGBA16F;
+		outputTex.filteringMag = Resources::TextureFiltering::Nearest;
+		outputTex.filteringMin = Resources::TextureFiltering::Nearest;
 
 		Buffers::FramebufferTexture outputDepth;
 		outputDepth.format = Resources::TextureFormat::Depth32;
+		outputDepth.filteringMag = Resources::TextureFiltering::Nearest;
+		outputDepth.filteringMin = Resources::TextureFiltering::Nearest;
 
 		Buffers::FramebufferSettings outputSettings;
 		outputSettings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
@@ -900,7 +912,8 @@ namespace PrRenderer::Core
 		}
 
 		p_lightShdr->SetUniformVec3("camPos", p_renderContext->camera->GetPosition());
-		p_lightShdr->SetUniformVec3("ambientColor", p_renderContext->m_settings->ambientColor);
+		p_lightShdr->SetUniformVec3("PBR_ambientColor", p_renderContext->m_settings->ambientColor);
+		p_lightShdr->SetUniformFloat("PBR_cubemapIntensity", p_renderContext->m_settings->ambientIntensity);
 
 		// Set Shadows
 		// Main Directional Light

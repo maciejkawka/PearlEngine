@@ -64,7 +64,6 @@ const int         maxDirLightNum = 8;
 const int         maxPointLightNum = 16;
 const int         maxSpotLightNum = 16;
 
-uniform vec3      ambientColor; //To be add in future
 
 
 // Shadows
@@ -117,7 +116,8 @@ uniform float     SHDW_DirLightBias = 0.005f;
 uniform samplerCube PBR_irradianceMap;
 uniform samplerCube PBR_prefilterMap;
 uniform sampler2D   PBR_brdfLUT;
-
+uniform float       PBR_cubemapIntensity = 1.0f;
+uniform vec3        PBR_ambientColor;
 
 // pseudorandom number generator
 float rand(vec2 co){
@@ -237,7 +237,7 @@ vec3 PBR_Light(mat4 light, PBR_Data data)
         L = normalize(lightPos - pos);
         
         float distance = length(lightPos - pos);
-        attenuation = 1.0 / (distance * distance);
+        attenuation = 1.0 / ( 1.0f + 1.0 * distance + 1.0 * distance * distance);
 
         if(distance >= lightRange)
             return vec3(0.0f);
@@ -254,7 +254,7 @@ vec3 PBR_Light(mat4 light, PBR_Data data)
         if (intensity == 0)
             return vec3(0.0f);
 
-        attenuation =  1.0 / (distance * distance);
+        attenuation =  1.0 / ( 1.0f + 1.0 * distance + 1.0 * distance * distance);
         attenuation = attenuation * intensity;
     }     
 
@@ -526,7 +526,6 @@ void main()
     //Sample Textures
     vec3 albedo = texture(albedoMap, uv0).rgb;
     float roughness = texture(albedoMap, uv0).a;
-    //albedoTex = pow(albedoTex.rgb, vec3(2.2));
     float ao = texture(aoMap, uv0).a;
     vec3 emission = texture(aoMap, uv0).rgb;
     vec3 N = texture(normalMap, uv0).rgb;
@@ -635,22 +634,16 @@ void main()
     vec3 diffuse = irradiance * albedo;
 
     if(diffuse == vec3(0.0f))
-        diffuse = ambientColor * albedo;
+        diffuse = PBR_ambientColor * albedo;
 
     //Indirect lighting specular
     const float MAX_REFLECTION_LOD = 4.0;
     vec3 prefilteredColor = textureLod(PBR_prefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;    
     vec2 brdf  = texture(PBR_brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
-    vec3 ambient = (kD * diffuse + specular) * ao;
+    vec3 ambient = (kD * diffuse + specular) * ao * PBR_cubemapIntensity;
     
     vec3 color = ambient + Lo + emission;
-
-    //tone maping    
-    color = color/(color + vec3(1.0));
-    
-    //gamma correction
-    color = pow(color, vec3(1.0/2.2));
 
     FragColor = vec4(color, 1.0f);
 } 

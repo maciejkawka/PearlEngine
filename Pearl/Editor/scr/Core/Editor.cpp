@@ -93,6 +93,12 @@ void Editor::OnFrame(float p_deltaTime)
 		scene->OnDisable();
 	}
 
+	auto testInfo = PrRenderer::Core::DefferedRendererFrontend::GetInstance().GetPreviousFrameInfo();
+	
+	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F3))
+		for (auto event : testInfo.timeEvents)
+			PRLOG_INFO("Event {0}, Time: {1}", event.first, event.second);
+
 	PrRenderer::Core::DefferedRendererFrontend::GetInstance().BuildFrame();
 	m_appContext->m_rendererBackend->PreRender();
 }

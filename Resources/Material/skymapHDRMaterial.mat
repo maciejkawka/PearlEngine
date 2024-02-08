@@ -15,5 +15,11 @@
     "texName" : "skybox",
     "texPath" : "SkyBox/CasualDay4K.hdr"
   }
+  ],
+  "floatproperties": [
+    {
+      "name": "intensity",
+      "value": 2.0
+    }
   ]
 }

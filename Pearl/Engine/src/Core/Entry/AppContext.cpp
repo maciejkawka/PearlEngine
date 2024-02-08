@@ -88,6 +88,7 @@ PrCore::Entry::AppContext::AppContext()
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, mainLightCascadeExtend);
 
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, ambientColor);
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, ambientIntensity);
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, skyColor);
 
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, enableFog);

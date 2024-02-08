@@ -236,6 +236,7 @@ namespace PrRenderer::Core {
 
 		// Ambient
 		PrCore::Math::vec3 ambientColor = { 0.0f, 0.0f, 0.0f };
+		float              ambientIntensity = 1.0f;
 		PrCore::Math::vec3 skyColor = { 0.5f, 0.5f, 0.5f };
 
 		// Fog

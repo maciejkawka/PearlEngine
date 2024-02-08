@@ -15,5 +15,11 @@
     "texName" : "skybox",
     "texPath" : "SkyBox/skybox.cubemap"
   }
+  ],
+  "floatproperties": [
+    {
+      "name": "intensity",
+      "value": 2.0
+    }
   ]
 }

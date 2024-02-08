@@ -26,8 +26,12 @@ in vec3 texCoords;
 out vec4 FragColor;
 
 uniform samplerCube skybox;
+uniform float intensity = 1.0f;
 
 void main()
 {
-    FragColor = texture(skybox, normalize(texCoords));
+    vec3 color = texture(skybox, normalize(texCoords)).rgb * intensity;
+    
+    color = pow(color, vec3(2.2f));
+    FragColor = vec4(color, 1.0f);
 } 
