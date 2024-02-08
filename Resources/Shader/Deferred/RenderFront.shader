@@ -21,8 +21,10 @@ out vec4 FragColor;
 in vec2 TexCoords;
 
 uniform sampler2D backTex;
+uniform float exposure = 1.0f;
 
-// Uncharted looks fine :)
+// Uncharted Tone Mapping
+// https://64.github.io/tonemapping/
 vec3 Uncharted2ToneMapping(vec3 color)
 {
   float A = 0.15f;
@@ -52,7 +54,7 @@ void main()
 {
     vec3 color = texture(backTex, TexCoords).rgb;
 
-    color = Uncharted2ToneMapping(color * 1.0f);
+    color = Uncharted2ToneMapping(color * exposure);
     vec3 white = vec3(1.0f) / Uncharted2ToneMapping(vec3(11.2f));
     color = color * white;
 

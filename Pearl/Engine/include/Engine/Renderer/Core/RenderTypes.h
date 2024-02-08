@@ -264,6 +264,10 @@ namespace PrRenderer::Core {
 
 		// General
 		bool               enableInstancing = true;
+
+		//Tone Mapping
+		float              toneMappingExposure = 1.0f;
+
 	};
 	using RendererSettingsPtr = std::shared_ptr<RendererSettings>;
 

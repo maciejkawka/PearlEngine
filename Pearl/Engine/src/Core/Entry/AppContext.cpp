@@ -110,6 +110,8 @@ PrCore::Entry::AppContext::AppContext()
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, SSAOBlureSize);
 
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, enableInstancing);
+
+		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, toneMappingExposure);
 	}
 
 	PrRenderer::Core::DefferedRendererFrontend::Init(rendererSettings);

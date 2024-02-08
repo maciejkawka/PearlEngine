@@ -710,6 +710,7 @@ namespace PrRenderer::Core
 		p_postProcessShader->Bind();
 		p_renderContext->outputTex->Bind(0);
 		p_postProcessShader->SetUniformInt("backTex", 0);
+		p_postProcessShader->SetUniformFloat("exposure", p_renderContext->m_settings->toneMappingExposure);
 
 		p_renderContext->m_quadMesh->Bind();
 		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
