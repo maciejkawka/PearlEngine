@@ -8,6 +8,7 @@ namespace PrRenderer::Core {
 
 #define SHADOW_CASCADES_COUNT 4
 #define MAX_LIGHT_COUNT 200
+#define BLOOM_SIZE 4
 
 	struct RenderObject;
 
@@ -261,7 +262,10 @@ namespace PrRenderer::Core {
 		int                SSAOBlureSize = 4;
 
 		// Bloom
-
+		bool               enableBloom = true;
+		float              bloomThreshold = 1.4f;
+		float              bloomKnee = 0.1f;
+		
 		// General
 		bool               enableInstancing = true;
 

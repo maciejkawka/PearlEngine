@@ -106,9 +106,9 @@
                 {
                     "Color": {
                         "a": 1.0,
-                        "b": 300.0,
-                        "g": 300.0,
-                        "r": 300.0
+                        "b": 30.0,
+                        "g": 30.0,
+                        "r": 30.0
                     },
                     "ConstantAttenuation": 1.0,
                     "Direction": {
@@ -179,9 +179,9 @@
                 {
                     "Color": {
                         "a": 1.0,
-                        "b": 300.0,
-                        "g": 300.0,
-                        "r": 300.0
+                        "b": 30.0,
+                        "g": 30.0,
+                        "r": 30.0
                     },
                     "ConstantAttenuation": 1.0,
                     "Direction": {
@@ -253,8 +253,8 @@
                     "Color": {
                         "a": 1.0,
                         "b": 0.0,
-                        "g": 300.0,
-                        "r": 300.0
+                        "g": 30.0,
+                        "r": 30.0
                     },
                     "ConstantAttenuation": 1.0,
                     "Direction": {
@@ -325,9 +325,9 @@
                 {
                     "Color": {
                         "a": 1.0,
-                        "b": 300.0,
+                        "b": 30.0,
                         "g": 0.0,
-                        "r": 300.0
+                        "r": 30.0
                     },
                     "ConstantAttenuation": 1.0,
                     "Direction": {

@@ -49,6 +49,10 @@ namespace PrRenderer::Core {
 			// Postprocess 
 			Buffers::FramebuffferPtr            postprocessBuff;
 			Resources::TexturePtr               postprocessTex;
+			Buffers::FramebuffferPtr            bloomDownscaleBuff[BLOOM_SIZE];
+			Resources::TexturePtr               bloomDownscaleTex[BLOOM_SIZE];
+			Buffers::FramebuffferPtr            bloomBuff;
+			Resources::TexturePtr               bloomTex;
 
 			// Shadow mapping
 			// One point light uses 6 subparts of the texture, so number of lights = TextureSize / (ShadowMapTexture * 6)
@@ -102,6 +106,9 @@ namespace PrRenderer::Core {
 		static void RenderFog(Resources::ShaderPtr p_fogShader, const RenderContext* p_renderContext);
 		REGISTER_RENDER_COMMAND(RenderFog, RenderFog, Resources::ShaderPtr, RenderContext*);
 
+		static void RenderBloom(Resources::ShaderPtr p_downsample, Resources::ShaderPtr p_upsample, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderBloom, RenderBloom, Resources::ShaderPtr, Resources::ShaderPtr, RenderContext*);
+
 		void GenerateSSAOContext();
 		void GeneratePostprocessContext();
 		void GenerategGBuffersContext();
@@ -127,6 +134,8 @@ namespace PrRenderer::Core {
 		Resources::ShaderPtr m_SSAOBlurShdr;
 		Resources::ShaderPtr m_FXAAShdr;
 		Resources::ShaderPtr m_fogShdr;
+		Resources::ShaderPtr m_downsample;
+		Resources::ShaderPtr m_upsample;
 
 		CascadeShadowUtility m_CSMUtility;
 	};

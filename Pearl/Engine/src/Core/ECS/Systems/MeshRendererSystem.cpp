@@ -70,21 +70,24 @@ void MeshRendererSystem::OnUpdate(float p_dt)
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::T))
 		settings->enableSSAO = !settings->enableSSAO;
 
+	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::B))
+		settings->enableBloom = !settings->enableBloom;
+
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(Input::PrKey::L))
 		lightID = (++lightID) % 5;
 
-	for (auto entity : m_entityViewer.EntitesWithComponents<LightComponent, TransformComponent, MeshRendererComponent>())
-	{
-		auto light = entity.GetComponent<LightComponent>();
-		auto mesh = entity.GetComponent<MeshRendererComponent>();
+	//for (auto entity : m_entityViewer.EntitesWithComponents<LightComponent, TransformComponent, MeshRendererComponent>())
+	//{
+	//	auto light = entity.GetComponent<LightComponent>();
+	//	auto mesh = entity.GetComponent<MeshRendererComponent>();
 
-		static float time = 0;
-		time += p_dt / 20.0f;
-		auto color = light->m_light->GetColor();
-		color.r = 300.0f * (PrCore::Math::sin(time) + 1.0f);
-		light->m_light->SetColor(color);
-		mesh->material->SetProperty("albedoValue", static_cast<PrCore::Math::vec4>(color));
-	}
+	//	static float time = 0;
+	//	time += p_dt / 20.0f;
+	//	auto color = light->m_light->GetColor();
+	//	color.r = 300.0f * (PrCore::Math::sin(time) + 1.0f);
+	//	light->m_light->SetColor(color);
+	//	mesh->material->SetProperty("albedoValue", static_cast<PrCore::Math::vec4>(color));
+	//}
 
 	for (auto entity : m_entityViewer.EntitesWithComponents<LightComponent, TransformComponent>())
 	{

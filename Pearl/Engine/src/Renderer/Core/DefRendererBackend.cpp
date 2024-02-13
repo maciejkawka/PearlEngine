@@ -25,6 +25,8 @@ namespace PrRenderer::Core
 		m_SSAOBlurShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/SSAO_Blur.shader");
 		m_FXAAShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/FXAA.shader");
 		m_fogShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/Fog.shader");
+		m_downsample = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/downsample.shader");
+		m_upsample = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/upsample.shader");
 
 		m_renderContext.m_quadMesh = Resources::Mesh::CreatePrimitive(Resources::Quad);
 		m_renderContext.m_settings = m_settings;
@@ -335,6 +337,13 @@ namespace PrRenderer::Core
 
 		TIME_RC_STOP(PostProcessPass);
 
+		//Bloom
+		if(m_settings->enableBloom)
+		{
+			PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
+			PushCommand(CreateRC<RenderBloomRC>(m_downsample, m_upsample, &m_renderContext));
+		}
+
 		// Render to Back Buffer
 		PushCommand(CreateRC<RenderBackBufferRC>(m_backBuffShdr, &m_renderContext));
 	}
@@ -547,13 +556,58 @@ namespace PrRenderer::Core
 
 		Buffers::FramebufferSettings settings;
 		settings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
-		settings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();;
+		settings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();
 		settings.mipMaped = false;
 		settings.colorTextureAttachments = { texture };
 		settings.depthStencilAttachment = depthTex;
 
 		m_renderContext.postprocessBuff = Buffers::Framebufffer::Create(settings);
 		m_renderContext.postprocessTex = m_renderContext.postprocessBuff->GetTexturePtr();
+
+		// Bloom
+		// downscale
+		for (int i = 0; i < BLOOM_SIZE; i++)
+		{
+			m_renderContext.bloomDownscaleBuff[i].reset();
+			m_renderContext.bloomDownscaleTex[i].reset();
+
+			Buffers::FramebufferTexture bloomTexture;
+			bloomTexture.format = Resources::TextureFormat::RGBA16F;
+			bloomTexture.wrapModeU = Resources::TextureWrapMode::Clamp;
+			bloomTexture.wrapModeV = Resources::TextureWrapMode::Clamp;
+
+			Buffers::FramebufferTexture bloomDepthTex;
+			bloomDepthTex.format = Resources::TextureFormat::Depth16;
+
+			Buffers::FramebufferSettings bloomSettings;
+			bloomSettings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth() >> (i + 1);
+			bloomSettings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight() >> (i + 1);
+			bloomSettings.colorTextureAttachments = { bloomTexture };
+			bloomSettings.depthStencilAttachment = bloomDepthTex;
+
+			m_renderContext.bloomDownscaleBuff[i] = Buffers::Framebufffer::Create(bloomSettings);
+			m_renderContext.bloomDownscaleTex[i] = m_renderContext.bloomDownscaleBuff[i]->GetTexturePtr();
+		}
+
+		m_renderContext.bloomBuff.reset();
+		m_renderContext.bloomTex.reset();
+
+		Buffers::FramebufferTexture bloomTexture;
+		bloomTexture.format = Resources::TextureFormat::RGBA16F;
+		bloomTexture.wrapModeU = Resources::TextureWrapMode::Clamp;
+		bloomTexture.wrapModeV = Resources::TextureWrapMode::Clamp;
+
+		Buffers::FramebufferTexture bloomDepthTex;
+		bloomDepthTex.format = Resources::TextureFormat::Depth16;
+
+		Buffers::FramebufferSettings bloomSettings;
+		bloomSettings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
+		bloomSettings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();
+		bloomSettings.colorTextureAttachments = { bloomTexture };
+		bloomSettings.depthStencilAttachment = bloomDepthTex;
+
+		m_renderContext.bloomBuff = Buffers::Framebufffer::Create(bloomSettings);
+		m_renderContext.bloomTex = m_renderContext.bloomBuff->GetTexturePtr();
 	}
 
 	void DefRendererBackend::GenerategGBuffersContext()
@@ -703,13 +757,17 @@ namespace PrRenderer::Core
 
 	void DefRendererBackend::RenderBackBuffer(Resources::ShaderPtr p_postProcessShader, const RenderContext* p_renderContext)
 	{
-		p_renderContext->outputTex->Bind();
 		LowRenderer::EnableDepth(false);
 		LowRenderer::EnableCullFace(false);
 
 		p_postProcessShader->Bind();
 		p_renderContext->outputTex->Bind(0);
 		p_postProcessShader->SetUniformInt("backTex", 0);
+
+		p_postProcessShader->SetUniformBool("enableBloom", p_renderContext->m_settings->enableBloom);
+		p_renderContext->bloomTex->Bind(1);
+		p_postProcessShader->SetUniformInt("bloomTex", 1);
+	
 		p_postProcessShader->SetUniformFloat("exposure", p_renderContext->m_settings->toneMappingExposure);
 
 		p_renderContext->m_quadMesh->Bind();
@@ -790,7 +848,7 @@ namespace PrRenderer::Core
 		p_SSAOShader->SetUniformVec3Array("samples", p_renderContext->ssaoKernel.data(), p_renderContext->ssaoKernel.size());
 		p_SSAOShader->SetUniformVec2("screenSize", PrCore::Math::vec2{ PrCore::Windowing::Window::GetMainWindow().GetWidth(), PrCore::Windowing::Window::GetMainWindow().GetHeight() });
 
-		p_SSAOShader->SetUniformFloat("kernelSize", p_renderContext->m_settings->SSAOKenrelSize);
+		p_SSAOShader->SetUniformInt("kernelSize", p_renderContext->m_settings->SSAOKenrelSize);
 		p_SSAOShader->SetUniformFloat("radius", p_renderContext->m_settings->SSAORadius);
 		p_SSAOShader->SetUniformFloat("bias", p_renderContext->m_settings->SSAObias);
 		p_SSAOShader->SetUniformFloat("magnitude", p_renderContext->m_settings->SSAOMagnitude);
@@ -879,6 +937,84 @@ namespace PrRenderer::Core
 
 		p_renderContext->otuputBuff->Unbind();
 		p_fogShader->Unbind();
+	}
+
+	void DefRendererBackend::RenderBloom(Resources::ShaderPtr p_downsample, Resources::ShaderPtr p_upsample, const RenderContext* p_renderContext)
+	{
+		// downsample
+
+		float& threshold = p_renderContext->m_settings->bloomThreshold;
+		float& knee = p_renderContext->m_settings->bloomKnee;
+
+		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::Y))
+			threshold += 0.1f;
+		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::H))
+			threshold -= 0.1f;
+
+		p_downsample->Bind();
+		p_renderContext->m_quadMesh->Bind();
+		p_renderContext->postprocessTex->Bind(0);
+		p_downsample->SetUniformInt("inputTex", 0);
+		p_downsample->SetUniformVec4("threshold", glm::vec4(threshold, threshold - knee, 2.0f * knee, 0.25f * knee));
+
+		for (int i = 0; i < BLOOM_SIZE; i++)
+		{
+			float width = PrCore::Windowing::Window::GetMainWindow().GetWidth() >> (i + 1);
+			float height = PrCore::Windowing::Window::GetMainWindow().GetHeight() >> (i + 1);
+
+			p_renderContext->bloomDownscaleBuff[i]->Bind();
+			LowRenderer::Clear(ColorBuffer | DepthBuffer);
+			p_downsample->SetUniformVec2("texelSize", PrCore::Math::vec2{ 1.0f / width, 1.0f / height});
+			LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+			p_renderContext->frameInfo->drawCalls++;
+
+			p_renderContext->bloomDownscaleTex[i]->Bind(0);
+			p_downsample->SetUniformInt("inputTex", 0);
+		}
+
+		p_renderContext->m_quadMesh->Unbind();
+		p_downsample->Unbind();
+
+
+		// upsample
+		LowRenderer::EnableBlending(true);
+		LowRenderer::SetBlendingAlgorythm(BlendingAlgorithm::One, BlendingAlgorithm::One);
+
+		p_upsample->Bind();
+		p_renderContext->m_quadMesh->Bind();
+		for (int i = BLOOM_SIZE - 1; i > 0; --i)
+		{
+			float width = PrCore::Windowing::Window::GetMainWindow().GetWidth() >> (i + 1);
+			float height = PrCore::Windowing::Window::GetMainWindow().GetHeight() >> (i + 1);
+
+			p_renderContext->bloomDownscaleBuff[PrCore::Math::max(i - 1, 0)]->Bind();
+
+			p_renderContext->bloomDownscaleTex[i]->Bind(0);
+			p_downsample->SetUniformInt("inputTex", 0);
+			p_downsample->SetUniformVec2("texelSize", PrCore::Math::vec2{ 1.0f / width, 1.0f / height });
+			LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+			p_renderContext->frameInfo->drawCalls++;
+
+		}
+
+		//Last draw into final blur
+		float width = PrCore::Windowing::Window::GetMainWindow().GetWidth() >> 1;
+		float height = PrCore::Windowing::Window::GetMainWindow().GetHeight() >> 1;
+
+		p_renderContext->bloomBuff->Bind();
+		LowRenderer::Clear(ColorBuffer | DepthBuffer);
+
+		p_renderContext->bloomDownscaleTex[0]->Bind(0);
+		p_downsample->SetUniformInt("inputTex", 0);
+		p_downsample->SetUniformVec2("texelSize", PrCore::Math::vec2{ 1.0f / width, 1.0f / height });
+		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->frameInfo->drawCalls++;
+
+		p_renderContext->m_quadMesh->Unbind();
+		p_renderContext->bloomBuff->Unbind();
+		p_upsample->Unbind();
+
+		LowRenderer::EnableBlending(false);
 	}
 
 	void DefRendererBackend::RenderLight(Resources::ShaderPtr p_lightShdr, DirLightObjectPtr p_mianDirectLight, std::vector<LightObjectPtr>* p_lights, const RenderContext* p_renderContext)
