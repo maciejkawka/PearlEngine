@@ -268,7 +268,8 @@ vec3 PBR_Light(mat4 light, PBR_Data data)
     vec3 numerator = NDF * G * F;
     float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot( N, L),0.0) + 0.0001;
     vec3 specular = numerator / denominator;
-
+    // Clamp to reasonable value to avoid bloom flickering
+    specular = clamp(specular, 0.0f, 10.0f);
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;
     kD *= 1.0 - metallic;
@@ -644,6 +645,6 @@ void main()
     vec3 ambient = (kD * diffuse + specular) * ao * PBR_cubemapIntensity;
     
     vec3 color = ambient + Lo + emission;
-
+    color = max(color, vec3(0.0f)); // Avoid negatve values
     FragColor = vec4(color, 1.0f);
 } 

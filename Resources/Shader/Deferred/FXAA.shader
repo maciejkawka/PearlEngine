@@ -33,6 +33,7 @@ uniform float edge_threshold_max = 0.125f;
 uniform float edge_iterations = 16;
 uniform float subpixel_quality = 0.75;
 uniform vec2 inverseScreenSize;
+uniform bool enableFXAA = true;
 
 uniform sampler2D screenTexture;
 
@@ -44,6 +45,12 @@ float rgb2luma(vec3 rgb)
 void main()
 {
     vec3 colorCenter = texture(screenTexture, uv0).rgb;
+
+    if(enableFXAA == false)
+    {
+        FragColor = vec4(colorCenter,1.0f);
+        return;
+    }
 
     // Luma at the current fragment
     float lumaCenter = rgb2luma(colorCenter);
@@ -67,9 +74,6 @@ void main()
         FragColor = vec4(colorCenter, 1.0f);
         return;
     }
-
-    //FragColor = vec4(lumaRange, lumaRange, lumaRange, 1.0f);
-    //return;
 
     // Query the 4 remaining corners lumas.
     float lumaDownLeft = rgb2luma(textureOffset(screenTexture, uv0, ivec2(-1, -1)).rgb);

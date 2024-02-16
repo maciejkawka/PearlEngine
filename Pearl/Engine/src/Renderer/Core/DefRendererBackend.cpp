@@ -328,15 +328,6 @@ namespace PrRenderer::Core
 			PushCommand(CreateRC<RenderFogRC>(m_fogShdr, &m_renderContext));
 		}
 
-		// FXAA Anti-Aliasing
-		if (m_settings->enableFXAAA)
-		{
-			PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
-			PushCommand(CreateRC<RenderFXAARC>(m_FXAAShdr, &m_renderContext));
-		}
-
-		TIME_RC_STOP(PostProcessPass);
-
 		//Bloom
 		if(m_settings->enableBloom)
 		{
@@ -344,8 +335,15 @@ namespace PrRenderer::Core
 			PushCommand(CreateRC<RenderBloomRC>(m_downsample, m_upsample, &m_renderContext));
 		}
 
-		// Render to Back Buffer
+		// Tone Mapping
+		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
 		PushCommand(CreateRC<RenderBackBufferRC>(m_backBuffShdr, &m_renderContext));
+
+		// FXAA Anti-Aliasing
+		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
+		PushCommand(CreateRC<RenderFXAARC>(m_FXAAShdr, &m_renderContext));
+
+		TIME_RC_STOP(PostProcessPass);
 	}
 
 	void DefRendererBackend::Render()
@@ -626,8 +624,7 @@ namespace PrRenderer::Core
 
 		Buffers::FramebufferTexture gAlbedo;
 		gAlbedo.format = Resources::TextureFormat::RGBA16F;
-		gAlbedo.filteringMag = Resources::TextureFiltering::Nearest;
-		gAlbedo.filteringMin = Resources::TextureFiltering::Nearest;
+
 
 		Buffers::FramebufferTexture gNormal;
 		gNormal.format = Resources::TextureFormat::RGBA16F;
@@ -636,8 +633,7 @@ namespace PrRenderer::Core
 
 		Buffers::FramebufferTexture gAo;
 		gAo.format = Resources::TextureFormat::RGBA16F;
-		gAo.filteringMag = Resources::TextureFiltering::Nearest;
-		gAo.filteringMin = Resources::TextureFiltering::Nearest;
+
 
 		Buffers::FramebufferTexture gDepth;
 		gDepth.format = Resources::TextureFormat::Depth32;
@@ -645,8 +641,8 @@ namespace PrRenderer::Core
 		gDepth.filteringMin = Resources::TextureFiltering::Nearest;
 
 		Buffers::FramebufferSettings settings;
-		settings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
-		settings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();;
+		settings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth() * 2;
+		settings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight() * 2;
 		settings.mipMaped = false;
 		settings.colorTextureAttachments = { gPos, gAlbedo, gNormal, gAo };
 		settings.depthStencilAttachment = gDepth;
@@ -662,17 +658,13 @@ namespace PrRenderer::Core
 		//Output framebuffer
 		Buffers::FramebufferTexture outputTex;
 		outputTex.format = Resources::TextureFormat::RGBA16F;
-		outputTex.filteringMag = Resources::TextureFiltering::Nearest;
-		outputTex.filteringMin = Resources::TextureFiltering::Nearest;
 
 		Buffers::FramebufferTexture outputDepth;
 		outputDepth.format = Resources::TextureFormat::Depth32;
-		outputDepth.filteringMag = Resources::TextureFiltering::Nearest;
-		outputDepth.filteringMin = Resources::TextureFiltering::Nearest;
 
 		Buffers::FramebufferSettings outputSettings;
 		outputSettings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
-		outputSettings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();;
+		outputSettings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();
 		outputSettings.mipMaped = false;
 		outputSettings.colorTextureAttachments = outputTex;
 		outputSettings.depthStencilAttachment = outputDepth;
@@ -760,8 +752,10 @@ namespace PrRenderer::Core
 		LowRenderer::EnableDepth(false);
 		LowRenderer::EnableCullFace(false);
 
+		p_renderContext->otuputBuff->Bind();
+
 		p_postProcessShader->Bind();
-		p_renderContext->outputTex->Bind(0);
+		p_renderContext->postprocessTex->Bind(0);
 		p_postProcessShader->SetUniformInt("backTex", 0);
 
 		p_postProcessShader->SetUniformBool("enableBloom", p_renderContext->m_settings->enableBloom);
@@ -776,7 +770,9 @@ namespace PrRenderer::Core
 
 		p_renderContext->m_quadMesh->Unbind();
 		p_postProcessShader->Unbind();
-		p_renderContext->outputTex->Unbind();
+		p_renderContext->postprocessTex->Unbind();
+
+		p_renderContext->otuputBuff->Unbind();
 	}
 
 	void DefRendererBackend::RenderTransparent(RenderObjectPtr p_object, const RenderContext* p_renderContext)
@@ -886,7 +882,6 @@ namespace PrRenderer::Core
 
 	void DefRendererBackend::RenderFXAA(Resources::ShaderPtr p_FXAAShader, const RenderContext* p_renderContext)
 	{
-		p_renderContext->otuputBuff->Bind();
 		p_FXAAShader->Bind();
 
 		LowRenderer::Clear(ColorBuffer | DepthBuffer);
@@ -895,6 +890,7 @@ namespace PrRenderer::Core
 
 		p_renderContext->postprocessTex->Bind(0);
 		p_FXAAShader->SetUniformInt("screenTexture", 0);
+		p_FXAAShader->SetUniformBool("enableFXAA", p_renderContext->m_settings->enableFXAAA);
 
 		p_FXAAShader->SetUniformVec2("inverseScreenSize", PrCore::Math::vec2{ 1.0f / PrCore::Windowing::Window::GetMainWindow().GetWidth(), 1.0f / PrCore::Windowing::Window::GetMainWindow().GetHeight() });
 		p_FXAAShader->SetUniformFloat("edge_threshold_min", p_renderContext->m_settings->FXAAThreasholdMin);
@@ -908,7 +904,6 @@ namespace PrRenderer::Core
 
 		p_renderContext->m_quadMesh->Unbind();
 
-		p_renderContext->otuputBuff->Unbind();
 		p_FXAAShader->Unbind();
 	}
 

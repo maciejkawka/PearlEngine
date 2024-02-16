@@ -66,5 +66,12 @@ void main()
 	sum += (1.0/32.0) * texture2D(inputTex, uv0 + vec2(+oneepixel.x, -oneepixel.y) );
 	sum += (1.0/32.0) * texture2D(inputTex, uv0 + vec2(-oneepixel.x, -oneepixel.y) );
 
+	//Uncomment if bloom creates artefacts
+	// if(isnan(quadratic_threshold(sum, threshold.x, threshold.yzw).rgb) == true)
+	// {
+	// 	FragColor = vec4(1.0f);
+	// 	return;
+	// }
+
     FragColor = vec4(quadratic_threshold(sum, threshold.x, threshold.yzw).rgb, 1.0f);
 }
