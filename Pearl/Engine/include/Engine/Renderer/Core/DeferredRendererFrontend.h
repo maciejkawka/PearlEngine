@@ -8,10 +8,9 @@ namespace PrRenderer::Core {
 		explicit DefferedRendererFrontend(RendererSettings& p_settings);
 
 		void AddLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id) override;
-		void AddCamera(ECS::CameraComponent* p_camera) override;
-		void AddCamera(Camera* p_camera) { m_currentFrame->camera = p_camera; };
+		void SetCamera(Camera* p_camera) override { m_camera = p_camera; };
 		void AddMesh(ECS::Entity& p_entity) override;
-		void AddCubemap(Resources::MaterialPtr p_cubemapMat) override;
+		void SetCubemap(Resources::MaterialPtr p_cubemapMat) override;
 
 		void PrepareFrame() override;
 		void BuildFrame() override;
@@ -20,13 +19,16 @@ namespace PrRenderer::Core {
 	private:
 		size_t InstanciateObjects(RenderObjectVector& p_renderObjects);
 
-		//Lighting
+		//Lighting shadowing
 		size_t m_nextPointLightPos;
 		size_t m_nextSpotLightPos;
 		size_t m_nextDirLightPos;
 
-		size_t m_pointLightNumber = 0;
-		size_t m_spotLightNumber = 0;
-		size_t m_dirLightNumber = 0;
+		size_t m_pointLightShadowNumber = 0;
+		size_t m_spotLightShadowNumber = 0;
+		size_t m_dirLightShadowNumber = 0;
+
+		RenderObjectPtr m_cubemapObject;
+		Camera* m_camera;
 	};
 }

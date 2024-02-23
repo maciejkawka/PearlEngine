@@ -34,9 +34,9 @@ namespace PrRenderer::Core {
 
 		//Render Entities
 		virtual void AddLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id) = 0;
-		virtual void AddCamera(ECS::CameraComponent* p_camera) = 0;
+		virtual void SetCamera(Camera* p_camera) = 0;
 		virtual void AddMesh(ECS::Entity& p_entity) = 0;
-		virtual void AddCubemap(Resources::MaterialPtr p_renderObject) = 0;
+		virtual void SetCubemap(Resources::MaterialPtr p_cubemap) = 0;
 		///////////////////////////////////////
 
 		//Frame
@@ -48,6 +48,7 @@ namespace PrRenderer::Core {
 
 		//More advanced functions
 		void PushCommand(RenderCommandPtr p_command) const { m_rendererBackend->PushCommand(p_command); }
+		void SetFlag(RendererFlag p_flag) const { m_currentFrame->renderFlag |= RendererFlag::CameraPerspectiveRecalculate; }
 
 		//Draw calls
 		virtual void PrepareFrame() = 0;

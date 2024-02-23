@@ -27,18 +27,12 @@ DefferedRendererFrontend::DefferedRendererFrontend(RendererSettings& p_settings)
 	m_nextSpotLightPos = 0;
 	m_nextDirLightPos = 0;
 
-	//Manual Settings Set
-	m_renderSettings->cascadeShadowBorders[0] = 0.1f;
-	m_renderSettings->cascadeShadowBorders[1] = 0.2f;
-	m_renderSettings->cascadeShadowBorders[2] = 0.5f;
-	m_renderSettings->cascadeShadowBorders[3] = 1.0f;
-
 	m_rendererBackend = std::make_shared<DefRendererBackend>(m_renderSettings);
 }
 
 void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id)
 {
-	//If Main light
+	// If Main light
 	if(p_lightComponent->mainDirectLight)
 	{
 		if (m_currentFrame->mainDirectLight)
@@ -53,18 +47,18 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 		return;
 	}
 
-	//If this is normal light
-	if (m_pointLightNumber >m_renderSettings->pointLightMaxShadows)
+	// If this is normal light
+	if (m_pointLightShadowNumber >m_renderSettings->pointLightMaxShadows)
 	{
 		PRLOG_WARN("FrontendRenderer: Discarding point light, max limit exceeded");
 		return;
 	}
-	if(m_spotLightNumber > m_renderSettings->spotLightMaxShadows)
+	if(m_spotLightShadowNumber > m_renderSettings->spotLightMaxShadows)
 	{
 		PRLOG_WARN("FrontendRenderer: Discarding spot light, max limit exceeded");
 		return;
 	}
-	if (m_dirLightNumber > m_renderSettings->dirLightMaxShadows)
+	if (m_dirLightShadowNumber > m_renderSettings->dirLightMaxShadows)
 	{
 		PRLOG_WARN("FrontendRenderer: Discarding directional light, max limit exceeded");
 		return;
@@ -85,7 +79,7 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 			lightObject->castShadow = true;
 			lightObject->shadowMapPos = m_nextDirLightPos;
 			m_nextDirLightPos++;
-			m_dirLightNumber++;
+			m_dirLightShadowNumber++;
 		}
 		break;
 	}
@@ -100,7 +94,7 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 			lightObject->castShadow = true;
 			lightObject->shadowMapPos = m_nextPointLightPos;
 			m_nextPointLightPos += 6;
-			m_pointLightNumber++;
+			m_pointLightShadowNumber++;
 		}
 		break;
 	}
@@ -115,7 +109,7 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 			lightObject->castShadow = true;
 			lightObject->shadowMapPos = m_nextSpotLightPos;
 			m_nextSpotLightPos++;
-			m_spotLightNumber++;
+			m_spotLightShadowNumber++;
 		}
 		break;
 	}
@@ -129,11 +123,6 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 	m_currentFrame->lights.push_back(std::move(lightObject));
 }
 
-void DefferedRendererFrontend::AddCamera(ECS::CameraComponent* p_camera)
-{
-	m_currentFrame->camera = p_camera->GetCamera();
-}
-
 void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 {
 	PR_ASSERT(p_entity.HasComponent<ECS::MeshRendererComponent>(), "FrontendRenderer: entity does not have a MeshRendererComponent");
@@ -145,8 +134,6 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 	auto material = meshComponent->material;
 	auto transformComponent = p_entity.GetComponent<ECS::TransformComponent>();
 	auto worldMatrix = transformComponent->GetWorldMatrix();
-	auto camera = m_currentFrame->camera;
-
 
 	// Create renderObject
 	RenderObjectPtr object = std::make_shared<RenderObject>();
@@ -158,16 +145,17 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 
 	// Calculate sorting hash
 	SortingHash hash(*object);
-	hash.SetDepth(RenderUtils::CalculateDepthValue(transformComponent->GetPosition(), camera));
+	hash.SetDepth(RenderUtils::CalculateDepthValue(transformComponent->GetPosition(), m_camera));
 	object->sortingHash = hash;
 
-	// Always add to shadowcasters
+	// Add to shadowcasters
 	if(meshComponent->shadowCaster && material->GetRenderType() == Resources::RenderType::Opaque)
 		m_currentFrame->shadowCasters.push_back(object);
 
-	//Frustrum culling
-	//Discard objects that are not visable in the main camera
-	const auto frustrum = Frustrum(camera->GetProjectionMatrix(), camera->GetViewMatrix());
+	// Frustrum culling
+	// Discard objects that are not visable in the main m_camera
+	// Move BoxVolume to the Mesh clas sin the future this is overkill to kalkulate that every frame
+	const auto frustrum = Frustrum(m_camera->GetProjectionMatrix(), m_camera->GetViewMatrix());
 	const auto bundingBox = BoxVolume(mesh->GetVertices());
 	if (!bundingBox.IsOnFrustrum(frustrum, worldMatrix))
 	{
@@ -175,18 +163,18 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 		return;
 	}
 
-	//Add object to the correct list
+	// Add object to the objects lists
 	if (material->GetRenderType() == Resources::RenderType::Opaque)
 		m_currentFrame->opaqueObjects.push_back(object);
 	else
 		m_currentFrame->transpatrentObjects.push_back(object);
 }
 
-void DefferedRendererFrontend::AddCubemap(Resources::MaterialPtr p_cubemapMat)
+void DefferedRendererFrontend::SetCubemap(Resources::MaterialPtr p_cubemapMat)
 {
 	if(p_cubemapMat == nullptr)
 	{
-		m_currentFrame->cubemapObject = nullptr;
+		m_cubemapObject = nullptr;
 	}
 	else if(m_previousFrame->cubemapObject == nullptr || reinterpret_cast<size_t>(p_cubemapMat.get()) != m_previousFrame->cubemapObject->id)
 	{
@@ -195,10 +183,10 @@ void DefferedRendererFrontend::AddCubemap(Resources::MaterialPtr p_cubemapMat)
 		object->type = RenderObjectType::CubeMap;
 		object->id = reinterpret_cast<size_t>(p_cubemapMat.get());
 		object->material = p_cubemapMat;
-		m_currentFrame->cubemapObject = object;
+		m_cubemapObject = object;
 	}
 	else
-		m_currentFrame->cubemapObject = m_previousFrame->cubemapObject;
+		m_cubemapObject = m_previousFrame->cubemapObject;
 }
 
 void DefferedRendererFrontend::PrepareFrame()
@@ -220,14 +208,17 @@ void DefferedRendererFrontend::PrepareFrame()
 	m_nextDirLightPos = 0;
 	m_nextPointLightPos = 0;
 	m_nextSpotLightPos = 0;
-	m_dirLightNumber = 0;
-	m_pointLightNumber = 0;
-	m_spotLightNumber = 0;
+	m_dirLightShadowNumber = 0;
+	m_pointLightShadowNumber = 0;
+	m_spotLightShadowNumber = 0;
 
 }
 
 void DefferedRendererFrontend::BuildFrame()
 {
+	m_currentFrame->camera = m_camera;
+	m_currentFrame->cubemapObject = m_cubemapObject;
+
 	// Sort objects
 	m_currentFrame->opaqueObjects.sort(NormalSort());
 	m_currentFrame->shadowCasters.sort(NormalSort());
@@ -298,10 +289,7 @@ size_t DefferedRendererFrontend::InstanciateObjects(RenderObjectVector& p_render
 				//Create material for instanced group
 				auto instancedMesh = instnaceFront->mesh;
 				auto instancedMat = instnaceFront->material;
-				//auto instancedMat = std::make_shared<Resources::Material>(*instnaceFront->material);
 
-				//instancedMat->SetPropertyArray("modelMatrixArray[0]", matrices.data(), matrices.size());
-				//instancedMat->SetProperty("instancedCount", (int)matrices.size());
 				RenderObjectPtr instncedObj = std::make_shared<RenderObject>();
 				instncedObj->material = instancedMat;
 				instncedObj->mesh = instancedMesh;

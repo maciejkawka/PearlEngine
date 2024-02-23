@@ -76,6 +76,7 @@ namespace PrRenderer::Core {
 		Mesh,
 		InstancedMesh,
 		CubeMap,
+		Debug,
 		TypeNum
 	};
 
@@ -87,11 +88,10 @@ namespace PrRenderer::Core {
 		SortingHash            sortingHash;
 		PrCore::Math::mat4     worldMat;
 
-		//Instanced ot be moved
+		//Instanced to be moved
 		size_t                 instanceSize;
 		std::vector<PrCore::Math::mat4>    worldMatrices;
 
-	public:
 
 		//Sorting
 		bool operator>(const RenderObject& rhs) const
@@ -109,7 +109,6 @@ namespace PrRenderer::Core {
 			return this->sortingHash == rhs.sortingHash;
 		}
 	};
-
 	using RenderObjectPtr = std::shared_ptr<RenderObject>;
 
 	struct NormalSort {
@@ -195,10 +194,12 @@ namespace PrRenderer::Core {
 
 	//-------------------------------------
 
-	enum class RendererFlag {
+	// Flag can be set in a frame to trigger a behaviour
+	enum class RendererFlag: std::uint64_t {
 		None = 0,
 		RerenderCubeMap = 1,
 		ForceStripframe = 2,
+		CameraPerspectiveRecalculate = 4,
 	};
 	DEFINE_ENUM_FLAG_OPERATORS(RendererFlag);
 
@@ -208,20 +209,20 @@ namespace PrRenderer::Core {
 		//Shadows
 		size_t             dirLightMaxShadows = 8;
 		size_t             dirLightShadowsMapSize = 2048;
-		size_t             dirLightCombineMapSize = 12288;
+		size_t             dirLightCombineMapSize = 12288; // A size to contain all light shadow maps size * mapSize
 		float              dirLightShadowBias = 0.005f;
 		float              dirLightCascadeExtend = 6.0f;
 		float              dirLightSize = 3.0f;
 
 		size_t             pointLightMaxShadows = 16;
 		size_t             pointLightShadowMapSize = 1024;
-		size_t             pointLightCombineShadowMapSize = 10240;
+		size_t             pointLightCombineShadowMapSize = 10240; // A size to contain all light shadow maps size * mapSize
 		float              pointLightShadowBias = 0.4f;
 		float              pointLightSize = 6.0f;
 
 		size_t             spotLightMaxShadows = 16;
 		size_t             spotLightShadowMapSize = 1024;
-		size_t             spotLightCombineShadowMapSize = 4096;
+		size_t             spotLightCombineShadowMapSize = 4096; // A size to contain all light shadow maps size * mapSize
 		float              spotLightShadowBias = 0.005f;
 		float              spotLightSize = 1.0f;
 

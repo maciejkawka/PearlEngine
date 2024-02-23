@@ -18,7 +18,7 @@ namespace PrRenderer::Core
 	{
 		//Prepare shaders
 		m_shadowMappingShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Shadows/ShadowMapping.shader");
-		m_backBuffShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/RenderFront.shader");
+		m_ToneMappingShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/RenderFront.shader");
 		m_pbrLightShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/lightPass.shader");
 		m_pointshadowMappingShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Shadows/PointShadowMapping.shader");
 		m_SSAOShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/SSAO.shader");
@@ -28,38 +28,42 @@ namespace PrRenderer::Core
 		m_downsample = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/downsample.shader");
 		m_upsample = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/upsample.shader");
 
-		m_renderContext.m_quadMesh = Resources::Mesh::CreatePrimitive(Resources::Quad);
-		m_renderContext.m_settings = m_settings;
+		m_renderContext.quadMesh = Resources::Mesh::CreatePrimitive(Resources::Quad);
+		m_renderContext.settings = m_settings;
 
+		m_screenWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
+		m_screenHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();
+
+		// Prepare bffers
 		GenerategGBuffersContext();
 		GenerateShadowMaps();
 		GenerateSSAOContext();
 		GeneratePostprocessContext();
 
-		//Set events
+		// Set events
 		PrCore::Events::EventListener windowResizedListener;
 		windowResizedListener.connect<&DefRendererBackend::OnWindowResize>(this);
 		PrCore::Events::EventManager::GetInstance().AddListener(windowResizedListener, PrCore::Events::WindowResizeEvent::s_type);
 	}
 
-	void DefRendererBackend::PreRender()
+	void DefRendererBackend::PreparePipeline()
 	{
-		//Temp variables
+		// Temp variables
 		const auto camera = m_frame->camera;
+		auto clock = PrCore::Utils::Clock::GetInstancePtr();
 		m_renderContext.frameInfo = &m_frame->frameInfo;
-		//Prepare camera
 		m_renderContext.camera = camera;
 		m_renderContext.camera->RecalculateMatrices();
-		auto clock = PrCore::Utils::Clock::GetInstancePtr();
 
-		//Pipeline
-		//Clear Back Buffer
+
+		// Begin pipeline preparations
+		// Clear Back Buffer
 		PushCommand(CreateRC<LowRenderer::EnableDepthRC>(true));
 		PushCommand(CreateRC<LowRenderer::EnableBlendingRC>(false));
 		PushCommand(CreateRC<LowRenderer::EnableCullFaceRC>(true));
 		PushCommand(CreateRC<LowRenderer::ClearRC>(ColorBuffer | DepthBuffer));
 
-		//Calculate PBR Reflection if cubemap changed
+		// Calculate PBR Reflection if cubemap changed
 		if((m_frame->renderFlag & RendererFlag::RerenderCubeMap) == RendererFlag::RerenderCubeMap && m_frame->cubemapObject)
 		{
 			SCOPE_HIGH_TIMER_CALLBACK(
@@ -90,8 +94,8 @@ namespace PrRenderer::Core
 		//---------------------------------
 		TIME_RC_START(ShadowMapping);
 
-		static bool calculateProjs = true;
-		if(calculateProjs)
+		// Camera settings has changed, recalculate CSM matrices
+		if((m_frame->renderFlag & RendererFlag::CameraPerspectiveRecalculate) == RendererFlag::CameraPerspectiveRecalculate)
 		{
 			for (int i = 0; i < SHADOW_CASCADES_COUNT; i++)
 				m_settings->cascadeShadowBordersCamSpace[i] = m_settings->cascadeShadowBorders[i] * camera->GetFar();
@@ -100,8 +104,6 @@ namespace PrRenderer::Core
 			m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings->cascadeShadowBorders[0], camera->GetFar() * m_settings->cascadeShadowBorders[1]));
 			m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings->cascadeShadowBorders[1], camera->GetFar() * m_settings->cascadeShadowBorders[2]));
 			m_CSMUtility.m_cameraProjs.push_back(PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, camera->GetFar() * m_settings->cascadeShadowBorders[2], camera->GetFar() * m_settings->cascadeShadowBorders[3]));
-
-			calculateProjs = false;
 		}
 
 		// Main Directional Light
@@ -213,7 +215,7 @@ namespace PrRenderer::Core
 		}
 		
 
-		// Spot Lights
+		// Spotlights
 		PushCommand(CreateRC<LambdaFunctionRC>([&]
 			{
 				m_renderContext.shadowMapSpotBuff->Bind();
@@ -267,7 +269,7 @@ namespace PrRenderer::Core
 				m_renderContext.gBuffer.buffer->Unbind();
 			}));
 
-		//Clear output buffer
+		// Clear output buffer
 		PushCommand(CreateRC<LambdaFunctionRC>([&]()
 			{
 				m_renderContext.otuputBuff->Bind();
@@ -296,7 +298,7 @@ namespace PrRenderer::Core
 		PushCommand(CreateRC<RenderLightRC>(m_pbrLightShdr, m_frame->mainDirectLight, &m_frame->lights, &m_renderContext));
 		TIME_RC_STOP(LightPass);
 
-		//Transparent Forward Pass
+		// Transparent Forward Pass
 		TIME_RC_START(TransparentPass);
 		PushCommand(CreateRC<LambdaFunctionRC>([&]()
 			{
@@ -328,7 +330,7 @@ namespace PrRenderer::Core
 			PushCommand(CreateRC<RenderFogRC>(m_fogShdr, &m_renderContext));
 		}
 
-		//Bloom
+		// Bloom
 		if(m_settings->enableBloom)
 		{
 			PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
@@ -337,9 +339,9 @@ namespace PrRenderer::Core
 
 		// Tone Mapping
 		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
-		PushCommand(CreateRC<RenderBackBufferRC>(m_backBuffShdr, &m_renderContext));
+		PushCommand(CreateRC<RenderToneMappingRC>(m_ToneMappingShdr, &m_renderContext));
 
-		// FXAA Anti-Aliasing
+		// FXAA Anti-Aliasing and Render front
 		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
 		PushCommand(CreateRC<RenderFXAARC>(m_FXAAShdr, &m_renderContext));
 
@@ -419,7 +421,7 @@ namespace PrRenderer::Core
 		p_shaderPtr->Bind();
 		p_shaderPtr->SetUniformMat4("PIPELINE_LIGHT_MAT", p_lightMatrix);
 
-		for (auto object : *p_objects)
+		for (auto& object : *p_objects)
 		{
 			if (object->type == RenderObjectType::Mesh)
 			{
@@ -450,7 +452,7 @@ namespace PrRenderer::Core
 		p_pointShadowMapShader->SetUniformMat4("PIPELINE_LIGHT_MAT", p_lightMatrix);
 		p_pointShadowMapShader->SetUniformVec3("PIPELINE_LIGHT_POS", p_lightPos);
 
-		for (auto object : *p_objects)
+		for (auto& object : *p_objects)
 		{
 			if (object->type == RenderObjectType::Mesh)
 			{
@@ -498,7 +500,7 @@ namespace PrRenderer::Core
 
 		//Generate Noise
 		std::vector<float> ssaoNoise;
-		for (unsigned int i = 0; i < 16; i++)
+		for (unsigned int i = 0; i < 16; ++i)
 		{
 			glm::vec3 noise(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, 0.0f); // rotate around z-axis (in tangent space)
 			ssaoNoise.push_back(noise.x);
@@ -531,8 +533,8 @@ namespace PrRenderer::Core
 		depthTex.format = Resources::TextureFormat::Depth32;
 
 		Buffers::FramebufferSettings settings;
-		settings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
-		settings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();;
+		settings.globalWidth = m_screenWidth;
+		settings.globalHeight = m_screenHeight;
 		settings.mipMaped = false;
 		settings.colorTextureAttachments = { ssaoTex };
 		settings.depthStencilAttachment = depthTex;
@@ -553,8 +555,8 @@ namespace PrRenderer::Core
 		depthTex.format = Resources::TextureFormat::Depth16;
 
 		Buffers::FramebufferSettings settings;
-		settings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
-		settings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();
+		settings.globalWidth = m_screenWidth;
+		settings.globalHeight = m_screenHeight;
 		settings.mipMaped = false;
 		settings.colorTextureAttachments = { texture };
 		settings.depthStencilAttachment = depthTex;
@@ -578,8 +580,8 @@ namespace PrRenderer::Core
 			bloomDepthTex.format = Resources::TextureFormat::Depth16;
 
 			Buffers::FramebufferSettings bloomSettings;
-			bloomSettings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth() >> (i + 1);
-			bloomSettings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight() >> (i + 1);
+			bloomSettings.globalWidth = m_screenWidth >> (i + 1);
+			bloomSettings.globalHeight = m_screenHeight >> (i + 1);
 			bloomSettings.colorTextureAttachments = { bloomTexture };
 			bloomSettings.depthStencilAttachment = bloomDepthTex;
 
@@ -599,8 +601,8 @@ namespace PrRenderer::Core
 		bloomDepthTex.format = Resources::TextureFormat::Depth16;
 
 		Buffers::FramebufferSettings bloomSettings;
-		bloomSettings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
-		bloomSettings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();
+		bloomSettings.globalWidth = m_screenWidth;
+		bloomSettings.globalHeight = m_screenHeight;
 		bloomSettings.colorTextureAttachments = { bloomTexture };
 		bloomSettings.depthStencilAttachment = bloomDepthTex;
 
@@ -641,8 +643,8 @@ namespace PrRenderer::Core
 		gDepth.filteringMin = Resources::TextureFiltering::Nearest;
 
 		Buffers::FramebufferSettings settings;
-		settings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth() * 2;
-		settings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight() * 2;
+		settings.globalWidth = m_screenWidth * 2; // Doubled size to imitate MSAA
+		settings.globalHeight = m_screenHeight * 2; // Doubled size to imitate MSAA
 		settings.mipMaped = false;
 		settings.colorTextureAttachments = { gPos, gAlbedo, gNormal, gAo };
 		settings.depthStencilAttachment = gDepth;
@@ -663,8 +665,8 @@ namespace PrRenderer::Core
 		outputDepth.format = Resources::TextureFormat::Depth32;
 
 		Buffers::FramebufferSettings outputSettings;
-		outputSettings.globalWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
-		outputSettings.globalHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();
+		outputSettings.globalWidth = m_screenWidth;
+		outputSettings.globalHeight = m_screenHeight;
 		outputSettings.mipMaped = false;
 		outputSettings.colorTextureAttachments = outputTex;
 		outputSettings.depthStencilAttachment = outputDepth;
@@ -738,38 +740,38 @@ namespace PrRenderer::Core
 		p_material->SetProperty("proj", p_renderContext->camera->GetProjectionMatrix());
 
 		p_material->Bind();
-		p_renderContext->m_quadMesh->Bind();
-		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray(), Primitives::TriangleStrip);
+		p_renderContext->quadMesh->Bind();
+		LowRenderer::Draw(p_renderContext->quadMesh->GetVertexArray(), Primitives::TriangleStrip);
 		p_renderContext->frameInfo->drawCalls++;
 
-		p_renderContext->m_quadMesh->Unbind();
+		p_renderContext->quadMesh->Unbind();
 		p_material->Unbind();
 		LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::Less);
 	}
 
-	void DefRendererBackend::RenderBackBuffer(Resources::ShaderPtr p_postProcessShader, const RenderContext* p_renderContext)
+	void DefRendererBackend::RenderToneMapping(Resources::ShaderPtr p_toneMapShader, const RenderContext* p_renderContext)
 	{
 		LowRenderer::EnableDepth(false);
 		LowRenderer::EnableCullFace(false);
 
 		p_renderContext->otuputBuff->Bind();
 
-		p_postProcessShader->Bind();
+		p_toneMapShader->Bind();
 		p_renderContext->postprocessTex->Bind(0);
-		p_postProcessShader->SetUniformInt("backTex", 0);
+		p_toneMapShader->SetUniformInt("backTex", 0);
 
-		p_postProcessShader->SetUniformBool("enableBloom", p_renderContext->m_settings->enableBloom);
+		p_toneMapShader->SetUniformBool("enableBloom", p_renderContext->settings->enableBloom);
 		p_renderContext->bloomTex->Bind(1);
-		p_postProcessShader->SetUniformInt("bloomTex", 1);
+		p_toneMapShader->SetUniformInt("bloomTex", 1);
 	
-		p_postProcessShader->SetUniformFloat("exposure", p_renderContext->m_settings->toneMappingExposure);
+		p_toneMapShader->SetUniformFloat("exposure", p_renderContext->settings->toneMappingExposure);
 
-		p_renderContext->m_quadMesh->Bind();
-		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->quadMesh->Bind();
+		LowRenderer::Draw(p_renderContext->quadMesh->GetVertexArray());
 		p_renderContext->frameInfo->drawCalls++;
 
-		p_renderContext->m_quadMesh->Unbind();
-		p_postProcessShader->Unbind();
+		p_renderContext->quadMesh->Unbind();
+		p_toneMapShader->Unbind();
 		p_renderContext->postprocessTex->Unbind();
 
 		p_renderContext->otuputBuff->Unbind();
@@ -844,16 +846,16 @@ namespace PrRenderer::Core
 		p_SSAOShader->SetUniformVec3Array("samples", p_renderContext->ssaoKernel.data(), p_renderContext->ssaoKernel.size());
 		p_SSAOShader->SetUniformVec2("screenSize", PrCore::Math::vec2{ PrCore::Windowing::Window::GetMainWindow().GetWidth(), PrCore::Windowing::Window::GetMainWindow().GetHeight() });
 
-		p_SSAOShader->SetUniformInt("kernelSize", p_renderContext->m_settings->SSAOKenrelSize);
-		p_SSAOShader->SetUniformFloat("radius", p_renderContext->m_settings->SSAORadius);
-		p_SSAOShader->SetUniformFloat("bias", p_renderContext->m_settings->SSAObias);
-		p_SSAOShader->SetUniformFloat("magnitude", p_renderContext->m_settings->SSAOMagnitude);
+		p_SSAOShader->SetUniformInt("kernelSize", p_renderContext->settings->SSAOKenrelSize);
+		p_SSAOShader->SetUniformFloat("radius", p_renderContext->settings->SSAORadius);
+		p_SSAOShader->SetUniformFloat("bias", p_renderContext->settings->SSAObias);
+		p_SSAOShader->SetUniformFloat("magnitude", p_renderContext->settings->SSAOMagnitude);
 
-		p_renderContext->m_quadMesh->Bind();
-		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->quadMesh->Bind();
+		LowRenderer::Draw(p_renderContext->quadMesh->GetVertexArray());
 		p_renderContext->frameInfo->drawCalls++;
 
-		p_renderContext->m_quadMesh->Unbind();
+		p_renderContext->quadMesh->Unbind();
 
 		p_SSAOShader->Unbind();
 		LowRenderer::EnableDepth(false);
@@ -867,13 +869,13 @@ namespace PrRenderer::Core
 
 		p_renderContext->SSAOTex->Bind(0);
 		p_SSAOShader->SetUniformInt("ssaoInput", 0);
-		p_SSAOShader->SetUniformInt("SSAOBlureSize", p_renderContext->m_settings->SSAOBlureSize);
+		p_SSAOShader->SetUniformInt("SSAOBlureSize", p_renderContext->settings->SSAOBlureSize);
 
-		p_renderContext->m_quadMesh->Bind();
-		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->quadMesh->Bind();
+		LowRenderer::Draw(p_renderContext->quadMesh->GetVertexArray());
 		p_renderContext->frameInfo->drawCalls++;
 
-		p_renderContext->m_quadMesh->Unbind();
+		p_renderContext->quadMesh->Unbind();
 
 		LowRenderer::SetColorMask(true, true, true, true);
 		p_BlurSSAOShader->Unbind();
@@ -890,19 +892,19 @@ namespace PrRenderer::Core
 
 		p_renderContext->postprocessTex->Bind(0);
 		p_FXAAShader->SetUniformInt("screenTexture", 0);
-		p_FXAAShader->SetUniformBool("enableFXAA", p_renderContext->m_settings->enableFXAAA);
+		p_FXAAShader->SetUniformBool("enableFXAA", p_renderContext->settings->enableFXAAA);
 
 		p_FXAAShader->SetUniformVec2("inverseScreenSize", PrCore::Math::vec2{ 1.0f / PrCore::Windowing::Window::GetMainWindow().GetWidth(), 1.0f / PrCore::Windowing::Window::GetMainWindow().GetHeight() });
-		p_FXAAShader->SetUniformFloat("edge_threshold_min", p_renderContext->m_settings->FXAAThreasholdMin);
-		p_FXAAShader->SetUniformFloat("edge_threshold_max", p_renderContext->m_settings->FXAAThreasholdMax);
-		p_FXAAShader->SetUniformFloat("edge_iterations", p_renderContext->m_settings->FXAAEdgeIterations);
-		p_FXAAShader->SetUniformFloat("subpixel_quality", p_renderContext->m_settings->FXAASubpixelQuiality);
+		p_FXAAShader->SetUniformFloat("edge_threshold_min", p_renderContext->settings->FXAAThreasholdMin);
+		p_FXAAShader->SetUniformFloat("edge_threshold_max", p_renderContext->settings->FXAAThreasholdMax);
+		p_FXAAShader->SetUniformFloat("edge_iterations", p_renderContext->settings->FXAAEdgeIterations);
+		p_FXAAShader->SetUniformFloat("subpixel_quality", p_renderContext->settings->FXAASubpixelQuiality);
 
-		p_renderContext->m_quadMesh->Bind();
-		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->quadMesh->Bind();
+		LowRenderer::Draw(p_renderContext->quadMesh->GetVertexArray());
 		p_renderContext->frameInfo->drawCalls++;
 
-		p_renderContext->m_quadMesh->Unbind();
+		p_renderContext->quadMesh->Unbind();
 
 		p_FXAAShader->Unbind();
 	}
@@ -920,37 +922,36 @@ namespace PrRenderer::Core
 		p_renderContext->gBuffer.positionTex->Bind(1);
 		p_fogShader->SetUniformInt("positionMap", 1);
 
-		p_fogShader->SetUniformVec3("fogColor", p_renderContext->m_settings->fogColor);
-		p_fogShader->SetUniformFloat("maxDistance", p_renderContext->m_settings->fogMaxDistance);
-		p_fogShader->SetUniformFloat("densityFactor", p_renderContext->m_settings->fogDencity);
+		p_fogShader->SetUniformVec3("fogColor", p_renderContext->settings->fogColor);
+		p_fogShader->SetUniformFloat("maxDistance", p_renderContext->settings->fogMaxDistance);
+		p_fogShader->SetUniformFloat("densityFactor", p_renderContext->settings->fogDencity);
 
-		p_renderContext->m_quadMesh->Bind();
-		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->quadMesh->Bind();
+		LowRenderer::Draw(p_renderContext->quadMesh->GetVertexArray());
 		p_renderContext->frameInfo->drawCalls++;
 
-		p_renderContext->m_quadMesh->Unbind();
+		p_renderContext->quadMesh->Unbind();
 
 		p_renderContext->otuputBuff->Unbind();
 		p_fogShader->Unbind();
 	}
 
-	void DefRendererBackend::RenderBloom(Resources::ShaderPtr p_downsample, Resources::ShaderPtr p_upsample, const RenderContext* p_renderContext)
+	void DefRendererBackend::RenderBloom(Resources::ShaderPtr p_downsampleShader, Resources::ShaderPtr p_upsampleShader, const RenderContext* p_renderContext)
 	{
 		// downsample
-
-		float& threshold = p_renderContext->m_settings->bloomThreshold;
-		float& knee = p_renderContext->m_settings->bloomKnee;
+		float& threshold = p_renderContext->settings->bloomThreshold;
+		float& knee = p_renderContext->settings->bloomKnee;
 
 		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::Y))
 			threshold += 0.1f;
 		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::H))
 			threshold -= 0.1f;
 
-		p_downsample->Bind();
-		p_renderContext->m_quadMesh->Bind();
+		p_downsampleShader->Bind();
+		p_renderContext->quadMesh->Bind();
 		p_renderContext->postprocessTex->Bind(0);
-		p_downsample->SetUniformInt("inputTex", 0);
-		p_downsample->SetUniformVec4("threshold", glm::vec4(threshold, threshold - knee, 2.0f * knee, 0.25f * knee));
+		p_downsampleShader->SetUniformInt("inputTex", 0);
+		p_downsampleShader->SetUniformVec4("threshold", glm::vec4(threshold, threshold - knee, 2.0f * knee, 0.25f * knee));
 
 		for (int i = 0; i < BLOOM_SIZE; i++)
 		{
@@ -959,24 +960,24 @@ namespace PrRenderer::Core
 
 			p_renderContext->bloomDownscaleBuff[i]->Bind();
 			LowRenderer::Clear(ColorBuffer | DepthBuffer);
-			p_downsample->SetUniformVec2("texelSize", PrCore::Math::vec2{ 1.0f / width, 1.0f / height});
-			LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+			p_downsampleShader->SetUniformVec2("texelSize", PrCore::Math::vec2{ 1.0f / width, 1.0f / height});
+			LowRenderer::Draw(p_renderContext->quadMesh->GetVertexArray());
 			p_renderContext->frameInfo->drawCalls++;
 
 			p_renderContext->bloomDownscaleTex[i]->Bind(0);
-			p_downsample->SetUniformInt("inputTex", 0);
+			p_downsampleShader->SetUniformInt("inputTex", 0);
 		}
 
-		p_renderContext->m_quadMesh->Unbind();
-		p_downsample->Unbind();
+		p_renderContext->quadMesh->Unbind();
+		p_downsampleShader->Unbind();
 
 
 		// upsample
 		LowRenderer::EnableBlending(true);
 		LowRenderer::SetBlendingAlgorythm(BlendingAlgorithm::One, BlendingAlgorithm::One);
 
-		p_upsample->Bind();
-		p_renderContext->m_quadMesh->Bind();
+		p_upsampleShader->Bind();
+		p_renderContext->quadMesh->Bind();
 		for (int i = BLOOM_SIZE - 1; i > 0; --i)
 		{
 			float width = PrCore::Windowing::Window::GetMainWindow().GetWidth() >> (i + 1);
@@ -985,9 +986,9 @@ namespace PrRenderer::Core
 			p_renderContext->bloomDownscaleBuff[PrCore::Math::max(i - 1, 0)]->Bind();
 
 			p_renderContext->bloomDownscaleTex[i]->Bind(0);
-			p_downsample->SetUniformInt("inputTex", 0);
-			p_downsample->SetUniformVec2("texelSize", PrCore::Math::vec2{ 1.0f / width, 1.0f / height });
-			LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+			p_downsampleShader->SetUniformInt("inputTex", 0);
+			p_downsampleShader->SetUniformVec2("texelSize", PrCore::Math::vec2{ 1.0f / width, 1.0f / height });
+			LowRenderer::Draw(p_renderContext->quadMesh->GetVertexArray());
 			p_renderContext->frameInfo->drawCalls++;
 
 		}
@@ -1000,14 +1001,14 @@ namespace PrRenderer::Core
 		LowRenderer::Clear(ColorBuffer | DepthBuffer);
 
 		p_renderContext->bloomDownscaleTex[0]->Bind(0);
-		p_downsample->SetUniformInt("inputTex", 0);
-		p_downsample->SetUniformVec2("texelSize", PrCore::Math::vec2{ 1.0f / width, 1.0f / height });
-		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_downsampleShader->SetUniformInt("inputTex", 0);
+		p_downsampleShader->SetUniformVec2("texelSize", PrCore::Math::vec2{ 1.0f / width, 1.0f / height });
+		LowRenderer::Draw(p_renderContext->quadMesh->GetVertexArray());
 		p_renderContext->frameInfo->drawCalls++;
 
-		p_renderContext->m_quadMesh->Unbind();
+		p_renderContext->quadMesh->Unbind();
 		p_renderContext->bloomBuff->Unbind();
-		p_upsample->Unbind();
+		p_upsampleShader->Unbind();
 
 		LowRenderer::EnableBlending(false);
 	}
@@ -1044,24 +1045,24 @@ namespace PrRenderer::Core
 		}
 
 		p_lightShdr->SetUniformVec3("camPos", p_renderContext->camera->GetPosition());
-		p_lightShdr->SetUniformVec3("PBR_ambientColor", p_renderContext->m_settings->ambientColor);
-		p_lightShdr->SetUniformFloat("PBR_cubemapIntensity", p_renderContext->m_settings->ambientIntensity);
+		p_lightShdr->SetUniformVec3("PBR_ambientColor", p_renderContext->settings->ambientColor);
+		p_lightShdr->SetUniformFloat("PBR_cubemapIntensity", p_renderContext->settings->ambientIntensity);
 
 		// Set Shadows
 		// Main Directional Light
-		p_lightShdr->SetUniformFloatArray("SHDW_borders", p_renderContext->m_settings->cascadeShadowBordersCamSpace, 4);
-		p_lightShdr->SetUniformFloatArray("SHDW_RadiusRatio", p_renderContext->m_settings->cascadeShadowRadiusRatio, 4);
+		p_lightShdr->SetUniformFloatArray("SHDW_borders", p_renderContext->settings->cascadeShadowBordersCamSpace, 4);
+		p_lightShdr->SetUniformFloatArray("SHDW_RadiusRatio", p_renderContext->settings->cascadeShadowRadiusRatio, 4);
 
 		if (p_mianDirectLight && p_renderContext->shadowMapMainDirTex)
 		{
 			p_lightShdr->SetUniformMat4("SHDW_MainDirLightMat", p_mianDirectLight->packedMat);
 			p_lightShdr->SetUniformBool("SHDW_HasMainDirLight", true);
 			p_lightShdr->SetUniformMat4Array("SHDW_MainDirLightViewMat", p_mianDirectLight->viewMatrices.data(), p_mianDirectLight->viewMatrices.size());
-			p_lightShdr->SetUniformInt("SHDW_MainDirLightMapSize", p_renderContext->m_settings->mainLightShadowMapSize);
-			p_lightShdr->SetUniformInt("SHDW_MainDirLightCombineMapSize", p_renderContext->m_settings->mainLightShadowCombineMapSize);
-			p_lightShdr->SetUniformFloat("SHDW_BorderBlend", p_renderContext->m_settings->mainLightBlendDist);
-			p_lightShdr->SetUniformFloat("SHDW_MainDirLightBias", p_renderContext->m_settings->mainLightShadowBias);
-			p_lightShdr->SetUniformFloat("SHDW_MainDirLightSize", p_renderContext->m_settings->mainLightSize);
+			p_lightShdr->SetUniformInt("SHDW_MainDirLightMapSize", p_renderContext->settings->mainLightShadowMapSize);
+			p_lightShdr->SetUniformInt("SHDW_MainDirLightCombineMapSize", p_renderContext->settings->mainLightShadowCombineMapSize);
+			p_lightShdr->SetUniformFloat("SHDW_BorderBlend", p_renderContext->settings->mainLightBlendDist);
+			p_lightShdr->SetUniformFloat("SHDW_MainDirLightBias", p_renderContext->settings->mainLightShadowBias);
+			p_lightShdr->SetUniformFloat("SHDW_MainDirLightSize", p_renderContext->settings->mainLightSize);
 
 			p_renderContext->shadowMapMainDirTex->Bind(7);
 			p_lightShdr->SetUniformInt("SHDW_MainDirLightMap", 7);
@@ -1112,10 +1113,10 @@ namespace PrRenderer::Core
 		p_lightShdr->SetUniformMat4Array("SHDW_DirLightMat", dirLightMat.data(), dirLightMat.size());
 		p_lightShdr->SetUniformMat4Array("SHDW_DirLightViewMat", dirLightViewMat.data(), dirLightViewMat.size());
 		p_lightShdr->SetUniformIntArray("SHDW_DirLightID", dirLightIDs.data(), dirLightIDs.size());
-		p_lightShdr->SetUniformInt("SHDW_DirLightMapSize", p_renderContext->m_settings->dirLightShadowsMapSize);
-		p_lightShdr->SetUniformInt("SHDW_DirLightCombineShadowMapSize", p_renderContext->m_settings->dirLightCombineMapSize);
-		p_lightShdr->SetUniformFloat("SHDW_DirLightBias", p_renderContext->m_settings->dirLightShadowBias);
-		p_lightShdr->SetUniformFloat("SHDW_DirLightSize", p_renderContext->m_settings->dirLightSize);
+		p_lightShdr->SetUniformInt("SHDW_DirLightMapSize", p_renderContext->settings->dirLightShadowsMapSize);
+		p_lightShdr->SetUniformInt("SHDW_DirLightCombineShadowMapSize", p_renderContext->settings->dirLightCombineMapSize);
+		p_lightShdr->SetUniformFloat("SHDW_DirLightBias", p_renderContext->settings->dirLightShadowBias);
+		p_lightShdr->SetUniformFloat("SHDW_DirLightSize", p_renderContext->settings->dirLightSize);
 		p_renderContext->shadowMapDirTex->Bind(8);
 		p_lightShdr->SetUniformInt("SHDW_DirLightMap", 8);
 
@@ -1123,10 +1124,10 @@ namespace PrRenderer::Core
 		p_lightShdr->SetUniformInt("SHDW_PointLightNumber", pointlightMat.size());
 		p_lightShdr->SetUniformMat4Array("SHDW_PointLightMat", pointlightMat.data(), pointlightMat.size());
 		p_lightShdr->SetUniformIntArray("SHDW_PointLightID", pointLighttexPos.data(), pointLighttexPos.size());
-		p_lightShdr->SetUniformInt("SHDW_PointLightMapSize", p_renderContext->m_settings->pointLightShadowMapSize);
-		p_lightShdr->SetUniformInt("SHDW_PointCombineLightMapSize", p_renderContext->m_settings->pointLightCombineShadowMapSize);
-		p_lightShdr->SetUniformFloat("SHDW_PointLightBias", p_renderContext->m_settings->pointLightShadowBias);
-		p_lightShdr->SetUniformFloat("SHDW_PointLightSize", p_renderContext->m_settings->pointLightSize);
+		p_lightShdr->SetUniformInt("SHDW_PointLightMapSize", p_renderContext->settings->pointLightShadowMapSize);
+		p_lightShdr->SetUniformInt("SHDW_PointCombineLightMapSize", p_renderContext->settings->pointLightCombineShadowMapSize);
+		p_lightShdr->SetUniformFloat("SHDW_PointLightBias", p_renderContext->settings->pointLightShadowBias);
+		p_lightShdr->SetUniformFloat("SHDW_PointLightSize", p_renderContext->settings->pointLightSize);
 		p_renderContext->shadowMapPointTex->Bind(9);
 		p_lightShdr->SetUniformInt("SHDW_PointLightMap", 9);
 
@@ -1135,18 +1136,18 @@ namespace PrRenderer::Core
 		p_lightShdr->SetUniformMat4Array("SHDW_SpotLightMat", spotLightMat.data(), spotLightMat.size());
 		p_lightShdr->SetUniformMat4Array("SHDW_SpotLightViewMat", spotLightViewMat.data(), spotLightViewMat.size());
 		p_lightShdr->SetUniformIntArray("SHDW_SpotLightID", spotLightIDs.data(), spotLightIDs.size());
-		p_lightShdr->SetUniformInt("SHDW_SpotLightMapSize", p_renderContext->m_settings->spotLightShadowMapSize);
-		p_lightShdr->SetUniformInt("SHDW_SpotLightCombineMapSize", p_renderContext->m_settings->spotLightCombineShadowMapSize);
-		p_lightShdr->SetUniformFloat("SHDW_SpotLightBias", p_renderContext->m_settings->spotLightShadowBias);
-		p_lightShdr->SetUniformFloat("SHDW_SpotLightSize", p_renderContext->m_settings->spotLightSize);
+		p_lightShdr->SetUniformInt("SHDW_SpotLightMapSize", p_renderContext->settings->spotLightShadowMapSize);
+		p_lightShdr->SetUniformInt("SHDW_SpotLightCombineMapSize", p_renderContext->settings->spotLightCombineShadowMapSize);
+		p_lightShdr->SetUniformFloat("SHDW_SpotLightBias", p_renderContext->settings->spotLightShadowBias);
+		p_lightShdr->SetUniformFloat("SHDW_SpotLightSize", p_renderContext->settings->spotLightSize);
 		p_renderContext->shadowMapSpotTex->Bind(10);
 		p_lightShdr->SetUniformInt("SHDW_SpotLightMap", 10);
 
-		p_renderContext->m_quadMesh->Bind();
-		LowRenderer::Draw(p_renderContext->m_quadMesh->GetVertexArray());
+		p_renderContext->quadMesh->Bind();
+		LowRenderer::Draw(p_renderContext->quadMesh->GetVertexArray());
 		p_renderContext->frameInfo->drawCalls++;
 
-		p_renderContext->m_quadMesh->Unbind();
+		p_renderContext->quadMesh->Unbind();
 
 		p_lightShdr->Unbind();
 		p_renderContext->otuputBuff->Unbind();

@@ -24,7 +24,7 @@ namespace PrRenderer::Core {
 		inline RendererSettingsPtr GetSettingsPtr() { return m_settings; }
 		inline RendererSettings& GetSettings() const { return *m_settings; }
 
-		virtual void PreRender() = 0;
+		virtual void PreparePipeline() = 0;
 		virtual void Render() = 0;
 		virtual void PostRender() = 0;
 
@@ -35,8 +35,8 @@ namespace PrRenderer::Core {
 		FrameDataPtr	      m_frame;
 		RendererSettingsPtr   m_settings;
 
-		float m_screenWidth;
-		float m_screenHeight;
+		size_t m_screenWidth;
+		size_t m_screenHeight;
 	};
 
 	using RendererBackendPtr = std::shared_ptr<IRendererBackend>;

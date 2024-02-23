@@ -87,6 +87,11 @@ PrCore::Entry::AppContext::AppContext()
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, mainLightBlendDist);
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, mainLightCascadeExtend);
 
+		rendererSettings.cascadeShadowBorders[0] = rendererConfig.GetSetting<float>("CSMBorder1");
+		rendererSettings.cascadeShadowBorders[1] = rendererConfig.GetSetting<float>("CSMBorder2");
+		rendererSettings.cascadeShadowBorders[2] = rendererConfig.GetSetting<float>("CSMBorder3");
+		rendererSettings.cascadeShadowBorders[3] = rendererConfig.GetSetting<float>("CSMBorder4");
+
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, ambientColor);
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, ambientIntensity);
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, skyColor);
