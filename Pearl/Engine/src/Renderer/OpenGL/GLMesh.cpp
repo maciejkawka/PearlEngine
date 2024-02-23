@@ -237,6 +237,8 @@ void GLMesh::UpdateBuffers()
     m_VA->SetIndexBuffer(indexBuffer);
     m_VA->SetVertexBuffer(vertexBuffer);
 
+    m_boxVolume = Core::BoxVolume(m_vertices);
+
     m_stateChanged = false;
 }
 

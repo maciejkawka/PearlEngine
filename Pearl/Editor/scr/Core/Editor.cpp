@@ -99,6 +99,9 @@ void Editor::OnFrame(float p_deltaTime)
 		for (auto event : testInfo.timeEvents)
 			PRLOG_INFO("Event {0}, Time: {1}", event.first, event.second);
 
+	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F4))
+		PRLOG_INFO("Culled objects {0}", testInfo.culledObjects);
+
 	PrRenderer::Core::DefferedRendererFrontend::GetInstance().BuildFrame();
 	m_appContext->m_rendererBackend->PreparePipeline();
 }

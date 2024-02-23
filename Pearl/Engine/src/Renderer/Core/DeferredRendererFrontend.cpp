@@ -154,10 +154,8 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 
 	// Frustrum culling
 	// Discard objects that are not visable in the main m_camera
-	// Move BoxVolume to the Mesh clas sin the future this is overkill to kalkulate that every frame
 	const auto frustrum = Frustrum(m_camera->GetProjectionMatrix(), m_camera->GetViewMatrix());
-	const auto bundingBox = BoxVolume(mesh->GetVertices());
-	if (!bundingBox.IsOnFrustrum(frustrum, worldMatrix))
+	if (!mesh->GetBoxVolume().IsOnFrustrum(frustrum, worldMatrix))
 	{
 		m_currentFrame->frameInfo.culledObjects++;
 		return;

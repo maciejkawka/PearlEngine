@@ -6,14 +6,38 @@ using namespace PrRenderer::Resources;
 
 MeshPtr Mesh::CreatePrimitive(PrimitiveType p_primitiveType)
 {
-	switch(p_primitiveType)
+	switch (p_primitiveType)
 	{
-	case Cube: return CreateCube();
-	case Sphere: return CreateSphere();
-	case Capsule: return CreateCapsule();
-	case Cylinder: return CreateCylinder();
-	case Plane: return CreatePlane();
-	case Quad: return CreateQuad();
+	case Cube:
+	{
+		static MeshPtr mesh = CreateCube();
+		return mesh;
+	}
+	case Sphere:
+	{
+		static MeshPtr mesh = CreateSphere();
+		return mesh;
+	}
+	case Capsule:
+	{
+		static MeshPtr mesh = CreateCapsule();
+		return mesh;
+	}
+	case Cylinder:
+	{
+		static MeshPtr mesh = CreateCylinder();
+		return mesh;
+	}
+	case Plane:
+	{
+		static MeshPtr mesh = CreatePlane();
+		return mesh;
+	}
+	case Quad:
+	{
+		static MeshPtr mesh = CreateQuad();
+		return mesh;
+	}
 	default: return MeshPtr();
 	}
 }

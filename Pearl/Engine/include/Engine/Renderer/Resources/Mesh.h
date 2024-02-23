@@ -4,6 +4,7 @@
 #include"Renderer/Core/Defines.h"
 #include"Renderer/Core/Color.h"
 #include"Renderer/Buffers/VertexArray.h"
+#include"Renderer/Core/BoundingVolume.h"
 
 #include<array>
 
@@ -60,6 +61,8 @@ namespace PrRenderer::Resources {
 		inline std::vector<PrCore::Math::vec3> GetNormals() { return m_normals; }
 		inline std::vector<PrCore::Math::vec4> GetTangents() { return m_tangents; }
 
+		inline const Core::BoxVolume& GetBoxVolume() { return m_boxVolume; }
+
 		void SetVertices(const std::vector<PrCore::Math::vec3>& p_vertices);
 		void SetIndices(const std::vector<unsigned int>& p_indices);
 		void SetColors(const std::vector<Core::Color>& p_colors);
@@ -72,6 +75,9 @@ namespace PrRenderer::Resources {
 		virtual void RecalculateTangents() = 0;
 
 		static MeshPtr Create();
+
+		// Returns a shared primitive, do not edit the vertices
+		// Copy the mesh first in order edit
 		static MeshPtr CreatePrimitive(PrimitiveType p_primitiveType);
 
 	protected:
@@ -96,7 +102,9 @@ namespace PrRenderer::Resources {
 
 		bool									m_stateChanged;
 
-		std::shared_ptr<Buffers::VertexArray>	m_VA;
+		std::shared_ptr<Buffers::VertexArray>   m_VA;
+
+		Core::BoxVolume                         m_boxVolume;
 
 	private:
 		static MeshPtr CreateCube();
