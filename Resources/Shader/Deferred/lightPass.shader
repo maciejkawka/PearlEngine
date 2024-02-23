@@ -76,6 +76,7 @@ uniform float     SHDW_BorderBlend = 5.0f;
 uniform sampler2D SHDW_MainDirLightMap;
 uniform int       SHDW_MainDirLightMapSize;
 uniform int       SHDW_MainDirLightCombineMapSize;
+uniform bool      SHDW_MainDirLightShadow;
 uniform mat4      SHDW_MainDirLightViewMat[4];
 uniform mat4      SHDW_MainDirLightMat;
 uniform bool      SHDW_HasMainDirLight = false;
@@ -436,7 +437,7 @@ float SHDW_CalculateSpotLightFactor(vec3 fragPos, int lightIndex)
     return SHDW_PCSS(SHDW_SpotLightID[lightIndex], projCoords.xy, fragToLight, SHDW_SpotLightMap, SHDW_SpotLightMapSize, SHDW_SpotLightCombineMapSize, SHDW_SpotLightBias, SHDW_SpotLightSize);
 }
 
-float SHDW_CalculateDirectLightFactor(float depth, vec3 fragPos, int lightIndex, vec3 normal, vec3 lightDir)
+float SHDW_CalculateDirectLightFactor(float depth, vec3 fragPos, int lightIndex)
 {
     float shadowFactor = 1.0f;
     for (int i = 0; i < SHDW_cascadesCount; i++)
@@ -459,7 +460,7 @@ float SHDW_CalculateDirectLightFactor(float depth, vec3 fragPos, int lightIndex,
            float blendB = SHDW_PCSS(SHDW_DirLightID[lightIndex] * SHDW_cascadesCount + i + 1, projCoordsB.xy, projCoordsB.z, SHDW_DirLightMap, SHDW_DirLightMapSize, SHDW_DirLightCombineShadowMapSize, SHDW_DirLightBias * SHDW_RadiusRatio[i + 1], SHDW_DirLightSize * SHDW_RadiusRatio[i + 1]);
 
            shadowFactor = mix(blendA, blendB, blendValue);
-            break;
+           break;
         }
         //Normal Shadow
         else if (depth < SHDW_borders[i])
@@ -496,7 +497,7 @@ float SHDW_CalculateMainDirectLightFactor(float depth, vec3 fragPos)
             float distToTransition = depth - SHDW_borders[i];
             float blendValue = (distToTransition / SHDW_BorderBlend) * 0.5f + 0.5f;
 
-            float blendA = SHDW_PCSS(i, projCoordsA.xy, projCoordsA.z, SHDW_MainDirLightMap, SHDW_MainDirLightMapSize, SHDW_MainDirLightCombineMapSize, SHDW_DirLightBias * SHDW_RadiusRatio[i], SHDW_DirLightSize * SHDW_RadiusRatio[i]);
+            float blendA = SHDW_PCSS(i, projCoordsA.xy, projCoordsA.z, SHDW_MainDirLightMap, SHDW_MainDirLightMapSize, SHDW_MainDirLightCombineMapSize, SHDW_MainDirLightBias * SHDW_RadiusRatio[i], SHDW_MainDirLightSize * SHDW_RadiusRatio[i]);
             float blendB = SHDW_PCSS(i + 1, projCoordsB.xy, projCoordsB.z, SHDW_MainDirLightMap, SHDW_MainDirLightMapSize, SHDW_MainDirLightCombineMapSize, SHDW_MainDirLightBias * SHDW_RadiusRatio[i + 1], SHDW_MainDirLightSize * SHDW_RadiusRatio[i + 1]);
 
             shadowFactor = mix(blendA, blendB, blendValue);
@@ -569,7 +570,7 @@ void main()
     if(SHDW_HasMainDirLight == true)
     { 
         float shadowFactor = 1;
-        if(true)
+        if(SHDW_MainDirLightShadow == true)
         {
             shadowFactor = SHDW_CalculateMainDirectLightFactor(depth, pos);
         }
@@ -586,7 +587,7 @@ void main()
         float shadowFactor = 1;
         if(SHDW_DirLightID[i] != -1)
         {
-            shadowFactor = SHDW_CalculateDirectLightFactor(depth, pos, i, N, lightDir);
+            shadowFactor = SHDW_CalculateDirectLightFactor(depth, pos, i);
         }
     
         if (shadowFactor > 0.0f)

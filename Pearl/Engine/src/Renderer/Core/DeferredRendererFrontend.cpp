@@ -41,8 +41,8 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 		auto lightObject = std::make_shared<DirLightObject>();
 		lightObject->id = p_id;
 		lightObject->packedMat = p_lightComponent->m_light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
-		lightObject->shadowMapPos = SIZE_MAX; // ShadowMapPos is not inmportant in main light
-
+		lightObject->shadowMapPos = SIZE_MAX; // ShadowMapPos is not important in main light
+		lightObject->castShadow = p_lightComponent->m_shadowCast;
 		m_currentFrame->mainDirectLight = lightObject;
 		return;
 	}

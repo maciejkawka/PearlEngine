@@ -41,7 +41,7 @@ PrCore::Math::mat4 CascadeShadowUtility::ClaculateFrustrums(float& p_cascadeShad
 
 	float radius = Math::length(boundingVertices[2] - boundingVertices[5]) / 2.0f;
 	float texelsPerUnit = p_mapSize / (2.0f * radius);
-	auto scale = Math::scale(Math::mat4(1.0f), Math::vec3(texelsPerUnit));
+	auto scale = Math::scale(Math::mat4(1.1f), Math::vec3(texelsPerUnit));
 
 	auto lookView = Math::lookAt(Math::vec3(0.0f) - p_lightDir, Math::vec3(0.0f), Math::vec3(0.0f, 1.0f, 0.0f));
 	lookView = scale * lookView;

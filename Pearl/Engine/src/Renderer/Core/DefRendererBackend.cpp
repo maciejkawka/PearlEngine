@@ -109,8 +109,8 @@ namespace PrRenderer::Core
 		// Main Directional Light
 		if(m_frame->mainDirectLight && m_frame->mainDirectLight->castShadow)
 		{
-			const auto& mainLight = m_frame->mainDirectLight;
-			const auto& lightDir = mainLight->GetDirection();
+			const auto mainLight = m_frame->mainDirectLight;
+			const auto lightDir = mainLight->GetDirection();
 
 			PushCommand(CreateRC<LambdaFunctionRC>([&]
 				{
@@ -127,6 +127,11 @@ namespace PrRenderer::Core
 				PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
 				PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr, lightMat, &m_frame->shadowCasters, &m_renderContext));
 			}
+
+			m_settings->cascadeShadowRadiusRatio[1] = m_settings->cascadeShadowRadiusRatio[0] / m_settings->cascadeShadowRadiusRatio[1];
+			m_settings->cascadeShadowRadiusRatio[2] = m_settings->cascadeShadowRadiusRatio[0] / m_settings->cascadeShadowRadiusRatio[2];
+			m_settings->cascadeShadowRadiusRatio[3] = m_settings->cascadeShadowRadiusRatio[0] / m_settings->cascadeShadowRadiusRatio[3];
+			m_settings->cascadeShadowRadiusRatio[0] = 1.0f;
 		}
 
 		// Directional Light
@@ -1057,6 +1062,7 @@ namespace PrRenderer::Core
 		{
 			p_lightShdr->SetUniformMat4("SHDW_MainDirLightMat", p_mianDirectLight->packedMat);
 			p_lightShdr->SetUniformBool("SHDW_HasMainDirLight", true);
+			p_lightShdr->SetUniformBool("SHDW_MainDirLightShadow", p_mianDirectLight->castShadow);
 			p_lightShdr->SetUniformMat4Array("SHDW_MainDirLightViewMat", p_mianDirectLight->viewMatrices.data(), p_mianDirectLight->viewMatrices.size());
 			p_lightShdr->SetUniformInt("SHDW_MainDirLightMapSize", p_renderContext->settings->mainLightShadowMapSize);
 			p_lightShdr->SetUniformInt("SHDW_MainDirLightCombineMapSize", p_renderContext->settings->mainLightShadowCombineMapSize);
