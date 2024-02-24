@@ -150,22 +150,6 @@ void MeshRendererSystem::OnUpdate(float p_dt)
 
 	for(auto entity: m_entityViewer.EntitesWithComponents<MeshRendererComponent, TransformComponent>())
 	{
-
-		if(entity.GetComponent<NameComponent>()->name == "Gun")
-		{
-			auto position = entity.GetComponent<TransformComponent>()->GetPosition();
-
-			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::U))
-				position.z += 10 * p_dt;
-			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::J))
-				position.z -= 10 * p_dt;
-
-			entity.GetComponent<TransformComponent>()->SetPosition(position);
-		}
-
-		if (entity.GetComponent<NameComponent>()->name == "Light1")
-			DefferedRendererFrontend::GetInstance().AddMesh(entity);
-			
 		DefferedRendererFrontend::GetInstance().AddMesh(entity);
 	}
 }
