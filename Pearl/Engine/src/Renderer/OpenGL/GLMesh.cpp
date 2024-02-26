@@ -166,12 +166,12 @@ void GLMesh::UpdateBuffers()
     bufferLayout.AddElementBuffer({ "Vertex", Buffers::ShaderDataType::Float3 });
     
     //Normals
-    if (m_normals.empty())
+    if (m_normals.empty() && m_normals.size() > 2)
         m_normals = CalculateNormals(); 
     bufferLayout.AddElementBuffer({ "Normals", Buffers::ShaderDataType::Float3 });
 
     //Tangents
-    if (m_tangents.empty())
+    if (m_tangents.empty() && m_normals.size() > 2)
         m_tangents = CalculateTangents();
     bufferLayout.AddElementBuffer({ "Tangents", Buffers::ShaderDataType::Float4 });
     

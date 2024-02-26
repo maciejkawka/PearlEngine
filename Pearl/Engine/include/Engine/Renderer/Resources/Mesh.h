@@ -22,7 +22,8 @@ namespace PrRenderer::Resources {
 		Capsule,
 		Cylinder,
 		Plane,
-		Quad
+		Quad,
+		Line
 	};
 
 	class Mesh : public PrCore::Resources::Resource {
@@ -113,5 +114,6 @@ namespace PrRenderer::Resources {
 		static MeshPtr CreateCylinder();
 		static MeshPtr CreatePlane();
 		static MeshPtr CreateQuad();
+		static MeshPtr CreateLine();
 	};
 }

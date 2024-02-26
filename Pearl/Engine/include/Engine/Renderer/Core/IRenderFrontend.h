@@ -59,8 +59,13 @@ namespace PrRenderer::Core {
 		RendererBackendPtr GetRendererBackend() { return m_rendererBackend; }
 
 		/// Debug
-		//void DrawGizmo();
-		//void DrawLine();
+		virtual void DrawCube(const Math::vec3& p_center, const Math::vec3& p_size, bool p_wireframe) = 0;
+		virtual void DrawSphere(const Math::vec3& p_center, float p_radius, bool p_wireframe) = 0;
+		virtual void DrawLine(const Math::vec3& p_start, const Math::vec3& p_end) = 0;
+		virtual void DrawFrustrum(const Math::vec3& p_center, float p_fov, float p_max, float p_min, float p_aspect, bool p_wireframe) = 0;
+
+		virtual void SetDebugColor(const Color& p_color) = 0;
+		virtual const Color& GetDebugColor() const { return m_debugColor; }
 
 	protected:
 		RendererBackendPtr m_rendererBackend;
@@ -70,6 +75,8 @@ namespace PrRenderer::Core {
 		FrameDataPtr m_currentFrame;
 		FrameDataPtr m_previousFrame;
 		size_t m_currentFrameIndex;
+
+		Color m_debugColor;
 	};
 
 	//RenderUtils

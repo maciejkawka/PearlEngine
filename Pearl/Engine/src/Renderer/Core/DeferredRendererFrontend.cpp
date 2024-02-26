@@ -27,6 +27,9 @@ DefferedRendererFrontend::DefferedRendererFrontend(RendererSettings& p_settings)
 	m_nextSpotLightPos = 0;
 	m_nextDirLightPos = 0;
 
+	m_debugShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("drawDebug.shader");
+	m_debugMaterial = std::make_shared<Resources::Material>(m_debugShader);
+
 	m_rendererBackend = std::make_shared<DefRendererBackend>(m_renderSettings);
 }
 
@@ -198,6 +201,7 @@ void DefferedRendererFrontend::PrepareFrame()
 	m_currentFrame->opaqueObjects.clear();
 	m_currentFrame->shadowCasters.clear();
 	m_currentFrame->transpatrentObjects.clear();
+	m_currentFrame->debugObjects.clear();
 	m_currentFrame->lights.clear();
 	m_currentFrame->mainDirectLight = nullptr;
 	m_currentFrame->renderFlag = RendererFlag::None;
@@ -219,6 +223,7 @@ void DefferedRendererFrontend::BuildFrame()
 
 	// Sort objects
 	m_currentFrame->opaqueObjects.sort(NormalSort());
+	m_currentFrame->debugObjects.sort(NormalSort());
 	m_currentFrame->shadowCasters.sort(NormalSort());
 	m_currentFrame->transpatrentObjects.sort(TransparentSort());
 
@@ -231,8 +236,9 @@ void DefferedRendererFrontend::BuildFrame()
 		m_currentFrame->frameInfo.instancedObjects += InstanciateObjects(m_currentFrame->opaqueObjects);
 		m_currentFrame->frameInfo.instancedObjects += InstanciateObjects(m_currentFrame->transpatrentObjects);
 
-		// Do not count instanced shadow objects
+		// Do not count instanced shadow and debug objects
 		InstanciateObjects(m_currentFrame->shadowCasters);
+		InstanciateObjects(m_currentFrame->debugObjects);
 	}
 
 	//Send objects to the backend renderer
@@ -240,6 +246,60 @@ void DefferedRendererFrontend::BuildFrame()
 
 	m_currentFrame->frameInfo.frameTimeStamp = Utils::Clock::GetInstance().GetRealTime();
 	m_currentFrame->frameInfo.frameID = m_frameID++;
+}
+
+void DefferedRendererFrontend::DrawCube(const Math::vec3& p_center, const Math::vec3& p_size, bool p_wireframe)
+{
+	Math::mat4 transformMat = Math::translate(Math::mat4(1.0f), p_center)
+		* Math::scale(Math::mat4(1.0f), p_size);
+
+	auto renderObj = std::make_shared<RenderObject>();
+	renderObj->type = RenderObjectType::Mesh;
+	renderObj->material = m_debugMaterial;
+	renderObj->worldMat = transformMat;
+	renderObj->id = 0;
+	renderObj->mesh = Resources::Mesh::CreatePrimitive(Resources::Cube);
+	renderObj->wiredframe = p_wireframe;
+
+	m_currentFrame->debugObjects.push_back(renderObj);
+}
+
+void DefferedRendererFrontend::DrawSphere(const Math::vec3& p_center, float p_radius, bool p_wireframe)
+{
+	Math::mat4 transformMat = Math::translate(Math::mat4(1.0f), p_center)
+		* Math::scale(Math::mat4(1.0f), PrCore::Math::vec3(p_radius));
+
+	auto renderObj = std::make_shared<RenderObject>();
+	renderObj->type = RenderObjectType::Mesh;
+	renderObj->material = m_debugMaterial;
+	renderObj->worldMat = transformMat;
+	renderObj->id = 0;
+	renderObj->mesh = Resources::Mesh::CreatePrimitive(Resources::Sphere);
+	renderObj->wiredframe = p_wireframe;
+
+	m_currentFrame->debugObjects.push_back(renderObj);
+}
+
+void DefferedRendererFrontend::DrawLine(const Math::vec3& p_start, const Math::vec3& p_end)
+{
+	Math::mat4 transformMat = Math::translate(Math::mat4(1.0f), p_start)
+		* Math::scale(Math::mat4(1.0f), PrCore::Math::vec3(p_end));
+
+	auto renderObj = std::make_shared<RenderObject>();
+	renderObj->type = RenderObjectType::Mesh;
+	renderObj->material = m_debugMaterial;
+	renderObj->worldMat = transformMat;
+	renderObj->id = 0;
+	renderObj->wiredframe = true;
+	renderObj->mesh = Resources::Mesh::CreatePrimitive(Resources::Line);
+
+	m_currentFrame->debugObjects.push_back(renderObj);
+}
+
+void DefferedRendererFrontend::SetDebugColor(const Color& p_color)
+{
+	m_debugColor = p_color;
+	m_debugMaterial->SetProperty("color", static_cast<Math::vec4>(p_color));
 }
 
 size_t DefferedRendererFrontend::InstanciateObjects(RenderObjectVector& p_renderObjects)
@@ -296,6 +356,7 @@ size_t DefferedRendererFrontend::InstanciateObjects(RenderObjectVector& p_render
 				instncedObj->type = RenderObjectType::InstancedMesh;
 				instncedObj->instanceSize = matrices.size();
 				instncedObj->worldMatrices = matrices;
+				instncedObj->wiredframe = object->wiredframe;
 
 				//Erase instanced objects from the buffer
 				innerIt = p_renderObjects.erase(innerItBegin, innerIt);

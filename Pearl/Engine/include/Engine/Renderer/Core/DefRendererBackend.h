@@ -122,6 +122,10 @@ namespace PrRenderer::Core {
 		static void RenderBloom(Resources::ShaderPtr p_downsampleShader, Resources::ShaderPtr p_upsampleShader, const RenderContext* p_renderContext);
 		REGISTER_RENDER_COMMAND(RenderBloom, RenderBloom, Resources::ShaderPtr, Resources::ShaderPtr, RenderContext*);
 
+		// Draw Debug
+		static void RenderDebug(RenderObjectVector* p_debugObjects, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderDebug, RenderDebug, RenderObjectVector*, RenderContext*);
+
 		void GenerateSSAOContext();
 		void GeneratePostprocessContext();
 		void GenerategGBuffersContext();

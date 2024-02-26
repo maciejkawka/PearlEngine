@@ -76,7 +76,6 @@ namespace PrRenderer::Core {
 		Mesh,
 		InstancedMesh,
 		CubeMap,
-		Debug,
 		TypeNum
 	};
 
@@ -87,6 +86,7 @@ namespace PrRenderer::Core {
 		Resources::MeshPtr     mesh;
 		SortingHash            sortingHash;
 		PrCore::Math::mat4     worldMat;
+		bool                   wiredframe = false;
 
 		//Instanced to be moved
 		size_t                 instanceSize;
@@ -110,6 +110,7 @@ namespace PrRenderer::Core {
 		}
 	};
 	using RenderObjectPtr = std::shared_ptr<RenderObject>;
+
 
 	struct NormalSort {
 		bool operator()(const RenderObjectPtr& a, const RenderObjectPtr& b) const

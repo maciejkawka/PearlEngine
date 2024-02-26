@@ -1,5 +1,7 @@
 #pragma once
+#include "Core/Entry/AppContext.h"
 #include "Renderer/Core/IRenderFrontend.h"
+#include "Renderer/Resources/Shader.h"
 
 namespace PrRenderer::Core {
 
@@ -16,6 +18,13 @@ namespace PrRenderer::Core {
 		void BuildFrame() override;
 		void FillFrameWithColor() override {}
 
+		virtual void DrawCube(const Math::vec3& p_center, const Math::vec3& p_size, bool p_wireframe = true) override;
+		virtual void DrawSphere(const Math::vec3& p_center, float p_radius, bool p_wireframe = true) override;
+		virtual void DrawLine(const Math::vec3& p_start, const Math::vec3& p_end) override;
+		virtual void DrawFrustrum(const Math::vec3& p_center, float p_fov, float p_max, float p_min, float p_aspect, bool p_wireframe = true) override {};
+
+		virtual void SetDebugColor(const Color& p_color) override;
+
 	private:
 		size_t InstanciateObjects(RenderObjectVector& p_renderObjects);
 
@@ -29,6 +38,8 @@ namespace PrRenderer::Core {
 		size_t m_dirLightShadowNumber = 0;
 
 		RenderObjectPtr m_cubemapObject;
+		Resources::ShaderPtr m_debugShader;
+		Resources::MaterialPtr m_debugMaterial;
 		Camera* m_camera;
 	};
 }

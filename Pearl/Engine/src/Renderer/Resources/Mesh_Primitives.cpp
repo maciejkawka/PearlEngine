@@ -38,7 +38,16 @@ MeshPtr Mesh::CreatePrimitive(PrimitiveType p_primitiveType)
 		static MeshPtr mesh = CreateQuad();
 		return mesh;
 	}
-	default: return MeshPtr();
+	case Line:
+	{
+		static MeshPtr mesh = CreateLine();
+		return mesh;
+	}
+	default:
+	{
+		PR_ASSERT(false);
+		return nullptr;
+	}
 	}
 }
 
@@ -4974,4 +4983,47 @@ MeshPtr Mesh::CreateQuad()
 	quad->UpdateBuffers();
 
 	return quad;
+}
+
+MeshPtr Mesh::CreateLine()
+{
+	MeshPtr line = Create();
+
+	std::vector<PrCore::Math::vec3> vertices =
+	{
+		{0.0f, 0.0f, 0.0f},
+		{1.0f, 1.0f, 1.0f}
+	};
+
+	std::vector<unsigned int> indices =
+	{
+		0, 1
+	};
+
+	std::vector<PrCore::Math::vec3> normals =
+	{
+		{0.f, 0.f, 1.f},
+		{0.f, 0.f, 1.f}
+	};
+
+	std::vector<PrCore::Math::vec2> texCoords =
+	{
+		{0.f, 0.f},
+		{1.f, 1.f}
+	};
+
+	line->SetName("Primitive_Line");
+
+	line->m_vertices = vertices;
+	line->m_indices = indices;
+	line->m_normals = normals;
+	line->m_UVs[0] = texCoords;
+
+	line->m_indicesCount = 2;
+	line->m_verticesCount = 2;
+
+	line->ValidateBuffers();
+	line->UpdateBuffers();
+
+	return line;
 }

@@ -337,6 +337,9 @@ namespace PrRenderer::Core
 		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
 		PushCommand(CreateRC<RenderToneMappingRC>(m_ToneMappingShdr, &m_renderContext));
 
+		//Render Debug
+		PushCommand(CreateRC<RenderDebugRC>(&m_frame->debugObjects, &m_renderContext));
+
 		// FXAA Anti-Aliasing and Render front
 		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
 		PushCommand(CreateRC<RenderFXAARC>(m_FXAAShdr, &m_renderContext));
@@ -1008,6 +1011,47 @@ namespace PrRenderer::Core
 		p_upsampleShader->Unbind();
 
 		LowRenderer::EnableBlending(false);
+	}
+
+	void DefRendererBackend::RenderDebug(RenderObjectVector* p_debugObjects, const RenderContext* p_renderContext)
+	{
+		p_renderContext->otuputBuff->Bind();
+
+		for (auto& object : *p_debugObjects)
+		{
+			auto material = object->material;
+			auto shader = material->GetShader();
+			auto mesh = object->mesh;
+			auto primitives = object->wiredframe ? Primitives::LineStrip : Primitives::Triangles;
+
+			material->Bind();
+			shader->SetUniformMat4("PIPELINE_VP_MAT", p_renderContext->camera->GetCameraMatrix());
+			shader->SetUniformFloat("PIPELINE_NEAR", p_renderContext->camera->GetNear());
+			shader->SetUniformFloat("PIPELINE_FAR", p_renderContext->camera->GetFar());
+
+			if (object->type == RenderObjectType::Mesh)
+			{
+				shader->SetUniformMat4("PIPELINE_MODEL_MAT", object->worldMat);
+				shader->SetUniformInt("PIPELINE_INTANCE_COUNT", 0);
+
+				mesh->Bind();
+				
+				LowRenderer::Draw(mesh->GetVertexArray(), primitives);
+			}
+			else if (object->type == RenderObjectType::InstancedMesh)
+			{
+				shader->SetUniformMat4Array("PIPELINE_MODEL_MAT_ARRAY[0]", object->worldMatrices.data(), object->worldMatrices.size());
+				shader->SetUniformInt("PIPELINE_INTANCE_COUNT", object->instanceSize);
+
+				mesh->Bind();
+				LowRenderer::DrawInstanced(mesh->GetVertexArray(), object->instanceSize, primitives);
+			}
+
+			material->Unbind();
+			mesh->Unbind();
+		}
+
+		p_renderContext->otuputBuff->Unbind();
 	}
 
 	void DefRendererBackend::RenderLight(Resources::ShaderPtr p_lightShdr, DirLightObjectPtr p_mianDirectLight, std::vector<LightObjectPtr>* p_lights, const RenderContext* p_renderContext)

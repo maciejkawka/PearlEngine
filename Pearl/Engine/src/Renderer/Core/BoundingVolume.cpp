@@ -145,9 +145,9 @@ BoxVolume::BoxVolume(const std::vector<PrCore::Math::vec3>&p_vertices)
 
 	m_center = (m_max + m_min) * 0.5f;
 	m_extends = PrCore::Math::vec3(
-		m_max.x - m_center.x,
-		m_max.y - m_center.y,
-		m_max.z - m_center.z
+		PrCore::Math::max(m_max.x - m_center.x, 0.01f),
+		PrCore::Math::max(m_max.y - m_center.y, 0.01f),
+		PrCore::Math::max(m_max.z - m_center.z, 0.01f)
 	);
 	m_size = m_extends * 2.0f;
 }
@@ -173,9 +173,14 @@ bool BoxVolume::IsOnFrustrum(const Frustrum& p_frustrum, PrCore::Math::mat4 p_tr
 		PrCore::Math::length(PrCore::Math::vec3(p_transform[0][1], p_transform[1][1], p_transform[2][1])),
 		PrCore::Math::length(PrCore::Math::vec3(p_transform[0][2], p_transform[1][2], p_transform[2][2]))
 	);
-	auto scaledExtends = m_extends * scale;
 
-	for(int i=0;i<6;i++)
+	PrCore::Math::mat3 RS(p_transform);
+	PrCore::Math::mat3 scaleMat = PrCore::Math::scale(PrCore::Math::mat4(1), scale);
+	PrCore::Math::mat3 rotationMat = RS * PrCore::Math::inverse(scaleMat);
+
+	auto scaledExtends = m_extends * rotationMat * scale;
+	scaledExtends = PrCore::Math::abs(scaledExtends);
+	for (int i = 0; i < 6; i++)
 	{
 		auto plane = p_frustrum.GetPlane(i);
 		auto planeNormal = plane.GetNormal();
@@ -186,7 +191,9 @@ bool BoxVolume::IsOnFrustrum(const Frustrum& p_frustrum, PrCore::Math::mat4 p_tr
 		float distance = PrCore::Math::dot(planeNormal, translatedCenter) + plane.GetDistance();
 
 		if (distance <= -radius)
+		{
 			return false;
+		}
 	}
 
 	return true;
