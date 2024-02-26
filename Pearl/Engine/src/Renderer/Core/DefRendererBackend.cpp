@@ -48,6 +48,9 @@ namespace PrRenderer::Core
 
 	void DefRendererBackend::PreparePipeline()
 	{
+		SCOPE_HIGH_TIMER_CALLBACK(
+			{ m_frame->frameInfo.timeEvents.push_back({ "PreparePipeline", time }); });
+
 		// Temp variables
 		const auto camera = m_frame->camera;
 		auto clock = PrCore::Utils::Clock::GetInstancePtr();
@@ -92,8 +95,6 @@ namespace PrRenderer::Core
 
 		// Shadow Mapping
 		//---------------------------------
-		TIME_RC_START(ShadowMapping);
-
 		// Camera settings has changed, recalculate CSM matrices
 		if((m_frame->renderFlag & RendererFlag::CameraPerspectiveRecalculate) == RendererFlag::CameraPerspectiveRecalculate)
 		{
@@ -251,8 +252,6 @@ namespace PrRenderer::Core
 		PushCommand(CreateRC<LowRenderer::SetViewportRC>(PrCore::Windowing::Window::GetMainWindow().GetWidth(),
 			PrCore::Windowing::Window::GetMainWindow().GetHeight(), 0, 0));
 
-		TIME_RC_STOP(ShadowMapping);
-
 		//---------------------------------
 
 		// Opaque Objects
@@ -264,10 +263,8 @@ namespace PrRenderer::Core
 				LowRenderer::EnableDepth(true);
 			}));
 
-		TIME_RC_START(OpaquePass);
 		for (auto object : m_frame->opaqueObjects)
 			PushCommand(CreateRC<RenderOpaqueRC>(object, &m_renderContext));
-		TIME_RC_STOP(OpaquePass);
 
 		PushCommand(CreateRC<LambdaFunctionRC>([&]()
 			{
@@ -299,12 +296,9 @@ namespace PrRenderer::Core
 			PushCommand(CreateRC<RenderSSAORC>(m_SSAOShdr, m_SSAOBlurShdr, &m_renderContext));
 
 		// PBR Light Pass
-		TIME_RC_START(LightPass);
 		PushCommand(CreateRC<RenderLightRC>(m_pbrLightShdr, m_frame->mainDirectLight, &m_frame->lights, &m_renderContext));
-		TIME_RC_STOP(LightPass);
 
 		// Transparent Forward Pass
-		TIME_RC_START(TransparentPass);
 		PushCommand(CreateRC<LambdaFunctionRC>([&]()
 			{
 				m_renderContext.otuputBuff->Bind();
@@ -322,12 +316,9 @@ namespace PrRenderer::Core
 				LowRenderer::EnableCullFace(false);
 				LowRenderer::EnableBlending(false);
 			}));
-		TIME_RC_STOP(TransparentPass);
 		//---------------------------------
 
 		// Post Processing
-		TIME_RC_START(PostProcessPass);
-
 		// Fog
 		if (m_settings->enableFog)
 		{
@@ -349,12 +340,13 @@ namespace PrRenderer::Core
 		// FXAA Anti-Aliasing and Render front
 		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
 		PushCommand(CreateRC<RenderFXAARC>(m_FXAAShdr, &m_renderContext));
-
-		TIME_RC_STOP(PostProcessPass);
 	}
 
 	void DefRendererBackend::Render()
 	{
+		SCOPE_HIGH_TIMER_CALLBACK(
+			{ m_frame->frameInfo.timeEvents.push_back({ "RenderOnCPU", time }); });
+
 		while (!m_commandQueue.empty())
 		{
 			m_commandQueue.front()->Invoke();

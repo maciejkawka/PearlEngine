@@ -349,5 +349,4 @@ namespace PrRenderer::Core {
 	};
 
 	using FrameDataPtr = std::shared_ptr<FrameData>;
-
 }

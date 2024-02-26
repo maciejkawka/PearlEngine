@@ -40,12 +40,4 @@ namespace PrRenderer::Core {
 	};
 
 	using RendererBackendPtr = std::shared_ptr<IRendererBackend>;
-
-#define TIME_RC_START(label) \
-	PrCore::Utils::HighResolutionTimer label; \
-	PushCommand(CreateRC<LambdaFunctionRC>([&] { label.Start(); }))
-
-#define TIME_RC_STOP(label) \
-	PushCommand(CreateRC<LambdaFunctionRC>([&] { m_frame->frameInfo.timeEvents.push_back({ #label, label.Stop() }); }))
-
 }
