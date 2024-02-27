@@ -18,6 +18,7 @@ namespace PrRenderer::Core {
 		void BuildFrame() override;
 		void FillFrameWithColor() override {}
 
+		virtual void DrawCube(const Math::mat4& p_transformMat, bool p_wireframe = true) override;
 		virtual void DrawCube(const Math::vec3& p_center, const Math::vec3& p_size, bool p_wireframe = true) override;
 		virtual void DrawSphere(const Math::vec3& p_center, float p_radius, bool p_wireframe = true) override;
 		virtual void DrawLine(const Math::vec3& p_start, const Math::vec3& p_end) override;

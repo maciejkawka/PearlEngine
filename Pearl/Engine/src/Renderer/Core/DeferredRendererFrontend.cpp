@@ -248,20 +248,25 @@ void DefferedRendererFrontend::BuildFrame()
 	m_currentFrame->frameInfo.frameID = m_frameID++;
 }
 
-void DefferedRendererFrontend::DrawCube(const Math::vec3& p_center, const Math::vec3& p_size, bool p_wireframe)
+void DefferedRendererFrontend::DrawCube(const Math::mat4& p_transformMat, bool p_wireframe)
 {
-	Math::mat4 transformMat = Math::translate(Math::mat4(1.0f), p_center)
-		* Math::scale(Math::mat4(1.0f), p_size);
-
 	auto renderObj = std::make_shared<RenderObject>();
 	renderObj->type = RenderObjectType::Mesh;
 	renderObj->material = m_debugMaterial;
-	renderObj->worldMat = transformMat;
+	renderObj->worldMat = p_transformMat;
 	renderObj->id = 0;
 	renderObj->mesh = Resources::Mesh::CreatePrimitive(Resources::Cube);
 	renderObj->wiredframe = p_wireframe;
 
 	m_currentFrame->debugObjects.push_back(renderObj);
+}
+
+void DefferedRendererFrontend::DrawCube(const Math::vec3& p_center, const Math::vec3& p_size, bool p_wireframe)
+{
+	Math::mat4 transformMat = Math::translate(Math::mat4(1.0f), p_center)
+		* Math::scale(Math::mat4(1.0f), p_size);
+
+	DrawCube(transformMat, p_wireframe);
 }
 
 void DefferedRendererFrontend::DrawSphere(const Math::vec3& p_center, float p_radius, bool p_wireframe)
