@@ -554,6 +554,9 @@
     <ClCompile Include="src\Renderer\Core\CascadeShadowMapper.cpp">
       <Filter>Renderer\Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\ECS\Systems\TestSystem.cpp">
+      <Filter>Core\ECS\Systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\Engine\Core\ECS\ComponentPool.inl">

@@ -61,7 +61,7 @@ const vec2        poissonDisk[16] = {
     vec2(0.437026f, 0.011920f)
 };
 const int         maxDirLightNum = 8;
-const int         maxPointLightNum = 16;
+const int         maxPointLightNum = 40;
 const int         maxSpotLightNum = 16;
 
 

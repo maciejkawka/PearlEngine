@@ -16,9 +16,5 @@ namespace PrCore::ECS {
 
 		inline virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
 		inline virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
-
-	private:
-		PrRenderer::Core::Camera* m_camera;
-		int lightID = 0;
 	};
 }

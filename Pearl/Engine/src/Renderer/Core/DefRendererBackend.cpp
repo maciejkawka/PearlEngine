@@ -942,11 +942,6 @@ namespace PrRenderer::Core
 		float& threshold = p_renderContext->settings->bloomThreshold;
 		float& knee = p_renderContext->settings->bloomKnee;
 
-		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::Y))
-			threshold += 0.1f;
-		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::H))
-			threshold -= 0.1f;
-
 		p_downsampleShader->Bind();
 		p_renderContext->quadMesh->Bind();
 		p_renderContext->postprocessTex->Bind(0);

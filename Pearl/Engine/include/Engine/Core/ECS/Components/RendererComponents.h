@@ -71,6 +71,9 @@ namespace PrCore::ECS {
 			p_serialized["Type"] = m_light->GetType();
 			p_serialized["InnerCone"] = m_light->GetInnerCone();
 			p_serialized["OutterCone"] = m_light->GetOutterCone();
+
+			p_serialized["ShadowCaster"] = m_shadowCast;
+			p_serialized["MainLight"] = mainDirectLight;
 		}
 
 		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override
@@ -82,6 +85,9 @@ namespace PrCore::ECS {
 			m_light->SetType(p_deserialized["Type"]);
 			m_light->SetInnerCone(p_deserialized["InnerCone"]);
 			m_light->SetOutterCone(p_deserialized["OutterCone"]);
+
+			m_shadowCast = p_deserialized["ShadowCaster"];
+			mainDirectLight = p_deserialized["MainLight"];
 		}
 	};
 

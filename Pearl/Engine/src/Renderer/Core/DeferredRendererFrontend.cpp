@@ -50,34 +50,24 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 		return;
 	}
 
-	// If this is normal light
-	if (m_pointLightShadowNumber >m_renderSettings->pointLightMaxShadows)
-	{
-		PRLOG_WARN("FrontendRenderer: Discarding point light, max limit exceeded");
-		return;
-	}
-	if(m_spotLightShadowNumber > m_renderSettings->spotLightMaxShadows)
-	{
-		PRLOG_WARN("FrontendRenderer: Discarding spot light, max limit exceeded");
-		return;
-	}
-	if (m_dirLightShadowNumber > m_renderSettings->dirLightMaxShadows)
-	{
-		PRLOG_WARN("FrontendRenderer: Discarding directional light, max limit exceeded");
-		return;
-	}
-
 	const auto& light = p_lightComponent->m_light;
 	LightObjectPtr lightObject = nullptr;
 	switch (light->GetType())
 	{
 	case Resources::LightType::Directional:
 	{
+		if(m_dirLightNumber > MAX_LIGHT_DIRECT_COUNT)
+		{
+			PRLOG_WARN("FrontendRenderer: Discarding directional light, max limit {0} exceeded", MAX_LIGHT_DIRECT_COUNT);
+			return;
+		}
+
 		lightObject = std::make_shared<DirLightObject>();
 		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
 		lightObject->id = p_id;
+		m_dirLightNumber++;
 
-		if (p_lightComponent->m_shadowCast)
+		if (p_lightComponent->m_shadowCast && m_dirLightShadowNumber < m_renderSettings->dirLightMaxShadows)
 		{
 			lightObject->castShadow = true;
 			lightObject->shadowMapPos = m_nextDirLightPos;
@@ -88,11 +78,18 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 	}
 	case Resources::LightType::Point:
 	{
+		if (m_pointLightNumber > MAX_LIGHT_POINT_COUNT)
+		{
+			PRLOG_WARN("FrontendRenderer: Discarding point light, max limit {0} exceeded", MAX_LIGHT_POINT_COUNT);
+			return;
+		}
+
 		lightObject = std::make_shared<LightObject>();
 		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
 		lightObject->id = p_id;
+		m_pointLightNumber++;
 
-		if (p_lightComponent->m_shadowCast)
+		if (p_lightComponent->m_shadowCast && m_pointLightShadowNumber < m_renderSettings->pointLightMaxShadows)
 		{
 			lightObject->castShadow = true;
 			lightObject->shadowMapPos = m_nextPointLightPos;
@@ -103,11 +100,18 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 	}
 	case Resources::LightType::Spot:
 	{
+		if (m_spotLightNumber > MAX_LIGHT_SPOT_COUNT)
+		{
+			PRLOG_WARN("FrontendRenderer: Discarding spot light, max limit {0} exceeded", MAX_LIGHT_SPOT_COUNT);
+			return;
+		}
+
 		lightObject = std::make_shared<SpotLightObject>();
 		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
 		lightObject->id = p_id;
+		m_spotLightNumber++;
 
-		if (p_lightComponent->m_shadowCast)
+		if (p_lightComponent->m_shadowCast && m_spotLightShadowNumber < m_renderSettings->spotLightMaxShadows)
 		{
 			lightObject->castShadow = true;
 			lightObject->shadowMapPos = m_nextSpotLightPos;
@@ -213,7 +217,9 @@ void DefferedRendererFrontend::PrepareFrame()
 	m_dirLightShadowNumber = 0;
 	m_pointLightShadowNumber = 0;
 	m_spotLightShadowNumber = 0;
-
+	m_spotLightNumber = 0;
+	m_pointLightNumber = 0;
+	m_dirLightNumber = 0;
 }
 
 void DefferedRendererFrontend::BuildFrame()

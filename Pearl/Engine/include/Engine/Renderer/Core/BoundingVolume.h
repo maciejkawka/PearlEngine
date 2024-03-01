@@ -6,6 +6,7 @@ namespace PrRenderer::Core {
 	class Frustrum {
 	public:
 		Frustrum() = default;
+		Frustrum(const PrCore::Math::mat4& m_transformMatrix);
 		Frustrum(const PrCore::Math::mat4& p_projMat, const PrCore::Math::mat4& p_viewMat);
 
 		PrCore::Math_PrTypes::Plane GetPlane(int p_index) const;

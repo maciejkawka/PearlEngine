@@ -26,6 +26,8 @@ namespace PrRenderer::Core {
 
 		virtual void SetDebugColor(const Color& p_color) override;
 
+		Camera* GetCamera() { return m_camera; }
+
 	private:
 		size_t InstanciateObjects(RenderObjectVector& p_renderObjects);
 
@@ -37,6 +39,10 @@ namespace PrRenderer::Core {
 		size_t m_pointLightShadowNumber = 0;
 		size_t m_spotLightShadowNumber = 0;
 		size_t m_dirLightShadowNumber = 0;
+
+		size_t m_pointLightNumber = 0;
+		size_t m_spotLightNumber = 0;
+		size_t m_dirLightNumber = 0;
 
 		RenderObjectPtr m_cubemapObject;
 		Resources::ShaderPtr m_debugShader;

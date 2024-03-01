@@ -4,11 +4,13 @@
 #include"Renderer/Resources/Mesh.h"
 #include"Renderer/Resources/Light.h"
 
-namespace PrRenderer::Core {
-
 #define SHADOW_CASCADES_COUNT 4
-#define MAX_LIGHT_COUNT 200
+#define MAX_LIGHT_POINT_COUNT 40
+#define MAX_LIGHT_SPOT_COUNT 16
+#define MAX_LIGHT_DIRECT_COUNT 8
 #define BLOOM_SIZE 4
+
+namespace PrRenderer::Core {
 
 	struct RenderObject;
 

@@ -2,6 +2,7 @@
 #include "Core/ECS/BaseSystem.h"
 #include "Core/ECS/Components.h"
 #include "Core/Input/InputManager.h"
+#include "Renderer/Core/DeferredRendererFrontend.h"
 
 namespace PrCore::ECS
 {
@@ -21,6 +22,27 @@ namespace PrCore::ECS
 				transform->SetPosition(position);
 			}
 		}
+
+		inline virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
+		inline virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
+	};
+
+	class RenderStressTest : public BaseSystem {
+	public:
+
+		virtual ~RenderStressTest() override
+		{
+			delete m_cameraTransform;
+		}
+
+		void OnEnable() override;
+		void OnDisable() override;
+		void OnUpdate(float p_dt) override;
+
+		TransformComponent* m_cameraTransform;
+		PrRenderer::Core::Camera* m_camera;
+		int m_selectedLight = 0;
+		int m_maxLight = 0;
 
 		inline virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
 		inline virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}

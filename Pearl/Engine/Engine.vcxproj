@@ -123,6 +123,7 @@
     <ClCompile Include="src\Core\ECS\SceneManager.cpp" />
     <ClCompile Include="src\Core\ECS\SystemManager.cpp" />
     <ClCompile Include="src\Core\ECS\Systems\MeshRendererSystem.cpp" />
+    <ClCompile Include="src\Core\ECS\Systems\TestSystem.cpp" />
     <ClCompile Include="src\Core\ECS\Systems\TransformSystem.cpp" />
     <ClCompile Include="src\Core\Entry\AppContext.cpp" />
     <ClCompile Include="src\Core\Entry\Application.cpp" />
