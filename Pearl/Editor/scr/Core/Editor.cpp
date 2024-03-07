@@ -102,6 +102,12 @@ void Editor::OnFrame(float p_deltaTime)
 	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F4))
 		PRLOG_INFO("Culled objects {0}", testInfo.culledObjects);
 
+	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F5))
+		PRLOG_INFO("Draw triangles {0}", testInfo.drawTriangles);
+
+	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F6))
+		PRLOG_INFO("Draw objects {0}", testInfo.drawObjects	);
+
 	PrRenderer::Core::DefferedRendererFrontend::GetInstance().BuildFrame();
 	m_appContext->m_rendererBackend->PreparePipeline();
 }

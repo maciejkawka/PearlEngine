@@ -138,6 +138,7 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 	//Preapre data
 	auto meshComponent = p_entity.GetComponent<ECS::MeshRendererComponent>();
 	auto mesh = meshComponent->mesh;
+	auto shadowMesh = meshComponent->shadowMesh;
 	auto material = meshComponent->material;
 	auto transformComponent = p_entity.GetComponent<ECS::TransformComponent>();
 	auto worldMatrix = transformComponent->GetWorldMatrix();
@@ -147,6 +148,7 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 	object->id = p_entity.GetID().GetID();
 	object->material = material;
 	object->mesh = mesh;
+	object->shadowMesh = shadowMesh;
 	object->type = RenderObjectType::Mesh;
 	object->worldMat = worldMatrix;
 
@@ -161,8 +163,8 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 
 	// Frustrum culling
 	// Discard objects that are not visable in the main m_camera
-	const auto frustrum = Frustrum(m_camera->GetProjectionMatrix(), m_camera->GetViewMatrix());
-	if (!mesh->GetBoxVolume().IsOnFrustrum(frustrum, worldMatrix))
+	//const auto frustrum = Frustrum(m_camera->GetProjectionMatrix(), m_camera->GetViewMatrix());
+	if (!mesh->GetBoxVolume().IsOnFrustrum(m_frustrum, worldMatrix))
 	{
 		m_currentFrame->frameInfo.culledObjects++;
 		return;
@@ -239,12 +241,12 @@ void DefferedRendererFrontend::BuildFrame()
 	//Instanciate objects
 	if(m_renderSettings->enableInstancing)
 	{
-		m_currentFrame->frameInfo.instancedObjects += InstanciateObjects(m_currentFrame->opaqueObjects);
-		m_currentFrame->frameInfo.instancedObjects += InstanciateObjects(m_currentFrame->transpatrentObjects);
+		m_currentFrame->frameInfo.instancedObjects += InstanciateObjectsByMaterial(m_currentFrame->opaqueObjects);
+		m_currentFrame->frameInfo.instancedObjects += InstanciateObjectsByMaterial(m_currentFrame->transpatrentObjects);
 
 		// Do not count instanced shadow and debug objects
-		InstanciateObjects(m_currentFrame->shadowCasters);
-		InstanciateObjects(m_currentFrame->debugObjects);
+		InstanciateObjectsByMaterial(m_currentFrame->shadowCasters);
+		InstanciateObjectsByMaterial(m_currentFrame->debugObjects);
 	}
 
 	//Send objects to the backend renderer
@@ -252,6 +254,12 @@ void DefferedRendererFrontend::BuildFrame()
 
 	m_currentFrame->frameInfo.frameTimeStamp = Utils::Clock::GetInstance().GetRealTime();
 	m_currentFrame->frameInfo.frameID = m_frameID++;
+}
+
+void DefferedRendererFrontend::CalculateFrustrum()
+{
+	m_camera->RecalculateMatrices();
+	m_frustrum.Calculate(m_camera->GetCameraMatrix());
 }
 
 void DefferedRendererFrontend::DrawCube(const Math::mat4& p_transformMat, bool p_wireframe)
@@ -313,7 +321,7 @@ void DefferedRendererFrontend::SetDebugColor(const Color& p_color)
 	m_debugMaterial->SetProperty("color", static_cast<Math::vec4>(p_color));
 }
 
-size_t DefferedRendererFrontend::InstanciateObjects(RenderObjectVector& p_renderObjects)
+size_t DefferedRendererFrontend::InstanciateObjectsByMaterial(RenderObjectVector& p_renderObjects)
 {
 	RenderObjectVector instanciateCandidates;
 	size_t instancedObjects = 0;
@@ -325,12 +333,12 @@ size_t DefferedRendererFrontend::InstanciateObjects(RenderObjectVector& p_render
 		auto& hash = object->sortingHash;
 		const auto materiaHash = hash.GetMaterialHash();
 		const auto renderOrder = hash.GetRenderOrder();
-		auto meshName = object->mesh->GetName();
+		auto meshName = object->mesh->GetNameHash();
 
 		//Find instance candidates
 		size_t instancedCount = 0;
 		auto innerIt = objIt;
-		while(objIt != p_renderObjects.end() && (*objIt)->sortingHash.GetMaterialHash() == materiaHash && (*objIt)->mesh->GetName() == meshName)
+		while(objIt != p_renderObjects.end() && (*objIt)->sortingHash.GetMaterialHash() == materiaHash && (*objIt)->mesh->GetNameHash() == meshName)
 		{
 			instanciateCandidates.push_back(*objIt);
 			instancedCount++;
@@ -356,18 +364,89 @@ size_t DefferedRendererFrontend::InstanciateObjects(RenderObjectVector& p_render
 				}
 
 				//Create material for instanced group
-				auto instancedMesh = instnaceFront->mesh;
-				auto instancedMat = instnaceFront->material;
+				const auto instancedMesh = instnaceFront->mesh;
+				const auto instancedMeshShadow = instnaceFront->shadowMesh;
+				const auto instancedMat = instnaceFront->material;
 
 				RenderObjectPtr instncedObj = std::make_shared<RenderObject>();
 				instncedObj->material = instancedMat;
 				instncedObj->mesh = instancedMesh;
+				instncedObj->shadowMesh = instancedMeshShadow;
 				instncedObj->id = 0;
 				instncedObj->sortingHash = instnaceFront->sortingHash;
 				instncedObj->type = RenderObjectType::InstancedMesh;
 				instncedObj->instanceSize = matrices.size();
 				instncedObj->worldMatrices = matrices;
 				instncedObj->wiredframe = object->wiredframe;
+
+				//Erase instanced objects from the buffer
+				innerIt = p_renderObjects.erase(innerItBegin, innerIt);
+				//Insert instanced object
+				objIt = p_renderObjects.insert(innerIt, instncedObj);
+				++objIt;
+
+				matrices.clear();
+			}
+
+			instancedObjects += instancedCount;
+		}
+
+		instanciateCandidates.clear();
+	}
+
+	return instancedObjects;
+}
+
+size_t DefferedRendererFrontend::InstanciateObjectsByMesh(RenderObjectVector& p_renderObjects)
+{
+	RenderObjectVector instanciateCandidates;
+	size_t instancedObjects = 0;
+
+	for (auto objIt = p_renderObjects.begin(); objIt != p_renderObjects.end();)
+	{
+		//First element data
+		const auto object = *objIt;
+		auto meshName = object->mesh->GetNameHash();
+
+		//Find instance candidates
+		size_t instancedCount = 0;
+		auto innerIt = objIt;
+		while (objIt != p_renderObjects.end() && (*objIt)->mesh->GetNameHash() == meshName)
+		{
+			instanciateCandidates.push_back(*objIt);
+			instancedCount++;
+			++objIt;
+		}
+
+		//Check if worth instancing
+		if (instancedCount > MIN_INSTANCE_COUNT)
+		{
+			//Grab common data for all instances
+			const auto& instnaceFront = instanciateCandidates.front();
+
+			std::vector<PrCore::Math::mat4> matrices;
+			matrices.reserve(MAX_INSTANCE_COUNT);
+			for (int i = 0; i < instancedCount; )
+			{
+				const auto innerItBegin = innerIt;
+				while (i < instanciateCandidates.size() && matrices.size() < MAX_INSTANCE_COUNT)
+				{
+					matrices.push_back(std::move((*innerIt)->worldMat));
+					i++;
+					++innerIt;
+				}
+
+				//Create material for instanced group
+				const auto instancedMesh = instnaceFront->mesh;
+				const auto instancedMeshShadow = instnaceFront->shadowMesh;
+
+				RenderObjectPtr instncedObj = std::make_shared<RenderObject>();
+				instncedObj->mesh = instancedMesh;
+				instncedObj->shadowMesh = instancedMeshShadow;
+				instncedObj->id = 0;
+				instncedObj->type = RenderObjectType::InstancedMesh;
+				instncedObj->instanceSize = matrices.size();
+				instncedObj->worldMatrices = matrices;
 
 				//Erase instanced objects from the buffer
 				innerIt = p_renderObjects.erase(innerItBegin, innerIt);

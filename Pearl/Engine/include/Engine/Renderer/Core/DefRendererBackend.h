@@ -83,12 +83,12 @@ namespace PrRenderer::Core {
 		REGISTER_RENDER_COMMAND(RenderOpaque, RenderOpaque, RenderObjectPtr, RenderContext*);
 
 		// Renders object into the directional and spotlight map
-		static void RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderToShadowMap, RenderToShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, std::list<RenderObjectPtr>*, RenderContext*);
+		static void RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData);
+		REGISTER_RENDER_COMMAND(RenderToShadowMap, RenderToShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, LightObjectPtr, std::list<RenderObjectPtr>*, RenderContext*);
 
 		// Renders object into the point light map
-		static void RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightMatrix, PrCore::Math::vec3& p_lightPos, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderToPointShadowMap, RenderToPointShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, PrCore::Math::vec3, std::list<RenderObjectPtr>*, RenderContext*);
+		static void RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightView, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData);
+		REGISTER_RENDER_COMMAND(RenderToPointShadowMap, RenderToPointShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, LightObjectPtr, std::list<RenderObjectPtr>*, RenderContext*);
 
 		// After objects are rendered into GBuffer this pass calculates PBR Ligthing, with global iluminance
 		static void RenderLight(Resources::ShaderPtr p_lightShdr, DirLightObjectPtr p_mianDirectLight, std::vector<LightObjectPtr>* p_lights, const RenderContext* p_renderContext);

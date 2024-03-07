@@ -252,7 +252,7 @@ vec3 PBR_Light(mat4 light, PBR_Data data)
         float epsilon = light[1].w - light[2].w;
         float intensity = clamp((theta - light[2].w) / epsilon, 0.0, 1.0);
 
-        if (intensity == 0)
+        if (intensity == 0 || distance >= lightRange)
             return vec3(0.0f);
 
         attenuation =  1.0 / ( 1.0f + 1.0 * distance + 1.0 * distance * distance);
@@ -430,7 +430,7 @@ float SHDW_CalculateSpotLightFactor(vec3 fragPos, int lightIndex)
 {
     vec4 lightSpacePos = SHDW_SpotLightViewMat[lightIndex] * vec4(fragPos, 1.0f);
     vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
-    // Convert [-1, 1] to [0, 1]
+
     projCoords = 0.5 * projCoords + 0.5;
     float fragToLight = projCoords.z;
 
@@ -467,11 +467,10 @@ float SHDW_CalculateDirectLightFactor(float depth, vec3 fragPos, int lightIndex)
         {
             vec4 lightSpacePos = SHDW_DirLightViewMat[lightIndex * SHDW_cascadesCount + i] * vec4(fragPos, 1.0f);
             vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
-            // Convert [-1, 1] to [0, 1]
+
             projCoords = 0.5 * projCoords + 0.5;
             float fragToLight = projCoords.z;
             shadowFactor = SHDW_PCSS(SHDW_DirLightID[lightIndex] * SHDW_cascadesCount + i, projCoords.xy, fragToLight, SHDW_DirLightMap, SHDW_DirLightMapSize, SHDW_DirLightCombineShadowMapSize, SHDW_DirLightBias * SHDW_RadiusRatio[i], SHDW_DirLightSize * SHDW_RadiusRatio[i]);
-            //Lo = CSM_DebugCascades(i) * shadowFactor;
             break;
         }
     }
@@ -526,24 +525,32 @@ float SHDW_CalculateMainDirectLightFactor(float depth, vec3 fragPos)
 void main()
 {
     //Sample Textures
-    vec3 albedo = texture(albedoMap, uv0).rgb;
-    float roughness = texture(albedoMap, uv0).a;
-    float ao = texture(aoMap, uv0).a;
-    vec3 emission = texture(aoMap, uv0).rgb;
-    vec3 N = texture(normalMap, uv0).rgb;
-    float metallic = texture(normalMap, uv0).a;
-    vec3 pos = texture(positionMap, uv0).rgb;
-    float depth = texture(positionMap, uv0).a;
+    vec4 albedoSampled = texture(albedoMap, uv0).rgba;
+    vec3 albedo = albedoSampled.rgb;
+    float roughness = albedoSampled.a;
+
+    vec4 aoSampled = texture(aoMap, uv0).rgba;
+    float ao = aoSampled.a;
+    vec3 emission = aoSampled.rgb;
+
+    vec4 normalSampled = texture(normalMap, uv0).rgba;
+    vec3 N = normalSampled.rgb;
+    float metallic = normalSampled.a;
+
+    vec4 positionSampled = texture(positionMap, uv0).rgba;
+    vec3 pos = positionSampled.rgb;
+    float depth = positionSampled.a;
 
     //If depth is 0 discard
     if(depth == 0)
         discard;
+
     // If N is vec3(0) it means we do not want to make a lighing on that fragment and copy albedo to the buffer
     if(N == vec3(0.0f))
-      {
+    {
         FragColor = vec4(albedo, 1.0f);
         return;
-      }
+    }
       
     N = normalize(N);
     vec3 V = normalize(camPos - pos);
@@ -569,62 +576,53 @@ void main()
     //Main CSM Directional Light
     if(SHDW_HasMainDirLight == true)
     { 
-        float shadowFactor = 1;
-        if(SHDW_MainDirLightShadow == true)
+        vec3 lightAmmount = PBR_Light(SHDW_MainDirLightMat, data);
+        if(length(lightAmmount) > 0.001f && SHDW_MainDirLightShadow == true)
         {
-            shadowFactor = SHDW_CalculateMainDirectLightFactor(depth, pos);
+            float shadowFactor = SHDW_CalculateMainDirectLightFactor(depth, pos);
+            lightAmmount *= shadowFactor;
         }
-        if (shadowFactor > 0.0f)
-        {
-            Lo += PBR_Light(SHDW_MainDirLightMat, data) * shadowFactor;
-        }
+
+        Lo += lightAmmount;
     }
 
     //Directional Light
     for (int i = 0; i < SHDW_DirLightNumber; i++)
     {
-        vec3 lightDir = normalize(-SHDW_DirLightMat[i][1].xyz);
-        float shadowFactor = 1;
-        if(SHDW_DirLightID[i] != -1)
+        vec3 lightAmmount = PBR_Light(SHDW_DirLightMat[i], data);
+        if(length(lightAmmount) > 0.001f && SHDW_DirLightID[i] != -1)
         {
-            shadowFactor = SHDW_CalculateDirectLightFactor(depth, pos, i);
+            float shadowFactor = SHDW_CalculateDirectLightFactor(depth, pos, i);
+            lightAmmount *= shadowFactor;
         }
-    
-        if (shadowFactor > 0.0f)
-        {
-            vec3 lightAmmount = PBR_Light(SHDW_DirLightMat[i], data) * shadowFactor;
-            Lo += lightAmmount;
-        }
+
+        Lo += lightAmmount;
     }
     
     //Point Light
     for (int i = 0; i < SHDW_PointLightNumber; i++)
     {
-        float shadowFactor = 1;
-        if(SHDW_PointLightID[i] != -1)
+        vec3 lightAmmount = PBR_Light(SHDW_PointLightMat[i], data);
+        if(length(lightAmmount) > 0.001f && SHDW_PointLightID[i] != -1)
         {
-            shadowFactor = SHDW_CalculatePointFactor(SHDW_PointLightMat[i], pos, i);
+            float shadowFactor = SHDW_CalculatePointFactor(SHDW_PointLightMat[i], pos, i);
+            lightAmmount *= shadowFactor;
         }
-        if (shadowFactor > 0.0f)
-        {
-            vec3 lightAmmount = PBR_Light(SHDW_PointLightMat[i], data) * shadowFactor;
-            Lo += lightAmmount;
-        }
+
+        Lo += lightAmmount;
     }
 
     //Spot Light
     for (int i = 0; i < SHDW_SpotLightNumber; i++)
     {
-        float shadowFactor = 1;
-        if(SHDW_SpotLightID[i] != -1)
+        vec3 lightAmmount = PBR_Light(SHDW_SpotLightMat[i], data);
+        if(length(lightAmmount) > 0.001f && SHDW_SpotLightID[i] != -1)
         {
-            shadowFactor = SHDW_CalculateSpotLightFactor(pos, i);
+            float shadowFactor = SHDW_CalculateSpotLightFactor(pos, i);
+            lightAmmount *= shadowFactor;
         }
-        if (shadowFactor > 0.0f)
-        {
-            vec3 lightAmmount = PBR_Light(SHDW_SpotLightMat[i], data) * shadowFactor;
-            Lo += lightAmmount;
-        }
+
+        Lo += lightAmmount;
     }
 
     //IR diffuse 

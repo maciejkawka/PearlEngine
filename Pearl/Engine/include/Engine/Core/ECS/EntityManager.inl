@@ -127,6 +127,6 @@ namespace PrCore::ECS {
 		auto findComponentPool = m_ComponentPools.find(componentID);
 		PR_ASSERT(findComponentPool != m_ComponentPools.end(), "Component not registered " + std::string(typeid(T).name()));
 
-		return std::static_pointer_cast<ComponentPool<T>>(m_ComponentPools[componentID]);
+		return std::static_pointer_cast<ComponentPool<T>>(findComponentPool->second);
 	}
 }

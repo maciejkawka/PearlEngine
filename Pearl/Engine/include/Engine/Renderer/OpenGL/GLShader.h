@@ -65,6 +65,7 @@ namespace PrRenderer::OpenGL {
 		int GetUniformLocation(const std::string& p_name);
 
 		std::string m_vertexShader;
+		std::string m_geometryShader;
 		std::string m_fragmentShader;
 	};
 }

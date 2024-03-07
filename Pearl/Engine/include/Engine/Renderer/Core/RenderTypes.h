@@ -86,6 +86,7 @@ namespace PrRenderer::Core {
 		size_t                 id;
 		Resources::MaterialPtr material;
 		Resources::MeshPtr     mesh;
+		Resources::MeshPtr     shadowMesh;
 		SortingHash            sortingHash;
 		PrCore::Math::mat4     worldMat;
 		bool                   wiredframe = false;
@@ -352,4 +353,15 @@ namespace PrRenderer::Core {
 	};
 
 	using FrameDataPtr = std::shared_ptr<FrameData>;
+}
+
+//RenderUtils
+namespace RenderUtils
+{
+	inline size_t CalculateDepthValue(const PrCore::Math::vec3& p_position, PrRenderer::Core::Camera* p_camera)
+	{
+		auto camera = p_camera;
+		auto distance = PrCore::Math::distance(p_position, camera->GetPosition());
+		return (distance - camera->GetNear()) / (camera->GetFar() - camera->GetNear()) * 0xFFFFFF;
+	}
 }

@@ -28,6 +28,8 @@ void MeshRendererSystem::OnDisable()
 
 void MeshRendererSystem::OnUpdate(float p_dt)
 {
+	DefferedRendererFrontend::GetInstance().CalculateFrustrum();
+
 	for (auto entity : m_entityViewer.EntitesWithComponents<LightComponent, TransformComponent>())
 	{
 		auto transform = entity.GetComponent<TransformComponent>();

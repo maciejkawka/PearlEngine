@@ -43,12 +43,14 @@ namespace PrCore::ECS {
 	{
 		PR_ASSERT(p_ID.GetIndex() <= MAX_ENTITIES, "Wrong ID");
 
+		auto it = m_entityToIndexMap.find(p_ID);
+
 		//If no component return null
-		//PR_ASSERT(m_entityToIndexMap.find(p_ID) != m_entityToIndexMap.end(), "Entity does not have component " + std::string(typeid(T).name()));
-		if(m_entityToIndexMap.find(p_ID) == m_entityToIndexMap.end())
+		PR_ASSERT(it != m_entityToIndexMap.end(), "Entity does not have component " + std::string(typeid(T).name()));
+		if(it == m_entityToIndexMap.end())
 			return nullptr;
 
-		return m_components[m_entityToIndexMap[p_ID]];
+		return m_components[it->second];
 	}
 
 	template<class T>

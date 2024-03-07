@@ -41,6 +41,11 @@ void GLRenderer::SetViewport(int p_width, int p_height, int p_x, int p_y)
 	glViewport(p_x, p_y, p_width, p_height);
 }
 
+void GLRenderer::SetViewportArray(int p_first, int p_count, float* p_viewportData)
+{
+	glViewportArrayv(p_first, p_count, p_viewportData);
+}
+
 void GLRenderer::GetViewport(int& p_width, int& p_height, int& p_x, int& p_y)
 {
 	GLint m_viewport[4];

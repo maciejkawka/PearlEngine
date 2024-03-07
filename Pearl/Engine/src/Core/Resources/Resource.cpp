@@ -10,14 +10,16 @@ Resource::Resource(const std::string& p_name):
 	m_name(p_name),
 	m_handle(UINT_MAX),
 	m_size(0),
-	m_state(ResourceStatus::Unmanaged)
+	m_state(ResourceStatus::Unmanaged),
+	m_nameHash(std::hash<std::string>{}(m_name))
 {}
 
 Resource::Resource(const std::string& p_name, ResourceHandle p_ID) :
 	m_name(p_name),
 	m_handle(p_ID),
 	m_state(ResourceStatus::Unloaded),
-	m_size(0)
+	m_size(0),
+	m_nameHash(std::hash<std::string>{}(m_name))
 {}
 
 void Resource::Load()

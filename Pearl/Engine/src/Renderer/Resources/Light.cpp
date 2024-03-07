@@ -10,7 +10,7 @@ Light::Light():
 	m_linearAttenuation(0.5f),
 	m_quadraticAttenuation(0.5f),
 	m_constantAttenuation(1.0f),
-	m_range(500.0f),
+	m_range(50.0f),
 	m_type(LightType::Directional),
 	m_innerCone(0.0f),
 	m_outterCone(0.0f)

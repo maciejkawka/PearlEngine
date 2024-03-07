@@ -54,6 +54,7 @@ namespace PrRenderer::Core {
 		virtual void PrepareFrame() = 0;
 		virtual void BuildFrame() = 0;
 		virtual void FillFrameWithColor() = 0;
+		virtual void CalculateFrustrum() = 0;
 
 		//Get Backend
 		RendererBackendPtr GetRendererBackend() { return m_rendererBackend; }
@@ -79,17 +80,4 @@ namespace PrRenderer::Core {
 
 		Color m_debugColor;
 	};
-
-	//RenderUtils
-	namespace RenderUtils
-	{
-		inline size_t CalculateDepthValue(const PrCore::Math::vec3& p_position, Camera* p_camera)
-		{
-			auto camera = p_camera;
-			auto distance = PrCore::Math::distance(p_position, camera->GetPosition());
-			return (distance - camera->GetNear()) / (camera->GetFar() - camera->GetNear()) * 0xFFFFFF;
-		}
-
-
-	}
 }

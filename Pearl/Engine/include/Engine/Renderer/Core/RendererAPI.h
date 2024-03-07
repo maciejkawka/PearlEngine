@@ -70,6 +70,7 @@ namespace PrRenderer::Core {
 		virtual void ClearColor(Color& p_color) = 0;
 
 		virtual void SetViewport(int p_width, int p_height, int p_x = 0, int p_y = 0) = 0;
+		virtual void SetViewportArray(int p_first, int p_count, float* p_viewportData) = 0;
 		virtual void GetViewport(int& p_width, int& p_height, int& p_x, int& p_y) = 0;
 
 		virtual void EnableDepth(bool p_enable) = 0;

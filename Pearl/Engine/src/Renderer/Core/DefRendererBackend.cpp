@@ -126,7 +126,7 @@ namespace PrRenderer::Core
 				mainLight->viewMatrices.push_back(lightMat);
 
 				PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-				PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr, lightMat, &m_frame->shadowCasters, &m_renderContext));
+				PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr, lightMat, m_frame->mainDirectLight, &m_frame->shadowCasters, &m_renderContext));
 			}
 
 			m_settings->cascadeShadowRadiusRatio[1] = m_settings->cascadeShadowRadiusRatio[0] / m_settings->cascadeShadowRadiusRatio[1];
@@ -160,7 +160,7 @@ namespace PrRenderer::Core
 				light->viewMatrices.push_back(lightMat);
 
 				PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-				PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr, lightMat, &m_frame->shadowCasters, &m_renderContext));
+				PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr, lightMat, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 			}
 
 			m_settings->cascadeShadowRadiusRatio[1] = m_settings->cascadeShadowRadiusRatio[0] / m_settings->cascadeShadowRadiusRatio[1];
@@ -177,47 +177,47 @@ namespace PrRenderer::Core
 				LowRenderer::Clear(ColorBuffer | DepthBuffer);
 			}));
 
-		for (auto light : m_frame->lights)
+		for (auto lightPtr : m_frame->lights)
 		{
-			if (light->GetType() != Resources::LightType::Point)
+			if (lightPtr->GetType() != Resources::LightType::Point)
 				continue;
 
-			if (!light->castShadow)
+			if (!lightPtr->castShadow)
 				continue;
 
-			auto lightProjMatrix = PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, 0.001f, light->GetRange() * 1.2f);
-			auto lightPos = light->GetPosition();
-			auto shadowMapPos = light->shadowMapPos;
+			auto lightProjMatrix = PrCore::Math::perspective(PrCore::Math::radians(90.0f), 1.0f, 0.001f, lightPtr->GetRange() * 1.2f);
+			auto lightPos = lightPtr->GetPosition();
+			auto shadowMapPos = lightPtr->shadowMapPos;
 
 			auto lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(1.0f, 0.0f, 0.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
 			auto viewport = CalculateLightTexture(shadowMapPos + 0, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(-1.0f, 0.0f, 0.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
 			viewport = CalculateLightTexture(shadowMapPos + 1, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, 1.0f, 0.0), PrCore::Math::vec3(0.0f, 0.0f, 1.0f));
 			viewport = CalculateLightTexture(shadowMapPos + 2, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, -1.0f, 0.0f), PrCore::Math::vec3(0.0f, 0.0f, -1.0f));
 			viewport = CalculateLightTexture(shadowMapPos + 3, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, 0.0f, 1.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
 			viewport = CalculateLightTexture(shadowMapPos + 4, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, 0.0f, -1.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
 			viewport = CalculateLightTexture(shadowMapPos + 5, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPos, &m_frame->shadowCasters, &m_renderContext));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 		}
 		
 
@@ -246,7 +246,7 @@ namespace PrRenderer::Core
 
 			auto viewport = CalculateLightTexture(light->shadowMapPos, m_settings->pointLightShadowMapSize, m_settings->spotLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr, lightProjMatrix * lightViewMatrix, &m_frame->shadowCasters, &m_renderContext));
+			PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 		}
 
 		PushCommand(CreateRC<LowRenderer::SetViewportRC>(PrCore::Windowing::Window::GetMainWindow().GetWidth(),
@@ -416,59 +416,83 @@ namespace PrRenderer::Core
 		mesh->Unbind();
 	}
 
-	void DefRendererBackend::RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
+	void DefRendererBackend::RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
 	{
+		const auto frustrum = Frustrum(p_lightMatrix);
+		bool skipCulling = p_light->GetType() == Resources::LightType::Directional;
+
 		p_shaderPtr->Bind();
 		p_shaderPtr->SetUniformMat4("PIPELINE_LIGHT_MAT", p_lightMatrix);
 
 		for (auto& object : *p_objects)
 		{
+			auto& renderMesh = object->shadowMesh ? object->shadowMesh : object->mesh;
+
 			if (object->type == RenderObjectType::Mesh)
 			{
+				// Cull if out of camera
+				if (!skipCulling && !object->mesh->GetBoxVolume().IsOnFrustrum(frustrum, object->worldMat))
+					continue;
+
 				p_shaderPtr->SetUniformMat4("PIPELINE_MODEL_MAT", object->worldMat);
 				p_shaderPtr->SetUniformInt("PIPELINE_INTANCE_COUNT", 0);
-				object->mesh->Bind();
-				LowRenderer::Draw(object->mesh->GetVertexArray());
+				renderMesh->Bind();
+				LowRenderer::Draw(renderMesh->GetVertexArray());
 				p_renderData->frameInfo->drawCalls++;
-				object->mesh->Unbind();
+				renderMesh->Unbind();
 			}
 			else if (object->type == RenderObjectType::InstancedMesh)
 			{
 				p_shaderPtr->SetUniformMat4Array("PIPELINE_MODEL_MAT_ARRAY[0]", object->worldMatrices.data(), object->worldMatrices.size());
 				p_shaderPtr->SetUniformInt("PIPELINE_INTANCE_COUNT", object->instanceSize);
-				object->mesh->Bind();
-				LowRenderer::DrawInstanced(object->mesh->GetVertexArray(), object->instanceSize);
+				renderMesh->Bind();
+				LowRenderer::DrawInstanced(renderMesh->GetVertexArray(), object->instanceSize);
 				p_renderData->frameInfo->drawCalls++;
-				object->mesh->Unbind();
+				renderMesh->Unbind();
 			}
 		}
 
 		p_shaderPtr->Unbind();
 	}
 
-	void DefRendererBackend::RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightMatrix, PrCore::Math::vec3& p_lightPos, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
+	void DefRendererBackend::RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightView, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
 	{
+		const auto lightPos = p_light->GetPosition();
+		const auto frustrum = Frustrum(p_lightView);
+
 		p_pointShadowMapShader->Bind();
-		p_pointShadowMapShader->SetUniformMat4("PIPELINE_LIGHT_MAT", p_lightMatrix);
-		p_pointShadowMapShader->SetUniformVec3("PIPELINE_LIGHT_POS", p_lightPos);
+		p_pointShadowMapShader->SetUniformMat4("PIPELINE_LIGHT_MAT", p_lightView);
+		p_pointShadowMapShader->SetUniformVec3("PIPELINE_LIGHT_POS", lightPos);
 
 		for (auto& object : *p_objects)
 		{
+			auto& renderMesh = object->shadowMesh ? object->shadowMesh : object->mesh;
+
 			if (object->type == RenderObjectType::Mesh)
 			{
+				// Cull if out of camera
+				if (!object->mesh->GetBoxVolume().IsOnFrustrum(frustrum, object->worldMat))
+					continue;
+
+				// Naive way to cull object, this should be a AABB-SPHERE Intersection in the future
+				PrCore::Math::vec3 objectPos{ object->worldMat[3].x, object->worldMat[3].y, object->worldMat[3].z };
+				auto dist = PrCore::Math::length(objectPos - lightPos);
+				if (dist > p_light->GetRange())
+					continue;
+
 				p_pointShadowMapShader->SetUniformMat4("PIPELINE_MODEL_MAT", object->worldMat);
 				p_pointShadowMapShader->SetUniformInt("PIPELINE_INTANCE_COUNT", 0);
-				object->mesh->Bind();
-				LowRenderer::Draw(object->mesh->GetVertexArray());
-				object->mesh->Unbind();
+				renderMesh->Bind();
+				LowRenderer::Draw(renderMesh->GetVertexArray());
+				renderMesh->Unbind();
 			}
 			else if (object->type == RenderObjectType::InstancedMesh)
 			{
 				p_pointShadowMapShader->SetUniformMat4Array("PIPELINE_MODEL_MAT_ARRAY[0]", object->worldMatrices.data(), object->worldMatrices.size());
 				p_pointShadowMapShader->SetUniformInt("PIPELINE_INTANCE_COUNT", object->instanceSize);
-				object->mesh->Bind();
-				LowRenderer::DrawInstanced(object->mesh->GetVertexArray(), object->instanceSize);
-				object->mesh->Unbind();
+				renderMesh->Bind();
+				LowRenderer::DrawInstanced(renderMesh->GetVertexArray(), object->instanceSize);
+				renderMesh->Unbind();
 			}
 		}
 
@@ -1056,28 +1080,30 @@ namespace PrRenderer::Core
 		p_lightShdr->Bind();
 
 		// Set PBR Textures
-		p_renderContext->gBuffer.albedoTex->Bind(0);
-		p_lightShdr->SetUniformInt("albedoMap", 0);
+		// Binding textures starting from 4 to avoid uneccessery slot switching
+		// First 4 slots can be used for object rendering
+		p_renderContext->gBuffer.albedoTex->Bind(4);
+		p_lightShdr->SetUniformInt("albedoMap", 4);
 
-		p_renderContext->gBuffer.normalsTex->Bind(1);
-		p_lightShdr->SetUniformInt("normalMap", 1);
+		p_renderContext->gBuffer.normalsTex->Bind(5);
+		p_lightShdr->SetUniformInt("normalMap", 5);
 
-		p_renderContext->gBuffer.positionTex->Bind(2);
-		p_lightShdr->SetUniformInt("positionMap", 2);
+		p_renderContext->gBuffer.positionTex->Bind(6);
+		p_lightShdr->SetUniformInt("positionMap", 6);
 
-		p_renderContext->gBuffer.aoTex->Bind(3);
-		p_lightShdr->SetUniformInt("aoMap", 3);
+		p_renderContext->gBuffer.aoTex->Bind(7);
+		p_lightShdr->SetUniformInt("aoMap", 7);
 
 		if (p_renderContext->IRMap && p_renderContext->prefilterMap && p_renderContext->brdfLUT)
 		{
-			p_renderContext->IRMap->Bind(4);
-			p_lightShdr->SetUniformInt("PBR_irradianceMap", 4);
+			p_renderContext->IRMap->Bind(8);
+			p_lightShdr->SetUniformInt("PBR_irradianceMap", 8);
 
-			p_renderContext->prefilterMap->Bind(5);
-			p_lightShdr->SetUniformInt("PBR_prefilterMap", 5);
+			p_renderContext->prefilterMap->Bind(9);
+			p_lightShdr->SetUniformInt("PBR_prefilterMap", 9);
 
-			p_renderContext->brdfLUT->Bind(6);
-			p_lightShdr->SetUniformInt("PBR_brdfLUT", 6);
+			p_renderContext->brdfLUT->Bind(10);
+			p_lightShdr->SetUniformInt("PBR_brdfLUT", 10);
 		}
 
 		p_lightShdr->SetUniformVec3("camPos", p_renderContext->camera->GetPosition());
@@ -1101,8 +1127,8 @@ namespace PrRenderer::Core
 			p_lightShdr->SetUniformFloat("SHDW_MainDirLightBias", p_renderContext->settings->mainLightShadowBias);
 			p_lightShdr->SetUniformFloat("SHDW_MainDirLightSize", p_renderContext->settings->mainLightSize);
 
-			p_renderContext->shadowMapMainDirTex->Bind(7);
-			p_lightShdr->SetUniformInt("SHDW_MainDirLightMap", 7);
+			p_renderContext->shadowMapMainDirTex->Bind(11);
+			p_lightShdr->SetUniformInt("SHDW_MainDirLightMap", 11);
 		}
 		else
 			p_lightShdr->SetUniformBool("SHDW_HasMainDirLight", false);
@@ -1154,8 +1180,8 @@ namespace PrRenderer::Core
 		p_lightShdr->SetUniformInt("SHDW_DirLightCombineShadowMapSize", p_renderContext->settings->dirLightCombineMapSize);
 		p_lightShdr->SetUniformFloat("SHDW_DirLightBias", p_renderContext->settings->dirLightShadowBias);
 		p_lightShdr->SetUniformFloat("SHDW_DirLightSize", p_renderContext->settings->dirLightSize);
-		p_renderContext->shadowMapDirTex->Bind(8);
-		p_lightShdr->SetUniformInt("SHDW_DirLightMap", 8);
+		p_renderContext->shadowMapDirTex->Bind(12);
+		p_lightShdr->SetUniformInt("SHDW_DirLightMap", 12);
 
 		// Point Light
 		p_lightShdr->SetUniformInt("SHDW_PointLightNumber", pointlightMat.size());
@@ -1165,8 +1191,8 @@ namespace PrRenderer::Core
 		p_lightShdr->SetUniformInt("SHDW_PointCombineLightMapSize", p_renderContext->settings->pointLightCombineShadowMapSize);
 		p_lightShdr->SetUniformFloat("SHDW_PointLightBias", p_renderContext->settings->pointLightShadowBias);
 		p_lightShdr->SetUniformFloat("SHDW_PointLightSize", p_renderContext->settings->pointLightSize);
-		p_renderContext->shadowMapPointTex->Bind(9);
-		p_lightShdr->SetUniformInt("SHDW_PointLightMap", 9);
+		p_renderContext->shadowMapPointTex->Bind(13);
+		p_lightShdr->SetUniformInt("SHDW_PointLightMap", 13);
 
 		// Spot Light
 		p_lightShdr->SetUniformInt("SHDW_SpotLightNumber", spotLightMat.size());
@@ -1177,8 +1203,8 @@ namespace PrRenderer::Core
 		p_lightShdr->SetUniformInt("SHDW_SpotLightCombineMapSize", p_renderContext->settings->spotLightCombineShadowMapSize);
 		p_lightShdr->SetUniformFloat("SHDW_SpotLightBias", p_renderContext->settings->spotLightShadowBias);
 		p_lightShdr->SetUniformFloat("SHDW_SpotLightSize", p_renderContext->settings->spotLightSize);
-		p_renderContext->shadowMapSpotTex->Bind(10);
-		p_lightShdr->SetUniformInt("SHDW_SpotLightMap", 10);
+		p_renderContext->shadowMapSpotTex->Bind(14);
+		p_lightShdr->SetUniformInt("SHDW_SpotLightMap", 14);
 
 		p_renderContext->quadMesh->Bind();
 		LowRenderer::Draw(p_renderContext->quadMesh->GetVertexArray());

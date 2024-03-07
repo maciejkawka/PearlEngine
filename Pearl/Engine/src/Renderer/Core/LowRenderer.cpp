@@ -48,6 +48,11 @@ void LowRenderer::SetViewport(int p_width, int p_height, int p_x, int p_y)
 	m_rendererAPI->SetViewport(p_width, p_height, p_x, p_y);
 }
 
+void LowRenderer::SetViewportArray(int p_first, int p_count, float* p_viewportData)
+{
+	m_rendererAPI->SetViewportArray(p_first, p_count, p_viewportData);
+}
+
 void LowRenderer::GetViewport(int& p_width, int& p_height, int& p_x, int& p_y)
 {
 	m_rendererAPI->GetViewport(p_width, p_height, p_x, p_y);

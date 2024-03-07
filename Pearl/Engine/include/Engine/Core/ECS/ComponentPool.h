@@ -41,10 +41,10 @@ namespace PrCore::ECS {
 		std::array<T*, MAX_ENTITIES> m_components;
 
 		//Map holds Entites to index references
-		std::unordered_map<ID, size_t> m_entityToIndexMap;
+		std::map<ID, size_t> m_entityToIndexMap;
 
 		//Map holds index to Entity references
-		std::unordered_map<size_t, ID> m_indexToEntityMap;
+		std::map<size_t, ID> m_indexToEntityMap;
 
 		//Number of all components
 		size_t m_componentsNumber;

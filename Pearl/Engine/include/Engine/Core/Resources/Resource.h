@@ -35,10 +35,15 @@ namespace PrCore::Resources {
 
 		inline ResourceSize GetSize() const { return m_size; }
 		inline std::string GetName() const { return m_name; }
+		inline size_t GetNameHash() const { return m_nameHash; }
 		inline ResourceHandle GetHandle() const { return m_handle; }
 
 		//Only for not a file resources
-		inline void SetName(const std::string& p_name) { m_name = p_name; }
+		inline void SetName(const std::string& p_name)
+		{
+			m_name = p_name;
+			m_nameHash = std::hash<std::string>{}(m_name);
+		}
 
 		inline ResourceStatus GetStatus() const { return m_state; }
 
@@ -69,6 +74,7 @@ namespace PrCore::Resources {
 		virtual void CalculateSize() = 0;
 
 		std::string m_name;
+		size_t m_nameHash;
 		ResourceHandle m_handle;
 		ResourceSize m_size;
 		ResourceStatus m_state;

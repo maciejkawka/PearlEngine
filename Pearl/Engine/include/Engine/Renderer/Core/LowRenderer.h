@@ -23,6 +23,7 @@ namespace PrRenderer::Core {
 		static void ClearColor(Color& p_color);
 
 		static void SetViewport(int p_width, int p_height, int p_x = 0, int p_y = 0);
+		static void SetViewportArray(int p_first, int p_count, float* p_viewportData);
 		static void GetViewport(int& p_width, int& p_height, int& p_x, int& p_y);
 
 		//Depth
@@ -65,6 +66,7 @@ namespace PrRenderer::Core {
 		REGISTER_RENDER_COMMAND(ClearColorColor, ClearColor, Color);
 
 		REGISTER_RENDER_COMMAND(SetViewport, SetViewport, int, int, int, int);
+		REGISTER_RENDER_COMMAND(SetViewportArray, SetViewportArray, int, int, float*);
 
 		REGISTER_RENDER_COMMAND(EnableDepth, EnableDepth, bool);
 		REGISTER_RENDER_COMMAND(SetDepthTest, SetDepthTest, bool);

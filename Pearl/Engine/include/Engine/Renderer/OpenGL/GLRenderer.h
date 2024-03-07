@@ -14,6 +14,7 @@ namespace PrRenderer::OpenGL {
 		void ClearColor(Core::Color& p_color) override;
 
 		void SetViewport(int p_width, int p_height, int p_x = 0.0f, int p_y = 0.0f) override;
+		void SetViewportArray(int p_first, int p_count, float* p_viewportData) override;
 		void GetViewport(int& p_width, int& p_height, int& p_x, int& p_y) override;
 
 		void EnableDepth(bool p_enable) override;

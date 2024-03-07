@@ -23,10 +23,15 @@ namespace PrCore::ECS {
 
 		bool shadowCaster = true;
 		std::shared_ptr<PrRenderer::Resources::Mesh> mesh;
+		std::shared_ptr<PrRenderer::Resources::Mesh> shadowMesh;
 		std::shared_ptr<PrRenderer::Resources::Material> material;
 
 		virtual void OnSerialize(Utils::JSON::json& p_serialized) override
 		{
+			if(shadowMesh != nullptr)
+			{
+				p_serialized["ShadowMesh"] = shadowMesh->GetName();
+			}
 			p_serialized["Mesh"] = mesh->GetName();
 			p_serialized["Material"] = material->GetName();
 		}
@@ -48,6 +53,26 @@ namespace PrCore::ECS {
 				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Quad);
 			else
 				mesh = Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Mesh>(p_deserialized["Mesh"]);
+
+			auto shadowMeshIt = p_deserialized.find("ShadowMesh");
+			if(shadowMeshIt != p_deserialized.end())
+			{
+				std::string meshName = p_deserialized["ShadowMesh"];
+				if (meshName.find("Primitive_Cube") != std::string::npos)
+					shadowMesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
+				else if (meshName.find("Primitive_Sphere") != std::string::npos)
+					shadowMesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Sphere);
+				else if (meshName.find("Primitive_Capsule") != std::string::npos)
+					shadowMesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Capsule);
+				else if (meshName.find("Primitive_Cylinder") != std::string::npos)
+					shadowMesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cylinder);
+				else if (meshName.find("Primitive_Plane") != std::string::npos)
+					shadowMesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Plane);
+				else if (meshName.find("Primitive_Quad") != std::string::npos)
+					shadowMesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Quad);
+				else
+					shadowMesh = Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Mesh>(p_deserialized["ShadowMesh"]);
+			}
 
 			material = Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>(p_deserialized["Material"]);
 		}

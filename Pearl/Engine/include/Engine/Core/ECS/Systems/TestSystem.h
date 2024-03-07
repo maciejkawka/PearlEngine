@@ -43,6 +43,7 @@ namespace PrCore::ECS
 		PrRenderer::Core::Camera* m_camera;
 		int m_selectedLight = 0;
 		int m_maxLight = 0;
+		PrRenderer::Resources::LightPtr m_mainLightPtr;
 
 		inline virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
 		inline virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}

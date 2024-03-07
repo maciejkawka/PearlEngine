@@ -211,6 +211,26 @@ bool GLShader::Compile()
 		return false;
 	}
 
+	RendererID geometryShader = 0;
+	if(!m_geometryShader.empty())
+	{
+		geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+
+		auto sourceGeometry = m_geometryShader.c_str();
+		glShaderSource(geometryShader, 1, &sourceGeometry, NULL);
+		glCompileShader(geometryShader);
+
+		glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &success);
+
+		if (!success)
+		{
+			char infoLog[512];
+			glGetShaderInfoLog(geometryShader, 512, NULL, infoLog);
+			PRLOG_ERROR("Renderer: GeometryShader " + m_name + " Error: " + infoLog);
+			return false;
+		}
+	}
+
 	RendererID fragmentShader;
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
@@ -232,10 +252,23 @@ bool GLShader::Compile()
 
 	glAttachShader(m_ID, vertexShader);
 	glAttachShader(m_ID, fragmentShader);
+	if(geometryShader)
+		glAttachShader(m_ID, geometryShader);
 	glLinkProgram(m_ID);
+
+	glGetShaderiv(m_ID, GL_LINK_STATUS, &success);
+
+	if (!success)
+	{
+		char infoLog[512];
+		glGetShaderInfoLog(m_ID, 512, NULL, infoLog);
+		PRLOG_ERROR("Renderer: Shader Linking " + m_name + " Error: " + infoLog);
+		return false;
+	}
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+	glDeleteShader(geometryShader);
 
 	return true;
 }
@@ -389,11 +422,22 @@ void GLShader::PreLoadImpl()
 
 	std::string vertexShaderKeyword = "#vertex";
 	std::string fragmentShaderKeyword = "#fragment";
+	std::string geometryShaderKeyword = "#geometry";
 
-	auto fragmentShaderPos = shader.find(fragmentShaderKeyword);
-	
-	m_vertexShader = shader.substr(vertexShaderKeyword.length(), fragmentShaderPos - vertexShaderKeyword.length());
-	m_fragmentShader = shader.substr(fragmentShaderPos + fragmentShaderKeyword.length());
+	// check if geometry shader is avaliable
+	const auto fragmentShaderPos = shader.find(fragmentShaderKeyword);
+	const auto geometryShaderPos = shader.find(geometryShaderKeyword);
+	if(geometryShaderPos != std::string::npos)
+	{	
+		m_vertexShader = shader.substr(vertexShaderKeyword.length(), geometryShaderPos - vertexShaderKeyword.length());
+		m_geometryShader = shader.substr(geometryShaderPos + geometryShaderKeyword.length(), fragmentShaderPos - geometryShaderPos - geometryShaderKeyword.length());
+		m_fragmentShader = shader.substr(fragmentShaderPos + fragmentShaderKeyword.length());
+	}
+	else
+	{
+		m_vertexShader = shader.substr(vertexShaderKeyword.length(), fragmentShaderPos - vertexShaderKeyword.length());
+		m_fragmentShader = shader.substr(fragmentShaderPos + fragmentShaderKeyword.length());
+	}
 }
 
 bool GLShader::LoadImpl()

@@ -1,9 +1,20 @@
 #include "Core/Common/pearl_pch.h"
 #include "Renderer/Core/BoundingVolume.h"
+#include "Renderer/Core/DeferredRendererFrontend.h"
 
 using namespace PrRenderer::Core;
 
 Frustrum::Frustrum(const PrCore::Math::mat4& m_transformMatrix)
+{
+	Calculate(m_transformMatrix);
+}
+
+Frustrum::Frustrum(const PrCore::Math::mat4& p_projMat, const PrCore::Math::mat4& p_viewMat)
+{
+	Calculate(p_projMat, p_viewMat);
+}
+
+void Frustrum::Calculate(const PrCore::Math::mat4& m_transformMatrix)
 {
 	auto xAxis = PrCore::Math::vec3(m_transformMatrix[0][0], m_transformMatrix[1][0], m_transformMatrix[2][0]);
 	auto yAxis = PrCore::Math::vec3(m_transformMatrix[0][1], m_transformMatrix[1][1], m_transformMatrix[2][1]);
@@ -24,7 +35,7 @@ Frustrum::Frustrum(const PrCore::Math::mat4& m_transformMatrix)
 	m_planes[5] = PrCore::Math_PrTypes::Plane(wAxis - zAxis, m_transformMatrix[3][3] - m_transformMatrix[3][2], true);
 }
 
-Frustrum::Frustrum(const PrCore::Math::mat4& p_projMat, const PrCore::Math::mat4& p_viewMat)
+void Frustrum::Calculate(const PrCore::Math::mat4& p_projMat, const PrCore::Math::mat4& p_viewMat)
 {
 	//Gribb/Hartmann method
 	//https://www.cs.otago.ac.nz/postgrads/alexis/planeExtraction.pdf
@@ -213,6 +224,8 @@ bool BoxVolume::IsOnFrustrum(const Frustrum& p_frustrum, PrCore::Math::mat4 p_tr
 		newMax.y - translatedCenter.y,
 		newMax.z - translatedCenter.z
 	);
+
+	//PrRenderer::Core::DefferedRendererFrontend::GetInstance().DrawCube(translatedCenter, newExtends * 2.0f,  true);
 
 	// Check if AABB in frustrum
 	for (int i = 0; i < 6; i++)

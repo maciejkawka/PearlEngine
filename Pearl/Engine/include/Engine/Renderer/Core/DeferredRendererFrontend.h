@@ -17,6 +17,7 @@ namespace PrRenderer::Core {
 		void PrepareFrame() override;
 		void BuildFrame() override;
 		void FillFrameWithColor() override {}
+		void CalculateFrustrum() override;
 
 		virtual void DrawCube(const Math::mat4& p_transformMat, bool p_wireframe = true) override;
 		virtual void DrawCube(const Math::vec3& p_center, const Math::vec3& p_size, bool p_wireframe = true) override;
@@ -29,7 +30,8 @@ namespace PrRenderer::Core {
 		Camera* GetCamera() { return m_camera; }
 
 	private:
-		size_t InstanciateObjects(RenderObjectVector& p_renderObjects);
+		size_t InstanciateObjectsByMaterial(RenderObjectVector& p_renderObjects);
+		size_t InstanciateObjectsByMesh(RenderObjectVector& p_renderObjects);
 
 		//Lighting shadowing
 		size_t m_nextPointLightPos;
@@ -48,5 +50,6 @@ namespace PrRenderer::Core {
 		Resources::ShaderPtr m_debugShader;
 		Resources::MaterialPtr m_debugMaterial;
 		Camera* m_camera;
+		Frustrum m_frustrum;
 	};
 }
