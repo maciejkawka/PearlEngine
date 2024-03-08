@@ -7,6 +7,8 @@ using namespace PrCore::Filesystem;
 
 FileSystem::FileSystem()
 {
+	DeduceResourcesPath();
+
 	PHYSFS_init(NULL);
 	InitDir();
 }
@@ -97,6 +99,19 @@ std::vector<std::string> FileSystem::GetFileList(const std::string& p_dir)
 
 void FileSystem::InitDir()
 {
-	PHYSFS_mount(ROOT_DIR, NULL, 0);
-	PHYSFS_setWriteDir(ROOT_DIR);
+	PHYSFS_mount(m_resourcesPath.c_str(), NULL, 0);
+	PHYSFS_setWriteDir(m_resourcesPath.c_str());
+}
+
+void FileSystem::DeduceResourcesPath()
+{
+	char pBuf[256];
+	size_t len = sizeof(pBuf);
+
+	int bytesRead = GetModuleFileNameA(nullptr, static_cast<LPSTR>(pBuf), len);
+	PR_ASSERT(bytesRead != 0, "Cannot read root folder");
+
+	std::string path = pBuf;
+	path = path.substr(0, path.find("\\Bin")) + "\\" + RESOURCES_DIR;
+	m_resourcesPath = std::move(path);
 }

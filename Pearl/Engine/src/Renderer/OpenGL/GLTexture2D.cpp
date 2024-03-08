@@ -236,9 +236,9 @@ unsigned char* GLTexture2D::ReadRawData()
 	int channelsNumber = 0;
 
 	//Change that in future
-	std::string dir = ROOT_DIR;
+	std::string dir = PrCore::Filesystem::FileSystem::GetInstance().GetResourcesPath();
 	dir += "/";
-	dir +=TEXTURE_DIR;
+	dir += TEXTURE_DIR;
 	dir += "/" + m_name;
 
 	stbi_set_flip_vertically_on_load(true);

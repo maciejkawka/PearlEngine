@@ -7,7 +7,8 @@
 
 namespace PrCore::Filesystem {
 	
-#define ROOT_DIR "C:/Users/Maciej/Current Projects/GitHub/PearlEngine/PearlEngine/Resources"
+//#define ROOT_DIR "C:/Users/Maciej/Current Projects/GitHub/PearlEngine/PearlEngine/Resources"
+#define RESOURCES_DIR "Resources"
 #define CONFIG_DIR "Config"
 #define SHADER_DIR "Shader"
 #define TEXTURE_DIR "Texture"
@@ -38,11 +39,17 @@ namespace PrCore::Filesystem {
 		unsigned int GetFileCount(const std::string& p_dir);
 		std::vector<std::string> GetFileList(const std::string& p_dir);
 
+		std::string GetResourcesPath() const { return m_resourcesPath; }
+		void SetResourcesPath(const std::string& p_root) { m_resourcesPath = p_root; }
+
 	private:
 		FileSystem();
 		~FileSystem();
 
 		void InitDir();
+		void DeduceResourcesPath();
+
+		std::string m_resourcesPath;
 
 		friend Singleton<FileSystem>;
 	};

@@ -174,7 +174,7 @@ unsigned char* GLCubemap::ReadRawData(const std::string& p_name, bool p_first)
 	int channelsNumber = 0;
 
 	//Change that in future
-	std::string dir = ROOT_DIR;
+	std::string dir = PrCore::Filesystem::FileSystem::GetInstance().GetResourcesPath();
 	dir += "/";
 	dir += TEXTURE_DIR;
 	dir += "/" + p_name;
