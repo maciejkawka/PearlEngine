@@ -8,6 +8,9 @@
     <Filter Include="Components">
       <UniqueIdentifier>{1a7ac779-9937-4185-9b89-b9c62ba24e81}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{ca2f7c57-586e-4d05-9aac-bbb21ec5cbc8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scr\Core\Editor.cpp">
@@ -39,5 +42,23 @@
     <ClInclude Include="include\Editor\Components\TestFeatures.h">
       <Filter>Components</Filter>
     </ClInclude>
+    <ClInclude Include="Resources\resource.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\icon.ico">
+      <Filter>Resources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resources\Editor.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Editor.aps">
+      <Filter>Resources</Filter>
+    </None>
   </ItemGroup>
 </Project>
