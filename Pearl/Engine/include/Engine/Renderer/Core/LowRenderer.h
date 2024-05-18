@@ -61,28 +61,28 @@ namespace PrRenderer::Core {
 		static void BlitFrameBuffers(Buffers::FramebuffferPtr p_readBuffer, Buffers::FramebuffferPtr p_drawBuffer = nullptr, Buffers::FramebufferMask p_mask = Buffers::FramebufferMask::ColorBufferBit);
 
 		//Commands
-		REGISTER_RENDER_COMMAND(Clear, Clear, ClearFlag);
-		REGISTER_RENDER_COMMAND(ClearColorFloat, ClearColor, float, float, float, float);
-		REGISTER_RENDER_COMMAND(ClearColorColor, ClearColor, Color);
+		REGISTER_RENDER_COMMAND(Clear, ClearFlag);
+		REGISTER_NAMED_RENDER_COMMAND(ClearColorFloat, ClearColor, float, float, float, float);
+		REGISTER_NAMED_RENDER_COMMAND(ClearColorColor, ClearColor, Color);
 
-		REGISTER_RENDER_COMMAND(SetViewport, SetViewport, int, int, int, int);
-		REGISTER_RENDER_COMMAND(SetViewportArray, SetViewportArray, int, int, float*);
+		REGISTER_RENDER_COMMAND(SetViewport, int, int, int, int);
+		REGISTER_RENDER_COMMAND(SetViewportArray, int, int, float*);
 
-		REGISTER_RENDER_COMMAND(EnableDepth, EnableDepth, bool);
-		REGISTER_RENDER_COMMAND(SetDepthTest, SetDepthTest, bool);
-		REGISTER_RENDER_COMMAND(SetDepthAlgorythm, SetDepthAlgorythm, ComparaisonAlgorithm);
+		REGISTER_RENDER_COMMAND(EnableDepth, bool);
+		REGISTER_RENDER_COMMAND(SetDepthTest, bool);
+		REGISTER_RENDER_COMMAND(SetDepthAlgorythm, ComparaisonAlgorithm);
 
-		REGISTER_RENDER_COMMAND(EnableBlending, EnableBlending, bool);
-		REGISTER_RENDER_COMMAND(SetBlendingAlgorythm, SetBlendingAlgorythm, BlendingAlgorithm, BlendingAlgorithm);
+		REGISTER_RENDER_COMMAND(EnableBlending, bool);
+		REGISTER_RENDER_COMMAND(SetBlendingAlgorythm, BlendingAlgorithm, BlendingAlgorithm);
 
-		REGISTER_RENDER_COMMAND(Draw, Draw, Buffers::VertexArrayPtr, Core::Primitives);
-		REGISTER_RENDER_COMMAND(DrawArray, DrawArray, Buffers::VertexBufferPtr, Core::Primitives);
-		REGISTER_RENDER_COMMAND(DrawInstanced, DrawInstanced, Buffers::VertexArrayPtr, size_t, Core::Primitives);
+		REGISTER_RENDER_COMMAND(Draw, Buffers::VertexArrayPtr, Core::Primitives);
+		REGISTER_RENDER_COMMAND(DrawArray, Buffers::VertexBufferPtr, Core::Primitives);
+		REGISTER_RENDER_COMMAND(DrawInstanced, Buffers::VertexArrayPtr, size_t, Core::Primitives);
 
-		REGISTER_RENDER_COMMAND(EnableCullFace, EnableCullFace, bool);
-		REGISTER_RENDER_COMMAND(SetCullFaceMode, SetCullFaceMode, CullFaceMode);
+		REGISTER_RENDER_COMMAND(EnableCullFace, bool);
+		REGISTER_RENDER_COMMAND(SetCullFaceMode, CullFaceMode);
 
-		REGISTER_RENDER_COMMAND(BlitFrameBuffers, BlitFrameBuffers, Buffers::FramebuffferPtr, Buffers::FramebuffferPtr, Buffers::FramebufferMask);
+		REGISTER_RENDER_COMMAND(BlitFrameBuffers, Buffers::FramebuffferPtr, Buffers::FramebuffferPtr, Buffers::FramebufferMask);
 
 	private:
 		inline static RendererAPI* m_rendererAPI = nullptr;

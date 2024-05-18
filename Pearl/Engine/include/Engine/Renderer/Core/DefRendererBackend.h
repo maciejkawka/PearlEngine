@@ -80,51 +80,51 @@ namespace PrRenderer::Core {
 		// Consider wrapping that with an objects in the future
 		// Renders Opaque objects, uses a shader stored in object's material
 		static void RenderOpaque(RenderObjectPtr p_object, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderOpaque, RenderOpaque, RenderObjectPtr, RenderContext*);
+		REGISTER_RENDER_COMMAND(RenderOpaque, RenderObjectPtr, RenderContext*);
 
 		// Renders object into the directional and spotlight map
 		static void RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderToShadowMap, RenderToShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, LightObjectPtr, std::list<RenderObjectPtr>*, RenderContext*);
+		REGISTER_RENDER_COMMAND(RenderToShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, LightObjectPtr, std::list<RenderObjectPtr>*, RenderContext*);
 
 		// Renders object into the point light map
 		static void RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightView, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderToPointShadowMap, RenderToPointShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, LightObjectPtr, std::list<RenderObjectPtr>*, RenderContext*);
+		REGISTER_RENDER_COMMAND(RenderToPointShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, LightObjectPtr, std::list<RenderObjectPtr>*, RenderContext*);
 
 		// After objects are rendered into GBuffer this pass calculates PBR Ligthing, with global iluminance
 		static void RenderLight(Resources::ShaderPtr p_lightShdr, DirLightObjectPtr p_mianDirectLight, std::vector<LightObjectPtr>* p_lights, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderLight, RenderLight, Resources::ShaderPtr, DirLightObjectPtr, std::vector<LightObjectPtr>*, const RenderContext*);
+		REGISTER_RENDER_COMMAND(RenderLight, Resources::ShaderPtr, DirLightObjectPtr, std::vector<LightObjectPtr>*, const RenderContext*);
 
 		// Renders cubemap in background
 		static void RenderCubeMap(Resources::MaterialPtr p_material, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderCubeMap, RenderCubeMap, Resources::MaterialPtr, const RenderContext*);
+		REGISTER_RENDER_COMMAND(RenderCubeMap, Resources::MaterialPtr, const RenderContext*);
 
 		// Renders a tone mapping and exposure
 		static void RenderToneMapping(Resources::ShaderPtr p_toneMapShader, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderToneMapping, RenderToneMapping, Resources::ShaderPtr, const RenderContext*);
+		REGISTER_RENDER_COMMAND(RenderToneMapping, Resources::ShaderPtr, const RenderContext*);
 
 		// Renders a transparent objects using froward rendering. Uses global ilumination, does not affected by light or shadows
 		static void RenderTransparent(RenderObjectPtr p_object, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderTransparent, RenderTransparent, RenderObjectPtr, RenderContext*);
+		REGISTER_RENDER_COMMAND(RenderTransparent, RenderObjectPtr, RenderContext*);
 
 		// Renders SSAO
 		static void RenderSSAO(Resources::ShaderPtr p_SSAOShader, Resources::ShaderPtr p_BlurSSAOShader, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderSSAO, RenderSSAO, Resources::ShaderPtr, Resources::ShaderPtr, RenderContext*);
+		REGISTER_RENDER_COMMAND(RenderSSAO, Resources::ShaderPtr, Resources::ShaderPtr, RenderContext*);
 
 		// Renders FXAA
 		static void RenderFXAA(Resources::ShaderPtr p_FXAAShader, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderFXAA, RenderFXAA, Resources::ShaderPtr, RenderContext*);
+		REGISTER_RENDER_COMMAND(RenderFXAA, Resources::ShaderPtr, RenderContext*);
 
 		// Renders a logarithmic fog, does not put a fog on transparent objects that are rendered on top of the skymap
 		static void RenderFog(Resources::ShaderPtr p_fogShader, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderFog, RenderFog, Resources::ShaderPtr, RenderContext*);
+		REGISTER_RENDER_COMMAND(RenderFog, Resources::ShaderPtr, RenderContext*);
 
 		// Renders bloom
 		static void RenderBloom(Resources::ShaderPtr p_downsampleShader, Resources::ShaderPtr p_upsampleShader, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderBloom, RenderBloom, Resources::ShaderPtr, Resources::ShaderPtr, RenderContext*);
+		REGISTER_RENDER_COMMAND(RenderBloom, Resources::ShaderPtr, Resources::ShaderPtr, RenderContext*);
 
 		// Draw Debug
 		static void RenderDebug(RenderObjectVector* p_debugObjects, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderDebug, RenderDebug, RenderObjectVector*, RenderContext*);
+		REGISTER_RENDER_COMMAND(RenderDebug, RenderObjectVector*, RenderContext*);
 
 		void GenerateSSAOContext();
 		void GeneratePostprocessContext();

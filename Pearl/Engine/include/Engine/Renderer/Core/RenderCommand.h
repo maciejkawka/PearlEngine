@@ -30,14 +30,17 @@ namespace PrRenderer::Core
 		CommandArgs m_args;                                              \
 	}
 
-#define REGISTER_RENDER_COMMAND(CommandName, FunctionName, ...) \
+#define REGISTER_NAMED_RENDER_COMMAND(CommandName, FunctionName, ...) \
 	BASIC_RENDER_COMMAND(CommandName ## RC, FunctionName, __VA_ARGS__)
+
+#define REGISTER_RENDER_COMMAND(FunctionName, ...) \
+	BASIC_RENDER_COMMAND(##FunctionName ## RC, FunctionName, __VA_ARGS__)
 
 	inline void LambdaFunction(std::function<void(void)> p_lambda)
 	{
 		p_lambda();
 	}
-	REGISTER_RENDER_COMMAND(LambdaFunction, LambdaFunction, std::function<void(void)>);
+	REGISTER_RENDER_COMMAND(LambdaFunction, std::function<void(void)>);
 
 	template<class CommandType, typename... Args>
 	inline RenderCommandPtr CreateRC(Args&&... args)
