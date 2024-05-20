@@ -71,15 +71,32 @@ namespace PrCore::ECS {
 		}
 	};
 
+	template<typename ComponentType, typename... ComponentTypes>
+	auto CreateComponentTupleHelper(Entity& p_entity)
+	{
+		if constexpr (sizeof...(ComponentTypes) == 0)
+			return std::make_tuple(p_entity.GetComponent<ComponentType>());
+		else
+			return std::tuple_cat(std::make_tuple(p_entity.GetComponent<ComponentType>()), CreateComponentTupleHelper<ComponentTypes...>(p_entity));
+	}
+
+	template<typename... ComponentTypes>
+	auto CreateComponentTuple(Entity& p_entity)
+	{
+		static_assert(sizeof...(ComponentTypes) != 0, "Cannot create a tuple, ComponentType is empty");
+		return CreateComponentTupleHelper<ComponentTypes...>(p_entity);
+	}
+
 	class EntityManager: public Utils::NonCopyable, Utils::ISerializable {
 	public:
 		using HierarchicalPair = std::pair<int, Entity>;
 
 		//Local Classes
+		template<typename... ComponentTypes>
 		class BasicIterator {
 		public:
 			using iterator_category = std::input_iterator_tag;
-			using difference_type = Entity;
+			using difference_type = std::tuple<Entity>;
 
 			BasicIterator() = delete;
 			explicit BasicIterator(size_t p_index, EntityManager* p_entityManager, size_t p_entitiesNumber) :
@@ -89,18 +106,19 @@ namespace PrCore::ECS {
 			{}
 			virtual ~BasicIterator() = default;
 
-			Entity operator*() const
+			std::tuple<Entity> operator*() const
 			{
 				PR_ASSERT(m_index < m_entitiesNumber, "Iterator out of range");
-				return m_entityManager->ConstructEntityonIndex(m_index + 1);
+				return std::tuple_cat(std::make_tuple(m_entityManager->ConstructEntityonIndex(m_index + 1)));
 			}
-			bool operator==(const BasicIterator& p_other) const { return m_index == p_other.m_index; }
-			bool operator!=(const BasicIterator& p_other) const { return m_index != p_other.m_index; }
-			virtual BasicIterator& operator++()
+
+			bool operator==(const BasicIterator<ComponentTypes...>& p_other) const { return m_index == p_other.m_index; }
+			bool operator!=(const BasicIterator<ComponentTypes...>& p_other) const { return m_index != p_other.m_index; }
+			virtual BasicIterator<ComponentTypes...>& operator++()
 			{
 				do {
-					m_index++;
-				} while (m_entityManager->m_entitiesSignature[m_index].none() && m_index < m_entitiesNumber);
+					++m_index;
+				} while (m_index < m_entitiesNumber && m_entityManager->m_entitiesSignature[m_index].none());
 
 				return *this;
 			}
@@ -111,18 +129,32 @@ namespace PrCore::ECS {
 			size_t m_index;
 		};
 
-		class TypedIterator : public BasicIterator {
+		template<typename... ComponentTypes>
+		class TypedIterator : public BasicIterator<ComponentTypes...> {
 		public:
+			using difference_type = std::tuple<Entity, std::add_pointer_t<ComponentTypes>...>;
+			using BasicIterator<ComponentTypes...>::m_entityManager;
+			using BasicIterator<ComponentTypes...>::m_entitiesNumber; 
+			using BasicIterator<ComponentTypes...>::m_index;
+
 			TypedIterator() = delete;
 			explicit TypedIterator(size_t p_index, EntityManager* p_entityManager, size_t p_entitiesNumber, ComponentSignature p_mask) :
-				BasicIterator(p_index, p_entityManager, p_entitiesNumber),
+				BasicIterator<ComponentTypes...>(p_index, p_entityManager, p_entitiesNumber),
 				m_mask(p_mask)
 			{}
 
-			virtual BasicIterator& operator++() override
+			std::tuple<Entity, std::add_pointer_t<ComponentTypes>...> operator*() const
+			{
+				PR_ASSERT(m_index < m_entitiesNumber, "Iterator out of range");
+
+				Entity entity = m_entityManager->ConstructEntityonIndex(m_index + 1);
+				return  std::tuple_cat(std::make_tuple(entity), CreateComponentTuple<ComponentTypes...>(entity));
+			}
+
+			virtual BasicIterator<ComponentTypes...>& operator++() override
 			{
 				do {
-					m_index++;
+					++m_index;
 				} while (m_index < m_entitiesNumber && (m_entityManager->m_entitiesSignature[m_index] & m_mask) != m_mask);
 
 				return *this;
@@ -132,10 +164,11 @@ namespace PrCore::ECS {
 			ComponentSignature m_mask;
 		};
 
+		template<typename... ComponentTypes>
 		class HierarchicalIterator {
 		public:
 			using iterator_category = std::input_iterator_tag;
-			using difference_type = HierarchicalPair;
+			using difference_type = std::tuple<Entity>;
 
 			HierarchicalIterator() = delete;
 			explicit HierarchicalIterator(size_t p_index, EntityManager* p_entityManager, size_t p_entitiesNumber) :
@@ -145,16 +178,17 @@ namespace PrCore::ECS {
 			{}
 			virtual ~HierarchicalIterator() = default;
 
-			Entity operator*() const
+			std::tuple<Entity> operator*() const
 			{
 				PR_ASSERT(m_index < m_entitiesNumber, "Iterator out of range");
-				return m_entityManager->m_hierarchicalEntites[m_index].second;
+				return std::make_tuple(m_entityManager->m_hierarchicalEntites[m_index].second);
 			}
-			bool operator==(const HierarchicalIterator& p_other) const { return m_index == p_other.m_index; }
-			bool operator!=(const HierarchicalIterator& p_other) const { return m_index != p_other.m_index; }
-			virtual HierarchicalIterator& operator++()
+
+			bool operator==(const HierarchicalIterator<ComponentTypes...>& p_other) const { return m_index == p_other.m_index; }
+			bool operator!=(const HierarchicalIterator<ComponentTypes...>& p_other) const { return m_index != p_other.m_index; }
+			virtual HierarchicalIterator<ComponentTypes...>& operator++()
 			{
-				m_index++;
+				++m_index;
 				return *this;
 			}
 		protected:
@@ -162,20 +196,33 @@ namespace PrCore::ECS {
 			size_t m_entitiesNumber;
 			size_t m_index;
 		};
-
-		class HierarchicalTypedIterator: public HierarchicalIterator {
+		template<typename... ComponentTypes>
+		class HierarchicalTypedIterator: public HierarchicalIterator<ComponentTypes...> {
 		public:
+			using difference_type = std::tuple<Entity, std::add_pointer_t<ComponentTypes>...>;
+			using HierarchicalIterator<ComponentTypes...>::m_entityManager;
+			using HierarchicalIterator<ComponentTypes...>::m_entitiesNumber;
+			using HierarchicalIterator<ComponentTypes...>::m_index;
+
 			HierarchicalTypedIterator() = delete;
 			explicit HierarchicalTypedIterator(size_t p_index, EntityManager* p_entityManager, size_t p_entitiesNumber, ComponentSignature p_mask) :
-				HierarchicalIterator(p_index, p_entityManager, p_entitiesNumber),
+				HierarchicalIterator<ComponentTypes...>(p_index, p_entityManager, p_entitiesNumber),
 				m_mask(p_mask)
 			{}
 
-			virtual HierarchicalTypedIterator& operator++() override
+			std::tuple<Entity, std::add_pointer_t<ComponentTypes>...> operator*() const
+			{
+				PR_ASSERT(m_index < m_entitiesNumber, "Iterator out of range");
+
+				Entity entity = m_entityManager->m_hierarchicalEntites[m_index].second;
+				return  std::tuple_cat(std::make_tuple(entity), CreateComponentTuple<ComponentTypes...>(m_entityManager->m_hierarchicalEntites[m_index].second));
+			}
+
+			virtual HierarchicalTypedIterator<ComponentTypes...>& operator++() override
 			{
 				Entity nextEntity;
 				do {
-					m_index++;
+					++m_index;
 				} while (m_index < m_entitiesNumber && (m_entityManager->m_hierarchicalEntites[m_index].second.GetComponentSignature() & m_mask) != m_mask);
 
 				return *this;
@@ -192,18 +239,18 @@ namespace PrCore::ECS {
 				m_entityManager(p_entityManager)
 			{}
 
-			BasicIterator begin() const
+			BasicIterator<void> begin() const
 			{
 				int index = 0;
 				while (index < m_entityManager->m_entitiesNumber && m_entityManager->m_entitiesSignature[index].none())
-					index++;
+					++index;
 
-				return BasicIterator(index, m_entityManager, m_entityManager->m_entitiesNumber);
+				return BasicIterator<void>(index, m_entityManager, m_entityManager->m_entitiesNumber);
 			}
 
-			BasicIterator end() const
+			BasicIterator<void> end() const
 			{
-				return BasicIterator(m_entityManager->m_entitiesNumber, m_entityManager, m_entityManager->m_entitiesNumber);
+				return BasicIterator<void>(m_entityManager->m_entitiesNumber, m_entityManager, m_entityManager->m_entitiesNumber);
 			}
 		private:
 			EntityManager* m_entityManager;
@@ -216,28 +263,25 @@ namespace PrCore::ECS {
 			explicit TypedView(EntityManager* p_entityManager) :
 				m_entityManager(p_entityManager)
 			{
-				if (sizeof...(ComponentTypes) == 0)
-					PR_ASSERT(sizeof...(ComponentTypes) != 0, "No Component Specitied in ComponentWithComponents");
-				else
-				{
-					size_t componentIDs[] = { m_entityManager->GetTypeID<ComponentTypes>() ... };
-					for (int i = 0; i < (sizeof...(ComponentTypes)); i++)
-						m_mask.set(componentIDs[i]);
-				}
+				static_assert(sizeof...(ComponentTypes) != 0, "No Component Specitied in ComponentWithComponents");
+
+				size_t componentIDs[] = { m_entityManager->GetTypeID<ComponentTypes>() ... };
+				for (int i = 0; i < (sizeof...(ComponentTypes)); i++)
+					m_mask.set(componentIDs[i]);
 			}
 
-			TypedIterator begin() const
+			TypedIterator<ComponentTypes...> begin() const
 			{
 				int index = 0;
 				while (index < m_entityManager->m_entitiesNumber && (m_entityManager->m_entitiesSignature[index] & m_mask) != m_mask)
-					index++;
+					++index;
 
-				return TypedIterator(index, m_entityManager, m_entityManager->m_entitiesNumber, m_mask);
+				return TypedIterator<ComponentTypes...>(index, m_entityManager, m_entityManager->m_entitiesNumber, m_mask);
 			}
 
-			TypedIterator end() const
+			TypedIterator<ComponentTypes...> end() const
 			{
-				return TypedIterator(m_entityManager->m_entitiesNumber, m_entityManager, m_entityManager->m_entitiesNumber, m_mask);
+				return TypedIterator<ComponentTypes...>(m_entityManager->m_entitiesNumber, m_entityManager, m_entityManager->m_entitiesNumber, m_mask);
 			}
 		private:
 			EntityManager* m_entityManager;
@@ -250,14 +294,14 @@ namespace PrCore::ECS {
 			explicit BasicHierarchicalView(EntityManager* p_entityManager);
 			virtual ~BasicHierarchicalView() = default;
 
-			HierarchicalIterator begin() const
+			HierarchicalIterator<void> begin() const
 			{
-				return HierarchicalIterator(0, m_entityManager, m_entityManager->m_entitiesNumber);
+				return HierarchicalIterator<void>(0, m_entityManager, m_entityManager->m_entitiesNumber);
 			}
 
-			HierarchicalIterator end() const
+			HierarchicalIterator<void> end() const
 			{
-				return HierarchicalIterator(m_entityManager->m_hierarchicalEntites.size(), m_entityManager, m_entityManager->m_entitiesNumber);
+				return HierarchicalIterator<void>(m_entityManager->m_hierarchicalEntites.size(), m_entityManager, m_entityManager->m_entitiesNumber);
 			}
 
 		protected:
@@ -274,33 +318,30 @@ namespace PrCore::ECS {
 			explicit TypedHierarchicalView(EntityManager* p_entityManager) :
 				BasicHierarchicalView(p_entityManager)
 			{
-				if (sizeof...(ComponentTypes) == 0)
-					PR_ASSERT(sizeof...(ComponentTypes) != 0, "No Component Specitied in ComponentWithComponents");
-				else
-				{
-					size_t componentIDs[] = { m_entityManager->GetTypeID<ComponentTypes>() ... };
-					for (int i = 0; i < (sizeof...(ComponentTypes)); i++)
-						m_mask.set(componentIDs[i]);
-				}
+				static_assert(sizeof...(ComponentTypes) != 0, "No Component Specitied in ComponentWithComponents");
+
+				size_t componentIDs[] = { m_entityManager->GetTypeID<ComponentTypes>() ... };
+				for (int i = 0; i < (sizeof...(ComponentTypes)); i++)
+					m_mask.set(componentIDs[i]);
 			}
 
-			HierarchicalTypedIterator begin() const
+			HierarchicalTypedIterator<ComponentTypes...> begin() const
 			{
 				int index = 0;
 				auto hierarchicalEntities = m_entityManager->m_hierarchicalEntites;
 				if (hierarchicalEntities.empty())
 					return end();
 
-				while (index < m_entityManager->m_entitiesNumber && (hierarchicalEntities[index].second.GetComponentSignature() & m_mask) != m_mask)
+				while (index < m_entityManager->m_hierarchicalEntites.size() && (hierarchicalEntities[index].second.GetComponentSignature() & m_mask) != m_mask)
 					index++;
 
-				return HierarchicalTypedIterator(index, m_entityManager, m_entityManager->m_hierarchicalEntites.size(), m_mask);
+				return HierarchicalTypedIterator<ComponentTypes...>(index, m_entityManager, m_entityManager->m_hierarchicalEntites.size(), m_mask);
 			}
 
-			virtual HierarchicalTypedIterator end() const
+			virtual HierarchicalTypedIterator<ComponentTypes...> end() const
 			{
 				auto size = m_entityManager->m_hierarchicalEntites.size();
-				return HierarchicalTypedIterator(size, m_entityManager, size, m_mask);
+				return HierarchicalTypedIterator<ComponentTypes...>(size, m_entityManager, size, m_mask);
 			}
 
 		protected:

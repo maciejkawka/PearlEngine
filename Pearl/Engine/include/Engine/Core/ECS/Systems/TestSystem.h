@@ -11,10 +11,8 @@ namespace PrCore::ECS
 
 		void OnUpdate(float p_dt) override
 		{
-			for (auto entity : m_entityViewer.EntitesWithComponents<TransformComponent, CameraComponent>())
+			for (auto [entity, transform, _] : m_entityViewer.EntitesWithComponents<TransformComponent, CameraComponent>())
 			{
-				auto transform = entity.GetComponent<TransformComponent>();
-
 				auto position = transform->GetPosition();
 				if (Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::W))
 					position.x += p_dt;

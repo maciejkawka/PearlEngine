@@ -30,15 +30,12 @@ void MeshRendererSystem::OnUpdate(float p_dt)
 {
 	DefferedRendererFrontend::GetInstance().CalculateFrustrum();
 
-	for (auto entity : m_entityViewer.EntitesWithComponents<LightComponent, TransformComponent>())
+	for (auto [entity, light, transform] : m_entityViewer.EntitesWithComponents<LightComponent, TransformComponent>())
 	{
-		auto transform = entity.GetComponent<TransformComponent>();
-		auto light = entity.GetComponent<LightComponent>();
-
 		DefferedRendererFrontend::GetInstance().AddLight(light, transform, entity.GetID().GetID());
 	}
 
-	for (auto entity : m_entityViewer.EntitesWithComponents<MeshRendererComponent, TransformComponent>())
+	for (auto [entity, mesh, transform] : m_entityViewer.EntitesWithComponents<MeshRendererComponent, TransformComponent>())
 	{
 		DefferedRendererFrontend::GetInstance().AddMesh(entity);
 	}

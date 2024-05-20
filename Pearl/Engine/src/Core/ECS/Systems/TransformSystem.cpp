@@ -13,10 +13,8 @@ void HierarchyTransform::OnCreate()
 
 void HierarchyTransform::OnUpdate(float p_dt)
 {
-	for(auto entity: m_entityViewer.HierarchicalEntitiesWithComponents<TransformComponent>())
+	for(auto [entity, transform]: m_entityViewer.HierarchicalEntitiesWithComponents<TransformComponent>())
 	{
-		auto transform = entity.GetComponent<TransformComponent>();
-
 		auto parentComponent = entity.GetComponent<ParentComponent>();
 		auto parent = parentComponent->parent;
 		auto parentTransform = parent.GetComponent<TransformComponent>();

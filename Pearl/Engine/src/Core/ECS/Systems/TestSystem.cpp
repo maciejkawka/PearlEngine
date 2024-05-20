@@ -33,21 +33,16 @@ void RenderStressTest::OnEnable()
 	}
 
 	//Randomize Lights
-	for (auto entity : m_entityViewer.EntitesWithComponents<LightComponent, MeshRendererComponent>())
+	for (auto [entity, light, mesh]: m_entityViewer.EntitesWithComponents<LightComponent, MeshRendererComponent>())
 	{
-		auto light = entity.GetComponent<LightComponent>();
-		auto mesh = entity.GetComponent<MeshRendererComponent>();
-
 		mesh->material = std::make_shared<PrRenderer::Resources::Material>(*mesh->material);
 		PrRenderer::Core::Color color = randColor();
 		light->m_light->SetColor(color);
 		mesh->material->SetProperty("albedoValue", static_cast<PrCore::Math::vec4>(color));
 	}
 
-	for (auto entity : m_entityViewer.EntitesWithComponents<LightComponent>())
+	for (auto [entity, light] : m_entityViewer.EntitesWithComponents<LightComponent>())
 	{
-		auto light = entity.GetComponent<LightComponent>();
-
 		if (light->mainDirectLight)
 		{
 			m_mainLightPtr = light->m_light;
@@ -99,28 +94,24 @@ void RenderStressTest::OnUpdate(float p_dt)
 	}
 
 	// Rotate all
-	for (auto entity : m_entityViewer.EntitesWithComponents<MeshRendererComponent, TransformComponent>())
+	for (auto [entity, mesh, transform] : m_entityViewer.EntitesWithComponents<MeshRendererComponent, TransformComponent>())
 	{
 		auto name = entity.GetComponent<NameComponent>()->name;
 		if (name.find("Ocluder") != std::string::npos ||
 			name.find("Light") != std::string::npos ||
 			name.find("Emission") != std::string::npos)
 		{
-			auto transform = entity.GetComponent<TransformComponent>();
 			auto rotate = transform->GetRotation();
 			auto rotationQuat = PrCore::Math::quat({ 0.0f, 3.14f / 4.0f * p_dt, 3.14f / 4.0f * p_dt });
 			transform->SetRotation(rotate * rotationQuat);
 		}
 	}
 
-	for (auto entity : m_entityViewer.EntitesWithComponents<TransformComponent, LightComponent, MeshRendererComponent>())
+	for (auto [entity, transform, light, mesh] : m_entityViewer.EntitesWithComponents<TransformComponent, LightComponent, MeshRendererComponent>())
 	{
 		//This is selected light
 		if (entity.GetComponent<NameComponent>()->name == "Light" + std::to_string(m_selectedLight))
 		{
-			auto transform = entity.GetComponent<TransformComponent>();
-			auto light = entity.GetComponent<LightComponent>();
-			auto mesh = entity.GetComponent<MeshRendererComponent>();
 			auto box = mesh->mesh->GetBoxVolume();
 
 			auto position = transform->GetPosition();

@@ -53,9 +53,8 @@ void Scene::DestoryEntityImmediate(Entity p_entity)
 Entity Scene::GetEntityByName(const std::string& p_name)
 {
 	auto entityViewer = m_entityManager->GetEntitiesWithComponents<NameComponent>();
-	for (auto entity : entityViewer)
+	for (auto [entity, name]: entityViewer)
 	{
-		auto name = entity.GetComponent<NameComponent>();
 		if (name->name == p_name)
 			return entity;
 	}
@@ -66,9 +65,8 @@ Entity Scene::GetEntityByName(const std::string& p_name)
 Entity Scene::GetEntityByID(Utils::UUID p_UUID)
 {
 	auto entityViewer = m_entityManager->GetEntitiesWithComponents<UUIDComponent>();
-	for (auto entity : entityViewer)
+	for (auto [entity, UUID]: entityViewer)
 	{
-		auto UUID = entity.GetComponent<UUIDComponent>();
 		if (UUID->UUID == p_UUID)
 			return entity;
 	}
@@ -79,9 +77,8 @@ Entity Scene::GetEntityByID(Utils::UUID p_UUID)
 Entity Scene::GetEntityByTag(const std::string& p_tag)
 {
 	auto entityViewer = m_entityManager->GetEntitiesWithComponents<TagComponent>();
-	for (auto entity : entityViewer)
+	for (auto [entity, tag] : entityViewer)
 	{
-		auto tag = entity.GetComponent<TagComponent>();
 		if (tag->tag == p_tag)
 			return entity;
 	}
@@ -111,7 +108,7 @@ void Scene::LateUpdate(float p_dt) const
 
 void Scene::CleanDestroyedEntities() const
 {
-	for (auto entity : m_entityManager->GetAllHierrarchicalEntities())
+	for (auto [entity] : m_entityManager->GetAllHierrarchicalEntities())
 	{
 		if (entity.HasComponent<ToDestoryTag>())
 			continue;
@@ -123,7 +120,7 @@ void Scene::CleanDestroyedEntities() const
 			entity.AddComponent<ToDestoryTag>();
 	}
 
-	for(auto entity: m_entityManager->GetEntitiesWithComponents<ToDestoryTag>())
+	for(auto [entity, _]: m_entityManager->GetEntitiesWithComponents<ToDestoryTag*>())
 		m_entityManager->DestoryEntity(entity.GetID());
 }
 
