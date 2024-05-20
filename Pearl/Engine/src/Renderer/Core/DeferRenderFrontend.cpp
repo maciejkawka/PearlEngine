@@ -1,10 +1,11 @@
 #include "Core/Common/pearl_pch.h"
 
+#include "Renderer/Core/DeferRenderFrontend.h"
+
 #include"Core/ECS/ECS.h"
 #include"Core/Utils/Clock.h"
 
-#include "Renderer/Core/DeferredRendererFrontend.h"
-#include "Renderer/Core/DefRendererBackend.h"
+#include "Renderer/Core/DeferRenderBackend.h"
 #include "Renderer/Core/BoundingVolume.h"
 
 using namespace PrRenderer::Core;
@@ -15,8 +16,8 @@ using namespace PrRenderer::Core;
 
 static std::uint64_t m_frameID;
 
-DefferedRendererFrontend::DefferedRendererFrontend(RendererSettings& p_settings) :
-	IRendererFrontend(p_settings)
+DeferRenderFrontend::DeferRenderFrontend(RendererSettings& p_settings) :
+	IRenderFrontend(p_settings)
 {
 	//Prepare frame data
 	m_currentFrame = m_frameData[0];
@@ -30,10 +31,10 @@ DefferedRendererFrontend::DefferedRendererFrontend(RendererSettings& p_settings)
 	m_debugShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("drawDebug.shader");
 	m_debugMaterial = std::make_shared<Resources::Material>(m_debugShader);
 
-	m_rendererBackend = std::make_shared<DefRendererBackend>(m_renderSettings);
+	m_rendererBackend = std::make_shared<DeferRenderBackend>(m_renderSettings);
 }
 
-void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id)
+void DeferRenderFrontend::SubmitLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id)
 {
 	// If Main light
 	if(p_lightComponent->mainDirectLight)
@@ -130,7 +131,7 @@ void DefferedRendererFrontend::AddLight(ECS::LightComponent* p_lightComponent, E
 	m_currentFrame->lights.push_back(std::move(lightObject));
 }
 
-void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
+void DeferRenderFrontend::SubmitMesh(ECS::Entity& p_entity)
 {
 	PR_ASSERT(p_entity.HasComponent<ECS::MeshRendererComponent>(), "FrontendRenderer: entity does not have a MeshRendererComponent");
 	PR_ASSERT(p_entity.HasComponent<ECS::TransformComponent>(), "FrontendRenderer: entity does not have a TransformComponent");
@@ -177,7 +178,7 @@ void DefferedRendererFrontend::AddMesh(ECS::Entity& p_entity)
 		m_currentFrame->transpatrentObjects.push_back(object);
 }
 
-void DefferedRendererFrontend::SetCubemap(Resources::MaterialPtr p_cubemapMat)
+void DeferRenderFrontend::SetCubemap(Resources::MaterialPtr p_cubemapMat)
 {
 	if(p_cubemapMat == nullptr)
 	{
@@ -196,7 +197,7 @@ void DefferedRendererFrontend::SetCubemap(Resources::MaterialPtr p_cubemapMat)
 		m_cubemapObject = m_previousFrame->cubemapObject;
 }
 
-void DefferedRendererFrontend::PrepareFrame()
+void DeferRenderFrontend::PrepareFrame()
 {
 	//Swap Frame Buffer Data
 	m_previousFrame = m_frameData[m_currentFrameIndex];
@@ -224,7 +225,7 @@ void DefferedRendererFrontend::PrepareFrame()
 	m_dirLightNumber = 0;
 }
 
-void DefferedRendererFrontend::BuildFrame()
+void DeferRenderFrontend::BuildFrame()
 {
 	m_currentFrame->camera = m_camera;
 	m_currentFrame->cubemapObject = m_cubemapObject;
@@ -256,13 +257,13 @@ void DefferedRendererFrontend::BuildFrame()
 	m_currentFrame->frameInfo.frameID = m_frameID++;
 }
 
-void DefferedRendererFrontend::CalculateFrustrum()
+void DeferRenderFrontend::CalculateFrustrum()
 {
 	m_camera->RecalculateMatrices();
 	m_frustrum.Calculate(m_camera->GetCameraMatrix());
 }
 
-void DefferedRendererFrontend::DrawCube(const Math::mat4& p_transformMat, bool p_wireframe)
+void DeferRenderFrontend::DrawDebugCube(const Math::mat4& p_transformMat, bool p_wireframe)
 {
 	auto renderObj = std::make_shared<RenderObject>();
 	renderObj->type = RenderObjectType::Mesh;
@@ -275,15 +276,15 @@ void DefferedRendererFrontend::DrawCube(const Math::mat4& p_transformMat, bool p
 	m_currentFrame->debugObjects.push_back(renderObj);
 }
 
-void DefferedRendererFrontend::DrawCube(const Math::vec3& p_center, const Math::vec3& p_size, bool p_wireframe)
+void DeferRenderFrontend::DrawDebugCube(const Math::vec3& p_center, const Math::vec3& p_size, bool p_wireframe)
 {
 	Math::mat4 transformMat = Math::translate(Math::mat4(1.0f), p_center)
 		* Math::scale(Math::mat4(1.0f), p_size);
 
-	DrawCube(transformMat, p_wireframe);
+	DrawDebugCube(transformMat, p_wireframe);
 }
 
-void DefferedRendererFrontend::DrawSphere(const Math::vec3& p_center, float p_radius, bool p_wireframe)
+void DeferRenderFrontend::DrawDebugSphere(const Math::vec3& p_center, float p_radius, bool p_wireframe)
 {
 	Math::mat4 transformMat = Math::translate(Math::mat4(1.0f), p_center)
 		* Math::scale(Math::mat4(1.0f), PrCore::Math::vec3(p_radius));
@@ -299,7 +300,7 @@ void DefferedRendererFrontend::DrawSphere(const Math::vec3& p_center, float p_ra
 	m_currentFrame->debugObjects.push_back(renderObj);
 }
 
-void DefferedRendererFrontend::DrawLine(const Math::vec3& p_start, const Math::vec3& p_end)
+void DeferRenderFrontend::DrawDebugLine(const Math::vec3& p_start, const Math::vec3& p_end)
 {
 	Math::mat4 transformMat = Math::translate(Math::mat4(1.0f), p_start)
 		* Math::scale(Math::mat4(1.0f), PrCore::Math::vec3(p_end));
@@ -315,13 +316,13 @@ void DefferedRendererFrontend::DrawLine(const Math::vec3& p_start, const Math::v
 	m_currentFrame->debugObjects.push_back(renderObj);
 }
 
-void DefferedRendererFrontend::SetDebugColor(const Color& p_color)
+void DeferRenderFrontend::SetDebugColor(const Color& p_color)
 {
 	m_debugColor = p_color;
 	m_debugMaterial->SetProperty("color", static_cast<Math::vec4>(p_color));
 }
 
-size_t DefferedRendererFrontend::InstanciateObjectsByMaterial(RenderObjectVector& p_renderObjects)
+size_t DeferRenderFrontend::InstanciateObjectsByMaterial(RenderObjectVector& p_renderObjects)
 {
 	RenderObjectVector instanciateCandidates;
 	size_t instancedObjects = 0;
@@ -397,7 +398,7 @@ size_t DefferedRendererFrontend::InstanciateObjectsByMaterial(RenderObjectVector
 	return instancedObjects;
 }
 
-size_t DefferedRendererFrontend::InstanciateObjectsByMesh(RenderObjectVector& p_renderObjects)
+size_t DeferRenderFrontend::InstanciateObjectsByMesh(RenderObjectVector& p_renderObjects)
 {
 	RenderObjectVector instanciateCandidates;
 	size_t instancedObjects = 0;

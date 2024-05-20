@@ -118,7 +118,3 @@ void GLVertexArray::SetIndexBuffer(const Buffers::IndexBufferPtr p_indexBuffer)
 	m_indexBuffer->Bind();
 	glBindVertexArray(0);
 }
-
-
-
-

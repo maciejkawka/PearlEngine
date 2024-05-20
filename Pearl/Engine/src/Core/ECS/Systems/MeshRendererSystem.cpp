@@ -3,7 +3,7 @@
 #include "Core/ECS/Systems/MeshRendererSystem.h"
 #include"Core/Resources/ResourceLoader.h"
 
-#include"Renderer/Core/DeferredRendererFrontend.h"
+#include"Renderer/Core/RenderSystem.h"
 
 using namespace PrCore::ECS;
 using namespace PrRenderer::Core;
@@ -19,7 +19,7 @@ void MeshRendererSystem::OnCreate()
 
 void MeshRendererSystem::OnEnable()
 {
-	DefferedRendererFrontend::GetInstance().SetFlag(RendererFlag::CameraPerspectiveRecalculate);
+	renderSystem->SetFlag(RendererFlag::CameraPerspectiveRecalculate);
 }
 
 void MeshRendererSystem::OnDisable()
@@ -28,15 +28,15 @@ void MeshRendererSystem::OnDisable()
 
 void MeshRendererSystem::OnUpdate(float p_dt)
 {
-	DefferedRendererFrontend::GetInstance().CalculateFrustrum();
+	renderSystem->CalculateFrustrum();
 
 	for (auto [entity, light, transform] : m_entityViewer.EntitesWithComponents<LightComponent, TransformComponent>())
 	{
-		DefferedRendererFrontend::GetInstance().AddLight(light, transform, entity.GetID().GetID());
+		renderSystem->SubmitLight(light, transform, entity.GetID().GetID());
 	}
 
 	for (auto [entity, mesh, transform] : m_entityViewer.EntitesWithComponents<MeshRendererComponent, TransformComponent>())
 	{
-		DefferedRendererFrontend::GetInstance().AddMesh(entity);
+		renderSystem->SubmitMesh(entity);
 	}
 }

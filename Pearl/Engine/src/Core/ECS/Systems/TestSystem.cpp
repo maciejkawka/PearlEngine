@@ -1,7 +1,7 @@
 #include "Core/Common/pearl_pch.h"
 
 #include"Core/ECS/Systems/TestSystem.h"
-#include "Renderer/Core/DeferredRendererFrontend.h"
+#include "Renderer/Core/RenderSystem.h"
 
 using namespace PrCore::ECS;
 using namespace PrRenderer::Core;
@@ -15,13 +15,13 @@ void RenderStressTest::OnEnable()
 		return color;
 	};
 
-	PrRenderer::Core::DefferedRendererFrontend::GetInstance().SetCubemap(nullptr);
+	renderSystem->SetCubemap(nullptr);
 
-	PrRenderer::Core::DefferedRendererFrontend::GetInstance().SetDebugColor(PrRenderer::Core::Color::Red);
-	m_camera = PrRenderer::Core::DefferedRendererFrontend::GetInstance().GetCamera();
+	renderSystem->SetDebugColor(PrRenderer::Core::Color::Red);
+	m_camera = renderSystem->GetCamera();
 	m_camera->SetPosition({ 40, 3, 20 });
 	m_camera->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 90, 0))));
-	auto settings = DefferedRendererFrontend::GetInstance().GetSettingsPtr();
+	auto settings = renderSystem->GetSettingsPtr();
 	settings->enableFog = false;
 
 	m_cameraTransform = new TransformComponent();
@@ -78,17 +78,17 @@ void RenderStressTest::OnUpdate(float p_dt)
 
 		if (cubemap == 0)
 		{
-			DefferedRendererFrontend::GetInstance().SetCubemap(Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("skymapHDRMaterial.mat"));
+			renderSystem->SetCubemap(Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("skymapHDRMaterial.mat"));
 			m_mainLightPtr->SetColor({ 0.8f, 0.8f, 0.8f, 1.0f });
 		}
 		else if (cubemap == 1)
 		{
-			DefferedRendererFrontend::GetInstance().SetCubemap(Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("cubemapMaterial.mat"));
+			renderSystem->SetCubemap(Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("cubemapMaterial.mat"));
 			m_mainLightPtr->SetColor({ 0.8f, 0.8f, 0.8f, 1.0f });
 		}
 		else if (cubemap == 2)
 		{
-			DefferedRendererFrontend::GetInstance().SetCubemap(nullptr);
+			renderSystem->SetCubemap(nullptr);
 			m_mainLightPtr->SetColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 		}
 	}
@@ -153,14 +153,14 @@ void RenderStressTest::OnUpdate(float p_dt)
 			Math::mat4 transformMat = Math::translate(Math::mat4(1.0f), box.GetCenter())
 				* Math::scale(Math::mat4(1.0f), box.GetSize() * 1.2f);
 
-			DefferedRendererFrontend::GetInstance().DrawCube(transform->GetWorldMatrix() * transformMat, true);
+			renderSystem->DrawDebugCube(transform->GetWorldMatrix() * transformMat, true);
 			if(light->m_shadowCast)
-				DefferedRendererFrontend::GetInstance().DrawSphere(position + 0.5f, 0.2f, true);
+				renderSystem->DrawDebugSphere(position + 0.5f, 0.2f, true);
 		}
 	}
 
 	// Retup renderer settings
-	auto settings = DefferedRendererFrontend::GetInstance().GetSettingsPtr();
+	auto settings = renderSystem->GetSettingsPtr();
 
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::E))
 		settings->enableInstancing = !settings->enableInstancing;

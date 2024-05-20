@@ -568,5 +568,3 @@ JSON::json Material::ReadFile()
 
 	return JSON::json::parse(dataVector);
 }
-
-

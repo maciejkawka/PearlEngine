@@ -1,5 +1,5 @@
 #include "Core/Common/pearl_pch.h"
-#include "Renderer/Core/DefRendererBackend.h"
+#include "Renderer/Core/DeferRenderBackend.h"
 
 #include "Core/Events/WindowEvents.h"
 #include "Renderer/Core/LowRenderer.h"
@@ -13,8 +13,8 @@
 
 namespace PrRenderer::Core
 {
-	DefRendererBackend::DefRendererBackend(RendererSettingsPtr& p_settings) :
-		IRendererBackend(p_settings)
+	DeferRenderBackend::DeferRenderBackend(RendererSettingsPtr& p_settings) :
+		IRenderBackend(p_settings)
 	{
 		//Prepare shaders
 		m_shadowMappingShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Shadows/ShadowMapping.shader");
@@ -42,11 +42,11 @@ namespace PrRenderer::Core
 
 		// Set events
 		PrCore::Events::EventListener windowResizedListener;
-		windowResizedListener.connect<&DefRendererBackend::OnWindowResize>(this);
+		windowResizedListener.connect<&DeferRenderBackend::OnWindowResize>(this);
 		PrCore::Events::EventManager::GetInstance().AddListener(windowResizedListener, PrCore::Events::WindowResizeEvent::s_type);
 	}
 
-	void DefRendererBackend::PreparePipeline()
+	void DeferRenderBackend::PreparePipeline()
 	{
 		SCOPE_HIGH_TIMER_CALLBACK(
 			{ m_frame->frameInfo.timeEvents.push_back({ "PreparePipeline", time }); });
@@ -345,7 +345,7 @@ namespace PrRenderer::Core
 		PushCommand(CreateRC<RenderFXAARC>(m_FXAAShdr, &m_renderContext));
 	}
 
-	void DefRendererBackend::Render()
+	void DeferRenderBackend::Render()
 	{
 		SCOPE_HIGH_TIMER_CALLBACK(
 			{ m_frame->frameInfo.timeEvents.push_back({ "RenderOnCPU", time }); });
@@ -357,11 +357,11 @@ namespace PrRenderer::Core
 		}
 	}
 
-	void DefRendererBackend::PostRender()
+	void DeferRenderBackend::PostRender()
 	{
 	}
 
-	void DefRendererBackend::OnWindowResize(PrCore::Events::EventPtr p_event)
+	void DeferRenderBackend::OnWindowResize(PrCore::Events::EventPtr p_event)
 	{
 		auto windowResizeEvent = std::static_pointer_cast<PrCore::Events::WindowResizeEvent>(p_event);
 		m_screenWidth = windowResizeEvent->m_width;
@@ -375,7 +375,7 @@ namespace PrRenderer::Core
 		PushCommand(CreateRC<LowRenderer::SetViewportRC>(m_screenWidth, m_screenHeight, 0, 0));
 	}
 
-	void DefRendererBackend::RenderOpaque(RenderObjectPtr p_object, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderOpaque(RenderObjectPtr p_object, const RenderContext* p_renderContext)
 	{
 		auto mesh = p_object->mesh;
 		auto material = p_object->material;
@@ -416,7 +416,7 @@ namespace PrRenderer::Core
 		mesh->Unbind();
 	}
 
-	void DefRendererBackend::RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
+	void DeferRenderBackend::RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
 	{
 		const auto frustrum = Frustrum(p_lightMatrix);
 		bool skipCulling = p_light->GetType() == Resources::LightType::Directional;
@@ -455,7 +455,7 @@ namespace PrRenderer::Core
 		p_shaderPtr->Unbind();
 	}
 
-	void DefRendererBackend::RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightView, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
+	void DeferRenderBackend::RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightView, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
 	{
 		const auto lightPos = p_light->GetPosition();
 		const auto frustrum = Frustrum(p_lightView);
@@ -499,7 +499,7 @@ namespace PrRenderer::Core
 		p_pointShadowMapShader->Unbind();
 	}
 
-	void DefRendererBackend::GenerateSSAOContext()
+	void DeferRenderBackend::GenerateSSAOContext()
 	{
 		m_renderContext.SSAOBuff.reset();
 		m_renderContext.SSAOTex.reset();
@@ -567,7 +567,7 @@ namespace PrRenderer::Core
 		m_renderContext.SSAOTex = m_renderContext.SSAOBuff->GetTexturePtr();
 	}
 
-	void DefRendererBackend::GeneratePostprocessContext()
+	void DeferRenderBackend::GeneratePostprocessContext()
 	{
 		m_renderContext.postprocessBuff.reset();
 		m_renderContext.postprocessTex.reset();
@@ -634,7 +634,7 @@ namespace PrRenderer::Core
 		m_renderContext.bloomTex = m_renderContext.bloomBuff->GetTexturePtr();
 	}
 
-	void DefRendererBackend::GenerategGBuffersContext()
+	void DeferRenderBackend::GenerategGBuffersContext()
 	{
 		m_renderContext.gBuffer.positionTex.reset();
 		m_renderContext.gBuffer.albedoTex.reset();
@@ -699,7 +699,7 @@ namespace PrRenderer::Core
 		m_renderContext.outputTex = m_renderContext.otuputBuff->GetTexturePtr(0);
 	}
 
-	void DefRendererBackend::GenerateShadowMaps()
+	void DeferRenderBackend::GenerateShadowMaps()
 	{
 		//Spot Lights Mapping
 		Buffers::FramebufferTexture spotDepthTex;
@@ -756,7 +756,7 @@ namespace PrRenderer::Core
 		m_renderContext.shadowMapMainDirTex = m_renderContext.shadowMapMainDirBuff->GetDepthTexturePtr();
 	}
 
-	void DefRendererBackend::RenderCubeMap(Resources::MaterialPtr p_material, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderCubeMap(Resources::MaterialPtr p_material, const RenderContext* p_renderContext)
 	{
 		LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::LessEqual);
 
@@ -773,7 +773,7 @@ namespace PrRenderer::Core
 		LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::Less);
 	}
 
-	void DefRendererBackend::RenderToneMapping(Resources::ShaderPtr p_toneMapShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderToneMapping(Resources::ShaderPtr p_toneMapShader, const RenderContext* p_renderContext)
 	{
 		LowRenderer::EnableDepth(false);
 		LowRenderer::EnableCullFace(false);
@@ -801,7 +801,7 @@ namespace PrRenderer::Core
 		p_renderContext->otuputBuff->Unbind();
 	}
 
-	void DefRendererBackend::RenderTransparent(RenderObjectPtr p_object, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderTransparent(RenderObjectPtr p_object, const RenderContext* p_renderContext)
 	{
 		auto material = p_object->material;
 		auto mesh = p_object->mesh;
@@ -846,7 +846,7 @@ namespace PrRenderer::Core
 		material->Unbind();
 	}
 
-	void DefRendererBackend::RenderSSAO(Resources::ShaderPtr p_SSAOShader, Resources::ShaderPtr p_BlurSSAOShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderSSAO(Resources::ShaderPtr p_SSAOShader, Resources::ShaderPtr p_BlurSSAOShader, const RenderContext* p_renderContext)
 	{
 		p_renderContext->SSAOBuff->Bind();
 		p_SSAOShader->Bind();
@@ -906,7 +906,7 @@ namespace PrRenderer::Core
 		p_renderContext->gBuffer.buffer->Unbind();
 	}
 
-	void DefRendererBackend::RenderFXAA(Resources::ShaderPtr p_FXAAShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderFXAA(Resources::ShaderPtr p_FXAAShader, const RenderContext* p_renderContext)
 	{
 		p_FXAAShader->Bind();
 
@@ -933,7 +933,7 @@ namespace PrRenderer::Core
 		p_FXAAShader->Unbind();
 	}
 
-	void DefRendererBackend::RenderFog(Resources::ShaderPtr p_fogShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderFog(Resources::ShaderPtr p_fogShader, const RenderContext* p_renderContext)
 	{
 		p_renderContext->otuputBuff->Bind();
 		p_fogShader->Bind();
@@ -960,7 +960,7 @@ namespace PrRenderer::Core
 		p_fogShader->Unbind();
 	}
 
-	void DefRendererBackend::RenderBloom(Resources::ShaderPtr p_downsampleShader, Resources::ShaderPtr p_upsampleShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderBloom(Resources::ShaderPtr p_downsampleShader, Resources::ShaderPtr p_upsampleShader, const RenderContext* p_renderContext)
 	{
 		// downsample
 		float& threshold = p_renderContext->settings->bloomThreshold;
@@ -1032,7 +1032,7 @@ namespace PrRenderer::Core
 		LowRenderer::EnableBlending(false);
 	}
 
-	void DefRendererBackend::RenderDebug(RenderObjectVector* p_debugObjects, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderDebug(RenderObjectVector* p_debugObjects, const RenderContext* p_renderContext)
 	{
 		p_renderContext->otuputBuff->Bind();
 
@@ -1073,7 +1073,7 @@ namespace PrRenderer::Core
 		p_renderContext->otuputBuff->Unbind();
 	}
 
-	void DefRendererBackend::RenderLight(Resources::ShaderPtr p_lightShdr, DirLightObjectPtr p_mianDirectLight, std::vector<LightObjectPtr>* p_lights, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderLight(Resources::ShaderPtr p_lightShdr, DirLightObjectPtr p_mianDirectLight, std::vector<LightObjectPtr>* p_lights, const RenderContext* p_renderContext)
 	{
 		p_renderContext->otuputBuff->Bind();
 
@@ -1216,7 +1216,7 @@ namespace PrRenderer::Core
 		p_renderContext->otuputBuff->Unbind();
 	}
 
-	void DefRendererBackend::GenerateIRMap()
+	void DeferRenderBackend::GenerateIRMap()
 	{
 		m_renderContext.IRMap.reset();
 
@@ -1273,7 +1273,7 @@ namespace PrRenderer::Core
 		PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<Resources::Shader>("IrradianceMap.shader");
 	}
 
-	void DefRendererBackend::GeneratePrefilterMap()
+	void DeferRenderBackend::GeneratePrefilterMap()
 	{
 		m_renderContext.prefilterMap.reset();
 
@@ -1338,7 +1338,7 @@ namespace PrRenderer::Core
 		PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<Resources::Shader>(shader->GetName());
 	}
 
-	void DefRendererBackend::GenerateLUTMap()
+	void DeferRenderBackend::GenerateLUTMap()
 	{
 		m_renderContext.brdfLUT.reset();
 
@@ -1371,7 +1371,7 @@ namespace PrRenderer::Core
 		PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<Resources::Shader>("LUTMap.shader");
 	}
 
-	PrCore::Math::vec4 DefRendererBackend::CalculateLightTexture(size_t p_lightID, size_t p_lightMapSize, size_t p_comboMapSize)
+	PrCore::Math::vec4 DeferRenderBackend::CalculateLightTexture(size_t p_lightID, size_t p_lightMapSize, size_t p_comboMapSize)
 	{
 		size_t comboMapSize = p_comboMapSize;
 

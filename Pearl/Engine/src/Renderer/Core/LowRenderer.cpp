@@ -17,9 +17,7 @@ void LowRenderer::Init(GraphicsAPI p_API)
 	default:
 		PRLOG_ERROR("Wrong GraphicsAPI");
 		return;
-
 	}
-	
 }
 
 void LowRenderer::Terminate()

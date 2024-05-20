@@ -7,16 +7,16 @@
 
 namespace PrRenderer::Core {
 
-	class IRendererBackend {
+	class IRenderBackend {
 	public:
-		explicit IRendererBackend(RendererSettingsPtr& p_settings) :
+		explicit IRenderBackend(RendererSettingsPtr& p_settings) :
 			m_settings(p_settings),
 			m_screenWidth(0),
 			m_screenHeight(0)
 		{}
 
-		IRendererBackend() = default;
-		virtual ~IRendererBackend() = default;
+		IRenderBackend() = default;
+		virtual ~IRenderBackend() = default;
 
 		inline void SetFrame(FrameDataPtr p_frame) { m_frame = p_frame; }
 		inline void PushCommand(RenderCommandPtr p_command) { m_commandQueue.push_back(p_command); }
@@ -39,5 +39,5 @@ namespace PrRenderer::Core {
 		size_t m_screenHeight;
 	};
 
-	using RendererBackendPtr = std::shared_ptr<IRendererBackend>;
+	using RendererBackendPtr = std::shared_ptr<IRenderBackend>;
 }

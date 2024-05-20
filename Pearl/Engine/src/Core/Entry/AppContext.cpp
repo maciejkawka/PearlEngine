@@ -8,8 +8,10 @@
 #include"Core/Filesystem/ConfigFile.h"
 #include"Core/Resources/ResourceLoader.h"
 #include"Core/ECS/SceneManager.h"
+
 #include"Renderer/OpenGL/GLContext.h"
-#include"Renderer/Core/DeferredRendererFrontend.h"
+#include"Renderer/Core/DeferRenderFrontend.h"
+#include"Renderer/Core/RenderSystem.h"
 
 const std::string_view GraphicConfig{ "graphic.cfg" };
 const std::string_view RendererConfig{ "renderer.cfg" };
@@ -119,8 +121,7 @@ PrCore::Entry::AppContext::AppContext()
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, toneMappingExposure);
 	}
 
-	PrRenderer::Core::DefferedRendererFrontend::Init(rendererSettings);
-	m_rendererBackend = PrRenderer::Core::DefferedRendererFrontend::GetInstance().GetRendererBackend();
+	PrRenderer::Core::renderSystem = std::make_unique<PrRenderer::Core::DeferRenderFrontend>(rendererSettings);
 
 	Input::InputManager::Init();
 
@@ -133,7 +134,7 @@ PrCore::Entry::AppContext::~AppContext()
 
 	ECS::SceneManager::Terminate();
 	Input::InputManager::Terminate();
-	PrRenderer::Core::DefferedRendererFrontend::Terminate();
+	PrRenderer::Core::renderSystem.reset();
 	delete m_rendererContext;
 	delete m_window;
 	Windowing::GLWindow::TerminateDevice();

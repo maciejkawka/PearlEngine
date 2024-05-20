@@ -7,4 +7,3 @@ namespace PrRenderer::Core {
 		bool m_debugMode = false;
 	};
 }
-

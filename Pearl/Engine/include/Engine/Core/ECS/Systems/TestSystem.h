@@ -2,7 +2,6 @@
 #include "Core/ECS/BaseSystem.h"
 #include "Core/ECS/Components.h"
 #include "Core/Input/InputManager.h"
-#include "Renderer/Core/DeferredRendererFrontend.h"
 
 namespace PrCore::ECS
 {

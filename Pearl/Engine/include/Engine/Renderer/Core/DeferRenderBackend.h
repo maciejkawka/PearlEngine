@@ -1,5 +1,5 @@
 #pragma once
-#include "Renderer/Core/IRendererBackend.h"
+#include "Renderer/Core/IRenderBackend.h"
 #include "Renderer/Core/RenderCommand.h"
 #include "Renderer/Core/CascadeShadowMapper.h"
 #include "Renderer/Buffers/Framebuffer.h"
@@ -8,11 +8,11 @@
 
 namespace PrRenderer::Core {
 
-	class DefRendererBackend : public IRendererBackend {
+	class DeferRenderBackend : public IRenderBackend {
 	public:
-		explicit DefRendererBackend(RendererSettingsPtr& p_settings);
+		explicit DeferRenderBackend(RendererSettingsPtr& p_settings);
 
-		~DefRendererBackend() override = default;
+		~DeferRenderBackend() override = default;
 
 		void PreparePipeline() override;
 		void Render() override;
@@ -155,5 +155,4 @@ namespace PrRenderer::Core {
 
 		CascadeShadowUtility m_CSMUtility;
 	};
-
 }

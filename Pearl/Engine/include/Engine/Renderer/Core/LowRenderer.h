@@ -6,8 +6,6 @@
 
 namespace PrRenderer::Core {
 
-
-
 	class LowRenderer {
 	public:
 		LowRenderer() = delete;
@@ -86,6 +84,5 @@ namespace PrRenderer::Core {
 
 	private:
 		inline static RendererAPI* m_rendererAPI = nullptr;
-
 	};
 }

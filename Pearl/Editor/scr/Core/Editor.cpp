@@ -6,12 +6,12 @@
 #include"Engine/Core/Events/EventManager.h"
 #include"Engine/Core/ECS/SceneManager.h"
 
+#include"Renderer/Core/RenderSystem.h"
 #include"Renderer/Resources/ShaderManager.h"
 #include"Renderer/Resources/TextureManager.h"
 #include"Renderer/Resources/MaterialManager.h"
 #include"Renderer/Resources/Shader.h"
 #include"Renderer/Resources/Material.h"
-#include"Renderer/Core/DeferredRendererFrontend.h"
 
 using namespace PrEditor::Core;
 using namespace PrCore::Events;
@@ -23,7 +23,7 @@ Editor::Editor()
 	m_basicCamera = new Components::BasicCamera(PrRenderer::Core::CameraType::Perspective);
 	m_basicCamera->GetCamera()->SetSize(5.0f);
 
-	PrRenderer::Core::DefferedRendererFrontend::GetInstance().SetCamera(m_basicCamera->GetCamera());
+	PrRenderer::Core::renderSystem->SetCamera(m_basicCamera->GetCamera());
 }
 
 Editor::~Editor()
@@ -36,7 +36,7 @@ Editor::~Editor()
 void Editor::PreFrame()
 {
 	m_appContext->m_window->PollEvents();
-	PrRenderer::Core::DefferedRendererFrontend::GetInstance().PrepareFrame();
+	PrRenderer::Core::renderSystem->PrepareFrame();
 
 	//Exit
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
@@ -93,7 +93,7 @@ void Editor::OnFrame(float p_deltaTime)
 		scene->OnDisable();
 	}
 
-	auto testInfo = PrRenderer::Core::DefferedRendererFrontend::GetInstance().GetPreviousFrameInfo();
+	auto testInfo = PrRenderer::Core::renderSystem->GetPreviousFrameInfo();
 	
 	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F3))
 		for (auto event : testInfo.timeEvents)
@@ -108,14 +108,14 @@ void Editor::OnFrame(float p_deltaTime)
 	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F6))
 		PRLOG_INFO("Draw objects {0}", testInfo.drawObjects	);
 
-	PrRenderer::Core::DefferedRendererFrontend::GetInstance().BuildFrame();
-	m_appContext->m_rendererBackend->PreparePipeline();
+	PrRenderer::Core::renderSystem->BuildFrame();
+	PrRenderer::Core::renderSystem->GetRendererBackend()->PreparePipeline();
 }
 
 void Editor::PostFrame()
 {
-	m_appContext->m_rendererBackend->Render();
-	m_appContext->m_rendererBackend->PostRender();
+	PrRenderer::Core::renderSystem->GetRendererBackend()->Render();
+	PrRenderer::Core::renderSystem->GetRendererBackend()->PostRender();
 
 	m_appContext->m_window->SwapBuffers();
 	PrCore::Input::InputManager::GetInstance().ResetFlags();

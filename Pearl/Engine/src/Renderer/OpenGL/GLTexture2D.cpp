@@ -288,5 +288,3 @@ unsigned char* GLTexture2D::ReadRawData()
 
 	return data;
 }
-
-

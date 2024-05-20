@@ -46,5 +46,4 @@ namespace PrRenderer::OpenGL {
 		bool LoadHDR();
 
 	};
-	
 }

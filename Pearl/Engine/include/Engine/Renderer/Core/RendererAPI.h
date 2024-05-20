@@ -1,5 +1,4 @@
 #pragma once
-#include"Core/Math/Math.h"
 #include"Renderer/Core/Color.h"
 
 #include"Renderer/Buffers/VertexArray.h"

@@ -1,9 +1,8 @@
 #pragma once
-#include"Core/Utils/Singleton.h"
 #include"Core/ECS/ECS.h"
 
 #include"Renderer/Core/RenderTypes.h"
-#include"Renderer/Core/IRendererBackend.h"
+#include"Renderer/Core/IRenderBackend.h"
 #include"Renderer/Resources/Material.h"
 
 namespace PrCore::ECS {
@@ -13,15 +12,13 @@ namespace PrCore::ECS {
 	class LightComponent;
 }
 
-
 namespace PrRenderer::Core {
 
 	using namespace PrCore;
-	class IRendererBackend;
 
-	class IRendererFrontend {
+	class IRenderFrontend {
 	public:
-		explicit IRendererFrontend(RendererSettings& s_settings)
+		explicit IRenderFrontend(RendererSettings& s_settings)
 		{
 			m_renderSettings = std::make_shared<RendererSettings>(s_settings);
 			m_frameData[0] = std::make_shared<FrameData>();
@@ -30,12 +27,12 @@ namespace PrRenderer::Core {
 			m_previousFrame = m_frameData[1];
 			m_currentFrameIndex = 0;
 		}
-		virtual ~IRendererFrontend() = default;
+		virtual ~IRenderFrontend() = default;
 
 		//Render Entities
-		virtual void AddLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id) = 0;
+		virtual void SubmitLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id) = 0;
 		virtual void SetCamera(Camera* p_camera) = 0;
-		virtual void AddMesh(ECS::Entity& p_entity) = 0;
+		virtual void SubmitMesh(ECS::Entity& p_entity) = 0;
 		virtual void SetCubemap(Resources::MaterialPtr p_cubemap) = 0;
 		///////////////////////////////////////
 
@@ -45,6 +42,7 @@ namespace PrRenderer::Core {
 
 		RendererSettingsPtr GetSettingsPtr() const { return  m_rendererBackend->GetSettingsPtr(); }
 		RendererSettings& GetSettings() const { return  m_rendererBackend->GetSettings(); }
+		virtual Camera* GetCamera() = 0;
 
 		//More advanced functions
 		void PushCommand(RenderCommandPtr p_command) const { m_rendererBackend->PushCommand(p_command); }
@@ -60,11 +58,11 @@ namespace PrRenderer::Core {
 		RendererBackendPtr GetRendererBackend() { return m_rendererBackend; }
 
 		/// Debug
-		virtual void DrawCube(const Math::mat4& p_transformMat, bool p_wireframe) = 0;
-		virtual void DrawCube(const Math::vec3& p_center, const Math::vec3& p_size, bool p_wireframe = true) = 0;
-		virtual void DrawSphere(const Math::vec3& p_center, float p_radius, bool p_wireframe) = 0;
-		virtual void DrawLine(const Math::vec3& p_start, const Math::vec3& p_end) = 0;
-		virtual void DrawFrustrum(const Math::vec3& p_center, float p_fov, float p_max, float p_min, float p_aspect, bool p_wireframe) = 0;
+		virtual void DrawDebugCube(const Math::mat4& p_transformMat, bool p_wireframe) = 0;
+		virtual void DrawDebugCube(const Math::vec3& p_center, const Math::vec3& p_size, bool p_wireframe = true) = 0;
+		virtual void DrawDebugSphere(const Math::vec3& p_center, float p_radius, bool p_wireframe) = 0;
+		virtual void DrawDebugLine(const Math::vec3& p_start, const Math::vec3& p_end) = 0;
+		virtual void DrawDebugFrustrum(const Math::vec3& p_center, float p_fov, float p_max, float p_min, float p_aspect, bool p_wireframe) = 0;
 
 		virtual void SetDebugColor(const Color& p_color) = 0;
 		virtual const Color& GetDebugColor() const { return m_debugColor; }

@@ -40,5 +40,3 @@ void GLIndexBuffer::SetIndeces(void* p_indeces, size_t p_size)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, p_size * sizeof(uint32_t), p_indeces, GL_STATIC_DRAW);
 	m_size = p_size;
 }
-
-

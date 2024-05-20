@@ -1,6 +1,5 @@
 #include "Core/Common/pearl_pch.h"
 #include "Renderer/Core/BoundingVolume.h"
-#include "Renderer/Core/DeferredRendererFrontend.h"
 
 using namespace PrRenderer::Core;
 

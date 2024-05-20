@@ -44,8 +44,6 @@ namespace PrRenderer::OpenGL {
 		PrCore::Math::vec4 GetUniformVec4(const std::string& p_name) override;
 		PrCore::Math::vec3 GetUniformVec3(const std::string& p_name) override;
 		PrCore::Math::vec2 GetUniformVec2(const std::string& p_name) override;
-		
-		
 
 	private:
 		void PreLoadImpl() override;

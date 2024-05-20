@@ -1,5 +1,4 @@
 #pragma once
-#include"Renderer/Core/Defines.h"
 #include"Renderer/Core/Color.h"
 #include"Core/Math/Math.h"
 
