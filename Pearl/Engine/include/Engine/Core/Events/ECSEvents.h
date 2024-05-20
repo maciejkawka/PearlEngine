@@ -14,8 +14,7 @@ namespace PrCore::Events {
 
 		ECS::Entity m_entity;
 
-		virtual inline EventType GetType() { return s_type; }
-		inline const static EventType s_type = 0x38ca239c;
+		DEFINE_EVENT_GUID(0x38ca239c);
 	};
 
 	class EntityDestroyedEvent : public Event {
@@ -26,8 +25,7 @@ namespace PrCore::Events {
 
 		ECS::Entity m_entity;
 
-		virtual inline EventType GetType() { return s_type; }
-		inline const static EventType s_type = 0x1153264b;
+		DEFINE_EVENT_GUID(0x1153264b);
 	};
 
 	template<class Component>

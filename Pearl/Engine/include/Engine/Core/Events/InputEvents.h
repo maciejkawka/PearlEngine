@@ -15,8 +15,7 @@ namespace PrCore::Events {
 
 		Input::PrKey m_key;
 
-		virtual inline EventType GetType() { return s_type; }
-		inline const static EventType s_type = 0x80e66091;
+		DEFINE_EVENT_GUID(0x80e66091);
 	};
 
 	class KeyReleasedEvent : public Event {
@@ -28,8 +27,7 @@ namespace PrCore::Events {
 
 		Input::PrKey m_key;
 
-		virtual inline EventType GetType() { return s_type; }
-		inline const static EventType s_type = 0x26dfe3a;
+		DEFINE_EVENT_GUID(0x26dfe3a);
 	};
 
 	class MouseButtonPressedEvent : public Event {
@@ -41,8 +39,7 @@ namespace PrCore::Events {
 
 		Input::PrMouseButton m_button;
 
-		virtual inline EventType GetType() { return s_type; }
-		inline const static EventType s_type = 0xb84be5a9;
+		DEFINE_EVENT_GUID(0xb84be5a9);
 	};
 
 	class MouseButtonReleasedEvent : public Event {
@@ -54,8 +51,7 @@ namespace PrCore::Events {
 
 		Input::PrMouseButton m_button;
 
-		virtual inline EventType GetType() { return s_type; }
-		inline const static EventType s_type = 0xe4f62295;
+		DEFINE_EVENT_GUID(0xe4f62295);
 	};
 
 	class MouseMovedEvent : public Event {
@@ -68,8 +64,7 @@ namespace PrCore::Events {
 		double m_xPos;
 		double m_yPos;
 
-		virtual inline EventType GetType() { return s_type; }
-		inline const static EventType s_type = 0x57ac3e95;
+		DEFINE_EVENT_GUID(0x57ac3e95);
 	};
 
 	class MouseScrollEvent : public Event {
@@ -82,7 +77,6 @@ namespace PrCore::Events {
 		double m_xOffset;
 		double m_yOffset;
 
-		virtual inline EventType GetType() { return s_type; }
-		inline const static EventType s_type = 0x934ff217;
+		DEFINE_EVENT_GUID(0x934ff217);
 	};
 }

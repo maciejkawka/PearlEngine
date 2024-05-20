@@ -17,8 +17,7 @@ namespace PrCore::Events {
 		float m_width;
 		float m_height;
 
-		virtual inline EventType GetType() { return s_type; }
-		inline const static EventType s_type = 0x9162135b;
+		DEFINE_EVENT_GUID(0x9162135b);
 	};
 
 	class WindowMinimalizeEvent : public Event {
@@ -33,7 +32,6 @@ namespace PrCore::Events {
 
 		bool m_minimalized;
 
-		virtual inline EventType GetType() { return s_type; }
-		inline const static EventType s_type = 0x1e4fd88e;
+		DEFINE_EVENT_GUID(0x1e4fd88e);
 	};
 }
