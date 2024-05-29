@@ -369,6 +369,9 @@
     <ClInclude Include="include\Engine\Renderer\Core\RenderSystem.h">
       <Filter>Renderer\Core</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\Utils\PathUtils.h">
+      <Filter>Core\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -559,6 +562,9 @@
     </ClCompile>
     <ClCompile Include="src\Core\ECS\Systems\TestSystem.cpp">
       <Filter>Core\ECS\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Utils\PathUtils.cpp">
+      <Filter>Core\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

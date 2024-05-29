@@ -293,7 +293,7 @@ void GLShader::ScanUniforms()
 		uniformName.resize(maxNameSize);
 		glGetActiveUniform(m_ID, i, maxNameSize, &uniformLength, &uniformSize, &uniformType, &uniformName[0]);
 
-		PrCore::Utils::StringUtils::ResizeToFitContains(uniformName);
+		PrCore::StringUtils::ResizeToFitContains(uniformName);
 
 		Resources::UniformType prUniformType = Resources::UniformType::None;
 		std::any uniformValue;
