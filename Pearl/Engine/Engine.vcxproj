@@ -247,7 +247,7 @@
       <PreprocessorDefinitions>PR_ASSERTENABLE;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/stb/include;../../Dependencies/glad/include;../../Dependencies/glm/include;../../Dependencies/tinyObj/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/stb/include;../../Dependencies/glad/include;../../Dependencies/glm;../../Dependencies/tinyObj/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>
@@ -273,7 +273,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/stb/include;../../Dependencies/glad/include;../../Dependencies/glm/include;../../Dependencies/tinyObj/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/stb/include;../../Dependencies/glad/include;../../Dependencies/glm;../../Dependencies/tinyObj/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>

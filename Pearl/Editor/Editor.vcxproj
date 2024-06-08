@@ -64,7 +64,7 @@
       <PreprocessorDefinitions>PR_ASSERTENABLE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include;..\Engine\include;..\Engine\include\Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glm/include;../../Dependencies/json/include;../../Dependencies/tinyObj/include;../../Dependencies/glad/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\Engine\include;..\Engine\include\Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glm;../../Dependencies/json/include;../../Dependencies/tinyObj/include;../../Dependencies/glad/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
@@ -83,7 +83,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include;..\Engine\include;..\Engine\include\Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glm/include;../../Dependencies/json/include;../../Dependencies/tinyObj/include;../../Dependencies/glad/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\Engine\include;..\Engine\include\Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glm;../../Dependencies/json/include;../../Dependencies/tinyObj/include;../../Dependencies/glad/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
