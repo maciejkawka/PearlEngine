@@ -67,6 +67,7 @@
       <AdditionalIncludeDirectories>include;..\Engine\include;..\Engine\include\Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glm;../../Dependencies/json/include;../../Dependencies/tinyObj/include;../../Dependencies/glad/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -86,6 +87,7 @@
       <AdditionalIncludeDirectories>include;..\Engine\include;..\Engine\include\Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glm;../../Dependencies/json/include;../../Dependencies/tinyObj/include;../../Dependencies/glad/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
