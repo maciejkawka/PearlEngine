@@ -21,5 +21,5 @@ inline void PrCore::Utils::pearl_assert(const char* p_msg, const char* p_file, i
 {
 	PRLOG_ERRORF("ASSERTION FILED! \nFILE: {0}\nLINE: {1}\nASSERT CAUSE: {2}\nINFO: {3}", p_file, p_line, p_msg, p_info);
 	PRLOG_ERROR("ASSERTION FILED! \nFILE: {0}\nLINE: {1}\nASSERT CAUSE: {2}\nINFO: {3}", p_file, p_line, p_msg, p_info);
-	std::abort();
+	__debugbreak();
 }

@@ -23,7 +23,7 @@ bool Entity::IsValid() const
 	return m_entityManager->IsValid(m_ID);
 }
 
-ComponentSignature Entity::GetComponentSignature()
+ComponentSignature Entity::GetComponentSignature() const
 {
 	return m_entityManager->GetComponentSignature(m_ID);
 }

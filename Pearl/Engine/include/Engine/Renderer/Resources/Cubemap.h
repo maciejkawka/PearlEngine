@@ -30,11 +30,11 @@ namespace PrRenderer::Resources{
 		inline void SetFace(int p_index, const std::string& p_name) { m_facesNames[p_index] = p_name; }
 		inline void Faces(std::vector<std::string> p_names) { m_facesNames = p_names; }
 
-		inline const std::vector<std::string>& GetFaces() { return m_facesNames; }
-		inline const std::string& GetFace(int p_index) { return m_facesNames[p_index]; }
+		inline const std::vector<std::string>& GetFaces() const { return m_facesNames; }
+		inline const std::string& GetFace(int p_index) const { return m_facesNames[p_index]; }
 
 		virtual void SetWrapModeR(TextureWrapMode p_wrapR) = 0;
-		TextureWrapMode GetWrapModeR() { return m_wrapR; }
+		TextureWrapMode GetWrapModeR() const { return m_wrapR; }
 
 		static TexturePtr GenerateBlackTexture();
 		static TexturePtr GenerateWhiteTexture();

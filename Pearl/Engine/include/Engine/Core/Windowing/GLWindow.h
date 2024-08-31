@@ -19,14 +19,14 @@ namespace PrCore::Windowing {
 		void PollEvents() override;
 		void SwapBuffers() override;
 
-		inline std::string GetTitle() override { return m_settings.title; }
-		inline int GetWidth() override { return m_settings.width; }
-		inline int GetHeight() override { return m_settings.height; }
+		inline std::string GetTitle() const override { return m_settings.title; }
+		inline int GetWidth() const override { return m_settings.width; }
+		inline int GetHeight() const override { return m_settings.height; }
 
 		bool ShouldClose() override;
 
 		void SetVSync(bool p_vsync) override;
-		inline bool IsVSync() override { return m_settings.vSync; }
+		inline bool IsVSync() const override { return m_settings.vSync; }
 
 		void SetIcon(std::string p_path) override;
 

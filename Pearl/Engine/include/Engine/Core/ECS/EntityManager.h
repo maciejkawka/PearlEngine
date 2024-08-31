@@ -41,9 +41,9 @@ namespace PrCore::ECS {
 		void RemoveComponent();
 
 		template<class T>
-		bool HasComponent();
+		bool HasComponent() const;
 
-		ComponentSignature GetComponentSignature();
+		ComponentSignature GetComponentSignature() const;
 
 		inline bool operator<(const Entity& p_entity) const { return m_ID < p_entity.GetID(); }
 		inline bool operator==(const Entity& p_entity) const { return m_ID == p_entity.GetID(); }

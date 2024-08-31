@@ -58,7 +58,7 @@ namespace PrCore::ECS {
 	}
 
 	template<class System>
-	bool SystemManager::IsActiveSystem()
+	bool SystemManager::IsActiveSystem() const
 	{
 		auto systemID = GetSystemID<System>();
 		return m_systems[systemID]->IsActive();

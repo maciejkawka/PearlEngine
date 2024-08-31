@@ -24,7 +24,7 @@ namespace PrRenderer::Buffers {
 		virtual const std::vector<VertexBufferPtr>& GetVertexBuffers() { return m_vertexBuffers; }
 		virtual const IndexBufferPtr GetIndexBuffer() { return m_indexBuffer; }
 
-		inline RendererID GetID() { return m_bufferID; }
+		inline RendererID GetID() const { return m_bufferID; }
 
 		static VertexArrayPtr Create();
 

@@ -139,7 +139,7 @@ void Scene::RenderUpdate(float p_dt) const
 	m_systemManager->UpdateSystem<MeshRendererSystem>(p_dt);
 }
 
-size_t Scene::GetEntitiesCount()
+size_t Scene::GetEntitiesCount() const
 {
 	return m_entityManager->GetEntityCount();
 }

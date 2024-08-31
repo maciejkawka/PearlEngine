@@ -89,16 +89,16 @@ namespace PrRenderer::Resources {
 		inline void SetWidth(size_t p_width) { m_width = p_width; }
 		inline void SetFormat(TextureFormat p_format) { m_format = p_format; }
 
-		inline RendererID GetRendererID() { return m_ID; }
-		inline size_t GetHeight() { return m_height; }
-		inline size_t GetWidth() { return m_width; }
-		inline bool  IsReadable() { return m_readable; }
-		inline bool IsMipMap() { return m_mipmap; }
-		inline TextureFiltering GetMinFiltering() { return m_minFiltering; }
-		inline TextureFiltering GetMagFiltering() { return m_magFiltering; }
-		inline TextureWrapMode GetWrapModeU() { return m_wrapU; }
-		inline TextureWrapMode GetWrapModeV() { return m_wrapV; }
-		inline TextureFormat GetFormat() { return m_format; }
+		inline RendererID GetRendererID() const { return m_ID; }
+		inline size_t GetHeight() const { return m_height; }
+		inline size_t GetWidth() const { return m_width; }
+		inline bool  IsReadable() const { return m_readable; }
+		inline bool IsMipMap() const { return m_mipmap; }
+		inline TextureFiltering GetMinFiltering() const { return m_minFiltering; }
+		inline TextureFiltering GetMagFiltering() const { return m_magFiltering; }
+		inline TextureWrapMode GetWrapModeU() const { return m_wrapU; }
+		inline TextureWrapMode GetWrapModeV() const { return m_wrapV; }
+		inline TextureFormat GetFormat() const { return m_format; }
 
 	protected:
 		virtual void LoadUnitTexture(Core::Color p_unitColor) = 0;

@@ -53,14 +53,14 @@ namespace PrRenderer::Resources {
 		inline std::shared_ptr<Buffers::VertexArray> GetVertexArray() { return m_VA; }
 
 		inline const std::vector<PrCore::Math::vec3>& GetVertices() { return m_vertices; }
-		inline size_t GetVerticesCount() { return m_verticesCount; }
+		inline size_t GetVerticesCount() const { return m_verticesCount; }
 
 		inline std::vector<unsigned int> GetIndices() { return m_indices; }
-		inline size_t GetIndicesCount() { return m_indicesCount; }
+		inline size_t GetIndicesCount() const { return m_indicesCount; }
 
-		inline std::vector<Core::Color> GetColors() { return m_colors; }
-		inline std::vector<PrCore::Math::vec3> GetNormals() { return m_normals; }
-		inline std::vector<PrCore::Math::vec4> GetTangents() { return m_tangents; }
+		inline std::vector<Core::Color> GetColors() const { return m_colors; }
+		inline std::vector<PrCore::Math::vec3> GetNormals() const { return m_normals; }
+		inline std::vector<PrCore::Math::vec4> GetTangents() const { return m_tangents; }
 
 		inline const Core::BoxVolume& GetBoxVolume() { return m_boxVolume; }
 

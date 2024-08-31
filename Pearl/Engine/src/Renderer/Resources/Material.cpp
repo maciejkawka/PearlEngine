@@ -59,7 +59,7 @@ void Material::SetColor(const Core::Color& p_color)
 		find->second.value = std::make_any<PrCore::Math::vec4>(p_color);
 }
 
-const PrRenderer::Core::Color& Material::GetColor()
+const PrRenderer::Core::Color& Material::GetColor() const
 {
 	auto find = m_uniforms.find(COLOR_UNIFORM);
 
@@ -201,7 +201,7 @@ void Material::SetTexOffset(const std::string& p_name, const PrCore::Math::vec2&
 		find->second.value = std::make_any<PrCore::Math::vec2>(p_value);
 }
 
-PrCore::Math::vec2 Material::GetTexScale(const std::string& p_name)
+PrCore::Math::vec2 Material::GetTexScale(const std::string& p_name) const
 {
 	auto find = m_uniforms.find(p_name + TEXSCALE_UNIFORM);
 
@@ -212,7 +212,7 @@ PrCore::Math::vec2 Material::GetTexScale(const std::string& p_name)
 	return PrCore::Math::vec2();
 }
 
-PrCore::Math::vec2 Material::GetTexOffset(const std::string& p_name)
+PrCore::Math::vec2 Material::GetTexOffset(const std::string& p_name) const
 {
 	auto find = m_uniforms.find(p_name + TEXOFFSET_UNIFORM);
 
@@ -223,7 +223,7 @@ PrCore::Math::vec2 Material::GetTexOffset(const std::string& p_name)
 	return PrCore::Math::vec2();
 }
 
-bool Material::HasProperty(const std::string& p_name)
+bool Material::HasProperty(const std::string& p_name) const
 {
 	return m_uniforms.find(p_name) != m_uniforms.end();
 }

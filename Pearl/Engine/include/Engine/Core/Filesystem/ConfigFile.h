@@ -21,7 +21,7 @@ namespace PrCore::Filesystem {
 		void Create(const std::string& p_fileName);
 		void Override();
 
-		inline bool isValid() { return m_isValid; }
+		inline bool IsValid() const { return m_isValid; }
 
 		template<typename T>
 		void SetSetting(const std::string& p_settingName, T settingValue)

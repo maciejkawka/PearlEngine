@@ -28,7 +28,7 @@ namespace PrCore::ECS {
 	}
 
 	template<class T>
-	bool Entity::HasComponent()
+	bool Entity::HasComponent() const
 	{
 		PR_ASSERT(m_entityManager != nullptr, "EntityManager is nullptr");
 		return m_entityManager->HasComponent<T>(m_ID);

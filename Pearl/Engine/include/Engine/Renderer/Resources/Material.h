@@ -35,7 +35,7 @@ namespace PrRenderer::Resources {
 		~Material() = default;
 
 		void SetColor(const Core::Color& p_color);
-		const Core::Color& GetColor();
+		const Core::Color& GetColor() const;
 
 		inline void SetShader(ShaderPtr p_shader)
 		{
@@ -61,10 +61,10 @@ namespace PrRenderer::Resources {
 		void SetTexScale(const std::string& p_name, const PrCore::Math::vec2& p_value);
 		void SetTexOffset(const std::string& p_name, const PrCore::Math::vec2& p_value);
 
-		PrCore::Math::vec2 GetTexScale(const std::string& p_name);
-		PrCore::Math::vec2 GetTexOffset(const std::string& p_name);
+		PrCore::Math::vec2 GetTexScale(const std::string& p_name) const;
+		PrCore::Math::vec2 GetTexOffset(const std::string& p_name) const;
 
-		bool HasProperty(const std::string& p_name);
+		bool HasProperty(const std::string& p_name) const;
 
 		void CopyPropertiesFrom(const Material& p_material);
 

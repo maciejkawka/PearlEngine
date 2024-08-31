@@ -10,15 +10,15 @@ namespace PrCore::Utils {
 		Clock();
 		~Clock() = default;
 
-		float GetDeltaTime();
+		float GetDeltaTime() const;
 
-		float GetUnscaledDeltaTime();
+		float GetUnscaledDeltaTime() const;
 
-		float GetTimeScale();
+		float GetTimeScale() const;
 
-		float GetRealTime();
+		float GetRealTime() const;
 
-		int GetFPS();
+		int GetFPS() const;
 
 		void SetTimeScale(float p_timeScale);
 

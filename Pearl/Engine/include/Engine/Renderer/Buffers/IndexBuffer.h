@@ -16,8 +16,8 @@ namespace PrRenderer::Buffers {
 
 		virtual void SetIndeces(void* p_indeces, size_t p_size) = 0;
 
-		inline size_t GetSize() { return m_size; }
-		inline RendererID GetID() { return m_bufferID; }
+		inline size_t GetSize() const { return m_size; }
+		inline RendererID GetID() const { return m_bufferID; }
 
 		static IndexBufferPtr Create();
 

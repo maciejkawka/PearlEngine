@@ -149,37 +149,37 @@ namespace PrRenderer::Core {
 		// Light can skip shadow casting
 		bool                   castShadow = false; 
 
-		const PrCore::Math::vec3 GetPosition()
+		const PrCore::Math::vec3 GetPosition() const
 		{
 			return { packedMat[0][0], packedMat[0][1], packedMat[0][2] };
 		}
 
-		Resources::LightType GetType()
+		Resources::LightType GetType() const
 		{
 			return static_cast<Resources::LightType>(packedMat[0][3]);
 		}
 
-		const PrCore::Math::vec3 GetDirection()
+		const PrCore::Math::vec3 GetDirection() const
 		{
 			return { packedMat[1][0], packedMat[1][1], packedMat[1][2] };
 		}
 
-		float GetInnerCone()
+		float GetInnerCone() const
 		{
 			return packedMat[1][3];
 		}
 
-		float GetOuterCone()
+		float GetOuterCone() const
 		{
 			return packedMat[2][3];
 		}
 
-		const PrCore::Math::vec3 GetColor()
+		const PrCore::Math::vec3 GetColor() const
 		{
 			return { packedMat[2][0], packedMat[2][1], packedMat[2][2] };
 		}
 
-		float GetRange()
+		float GetRange() const
 		{
 			return packedMat[3][3];
 		}

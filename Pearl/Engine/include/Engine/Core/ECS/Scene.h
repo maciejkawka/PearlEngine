@@ -25,7 +25,7 @@ namespace PrCore::ECS {
 		void SetActiveSystem(bool p_isActive);
 
 		template<class System>
-		bool IsActiveSystem();
+		bool IsActiveSystem() const;
 
 		Entity GetEntityByName(const std::string& p_name);
 		Entity GetEntityByID(Utils::UUID p_UUID);
@@ -51,7 +51,7 @@ namespace PrCore::ECS {
 		inline void SetSceneName(const std::string& p_name) { m_name = p_name; }
 		inline void SetScenePath(const std::string& p_path) { m_path = p_path; }
 
-		size_t GetEntitiesCount();
+		size_t GetEntitiesCount() const;
 
 		void OnSerialize(Utils::JSON::json& p_serialized) override;
 		void OnDeserialize(const Utils::JSON::json& p_deserialized) override;

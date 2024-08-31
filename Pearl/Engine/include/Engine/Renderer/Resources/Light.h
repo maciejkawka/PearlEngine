@@ -32,16 +32,16 @@ namespace PrRenderer::Resources {
 		inline void SetInnerCone(float p_inner) { m_innerCone = p_inner; }
 		inline void SetOutterCone(float p_outter) { m_outterCone = p_outter; }
 
-		inline LightType GetType() { return m_type; }
-		inline PrRenderer::Core::Color GetColor() { return m_color; }
+		inline LightType GetType() const { return m_type; }
+		inline PrRenderer::Core::Color GetColor() const { return m_color; }
 
-		inline float GetQuadraticAttenuation() { return m_quadraticAttenuation; }
-		inline float GetLinearAttenuation() { return m_linearAttenuation; }
-		inline float GetConstantAttenuation() { return m_constantAttenuation; }
-		inline float GetRange() { return m_range; }
+		inline float GetQuadraticAttenuation() const { return m_quadraticAttenuation; }
+		inline float GetLinearAttenuation() const { return m_linearAttenuation; }
+		inline float GetConstantAttenuation() const { return m_constantAttenuation; }
+		inline float GetRange() const { return m_range; }
 
-		inline float GetInnerCone() { return m_innerCone; }
-		inline float GetOutterCone() { return m_outterCone; }
+		inline float GetInnerCone() const { return m_innerCone; }
+		inline float GetOutterCone() const { return m_outterCone; }
 
 		PrCore::Math::mat4 CreatePackedMatrix(const PrCore::Math::vec3& p_position, const PrCore::Math::vec3& p_direction) const;
 

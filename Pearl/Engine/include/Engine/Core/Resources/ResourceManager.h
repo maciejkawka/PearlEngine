@@ -50,9 +50,9 @@ namespace PrCore::Resources {
 		void Delete(const std::string& p_name);
 		void DeleteAll();
 
-		inline size_t GetMaxMemory() { return m_maxMemory; }
+		inline size_t GetMaxMemory() const { return m_maxMemory; }
 		void  SetMaxMemory(size_t p_maxMemory);
-		inline size_t GetMemoryUsage() { return m_memoryUsage; }
+		inline size_t GetMemoryUsage() const { return m_memoryUsage; }
 
 		ResourcePtr GetResource(const std::string& p_name);
 

@@ -31,10 +31,10 @@ namespace PrRenderer::Core {
 		inline void SetRatio(float p_ratio) { m_ratio = p_ratio; }
 		inline void SetSize(float p_size) { m_size = p_size; }
 
-		inline CameraType GetType() { return m_type; }
+		inline CameraType GetType() const { return m_type; }
 		inline const PrCore::Math::vec3& GetPosition() const { return m_position; }
 		inline const PrCore::Math::vec3& GetRotation() const { return m_rotation; }
-		inline const Color GetClearColor() { return m_clearColor; }
+		inline const Color GetClearColor() const { return m_clearColor; }
 				
 		inline float GetFar() const { return m_far; }
 		inline float GetNear() const { return m_near; }

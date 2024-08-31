@@ -65,7 +65,7 @@ InputManager::~InputManager()
 	Events::EventManager::GetInstance().RemoveListener(mouseScrollListener, Events::MouseScrollEvent::s_type);
 }
 
-bool InputManager::IsKeyPressed(PrKey p_key)
+bool InputManager::IsKeyPressed(PrKey p_key) const
 {
 	auto keyIterator = s_keyState.find(p_key);
 	if (keyIterator == s_keyState.end())
@@ -73,7 +73,7 @@ bool InputManager::IsKeyPressed(PrKey p_key)
 	return keyIterator->second  == PrInputState::PRESS;
 }
 
-bool InputManager::IsKeyReleased(PrKey p_key)
+bool InputManager::IsKeyReleased(PrKey p_key) const
 {
 	auto keyIterator = s_keyState.find(p_key);
 	if (keyIterator == s_keyState.end())
@@ -81,7 +81,7 @@ bool InputManager::IsKeyReleased(PrKey p_key)
 	return keyIterator->second == PrInputState::RELEASE;
 }
 
-bool InputManager::IsKeyHold(PrKey p_key)
+bool InputManager::IsKeyHold(PrKey p_key) const
 {
 	auto keyHoldIterator = s_keyHold.find(p_key);
 	if (keyHoldIterator == s_keyHold.end())
@@ -89,7 +89,7 @@ bool InputManager::IsKeyHold(PrKey p_key)
 	return keyHoldIterator->second;
 }
 
-bool InputManager::IsButtonPressed(PrMouseButton p_key)
+bool InputManager::IsButtonPressed(PrMouseButton p_key) const
 {
 	auto buttonIterator = s_buttonState.find(p_key);
 	if (buttonIterator == s_buttonState.end())
@@ -97,7 +97,7 @@ bool InputManager::IsButtonPressed(PrMouseButton p_key)
 	return buttonIterator->second == PrInputState::PRESS;
 }
 
-bool InputManager::IsButtonReleased(PrMouseButton p_key)
+bool InputManager::IsButtonReleased(PrMouseButton p_key) const
 {
 	auto buttonIterator = s_buttonState.find(p_key);
 	if (buttonIterator == s_buttonState.end())
@@ -105,7 +105,7 @@ bool InputManager::IsButtonReleased(PrMouseButton p_key)
 	return buttonIterator->second == PrInputState::RELEASE;
 }
 
-bool InputManager::IsButtonHold(PrMouseButton p_key)
+bool InputManager::IsButtonHold(PrMouseButton p_key) const
 {
 	auto buttonHoldIterator = s_buttonHold.find(p_key);
 	if (buttonHoldIterator == s_buttonHold.end())
@@ -113,32 +113,32 @@ bool InputManager::IsButtonHold(PrMouseButton p_key)
 	return buttonHoldIterator->second;
 }
 
-bool InputManager::IsAnyKeyPressed()
+bool InputManager::IsAnyKeyPressed() const
 {
 	return s_anyPressed;
 }
 
-bool InputManager::IsAnyKeyHold()
+bool InputManager::IsAnyKeyHold() const
 {
 	return s_anyHold;
 }
 
-double InputManager::GetMouseScroll()
+double InputManager::GetMouseScroll() const
 {
 	return s_mouseScroll;
 }
 
-double InputManager::GetMouseX()
+double InputManager::GetMouseX() const
 {
 	return s_mouseXPos;
 }
 
-double InputManager::GetMouseY()
+double InputManager::GetMouseY() const
 {
 	return s_mouseYPos;
 }
 
-PrCore::Math::vec2 InputManager::GetMousePosition()
+PrCore::Math::vec2 InputManager::GetMousePosition() const
 {
 	return Math::vec2(GetMouseX(), GetMouseY());
 }

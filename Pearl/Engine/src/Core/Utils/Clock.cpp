@@ -17,27 +17,27 @@ Clock::Clock()
 	m_frameStart = m_beginning;
 }
 
-float Clock::GetDeltaTime()
+float Clock::GetDeltaTime() const
 {
 	return m_deltaTime * m_timeScale;
 }
 
-float Clock::GetUnscaledDeltaTime()
+float Clock::GetUnscaledDeltaTime() const
 {
 	return m_deltaTime;
 }
 
-float Clock::GetTimeScale()
+float Clock::GetTimeScale() const
 {
 	return m_timeScale;
 }
 
-float Clock::GetRealTime()
+float Clock::GetRealTime() const
 {
 	return m_realTime;
 }
 
-int Clock::GetFPS()
+int Clock::GetFPS() const
 {
 	return 1 / m_deltaTime;
 }

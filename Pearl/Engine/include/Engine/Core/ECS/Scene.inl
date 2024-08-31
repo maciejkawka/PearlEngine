@@ -17,7 +17,7 @@ namespace PrCore::ECS {
 	}
 
 	template<class System>
-	bool Scene::IsActiveSystem()
+	bool Scene::IsActiveSystem() const
 	{
 		return m_systemManager->IsActiveSystem<System>();
 	}

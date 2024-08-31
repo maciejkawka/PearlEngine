@@ -30,9 +30,9 @@ namespace PrRenderer::Resources {
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
 
-		inline RendererID GetID() { return m_ID; }
+		inline RendererID GetID() const { return m_ID; }
 
-		inline size_t GetUniformsCount() { return m_uniforms.size(); }
+		inline size_t GetUniformsCount() const { return m_uniforms.size(); }
 		inline const std::map<std::string, Uniform>& GetAllUniforms() { return m_uniforms; }
 
 		virtual void SetUniformFloat(const std::string& p_name, float p_value) = 0;

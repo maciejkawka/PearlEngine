@@ -30,7 +30,7 @@ PrCore::Entry::AppContext::AppContext()
 
 	Filesystem::ConfigFile contexConfig(GraphicConfig.data());
 	Windowing::WindowContext context;
-	if (contexConfig.isValid())
+	if (contexConfig.IsValid())
 	{
 		context.debugMode = contexConfig.GetSetting<bool>("debugMode");
 		context.forwardCompatibility = contexConfig.GetSetting<bool>("forwardCompatibility");
@@ -42,7 +42,7 @@ PrCore::Entry::AppContext::AppContext()
 	Windowing::GLWindow::InitDevice(context);
 	
 	Windowing::WindowSettings windowSettings;
-	if (contexConfig.isValid())
+	if (contexConfig.IsValid())
 	{
 		windowSettings.title = contexConfig.GetSetting<std::string>("title");
 		windowSettings.height = contexConfig.GetSetting("height");
@@ -61,7 +61,7 @@ PrCore::Entry::AppContext::AppContext()
 
 	PrRenderer::Core::RendererSettings rendererSettings;
 	Filesystem::ConfigFile rendererConfig(RendererConfig.data());
-	if(rendererConfig.isValid())
+	if(rendererConfig.IsValid())
 	{
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, dirLightMaxShadows);
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, dirLightShadowsMapSize);

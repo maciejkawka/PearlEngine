@@ -4,7 +4,7 @@ namespace PrCore::Events {
 
 	class WindowCloseEvent: public Event {
 	public:
-		virtual inline EventType GetType() { return s_type; }
+		virtual inline EventType GetType() const { return s_type; }
 		inline const static EventType s_type = 0x1cd2925a;
 	};
 

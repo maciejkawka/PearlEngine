@@ -17,7 +17,7 @@ namespace PrCore::Events{
 		Resources::ResourceSize m_size;
 		Resources::ResourceHandle m_ID;
 
-		virtual inline EventType GetType() { return s_type; }
+		virtual inline EventType GetType() const { return s_type; }
 		inline const static EventType s_type = 0xa7288100;
 	};
 
@@ -34,7 +34,7 @@ namespace PrCore::Events{
 		Resources::ResourceSize m_size;
 		Resources::ResourceHandle m_ID;
 
-		virtual inline EventType GetType() { return s_type; }
+		virtual inline EventType GetType() const { return s_type; }
 		inline const static EventType s_type = 0x3149ba25;
 	};
 
@@ -51,7 +51,7 @@ namespace PrCore::Events{
 		Resources::ResourceSize m_size;
 		Resources::ResourceHandle m_ID;
 
-		virtual inline EventType GetType() { return s_type; }
+		virtual inline EventType GetType() const { return s_type; }
 		inline const static EventType s_type = 0x63c8e53e;
 	};
 
@@ -63,7 +63,7 @@ namespace PrCore::Events{
 
 		Resources::CacheMiss m_cacheMissType;
 
-		virtual inline EventType GetType() { return s_type; }
+		virtual inline EventType GetType() const { return s_type; }
 		inline const static EventType s_type = 0xb5a6a882;
 	};
 }

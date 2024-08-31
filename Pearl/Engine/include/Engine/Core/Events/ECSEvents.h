@@ -39,7 +39,7 @@ namespace PrCore::Events {
 		ECS::Entity m_entity;
 		Component* m_component;
 
-		virtual inline EventType GetType() { return s_type; }
+		virtual inline EventType GetType() const { return s_type; }
 		const static EventType s_type;
 	};
 
@@ -57,7 +57,7 @@ namespace PrCore::Events {
 		ECS::Entity m_entity;
 		Component* m_component;
 
-		virtual inline EventType GetType() { return s_type; }
+		virtual inline EventType GetType() const { return s_type; }
 		const static EventType s_type;
 	};
 

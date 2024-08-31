@@ -19,21 +19,21 @@ namespace PrCore::Input {
 		typedef std::unordered_map<PrMouseButton, bool>				ButtonHoldMap;
 
 	public:
-		bool IsKeyPressed(PrKey p_key);
-		bool IsKeyReleased(PrKey p_key);
-		bool IsKeyHold(PrKey p_key);
+		bool IsKeyPressed(PrKey p_key) const;
+		bool IsKeyReleased(PrKey p_key) const;
+		bool IsKeyHold(PrKey p_key) const;
 
-		bool IsButtonPressed(PrMouseButton p_key);
-		bool IsButtonReleased(PrMouseButton p_key);
-		bool IsButtonHold(PrMouseButton p_key);
+		bool IsButtonPressed(PrMouseButton p_key) const;
+		bool IsButtonReleased(PrMouseButton p_key) const;
+		bool IsButtonHold(PrMouseButton p_key) const;
 
-		bool IsAnyKeyPressed();
-		bool IsAnyKeyHold();
+		bool IsAnyKeyPressed() const;
+		bool IsAnyKeyHold() const;
 
-		double GetMouseScroll();
-		double GetMouseX();
-		double GetMouseY();
-		Math::vec2 GetMousePosition();
+		double GetMouseScroll() const;
+		double GetMouseX() const;
+		double GetMouseY() const;
+		Math::vec2 GetMousePosition() const;
 
 		void ResetFlags();
 
