@@ -11,17 +11,20 @@ namespace PrCore::PathUtils
 
 	std::string      GetExtension(std::string_view p_path);
 	std::string_view GetExtensionInPlace(std::string_view p_path);
-
 	std::string      ReplaceExtension(std::string_view p_path, std::string_view p_ext);
 	std::string      RemoveExtension(std::string_view p_path);
 	std::string_view RemoveExtensionInPlace(std::string_view p_path);
 
 	std::string      GetFilename(std::string_view p_path);
 	std::string_view GetFilenameInPlace(std::string_view p_path);
-
 	std::string      ReplaceFilename(std::string_view p_path, std::string_view p_name);
 	std::string      RemoveFilename(std::string_view p_path);
-	std::string_view RemoveFilenameInPlace(std::string_view p_path);
+
+	std::string      GetFile(std::string_view p_path);
+	std::string_view GetFileInPlace(std::string_view p_path);
+	std::string      PrReplaceFile(std::string_view p_path, std::string_view p_file);
+	std::string      RemoveFile(std::string_view p_path);
+	std::string_view RemoveFileInPlace(std::string_view p_path);
 
 	std::string      MakePath(std::string_view p_dir, std::string_view p_file);
 	std::string      MakePath(std::string_view p_dir, std::string_view p_file, std::string_view p_ext);

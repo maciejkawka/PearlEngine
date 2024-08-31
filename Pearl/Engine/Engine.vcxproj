@@ -230,13 +230,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>../../Bin/$(Configuration)/$(ProjectName)/</OutDir>
+    <OutDir>../../Bin/$(Configuration)/</OutDir>
     <IntDir>../../Bin-int/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetName>PearlEngine</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>../../Bin/$(Configuration)/$(ProjectName)/</OutDir>
+    <OutDir>../../Bin/$(Configuration)/</OutDir>
     <IntDir>../../Bin-int/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetName>PearlEngine</TargetName>
   </PropertyGroup>
@@ -255,6 +255,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

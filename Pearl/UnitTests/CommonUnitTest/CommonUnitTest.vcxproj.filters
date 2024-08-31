@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Mocking">
+      <UniqueIdentifier>{5fc563c0-9c10-46ba-859f-9bf6b1c70acd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mocking\Core">
+      <UniqueIdentifier>{6a65b1d0-9ea2-4463-be47-cdcd779d2c67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{a46f9b65-d636-46cb-bec3-a2a850ed32b5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\CommonUnitTest\Mocking\Core\Logger.h">
+      <Filter>Mocking\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CommonUnitTest\Common\common.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Common\common.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

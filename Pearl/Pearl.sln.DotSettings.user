@@ -1,2 +1,31 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=4DAFC13E_002D5AD2_002D4BBC_002DA0A4_002D55706BCECC7F_002Fd_003Asrc_002Fd_003ARenderer_002Fd_003ACore_002Ff_003ARenderer3D_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String></wpf:ResourceDictionary>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=4DAFC13E_002D5AD2_002D4BBC_002DA0A4_002D55706BCECC7F_002Fd_003Asrc_002Fd_003ARenderer_002Fd_003ACore_002Ff_003ARenderer3D_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=76d8ef38_002D9022_002D4638_002Db30d_002D2db2c4548d30/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="ReplaceFile #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;GTest::01AA3A3B-E66F-492C-B60E-0877971C4CB6::.NETFramework,Version=v4.0::PathUtils.ReplaceFile&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;GTest::01AA3A3B-E66F-492C-B60E-0877971C4CB6::.NETFramework,Version=v4.0::PathUtils.MakePath&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=9dcef76f_002Dbd7d_002D4079_002Dbfbc_002Dc1e12b4aa8a9/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="MakePath" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;GTest::01AA3A3B-E66F-492C-B60E-0877971C4CB6::.NETFramework,Version=v4.0::PathUtils.MakePath&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;GTest::01AA3A3B-E66F-492C-B60E-0877971C4CB6::.NETFramework,Version=v4.0::PathUtils.SplitPath&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;GTest::01AA3A3B-E66F-492C-B60E-0877971C4CB6::.NETFramework,Version=v4.0::PathUtils.GetSubFolder&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=d02e16fe_002D90be_002D4e41_002D91d2_002D2f78ebf11c33/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="GetExtension" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;GTest::01AA3A3B-E66F-492C-B60E-0877971C4CB6::.NETFramework,Version=v4.0::PathUtils.GetFile&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;GTest::01AA3A3B-E66F-492C-B60E-0877971C4CB6::.NETFramework,Version=v4.0::PathUtils.ReplaceFile&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=d1a1c225_002D4aed_002D4640_002Db2d9_002D61271cba42ec/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="ReplaceFile" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;GTest::01AA3A3B-E66F-492C-B60E-0877971C4CB6::.NETFramework,Version=v4.0::PathUtils.ReplaceFile&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;GTest::01AA3A3B-E66F-492C-B60E-0877971C4CB6::.NETFramework,Version=v4.0::PathUtils.GetSubFolder&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	
+	
+	
+	</wpf:ResourceDictionary>
