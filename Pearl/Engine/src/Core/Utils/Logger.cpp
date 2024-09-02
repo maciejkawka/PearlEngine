@@ -13,7 +13,7 @@ void Logger::Init()
 {
 	//Main logger
 	auto consoleSink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
-	consoleSink->set_pattern("[%T %n]\n%^%l: %v\n%$");
+	consoleSink->set_pattern("<%T> %^%l: %v\n%$");
 
 	s_mainLogger = std::make_shared<spdlog::logger>("Pearl", consoleSink);
 	s_mainLogger->flush_on(spdlog::level::debug);
