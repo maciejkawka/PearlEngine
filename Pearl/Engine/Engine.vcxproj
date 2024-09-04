@@ -51,7 +51,10 @@
     <ClInclude Include="include\Engine\Core\Input\PrKeyState.h" />
     <ClInclude Include="include\Engine\Core\Input\PrMouseButton.h" />
     <ClInclude Include="include\Engine\Core\Math\Math.h" />
+    <ClInclude Include="include\Engine\Core\Resources\IResource.h" />
+    <ClInclude Include="include\Engine\Core\Resources\IResourceDataLoader.h" />
     <ClInclude Include="include\Engine\Core\Resources\Resource.h" />
+    <ClInclude Include="include\Engine\Core\Resources\ResourceDatabase.h" />
     <ClInclude Include="include\Engine\Core\Resources\ResourceLoader.h" />
     <ClInclude Include="include\Engine\Core\Resources\ResourceManager.h" />
     <ClInclude Include="include\Engine\Core\Utils\Assert.h" />
@@ -118,6 +121,7 @@
     <ClInclude Include="include\Engine\Renderer\Core\RenderCommand.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Resources\ResourceDatabase.cpp" />
     <ClCompile Include="src\Core\ECS\Components\TransformComponent.cpp" />
     <ClCompile Include="src\Core\ECS\EntityManager.cpp" />
     <ClCompile Include="src\Core\ECS\Defines.cpp" />

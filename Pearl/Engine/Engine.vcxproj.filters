@@ -372,6 +372,15 @@
     <ClInclude Include="include\Engine\Core\Utils\PathUtils.h">
       <Filter>Core\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\Resources\IResource.h">
+      <Filter>Core\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Resources\IResourceDataLoader.h">
+      <Filter>Core\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Resources\ResourceDatabase.h">
+      <Filter>Core\Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -565,6 +574,9 @@
     </ClCompile>
     <ClCompile Include="src\Core\Utils\PathUtils.cpp">
       <Filter>Core\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Resources\ResourceDatabase.cpp">
+      <Filter>Core\Resources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
