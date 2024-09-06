@@ -32,79 +32,91 @@ namespace PrCore::Resources {
 		Corrupted = 4
 	};
 
-	enum class ResourceSource : uint8_t
+
+	enum class ResourceOrigin : uint8_t
 	{
 		// Created and loaded from file can be unloaded or corrupted
-		FromFile = 0,
+		File = 0,
 
 		// Created manually in a code lives in the memory only
-		FromMemory = 1
+		Memory = 1
 	};
 
-	// The place holder to store resource data only 
-	// Overrides along with IResourceDesc to implement new Resource type
+
+	// Base class for all Resource in the engine like Textures, Materials, Shaders
 	class IResourceData {
 	public:
 		virtual ~IResourceData() = default;
+
+		// Return size of loaded resource this should update during asset manipulations and calculate current size.
+		virtual size_t GetByteSize() const = 0;
 	};
 	using IResourceDataPtr = std::shared_ptr<IResourceData>;
 
+
 	// The Resource descriptor storing resource data and metadata
-	// To access resource data call GetData()
-	class ResourceDesc {
+	// To access resource data call GetData() and cast to correct type
+	struct ResourceDesc final {
 	public:
 		ResourceDesc() :
-			m_data(nullptr),
-			m_ID(InvalidID),
-			m_path(""),
-			m_state(ResourceState::Unmanaged),
-			m_source(ResourceSource::FromMemory),
-			m_size(0)
+			data(nullptr),
+			id(InvalidID),
+			filePath(""),
+			state(ResourceState::Unmanaged),
+			origin(ResourceOrigin::Memory),
+			size(0)
 		{}
 
-		ResourceID          GetID() const { return m_ID; }
-		const std::string&  GetPath() const { return m_path; }
-		ResourceState       GetState() const { return m_state; }
-		ResourceSource      GetSource() const { return m_source; }
-		size_t              GetSize() const { return m_size; }
-		IResourceDataPtr    GetData() { return m_data; }
+		// Resource data 
+		IResourceDataPtr data;
 
-		IResourceDataPtr m_data;
-		size_t          m_size; // Size in bytes
-		ResourceID      m_ID{};
-		ResourceState   m_state;
-		ResourceSource  m_source;
-		std::string     m_path;
+		// Size in bytes snapshot created during loading, it is not refreshed if the resource data changes
+		size_t          size;
+
+		// Unique ID assigned by resource database
+		ResourceID      id{};
+
+		// Current resource state
+		ResourceState   state;
+
+		// Resource origin can be file or memory
+		ResourceOrigin  origin;
+
+		// If resource origin is file this stores the file path
+		std::string     filePath;
 
 	};
 	using ResourceDescPtr = std::shared_ptr<ResourceDesc>;
 	using ResourceDescConstPtr = std::shared_ptr<const ResourceDesc>;
 
 	// Resource descriptor wrapper that automatically deduces the GetData type
-	// Override when creating a new resource type
+	// It is main resource access object
 	template<class T>
-	class IResource {
+	class Resourcev2 final {
 	public:
-		IResource(const ResourceDescPtr p_resourceDesc) :
+		Resourcev2(const ResourceDescPtr& p_resourceDesc) :
 			m_resourceDesc(p_resourceDesc)
 		{}
 
-		ResourceID          GetID() const { return m_resourceDesc->m_ID; }
-		const std::string&  GetPath() const { return m_resourceDesc->m_path; }
-		ResourceState       GetState() const { return m_resourceDesc->m_state; }
-		ResourceSource      GetSource() const { return m_resourceDesc->m_source; }
-		size_t              GetSize() const { return m_resourceDesc->m_size; }
-		std::shared_ptr<T>  GetData() { return std::static_pointer_cast<T>(m_resourceDesc->m_data); }
+		ResourceID          GetID() const { return m_resourceDesc->id; }
+		const std::string&  GetPath() const { return m_resourceDesc->filePath; }
+		ResourceState       GetState() const { return m_resourceDesc->state; }
+		ResourceOrigin      GetSource() const { return m_resourceDesc->origin; }
+		size_t              GetSize() const { return m_resourceDesc->size; }
+		std::shared_ptr<T>  GetData() { return std::static_pointer_cast<T>(m_resourceDesc->data); }
 
 	protected:
-		ResourceDescPtr m_resourceDesc;
+		const ResourceDescPtr m_resourceDesc;
 	};
+
+#define REGISTRER_RESOURCE_TYPE(ResourceName) \
+	using ResourceName ## Handle = Resourcev2<ResourceName>
 
 	// Example usage
 	//
-	//class TextureData : public IResourceData
-	//class TextureResource: public IResource<TextureData>
-
+	//class Texture : public IResourceData
+	// using TextureResource = Resourcev2<Texture>;
+	// 
 	// TextureResource textureResource = ResourceSystem::Get<T>("TestPath/Elo.png");
-	// TextureData texture = textureResource->GetData();
+	// Texture texture = textureResource->GetData();
 }

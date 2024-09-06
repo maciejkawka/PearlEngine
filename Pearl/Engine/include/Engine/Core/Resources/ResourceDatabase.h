@@ -17,14 +17,16 @@ namespace PrCore::Resources {
 			m_memoryBudget(0)
 		{}
 
-		ResourceDescPtr Load(const std::string& p_path, IResourceDataLoader* p_loader = nullptr);
-		ResourceDescPtr Load(ResourceID p_id, IResourceDataLoader* p_loader = nullptr);
+		~ResourceDatabase();
+
+		ResourceDescPtr Load(const std::string& p_path, std::shared_ptr<IResourceDataLoader> p_loader = nullptr);
+		ResourceDescPtr Load(ResourceID p_id, std::shared_ptr<IResourceDataLoader> p_loader = nullptr);
 
 		//IResourcePtr LoadAsync(const std::string p_path, const IResourceLoader* p_loader = nullptr);
 		//IResourcePtr LoadAsync(ResourceID p_id);
 
-		void Unload(const std::string& p_path, IResourceDataLoader* p_loader = nullptr);
-		void Unload(ResourceID p_id, IResourceDataLoader* p_loader = nullptr);
+		void Unload(const std::string& p_path);
+		void Unload(ResourceID p_id);
 		void UnloadAll();
 
 		//void UnloadAsync(const std::string p_path, const IResourceLoader* p_loader = nullptr);
@@ -35,11 +37,10 @@ namespace PrCore::Resources {
 		ResourceDescPtr Get(const std::string& p_path);
 
 		// Does not assures that resource data is loaded and available.
-		// Fetches only current descriptor and returns copy without data ptr 
-		ResourceDesc GetMetadata(ResourceID p_id);
-		ResourceDesc GetMetadata(const std::string& p_path);
+		ResourceDescPtr GetMetadata(ResourceID p_id);
+		ResourceDescPtr GetMetadata(const std::string& p_path);
 
-		ResourceDescPtr Register(IResourceDataPtr p_resourceData, size_t p_size = 0);
+		ResourceDescPtr Register(IResourceDataPtr p_resourceData);
 		ResourceDescPtr Register(const std::string& p_path);
 
 		bool Remove(ResourceID p_id);
@@ -54,18 +55,17 @@ namespace PrCore::Resources {
 		void   SetMemoryBudget(size_t p_budget) { m_memoryBudget = p_budget; }
 		size_t GetMemoryBudget() const { return m_memoryBudget; }
 
-		void                 RegisterLoader(const std::string& p_fileExtension, IResourceDataLoader* p_loader);
-		IResourceDataLoader* GetLoader(const std::string& p_fileExtension);
-		void                 UnregisterLoader(const std::string& p_fileExtension);
-		void                 UnregisterAllLoaders();
+		void                                  RegisterLoader(const std::string& p_fileExtension, std::unique_ptr<IResourceDataLoader> p_loader);
+		std::unique_ptr<IResourceDataLoader>& GetLoader(const std::string& p_fileExtension);
+		void                                  UnregisterLoader(const std::string& p_fileExtension);
+		void                                  UnregisterAllLoaders();
 
 	private:
-		bool LoadResourcePrivate(ResourceDescPtr p_resourceDesc, IResourceDataLoader* p_loader = nullptr);
-		void UnloadResourcePrivate(ResourceDescPtr p_resourceDesc, IResourceDataLoader* p_loader = nullptr);
+		bool LoadResourcePrivate(const ResourceDescPtr& p_resourceDesc, std::shared_ptr<IResourceDataLoader> p_loader = nullptr);
+		void UnloadResourcePrivate(const ResourceDescPtr& p_resourceDesc);
 
-		//ResourceID RegisterResourcePrivate(ResourceDescPtr p_resource);
 		ResourceDescPtr RegisterFileResourcePrivate(const std::string& p_path);
-		ResourceDescPtr RegisterMemoryResourcePrivate(IResourceDataPtr p_resourceData, size_t p_size = 0);
+		ResourceDescPtr RegisterMemoryResourcePrivate(const IResourceDataPtr& p_resourceData);
 
 		ResourceDescPtr ResourceByID(ResourceID p_id);
 		ResourceDescPtr ResourceByPath(const std::string& p_path);
@@ -81,8 +81,8 @@ namespace PrCore::Resources {
 
 		using IDMap = std::map<ResourceID, ResourceDescPtr>;
 		using PathMap = std::map<std::string, ResourceDescPtr>;
-		using LoaderMap = std::map<std::string, IResourceDataLoader*>;
-		using CustomLoaderMap = std::map<ResourceID, IResourceDataLoader*>;
+		using LoaderMap = std::map<std::string, std::unique_ptr<IResourceDataLoader>>;
+		using CustomLoaderMap = std::map<ResourceID, std::shared_ptr<IResourceDataLoader>>;
 
 		IDMap m_resourcesID;
 		PathMap m_resourcesPaths;

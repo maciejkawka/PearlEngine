@@ -381,6 +381,9 @@
     <ClInclude Include="include\Engine\Core\Resources\ResourceDatabase.h">
       <Filter>Core\Resources</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\Resources\ResourceSystem.h">
+      <Filter>Core\Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -578,6 +581,9 @@
     <ClCompile Include="src\Core\Resources\ResourceDatabase.cpp">
       <Filter>Core\Resources</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Resources\ResourceSystem.cpp">
+      <Filter>Core\Resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\Engine\Core\ECS\ComponentPool.inl">
@@ -591,6 +597,9 @@
     </None>
     <None Include="include\Engine\Core\ECS\Scene.inl">
       <Filter>Core\ECS</Filter>
+    </None>
+    <None Include="include\Engine\Core\Resources\ResourceSystem.inl">
+      <Filter>Core\Resources</Filter>
     </None>
   </ItemGroup>
 </Project>

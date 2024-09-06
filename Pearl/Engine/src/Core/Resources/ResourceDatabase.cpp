@@ -11,7 +11,13 @@
 
 using namespace PrCore::Resources;
 
-ResourceDescPtr ResourceDatabase::Load(const std::string& p_path, IResourceDataLoader* p_loader /*= nullptr*/)
+ResourceDatabase::~ResourceDatabase()
+{
+	RemoveAll();
+	UnregisterAllLoaders();
+}
+
+ResourceDescPtr ResourceDatabase::Load(const std::string& p_path, std::shared_ptr<IResourceDataLoader> p_loader /*= nullptr*/)
 {
 	PR_ASSERT(!p_path.empty(), "Resource path is empty");
 
@@ -19,13 +25,13 @@ ResourceDescPtr ResourceDatabase::Load(const std::string& p_path, IResourceDataL
 	if (resourceDesc == nullptr)
 		resourceDesc = RegisterFileResourcePrivate(p_path);
 	
-	if (resourceDesc->GetState() == ResourceState::Unloaded || resourceDesc->GetState() == ResourceState::Registered)
+	if (resourceDesc->state == ResourceState::Unloaded || resourceDesc->state == ResourceState::Registered)
 		LoadResourcePrivate(resourceDesc, p_loader);
 	
 	return resourceDesc;
 }
 
-ResourceDescPtr ResourceDatabase::Load(ResourceID p_id, IResourceDataLoader* p_loader /*= nullptr*/)
+ResourceDescPtr ResourceDatabase::Load(ResourceID p_id, std::shared_ptr<IResourceDataLoader> p_loader /*= nullptr*/)
 {
 	PR_ASSERT(p_id != InvalidID, "ResourceID is invalid.");
 
@@ -36,22 +42,22 @@ ResourceDescPtr ResourceDatabase::Load(ResourceID p_id, IResourceDataLoader* p_l
 		return nullptr;
 	}
 
-	if (resourceDesc->m_source != ResourceSource::FromFile)
+	if (resourceDesc->origin != ResourceOrigin::File)
 	{
 		PRLOG_WARN("Cannot load resource with ID {0}. Only file resources can be loaded. Returning memory resource directly.", p_id);
 		return resourceDesc;
 	}
 
-	if (resourceDesc->m_state == ResourceState::Corrupted)
-		PRLOG_WARN("Cannot load resource with ID {0} and path {1}. Resource is corrupted.", p_id, resourceDesc->m_path);
+	if (resourceDesc->state == ResourceState::Corrupted)
+		PRLOG_WARN("Cannot load resource with ID {0} and path {1}. Resource is corrupted.", p_id, resourceDesc->filePath);
 
-	if (resourceDesc->GetState() == ResourceState::Unloaded || resourceDesc->GetState() == ResourceState::Registered)
+	if (resourceDesc->state == ResourceState::Unloaded || resourceDesc->state == ResourceState::Registered)
 		LoadResourcePrivate(resourceDesc, p_loader);
 	
 	return resourceDesc;
 }
 
-void ResourceDatabase::Unload(const std::string& p_path, IResourceDataLoader* p_loader /*= nullptr*/)
+void ResourceDatabase::Unload(const std::string& p_path)
 {
 	PR_ASSERT(!p_path.empty(), "Resource path is empty");
 
@@ -62,20 +68,20 @@ void ResourceDatabase::Unload(const std::string& p_path, IResourceDataLoader* p_
 		return;
 	}
 
-	if (resourceDesc->m_source != ResourceSource::FromFile)
+	if (resourceDesc->origin != ResourceOrigin::File)
 	{
 		PRLOG_WARN("Cannot unload resource with ID {0}, path {1}. Only file resources can be loaded and unloaded. Use ResourceDatabase::Remove() to delete the memory resource.", p_id, p_path);
 		return;
 	}
 
-	if (resourceDesc->m_state == ResourceState::Corrupted)
-		PRLOG_WARN("Cannot unload resource with ID {0} path {1}. Resource is corrupted.", p_id, resourceDesc->m_path);
+	if (resourceDesc->state == ResourceState::Corrupted)
+		PRLOG_WARN("Cannot unload resource with ID {0} path {1}. Resource is corrupted.", p_id, resourceDesc->filePath);
 
-	if (resourceDesc->GetState() == ResourceState::Loaded)
-		UnloadResourcePrivate(resourceDesc, p_loader);
+	if (resourceDesc->state == ResourceState::Loaded)
+		UnloadResourcePrivate(resourceDesc);
 }
 
-void ResourceDatabase::Unload(ResourceID p_id, IResourceDataLoader* p_loader /*= nullptr*/)
+void ResourceDatabase::Unload(ResourceID p_id)
 {
 	PR_ASSERT(p_id != InvalidID, "ResourceID is invalid.");
 
@@ -86,17 +92,17 @@ void ResourceDatabase::Unload(ResourceID p_id, IResourceDataLoader* p_loader /*=
 		return;
 	}
 
-	if (resourceDesc->m_source != ResourceSource::FromFile)
+	if (resourceDesc->origin != ResourceOrigin::File)
 	{
 		PRLOG_WARN("Cannot unload resource with ID {0}. Only file resources can be loaded and unloaded, this is memory source. Use ResourceDatabase::Remove() to delete the memory resource.", p_id);
 		return;
 	}
 
-	if (resourceDesc->m_state == ResourceState::Corrupted)
-		PRLOG_WARN("Cannot unload resource with ID {0} path {1}. Resource is corrupted.", p_id, resourceDesc->m_path);
+	if (resourceDesc->state == ResourceState::Corrupted)
+		PRLOG_WARN("Cannot unload resource with ID {0} path {1}. Resource is corrupted.", p_id, resourceDesc->filePath);
 
-	if (resourceDesc->GetState() == ResourceState::Loaded)
-		UnloadResourcePrivate(resourceDesc, p_loader);
+	if (resourceDesc->state == ResourceState::Loaded)
+		UnloadResourcePrivate(resourceDesc);
 }
 
 PrCore::Resources::ResourceDescPtr ResourceDatabase::Get(ResourceID p_id)
@@ -110,10 +116,10 @@ PrCore::Resources::ResourceDescPtr ResourceDatabase::Get(ResourceID p_id)
 		return nullptr;
 	}
 
-	if (resourceDesc->m_source == ResourceSource::FromFile && (resourceDesc->m_state == ResourceState::Unloaded || resourceDesc->m_state == ResourceState::Registered))
+	if (resourceDesc->origin == ResourceOrigin::File && (resourceDesc->state == ResourceState::Unloaded || resourceDesc->state == ResourceState::Registered))
 	{
 		LoadResourcePrivate(resourceDesc);
-		FireCacheMiss(resourceDesc->m_ID, resourceDesc->m_path);
+		FireCacheMiss(resourceDesc->id, resourceDesc->filePath);
 	}
 
 	return resourceDesc;
@@ -130,18 +136,18 @@ PrCore::Resources::ResourceDescPtr ResourceDatabase::Get(const std::string& p_pa
 		return nullptr;
 	}
 
-	if (resourceDesc->m_source == ResourceSource::FromFile && (resourceDesc->m_state == ResourceState::Unloaded || resourceDesc->m_state == ResourceState::Registered))
+	if (resourceDesc->origin == ResourceOrigin::File && (resourceDesc->state == ResourceState::Unloaded || resourceDesc->state == ResourceState::Registered))
 	{
 		LoadResourcePrivate(resourceDesc);
-		FireCacheMiss(resourceDesc->m_ID, resourceDesc->m_path);
+		FireCacheMiss(resourceDesc->id, resourceDesc->filePath);
 	}
 
 	return resourceDesc;
 }
 
-PrCore::Resources::ResourceDescPtr ResourceDatabase::Register(IResourceDataPtr p_resourceData, size_t p_size /*= 0*/)
+PrCore::Resources::ResourceDescPtr ResourceDatabase::Register(IResourceDataPtr p_resourceData)
 {
-	return RegisterMemoryResourcePrivate(p_resourceData, p_size);
+	return RegisterMemoryResourcePrivate(p_resourceData);
 }
 
 PrCore::Resources::ResourceDescPtr ResourceDatabase::Register(const std::string& p_path)
@@ -161,23 +167,27 @@ bool ResourceDatabase::Remove(ResourceID p_id)
 		return false;
 	}
 
-	if (resourceDesc->m_source == ResourceSource::FromFile && resourceDesc->m_state == ResourceState::Loaded)
+	if (resourceDesc->origin == ResourceOrigin::File && resourceDesc->state == ResourceState::Loaded)
 	{
 		UnloadResourcePrivate(resourceDesc);
-		FireUnloadedEvent(resourceDesc->m_ID, resourceDesc->m_path);
+		FireUnloadedEvent(resourceDesc->id, resourceDesc->filePath);
 	}
 
-	if (resourceDesc->m_source == ResourceSource::FromMemory)
-		m_memoryUsage -= resourceDesc->m_size;
+	if (resourceDesc->origin == ResourceOrigin::Memory)
+		m_memoryUsage -= resourceDesc->size;
 
-	m_resourcesID.erase(resourceDesc->m_ID);
-	if(resourceDesc->m_source == ResourceSource::FromFile && !resourceDesc->m_path.empty())
-		m_resourcesPaths.erase(resourceDesc->m_path);
+	m_resourcesID.erase(resourceDesc->id);
+	if(resourceDesc->origin == ResourceOrigin::File && !resourceDesc->filePath.empty())
+		m_resourcesPaths.erase(resourceDesc->filePath);
 
-	resourceDesc->m_ID = InvalidID;
-	resourceDesc->m_data = nullptr;
-	resourceDesc->m_size = 0;
-	resourceDesc->m_state = ResourceState::Unmanaged;
+	// Remove custom loader for the removed resource
+	if(auto customLoaderIt = m_customLoaders.find(resourceDesc->id); customLoaderIt != m_customLoaders.end())
+		m_customLoaders.erase(customLoaderIt);
+
+	resourceDesc->id = InvalidID;
+	resourceDesc->data = nullptr;
+	resourceDesc->size = 0;
+	resourceDesc->state = ResourceState::Unmanaged;
 
 	return true;
 }
@@ -187,92 +197,109 @@ PrCore::Resources::ResourceDescPtr ResourceDatabase::RegisterFileResourcePrivate
 	PR_ASSERT(!p_path.empty(), "Resource path is empty");
 
 	auto resourceDesc = std::make_shared<ResourceDesc>();
-	resourceDesc->m_ID = Utils::UUIDGenerator().Generate();
-	resourceDesc->m_path = p_path;
-	resourceDesc->m_state = ResourceState::Registered;
-	resourceDesc->m_source = ResourceSource::FromFile;
-	resourceDesc->m_data = nullptr;
-	resourceDesc->m_size = 0;
+	resourceDesc->id = Utils::UUIDGenerator().Generate();
+	resourceDesc->filePath = p_path;
+	resourceDesc->state = ResourceState::Registered;
+	resourceDesc->origin = ResourceOrigin::File;
+	resourceDesc->data = nullptr;
+	resourceDesc->size = 0;
 
-	m_resourcesID.emplace(resourceDesc->GetID(), resourceDesc);
-	m_resourcesPaths.emplace(resourceDesc->GetPath(), resourceDesc);
+	m_resourcesID.emplace(resourceDesc->id, resourceDesc);
+	m_resourcesPaths.emplace(resourceDesc->filePath, resourceDesc);
 
 	return resourceDesc;
 }
 
-PrCore::Resources::ResourceDescPtr ResourceDatabase::RegisterMemoryResourcePrivate(IResourceDataPtr p_resourceData, size_t p_size)
+PrCore::Resources::ResourceDescPtr PrCore::Resources::ResourceDatabase::RegisterMemoryResourcePrivate(const IResourceDataPtr& p_resourceData)
 {
 	PR_ASSERT(p_resourceData, "Resource data is nullptr");
 
 	auto resourceDesc = std::make_shared<ResourceDesc>();
-	resourceDesc->m_ID = Utils::UUIDGenerator().Generate();
-	resourceDesc->m_path = "";
-	resourceDesc->m_state = ResourceState::Registered;
-	resourceDesc->m_source = ResourceSource::FromMemory;
-	resourceDesc->m_data = p_resourceData;
-	resourceDesc->m_size = p_size;
+	resourceDesc->id = Utils::UUIDGenerator().Generate();
+	resourceDesc->filePath = "";
+	resourceDesc->state = ResourceState::Registered;
+	resourceDesc->origin = ResourceOrigin::Memory;
+	resourceDesc->data = p_resourceData;
+	resourceDesc->size = p_resourceData->GetByteSize();
 
-	m_memoryUsage += p_size;
+	m_memoryUsage += resourceDesc->size;
 	CheckMemoryBudget(resourceDesc);
 
-	m_resourcesID.emplace(resourceDesc->GetID(), resourceDesc);
+	m_resourcesID.emplace(resourceDesc->id, resourceDesc);
 
 	return resourceDesc;
 }
 
-bool PrCore::Resources::ResourceDatabase::LoadResourcePrivate(ResourceDescPtr p_resourceDesc, IResourceDataLoader* p_loader /*= nullptr*/)
+bool PrCore::Resources::ResourceDatabase::LoadResourcePrivate(const ResourceDescPtr& p_resourceDesc, std::shared_ptr<IResourceDataLoader> p_loader /*= nullptr*/)
 {
 	PR_ASSERT(p_resourceDesc, "Resource is nullptr");
-	PR_ASSERT(!p_resourceDesc->m_path.empty(), "Resource path is empty");
+	PR_ASSERT(!p_resourceDesc->filePath.empty(), "Resource path is empty");
 
-	const std::string& path = p_resourceDesc->m_path;
+	const std::string& path = p_resourceDesc->filePath;
 	IResourceDataPtr resourceData = nullptr;
-	IResourceDataLoader* loader = nullptr;
-	size_t dataSize = 0;
 	
-	// Choose correct loader
+	// Check if custom loader was passed to use
 	if (p_loader)
 	{
-		loader = p_loader;
-		m_customLoaders.emplace(p_resourceDesc->m_ID, loader);
+		//Use custom loader and insert it into the map, replace if another custom loader was used previously. 
+		resourceData = p_loader->LoadResource(path);
+		m_customLoaders.insert_or_assign(p_resourceDesc->id, p_loader);
 	}
 	else
 	{
-		auto loaderIt = m_loaders.find(PathUtils::GetExtension(path));
-		PR_ASSERT(loaderIt != m_loaders.end(), "Cannot load resource. Resource loader not registered.");
+		auto customLoader = m_customLoaders.find(p_resourceDesc->id);
+		if (customLoader != m_customLoaders.end())
+		{
+			// Use a custom loader if assigned
+			resourceData = customLoader->second->LoadResource(path);
+		}
+		else
+		{
+			// Use default loader for extension
+			auto loaderIt = m_loaders.find(PathUtils::GetExtension(path));
+			PR_ASSERT(loaderIt != m_loaders.end(), "Cannot load resource. Resource loader not registered.");
 
-		if (loaderIt != m_loaders.end())
-			loader = loaderIt->second;
+			if (loaderIt != m_loaders.end())
+				resourceData = loaderIt->second->LoadResource(path);
+		}
 	}
-
-	// Load resource
-	resourceData = loader->LoadResource(path, dataSize);
 
 	if (resourceData == nullptr)
 	{
 		PRLOG_WARN("Cannot load resource path: {0} with ID {1}", path, path, p_resourceDesc->GetID());
-		FireCorruptedEvent(p_resourceDesc->m_ID, path);
+		FireCorruptedEvent(p_resourceDesc->id, path);
 
-		p_resourceDesc->m_data = nullptr;
-		p_resourceDesc->m_size = 0;
-		p_resourceDesc->m_state = ResourceState::Corrupted;
-		p_resourceDesc->m_source = ResourceSource::FromFile;
+		p_resourceDesc->data = nullptr;
+		p_resourceDesc->size = 0;
+		p_resourceDesc->state = ResourceState::Corrupted;
+		p_resourceDesc->origin = ResourceOrigin::File;
 
 		return false;
 	}
 
-	p_resourceDesc->m_data = resourceData;
-	p_resourceDesc->m_size = dataSize;
-	p_resourceDesc->m_state = ResourceState::Loaded;
-	p_resourceDesc->m_source = ResourceSource::FromFile;
+	p_resourceDesc->data = resourceData;
+	p_resourceDesc->size = resourceData->GetByteSize();
+	p_resourceDesc->state = ResourceState::Loaded;
+	p_resourceDesc->origin = ResourceOrigin::File;
 
 	PRLOG_INFO("Loaded resource path: {0} with UUID {1}", path, p_resourceDesc->GetID());
-	FireLoadedEvent(p_resourceDesc->m_ID, p_resourceDesc->m_path);
+	FireLoadedEvent(p_resourceDesc->id, p_resourceDesc->filePath);
 	
-	m_memoryUsage += dataSize;
+	m_memoryUsage += p_resourceDesc->size;
 	CheckMemoryBudget(p_resourceDesc);
 
 	return true;
+}
+
+std::unique_ptr<IResourceDataLoader>& ResourceDatabase::GetLoader(const std::string& p_fileExtension)
+{
+	PR_ASSERT(!p_fileExtension.empty(), "File extension is empty");
+
+	auto it = m_loaders.find(p_fileExtension);
+
+	PR_ASSERT(it != m_loaders.end(), "Loader is not registered. Cannot unregister the loader.");
+
+	return it->second;
 }
 
 PrCore::Resources::ResourceDescPtr ResourceDatabase::SaveToFileAndLoad(ResourceID p_sourceId, const std::string& p_path)
@@ -299,11 +326,11 @@ bool ResourceDatabase::SaveToFile(ResourceID p_sourceId, const std::string& p_pa
 		return false;
 
 	// Get loader
-	IResourceDataLoader* loader = nullptr;
-	auto customLoaderIt = m_customLoaders.find(resourceDesc->m_ID);
+	bool success = false;
+	auto customLoaderIt = m_customLoaders.find(resourceDesc->id);
 	if (customLoaderIt != m_customLoaders.end())
 	{
-		loader = customLoaderIt->second;
+		success = customLoaderIt->second->SaveResourceOnDisc(resourceDesc->data, p_path);
 	}
 	else
 	{
@@ -311,11 +338,10 @@ bool ResourceDatabase::SaveToFile(ResourceID p_sourceId, const std::string& p_pa
 		PR_ASSERT(loaderIt != m_loaders.end(), "Cannot unload resource. Resource loader not registered.");
 
 		if (loaderIt != m_loaders.end())
-			loader = loaderIt->second;
+			success = loaderIt->second->SaveResourceOnDisc(resourceDesc->data, p_path);
 	}
-
-	// Save to file
-	return loader->SaveResourceOnDisc(resourceDesc->m_data, p_path);
+	
+	return success;
 }
 
 void ResourceDatabase::ForEachResource(ResourceVisitor p_visitor)
@@ -336,7 +362,7 @@ void ResourceDatabase::RemoveAll()
 		Remove(id);
 }
 
-PrCore::Resources::ResourceDesc ResourceDatabase::GetMetadata(const std::string& p_path)
+PrCore::Resources::ResourceDescPtr ResourceDatabase::GetMetadata(const std::string& p_path)
 {
 	PR_ASSERT(!p_path.empty(), "Resource path is empty");
 
@@ -344,16 +370,13 @@ PrCore::Resources::ResourceDesc ResourceDatabase::GetMetadata(const std::string&
 	if (resourceDesc == nullptr)
 	{
 		PRLOG_WARN("Cannot unload resource with path {0}. Resource is not registered.", p_path);
-		return ResourceDesc();
+		return nullptr;
 	}
 
-	// Pass only metadata
-	auto metadata = *resourceDesc;
-	metadata.m_data = nullptr;
-	return metadata;
+	return resourceDesc;
 }
 
-PrCore::Resources::ResourceDesc ResourceDatabase::GetMetadata(ResourceID p_id)
+PrCore::Resources::ResourceDescPtr ResourceDatabase::GetMetadata(ResourceID p_id)
 {
 	PR_ASSERT(p_id != InvalidID, "ResourceID is invalid.");
 
@@ -361,26 +384,23 @@ PrCore::Resources::ResourceDesc ResourceDatabase::GetMetadata(ResourceID p_id)
 	if (resourceDesc == nullptr)
 	{
 		PRLOG_WARN("Cannot load resource with ID {0}. Resource is not registered.", p_id);
-		return ResourceDesc();
+		return nullptr;
 	}
 
-	// Pass only metadata
-	auto metadata = *resourceDesc;
-	metadata.m_data = nullptr;
-	return metadata;
+	return resourceDesc;
 }
 
 void ResourceDatabase::CheckMemoryBudget(ResourceDescPtr p_resource)
 {
 	if (m_memoryUsage > m_memoryBudget)
-		FireBudgetExceeded(p_resource->m_ID, p_resource->m_path, m_memoryUsage, m_memoryBudget);
+		FireBudgetExceeded(p_resource->id, p_resource->filePath, m_memoryUsage, m_memoryBudget);
 }
 
 void ResourceDatabase::UnloadAll()
 {
 	for (auto& [_, resourceDesc] : m_resourcesPaths)
 	{
-		if (resourceDesc->GetSource() == ResourceSource::FromFile && resourceDesc->GetState() == ResourceState::Loaded)
+		if (resourceDesc->origin == ResourceOrigin::File && resourceDesc->state == ResourceState::Loaded)
 			UnloadResourcePrivate(resourceDesc);
 	}
 }
@@ -400,7 +420,7 @@ void ResourceDatabase::UnregisterLoader(const std::string& p_fileExtension)
 	m_loaders.erase(it);
 }
 
-void ResourceDatabase::RegisterLoader(const std::string& p_fileExtension, IResourceDataLoader* p_loader)
+void ResourceDatabase::RegisterLoader(const std::string& p_fileExtension, std::unique_ptr<IResourceDataLoader> p_loader)
 {
 	PR_ASSERT(p_loader != nullptr, "Loader is nullptr");
 	PR_ASSERT(!p_fileExtension.empty(), "File extension is empty");
@@ -408,7 +428,7 @@ void ResourceDatabase::RegisterLoader(const std::string& p_fileExtension, IResou
 	if (m_loaders.find(p_fileExtension) != m_loaders.end())
 		PRLOG_WARN("Loader with extension {0} already registered. Replacing the loader.", p_fileExtension);
 
-	m_loaders.emplace(p_fileExtension, p_loader);
+	m_loaders.emplace(p_fileExtension, std::move(p_loader));
 }
 
 void ResourceDatabase::UnregisterAllLoaders()
@@ -416,44 +436,36 @@ void ResourceDatabase::UnregisterAllLoaders()
 	m_loaders.clear();
 }
 
-void ResourceDatabase::UnloadResourcePrivate(ResourceDescPtr p_resourceDesc, IResourceDataLoader* p_loader /*= nullptr*/)
+void PrCore::Resources::ResourceDatabase::UnloadResourcePrivate(const ResourceDescPtr& p_resourceDesc)
 {
 	PR_ASSERT(p_resourceDesc, "Resource is nullptr");
-	PR_ASSERT(!p_resourceDesc->m_path.empty(), "Resource path is empty");
+	PR_ASSERT(!p_resourceDesc->filePath.empty(), "Resource path is empty");
 
-	const std::string& path = p_resourceDesc->m_path;
-	IResourceDataLoader* loader = nullptr;
-	if (p_loader)
-		loader = p_loader;
+	const std::string& path = p_resourceDesc->filePath;
+	auto customLoaderIt = m_customLoaders.find(p_resourceDesc->id);
+	if (customLoaderIt != m_customLoaders.end())
+	{
+		// Check if resource was loaded with custom loader
+		customLoaderIt->second->UnloadResource(p_resourceDesc->data);
+	}
 	else
 	{
-		auto customLoaderIt = m_customLoaders.find(p_resourceDesc->m_ID);
-		if (customLoaderIt != m_customLoaders.end())
-		{
-			loader = customLoaderIt->second;
-			m_customLoaders.erase(customLoaderIt);
-		}
-		else
-		{
-			auto loaderIt = m_loaders.find(PathUtils::GetExtension(path));
-			PR_ASSERT(loaderIt != m_loaders.end(), "Cannot unload resource. Resource loader not registered.");
+		// Use default loader for extension
+		auto loaderIt = m_loaders.find(PathUtils::GetExtension(path));
+		PR_ASSERT(loaderIt != m_loaders.end(), "Cannot unload resource. Resource loader not registered.");
 
-			if (loaderIt != m_loaders.end())
-				loader = loaderIt->second;
-		}
+		if (loaderIt != m_loaders.end())
+			loaderIt->second->UnloadResource(p_resourceDesc->data);
 	}
 
-	loader->UnloadResource(p_resourceDesc->m_data);
-	size_t dataSize = p_resourceDesc->m_size;
+	m_memoryUsage -= p_resourceDesc->size;
 
-	p_resourceDesc->m_data = nullptr;
-	p_resourceDesc->m_size = 0;
-	p_resourceDesc->m_state = ResourceState::Unloaded;
+	p_resourceDesc->data = nullptr;
+	p_resourceDesc->size = 0;
+	p_resourceDesc->state = ResourceState::Unloaded;
 
 	PRLOG_INFO("Unloaded resource path: {0} with UUID {1}", path, p_resourceDesc->GetID());
-	FireUnloadedEvent(p_resourceDesc->GetID(), path);
-
-	m_memoryUsage -= dataSize;
+	FireUnloadedEvent(p_resourceDesc->id, path);
 }
 
 PrCore::Resources::ResourceDescPtr ResourceDatabase::ResourceByID(ResourceID p_id)
