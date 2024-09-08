@@ -2,7 +2,7 @@
 
 #include "IResource.h"
 #include "IResourceDataLoader.h"
-#include "ResourceDatabase.h"
+#include "IResourceDatabase.h"
 
 namespace PrCore::Resources {
 
@@ -11,7 +11,7 @@ namespace PrCore::Resources {
 		ResourceSystem() = default;
 
 		//-----------------------------------------------------------------------------
-		// Loads IResource into memory, only file originated resource can be loaded
+		// Loads Resource into memory, only file originated resource can be loaded
 		// Resources created manually in code should be Registered with IResourceDataPtr only
 		// Pass p_loader when want to load resource differently. This loader is bound to the resource Id until it is Removed from the database.
 		template<class T>
@@ -26,7 +26,7 @@ namespace PrCore::Resources {
 
 
 		//-----------------------------------------------------------------------------
-		// Unloads IResource from memory, only file originated resource can be unloaded. Resource can be loaded later
+		// Unloads Resource from memory, only file originated resource can be unloaded. Resource can be loaded later
 		// Unloads with default extension loader or uses custom loader pass during loading
 		// Resources created manually in code cannot be unloaded and should be removed
 		template<class T>
@@ -55,7 +55,7 @@ namespace PrCore::Resources {
 
 
 		//-----------------------------------------------------------------------------
-		// Gets the ResourceDescriptor, it is a copy so it will not be updated if the Resource status changes.
+		// Gets the ResourceMetadata
 		// Use to check resource metadata without fetching the ptr.
 		template<class T>
 		Resourcev2<T> GetMetadata(ResourceID p_id);
@@ -139,7 +139,7 @@ namespace PrCore::Resources {
 		//-----------------------------------------------------------------------------
 		//Registers the resource database associated with the IResourceData type.
 		template<class T>
-		void RegisterDatabase(std::unique_ptr<ResourceDatabase> p_database);
+		void RegisterDatabase(std::unique_ptr<IResourceDatabase> p_database);
 
 		template<class T>
 		void UnregisterDatabase();
@@ -149,9 +149,9 @@ namespace PrCore::Resources {
 
 	private:
 		template<class T>
-		std::unique_ptr<ResourceDatabase>& GetResourceDatabase();
+		std::unique_ptr<IResourceDatabase>& GetResourceDatabase();
 
-		using ResourceDatabaseTypeMap = std::map<size_t, std::unique_ptr<ResourceDatabase>>;
+		using ResourceDatabaseTypeMap = std::map<size_t, std::unique_ptr<IResourceDatabase>>;
 
 		ResourceDatabaseTypeMap m_resourceDatabaseTypes;
 	};

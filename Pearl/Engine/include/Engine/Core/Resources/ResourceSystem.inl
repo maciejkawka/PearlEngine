@@ -158,7 +158,7 @@ namespace PrCore::Resources {
 	}
 
 	template<class T>
-	std::unique_ptr<ResourceDatabase>& ResourceSystem::GetResourceDatabase()
+	std::unique_ptr<IResourceDatabase>& ResourceSystem::GetResourceDatabase()
 	{
 		auto database = m_resourceDatabaseTypes.find(typeid(T).hash_code());
 		PR_ASSERT(database != m_resourceDatabaseTypes.end(), "Resource database is not registered.");
@@ -167,7 +167,7 @@ namespace PrCore::Resources {
 	}
 
 	template<class T>
-	void ResourceSystem::RegisterDatabase(std::unique_ptr<ResourceDatabase> p_database)
+	void ResourceSystem::RegisterDatabase(std::unique_ptr<IResourceDatabase> p_database)
 	{
 		auto databaseIt = m_resourceDatabaseTypes.find(typeid(T).hash_code());
 		PR_ASSERT(databaseIt != m_resourceDatabaseTypes.end(), "Database already registered.");
