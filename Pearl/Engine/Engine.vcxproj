@@ -93,6 +93,10 @@
     <ClInclude Include="include\Engine\Renderer\Core\RenderSystem.h" />
     <ClInclude Include="include\Engine\Renderer\Core\RenderTypes.h" />
     <ClInclude Include="include\Engine\Renderer\Core\RenderObjectBuffer.h" />
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLCubemapv2.h" />
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLTexture2Dv2.h" />
+    <ClInclude Include="include\Engine\Renderer\Resources\CubemapLoader.h" />
+    <ClInclude Include="include\Engine\Renderer\Resources\Cubemapv2.h" />
     <ClInclude Include="include\Engine\Renderer\Resources\Light.h" />
     <ClInclude Include="include\Engine\Renderer\Core\LowRenderer.h" />
     <ClInclude Include="include\Engine\Renderer\Core\MeshRenderObject.h" />
@@ -118,7 +122,10 @@
     <ClInclude Include="include\Engine\Renderer\Resources\ShaderManager.h" />
     <ClInclude Include="include\Engine\Renderer\Resources\Texture.h" />
     <ClInclude Include="include\Engine\Renderer\Resources\Texture2D.h" />
+    <ClInclude Include="include\Engine\Renderer\Resources\Texture2DLoader.h" />
+    <ClInclude Include="include\Engine\Renderer\Resources\Texture2Dv2.h" />
     <ClInclude Include="include\Engine\Renderer\Resources\TextureManager.h" />
+    <ClInclude Include="include\Engine\Renderer\Resources\Texturev2.h" />
     <ClInclude Include="include\Engine\Renderer\Resources\Uniform.h" />
     <ClInclude Include="include\Engine\Renderer\Core\RenderCommand.h" />
   </ItemGroup>
@@ -169,6 +176,10 @@
     <ClCompile Include="src\Renderer\Core\Color.cpp" />
     <ClCompile Include="src\Renderer\Core\DeferRenderFrontend.cpp" />
     <ClCompile Include="src\Renderer\Core\DeferRenderBackend.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL\GLTexture2Dv2.cpp" />
+    <ClCompile Include="src\Renderer\Resources\CubemapLoader.cpp" />
+    <ClCompile Include="src\Renderer\Resources\Cubemapv2.cpp" />
+    <ClCompile Include="src\Renderer\Resources\GLCubemapv2.cpp" />
     <ClCompile Include="src\Renderer\Resources\Light.cpp" />
     <ClCompile Include="src\Renderer\Core\LowRenderer.cpp" />
     <ClCompile Include="src\Renderer\Core\RenderTypes.cpp" />
@@ -193,6 +204,8 @@
     <ClCompile Include="src\Renderer\Resources\ShaderManager.cpp" />
     <ClCompile Include="src\Renderer\Resources\Texture.cpp" />
     <ClCompile Include="src\Renderer\Resources\Texture2D.cpp" />
+    <ClCompile Include="src\Renderer\Resources\Texture2DLoader.cpp" />
+    <ClCompile Include="src\Renderer\Resources\Texture2Dv2.cpp" />
     <ClCompile Include="src\Renderer\Resources\TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>

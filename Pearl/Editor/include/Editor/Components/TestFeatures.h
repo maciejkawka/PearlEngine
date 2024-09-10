@@ -1,6 +1,7 @@
 #pragma once
 
-#include"Renderer/Core/Renderer3D.h"
+#include"Renderer/Resources/Mesh.h"
+//#include"Renderer/Core/Renderer3D.h"
 
 namespace PrEditor::Components {
 
