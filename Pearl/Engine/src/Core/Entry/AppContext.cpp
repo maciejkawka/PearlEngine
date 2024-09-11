@@ -7,6 +7,7 @@
 #include"Core/Filesystem/FileSystem.h"
 #include"Core/Filesystem/ConfigFile.h"
 #include"Core/Resources/ResourceLoader.h"
+#include"Core/Resources/ResourceSystem.h"
 #include"Core/ECS/SceneManager.h"
 
 #include"Renderer/OpenGL/GLContext.h"
@@ -27,6 +28,7 @@ PrCore::Entry::AppContext::AppContext()
 	Events::EventManager::Init();
 
 	Resources::ResourceLoader::Init();
+	Resources::ResourceSystem::Init();
 
 	Filesystem::ConfigFile contexConfig(GraphicConfig.data());
 	Windowing::WindowContext context;
@@ -138,6 +140,7 @@ PrCore::Entry::AppContext::~AppContext()
 	delete m_rendererContext;
 	delete m_window;
 	Windowing::GLWindow::TerminateDevice();
+	Resources::ResourceSystem::Terminate();
 	Resources::ResourceLoader::Terminate();
 	Events::EventManager::Terminate();
 	Filesystem::FileSystem::Terminate();

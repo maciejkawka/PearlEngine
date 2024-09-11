@@ -387,7 +387,7 @@
     <ClInclude Include="include\Engine\Core\Resources\IResourceDatabase.h">
       <Filter>Core\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\CubemapLoader.h">
+    <ClInclude Include="include\Engine\Renderer\Resources\BasicCubemapLoader.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Resources\Cubemapv2.h">
@@ -430,6 +430,9 @@
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Resources\MaterialLoader.h">
+      <Filter>Renderer\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Renderer\Resources\HdrCubemapLoader.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
   </ItemGroup>
@@ -632,7 +635,7 @@
     <ClCompile Include="src\Core\Resources\ResourceSystem.cpp">
       <Filter>Core\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\CubemapLoader.cpp">
+    <ClCompile Include="src\Renderer\Resources\BasicCubemapLoader.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Resources\Cubemapv2.cpp">
@@ -672,6 +675,9 @@
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Resources\MaterialLoader.cpp">
+      <Filter>Renderer\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Resources\HdrCubemapLoader.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
   </ItemGroup>

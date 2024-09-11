@@ -7,7 +7,6 @@
 
 #include"Core/Filesystem/FileSystem.h"
 
-#define TINYOBJLOADER_IMPLEMENTATION
 #include"tinyObj/tiny_obj_loader.h"
 
 using namespace PrRenderer::OpenGL;

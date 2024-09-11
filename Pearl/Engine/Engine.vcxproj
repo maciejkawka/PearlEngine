@@ -97,8 +97,9 @@
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLMeshv2.h" />
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLShaderv2.h" />
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLTexture2Dv2.h" />
-    <ClInclude Include="include\Engine\Renderer\Resources\CubemapLoader.h" />
+    <ClInclude Include="include\Engine\Renderer\Resources\BasicCubemapLoader.h" />
     <ClInclude Include="include\Engine\Renderer\Resources\Cubemapv2.h" />
+    <ClInclude Include="include\Engine\Renderer\Resources\HdrCubemapLoader.h" />
     <ClInclude Include="include\Engine\Renderer\Resources\Light.h" />
     <ClInclude Include="include\Engine\Renderer\Core\LowRenderer.h" />
     <ClInclude Include="include\Engine\Renderer\Core\MeshRenderObject.h" />
@@ -187,9 +188,10 @@
     <ClCompile Include="src\Renderer\OpenGL\GLMeshv2.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\GLShaderv2.cpp" />
     <ClCompile Include="src\Renderer\OpenGL\GLTexture2Dv2.cpp" />
-    <ClCompile Include="src\Renderer\Resources\CubemapLoader.cpp" />
+    <ClCompile Include="src\Renderer\Resources\BasicCubemapLoader.cpp" />
     <ClCompile Include="src\Renderer\Resources\Cubemapv2.cpp" />
     <ClCompile Include="src\Renderer\Resources\GLCubemapv2.cpp" />
+    <ClCompile Include="src\Renderer\Resources\HdrCubemapLoader.cpp" />
     <ClCompile Include="src\Renderer\Resources\Light.cpp" />
     <ClCompile Include="src\Renderer\Core\LowRenderer.cpp" />
     <ClCompile Include="src\Renderer\Core\RenderTypes.cpp" />

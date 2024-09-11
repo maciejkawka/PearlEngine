@@ -209,3 +209,52 @@ bool Meshv2::ValidateBuffers()
 
 	return true;
 }
+
+PrRenderer::Resources::Meshv2Ptr Meshv2::CreatePrimitive(PrimitiveType p_primitiveType)
+{
+	/*switch (p_primitiveType)
+	{
+	case Cube:
+	{
+		static Meshv2Ptr mesh = CreateCube();
+		return mesh;
+	}
+	case Sphere:
+	{
+		static Meshv2Ptr mesh = CreateSphere();
+		return mesh;
+	}
+	case Capsule:
+	{
+		static Meshv2Ptr mesh = CreateCapsule();
+		return mesh;
+	}
+	case Cylinder:
+	{
+		static Meshv2Ptr mesh = CreateCylinder();
+		return mesh;
+	}
+	case Plane:
+	{
+		static Meshv2Ptr mesh = CreatePlane();
+		return mesh;
+	}
+	case Quad:
+	{
+		static Meshv2Ptr mesh = CreateQuad();
+		return mesh;
+	}
+	case Line:
+	{
+		static Meshv2Ptr mesh = CreateLine();
+		return mesh;
+	}
+	default:
+	{
+		PR_ASSERT(false);
+		return nullptr;
+	}
+	}*/
+
+	return nullptr;
+}

@@ -23,6 +23,23 @@ std::shared_ptr<Cubemapv2> Cubemapv2::Create()
 	return texture;
 }
 
+std::shared_ptr<PrRenderer::Resources::Cubemapv2> Cubemapv2::Create(RendererID p_id, size_t p_width, size_t p_height, Resources::TextureFormat p_format)
+{
+	Cubemapv2Ptr texture;
+	switch (Core::RendererAPI::GetGraphicsAPI())
+	{
+	case Core::GraphicsAPI::OpenGL: texture = std::make_shared<OpenGL::GLCubemapv2>(p_id, p_width, p_height, p_format); break;
+
+	default:
+	{
+		PRLOG_ERROR("No such Graphics API");
+		break;
+	}
+	}
+
+	return texture;
+}
+
 std::shared_ptr<Cubemapv2> Cubemapv2::CreateUnitTex(const Core::Color& p_unitColor)
 {
 	// Create empty texture and fills it with unit data

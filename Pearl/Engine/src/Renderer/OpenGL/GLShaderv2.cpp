@@ -275,6 +275,8 @@ bool GLShaderv2::Compile()
 	glDeleteShader(fragmentShader);
 	glDeleteShader(geometryShader);
 
+	ScanUniforms();
+
 	return true;
 }
 

@@ -62,9 +62,10 @@ namespace PrRenderer::Resources {
 
 		// Factories
 		static Meshv2Ptr Create();
+
 		// Returns a shared primitive, do not edit the vertices
 		// Copy the mesh first in order edit
-		//static MeshPtr CreatePrimitive(PrimitiveType p_primitiveType);
+		static Meshv2Ptr CreatePrimitive(PrimitiveType p_primitiveType);
 
 	protected:
 		std::vector<PrCore::Math::vec4> CalculateTangents();

@@ -14,8 +14,15 @@ namespace PrRenderer::Resources {
 			m_wrapR(TextureWrapMode::Clamp)
 		{}
 
+		Cubemapv2(RendererID p_id, size_t p_width, size_t p_height, Resources::TextureFormat p_format):
+			Texture2Dv2(),
+			m_rawDataArray(nullptr),
+			m_wrapR(TextureWrapMode::Clamp)
+		{}
+
 		// Texture factories
 		static std::shared_ptr<Cubemapv2> Create();
+		static std::shared_ptr<Cubemapv2> Create(RendererID p_id, size_t p_width, size_t p_height, Resources::TextureFormat p_format);
 		static std::shared_ptr<Cubemapv2> CreateUnitTex(const Core::Color& p_unitColor);
 
 		virtual void SetWrapModeR(TextureWrapMode p_wrapR) { m_wrapR = p_wrapR; }

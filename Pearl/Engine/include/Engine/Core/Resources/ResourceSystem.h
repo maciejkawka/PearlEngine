@@ -4,9 +4,11 @@
 #include "IResourceDataLoader.h"
 #include "IResourceDatabase.h"
 
+#include "Core/Utils/Singleton.h"
+
 namespace PrCore::Resources {
 
-	class ResourceSystem {
+	class ResourceSystem: public Utils::Singleton<ResourceSystem> {
 	public:
 		ResourceSystem() = default;
 
