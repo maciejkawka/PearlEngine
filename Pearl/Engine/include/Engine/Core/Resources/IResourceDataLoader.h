@@ -1,5 +1,6 @@
 #pragma once
-#include "IResource.h"
+#include "Core/Resources/IResource.h"
+
 
 namespace PrCore::Resources {
 
