@@ -1,4 +1,5 @@
 #pragma once
+
 #include"Core/Resources/IResource.h"
 
 #include"Renderer/Core/Defines.h"
@@ -86,6 +87,8 @@ namespace PrRenderer::Resources {
 
 		const float m_materialVersion = 0.1f;
 	};
+
+	REGISTRER_RESOURCE_HANDLE(Materialv2);
 	typedef std::shared_ptr<Materialv2> Materialv2Ptr;
 
 

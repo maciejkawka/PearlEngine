@@ -159,7 +159,7 @@ PrCore::Resources::IResourceDataPtr MeshOBJLoader::LoadResource(const std::strin
 
 	if (!mesh->ValidateBuffers())
 	{
-		PRLOG_ERROR("Renderer: Mesh {0} invalid", m_name);
+		PRLOG_ERROR("Renderer: Mesh {0} invalid", mesh->GetName());
 		return nullptr;
 	}
 

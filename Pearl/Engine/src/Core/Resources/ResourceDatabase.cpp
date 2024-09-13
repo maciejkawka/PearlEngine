@@ -70,12 +70,12 @@ void ResourceDatabase::Unload(const std::string& p_path)
 
 	if (resourceDesc->origin != ResourceOrigin::File)
 	{
-		PRLOG_WARN("Cannot unload resource with ID {0}, path {1}. Only file resources can be loaded and unloaded. Use ResourceDatabase::Remove() to delete the memory resource.", p_id, p_path);
+		PRLOG_WARN("Cannot unload resource with ID {0}, path {1}. Only file resources can be loaded and unloaded. Use ResourceDatabase::Remove() to delete the memory resource.", resourceDesc->id, resourceDesc->filePath);
 		return;
 	}
 
 	if (resourceDesc->state == ResourceState::Corrupted)
-		PRLOG_WARN("Cannot unload resource with ID {0} path {1}. Resource is corrupted.", p_id, resourceDesc->filePath);
+		PRLOG_WARN("Cannot unload resource with ID {0} path {1}. Resource is corrupted.", resourceDesc->id, resourceDesc->filePath);
 
 	if (resourceDesc->state == ResourceState::Loaded)
 		UnloadResourcePrivate(resourceDesc);
@@ -266,7 +266,7 @@ bool PrCore::Resources::ResourceDatabase::LoadResourcePrivate(const ResourceDesc
 
 	if (resourceData == nullptr)
 	{
-		PRLOG_WARN("Cannot load resource path: {0} with ID {1}", path, path, p_resourceDesc->GetID());
+		PRLOG_WARN("Cannot load resource path: {0} with ID {1}", path, p_resourceDesc->id);
 		FireCorruptedEvent(p_resourceDesc->id, path);
 
 		p_resourceDesc->data = nullptr;
@@ -277,12 +277,15 @@ bool PrCore::Resources::ResourceDatabase::LoadResourcePrivate(const ResourceDesc
 		return false;
 	}
 
+	// Set resource data name for logging purpose
+	resourceData->SetName(path);
+
 	p_resourceDesc->data = resourceData;
 	p_resourceDesc->size = resourceData->GetByteSize();
 	p_resourceDesc->state = ResourceState::Loaded;
 	p_resourceDesc->origin = ResourceOrigin::File;
 
-	PRLOG_INFO("Loaded resource path: {0} with UUID {1}", path, p_resourceDesc->GetID());
+	PRLOG_INFO("Loaded resource path: {0} with UUID {1}", path, p_resourceDesc->id);
 	FireLoadedEvent(p_resourceDesc->id, p_resourceDesc->filePath);
 	
 	m_memoryUsage += p_resourceDesc->size;
@@ -464,7 +467,7 @@ void PrCore::Resources::ResourceDatabase::UnloadResourcePrivate(const ResourceDe
 	p_resourceDesc->size = 0;
 	p_resourceDesc->state = ResourceState::Unloaded;
 
-	PRLOG_INFO("Unloaded resource path: {0} with UUID {1}", path, p_resourceDesc->GetID());
+	PRLOG_INFO("Unloaded resource path: {0} with UUID {1}", path, p_resourceDesc->id);
 	FireUnloadedEvent(p_resourceDesc->id, path);
 }
 
@@ -490,35 +493,35 @@ PrCore::Resources::ResourceDescPtr ResourceDatabase::ResourceByPath(const std::s
 
 void ResourceDatabase::FireBudgetExceeded(ResourceID p_id, const std::string& p_path, size_t p_usage, size_t p_budget)
 {
-	//Events::EventPtr event =
-	//	std::make_shared<Events::BudgetExceededv2>(p_id, p_path, p_usage, p_budget);
-	//Events::EventManager::GetInstance().QueueEvent(event);
+	Events::EventPtr event =
+		std::make_shared<Events::BudgetExceededv2>(p_id, p_path, p_usage, p_budget);
+	Events::EventManager::GetInstance().QueueEvent(event);
 }
 
 void ResourceDatabase::FireCacheMiss(ResourceID p_id, const std::string& p_path)
 {
-	//Events::EventPtr event =
-	//	std::make_shared<Events::CacheMissEventv2>(p_id, p_path);
-	//Events::EventManager::GetInstance().QueueEvent(event);
+	Events::EventPtr event =
+		std::make_shared<Events::CacheMissEventv2>(p_id, p_path);
+	Events::EventManager::GetInstance().QueueEvent(event);
 }
 
 void ResourceDatabase::FireCorruptedEvent(ResourceID p_id, const std::string& p_path)
 {
-	//Events::EventPtr event =
-	//	std::make_shared<Events::ResourceCorruptedEventv2>(p_id, p_path);
-	//Events::EventManager::GetInstance().QueueEvent(event);
+	Events::EventPtr event =
+		std::make_shared<Events::ResourceCorruptedEventv2>(p_id, p_path);
+	Events::EventManager::GetInstance().QueueEvent(event);
 }
 
 void ResourceDatabase::FireLoadedEvent(ResourceID p_id, const std::string& p_path)
 {
-	//Events::EventPtr event =
-	//	std::make_shared<Events::ResourceLoadedEventv2>(p_id, p_path);
-	//Events::EventManager::GetInstance().QueueEvent(event);
+	Events::EventPtr event =
+		std::make_shared<Events::ResourceLoadedEventv2>(p_id, p_path);
+	Events::EventManager::GetInstance().QueueEvent(event);
 }
 
 void ResourceDatabase::FireUnloadedEvent(ResourceID p_id, const std::string& p_path)
 {
-	//Events::EventPtr event =
-	//	std::make_shared<Events::ResourceUnloadedEventv2>(p_id, p_path);
-	//Events::EventManager::GetInstance().QueueEvent(event);
+	Events::EventPtr event =
+		std::make_shared<Events::ResourceUnloadedEventv2>(p_id, p_path);
+	Events::EventManager::GetInstance().QueueEvent(event);
 }

@@ -10,5 +10,7 @@ namespace PrRenderer::Resources {
 		static std::shared_ptr<Texture2Dv2> Create();
 		static std::shared_ptr<Texture2Dv2> CreateUnitTex(const Core::Color& p_unitColor);
 	};
+
+	REGISTRER_RESOURCE_HANDLE(Texture2Dv2);
 	using Texture2Dv2Ptr = std::shared_ptr<Texture2Dv2>;
 }

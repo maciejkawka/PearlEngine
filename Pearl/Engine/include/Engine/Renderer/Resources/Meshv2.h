@@ -100,4 +100,6 @@ namespace PrRenderer::Resources {
 		//static MeshPtr CreateQuad();
 		//static MeshPtr CreateLine();
 	};
+
+	REGISTRER_RESOURCE_HANDLE(Meshv2);
 }

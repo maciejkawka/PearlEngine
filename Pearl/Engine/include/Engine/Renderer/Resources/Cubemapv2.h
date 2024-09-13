@@ -34,5 +34,7 @@ namespace PrRenderer::Resources {
 		void** m_rawDataArray;
 		TextureWrapMode m_wrapR;
 	};
+
+	REGISTRER_RESOURCE_HANDLE(Cubemapv2);
 	using Cubemapv2Ptr = std::shared_ptr<Cubemapv2>;
 }

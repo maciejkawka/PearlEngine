@@ -194,7 +194,7 @@ bool GLShaderv2::Compile()
 {
 	if (m_ID != 0)
 	{
-		PRLOG_WARN("Shader already compiled! Shader ID {0}" m_ID);
+		PRLOG_WARN("Shader already compiled! Shader ID {0}", m_ID);
 		return true;
 	}
 

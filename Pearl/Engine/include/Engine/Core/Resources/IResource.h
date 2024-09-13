@@ -50,6 +50,14 @@ namespace PrCore::Resources {
 
 		// Return size of loaded resource this should update during asset manipulations and calculate current size.
 		virtual size_t GetByteSize() const = 0;
+
+		// These functions allow adding resource name. It is used for only logging and debug purpose.
+		// Name is automatically set by the IResourceDatabase but you can set your custom name too.
+		const std::string& GetName() const { return m_name; }
+		void               SetName(const std::string& p_name) { m_name = p_name; }
+		
+	protected:
+		std::string m_name;
 	};
 	using IResourceDataPtr = std::shared_ptr<IResourceData>;
 
@@ -105,12 +113,18 @@ namespace PrCore::Resources {
 		size_t              GetSize() const { return m_resourceDesc->size; }
 		std::shared_ptr<T>  GetData() { return std::static_pointer_cast<T>(m_resourceDesc->data); }
 
+		// Proxy functions to access IResourceData directly
+		// Use these functions instead of GetData()
+		std::shared_ptr<T> operator->() { return GetData(); }
+		bool               operator==(const IResourceDataPtr& p_ptr) const { return std::static_pointer_cast<const T>(m_resourceDesc->data) == p_ptr; }
+		bool               operator!=(const IResourceDataPtr& p_ptr) const { return std::static_pointer_cast<const T>(m_resourceDesc->data) != p_ptr; }
+
 	protected:
 		const ResourceDescPtr m_resourceDesc;
 	};
 
-#define REGISTRER_RESOURCE_TYPE(ResourceName) \
-	using ResourceName ## Handle = Resourcev2<ResourceName>
+#define REGISTRER_RESOURCE_HANDLE(ResourceName) \
+	using ResourceName ## Handle = PrCore::Resources::Resourcev2<ResourceName>
 
 	// Example usage
 	//

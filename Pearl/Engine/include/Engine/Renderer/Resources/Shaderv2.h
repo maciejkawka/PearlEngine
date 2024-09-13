@@ -72,5 +72,7 @@ namespace PrRenderer::Resources {
 		std::string m_geometryShader;
 		std::string m_fragmentShader;
 	};
+
+	REGISTRER_RESOURCE_HANDLE(Shaderv2);
 	using Shaderv2Ptr = std::shared_ptr<Shaderv2>;
 }
