@@ -75,6 +75,15 @@ namespace PrCore::Resources {
 			size(0)
 		{}
 
+		ResourceDesc(IResourceDataPtr p_data) :
+			data(p_data),
+			id(InvalidID),
+			filePath(""),
+			state(ResourceState::Unmanaged),
+			origin(ResourceOrigin::Memory),
+			size(0)
+		{}
+
 		// Resource data 
 		IResourceDataPtr data;
 
@@ -97,14 +106,66 @@ namespace PrCore::Resources {
 	using ResourceDescPtr = std::shared_ptr<ResourceDesc>;
 	using ResourceDescConstPtr = std::shared_ptr<const ResourceDesc>;
 
-	// Resource descriptor wrapper that automatically deduces the GetData type
-	// It is main resource access object
+	// Resource descriptor proxy that automatically deduces the GetData type
+	// It is main resource access object 
+	// Manually created resources should also be assigned to this object
 	template<class T>
 	class Resourcev2 final {
 	public:
+		Resourcev2() :
+			m_resourceDesc(nullptr)
+		{}
+
+		Resourcev2(const Resourcev2<T>& p_ref) :
+			m_resourceDesc(p_ref.m_resourceDesc)
+		{}
+
+		Resourcev2(Resourcev2<T>&& p_ref) :
+			m_resourceDesc(p_ref.m_resourceDesc)
+		{}
+
 		Resourcev2(const ResourceDescPtr& p_resourceDesc) :
 			m_resourceDesc(p_resourceDesc)
 		{}
+
+		// Create ResourceHandle from the stack allocated ResourceDesc
+		Resourcev2(const ResourceDesc& p_resourceDesc) :
+			m_resourceDesc(std::make_shared<ResourceDesc>(p_resourceDesc))
+		{}
+
+		// Create ResourceHandle from the stack allocated ResourceDesc 
+		Resourcev2(ResourceDesc&& p_resourceDesc) :
+			m_resourceDesc(std::make_shared<ResourceDesc>(std::move(p_resourceDesc)))
+		{}
+
+		// Create ResourceHandle from resource data 
+		// Useful when creating resource data manually and want to wrap with the handler
+		// IMPORTANT! This constructor is implicit
+		Resourcev2(std::shared_ptr<T> p_dataPtr)
+		{
+			m_resourceDesc = std::make_shared<ResourceDesc>(p_dataPtr);
+		}
+
+		// Assign operators
+		Resourcev2<T>& operator=(const Resourcev2<T>& p_ref)
+		{
+			if (this != &p_ref)
+			{
+				m_resourceDesc = p_ref.m_resourceDesc;
+			}
+
+			return *this;
+		}
+
+		Resourcev2<T>& operator=(Resourcev2<T>&& p_ref) noexcept
+		{
+			if (this != &p_ref)
+			{
+				m_resourceDesc = std::move(p_ref.m_resourceDesc);
+			}
+
+			return *this;
+		}
 
 		ResourceID          GetID() const { return m_resourceDesc->id; }
 		const std::string&  GetPath() const { return m_resourceDesc->filePath; }
@@ -116,11 +177,11 @@ namespace PrCore::Resources {
 		// Proxy functions to access IResourceData directly
 		// Use these functions instead of GetData()
 		std::shared_ptr<T> operator->() { return GetData(); }
-		bool               operator==(const IResourceDataPtr& p_ptr) const { return std::static_pointer_cast<const T>(m_resourceDesc->data) == p_ptr; }
-		bool               operator!=(const IResourceDataPtr& p_ptr) const { return std::static_pointer_cast<const T>(m_resourceDesc->data) != p_ptr; }
+		bool               operator==(const IResourceDataPtr& p_ptr) const { return m_resourceDesc != nullptr && std::static_pointer_cast<const T>(m_resourceDesc->data) == p_ptr; }
+		bool               operator!=(const IResourceDataPtr& p_ptr) const { return m_resourceDesc != nullptr && std::static_pointer_cast<const T>(m_resourceDesc->data) != p_ptr; }
 
 	protected:
-		const ResourceDescPtr m_resourceDesc;
+		ResourceDescPtr m_resourceDesc;
 	};
 
 #define REGISTRER_RESOURCE_HANDLE(ResourceName) \

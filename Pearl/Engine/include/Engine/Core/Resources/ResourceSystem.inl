@@ -92,7 +92,15 @@ namespace PrCore::Resources {
 	bool ResourceSystem::Remove(ResourceID p_id)
 	{
 		static_assert(std::is_base_of<IResourceData, T>::value, "T has to be base of IResourceData.");
-		 return GetResourceDatabase<T>()->Remove(p_id);
+		return GetResourceDatabase<T>()->Remove(p_id);
+	}
+
+	template<class T>
+	bool ResourceSystem::Remove(const std::string& p_path)
+	{
+		static_assert(std::is_base_of<IResourceData, T>::value, "T has to be base of IResourceData.");
+		ResourceID id = GetResourceDatabase<T>()->GetMetadata(p_path)->id;
+		return GetResourceDatabase<T>()->Remove(id);
 	}
 
 	template<class T>
@@ -187,7 +195,7 @@ namespace PrCore::Resources {
 	{
 		static_assert(std::is_base_of<IResourceData, T>::value, "T has to be base of IResourceData.");
 		auto database = m_resourceDatabaseTypes.find(typeid(T).hash_code());
-		PR_ASSERT(database != m_resourceDatabaseTypes.end(), "Resource database is not registered.");
+		PR_ASSERT(database != m_resourceDatabaseTypes.end(), "Resource database is not registered. Resource Type: " + std::string(typeid(T).name()));
 		
 		return database->second;
 	}
@@ -197,7 +205,7 @@ namespace PrCore::Resources {
 	{
 		static_assert(std::is_base_of<IResourceData, T>::value, "T has to be base of IResourceData.");
 		auto databaseIt = m_resourceDatabaseTypes.find(typeid(T).hash_code());
-		PR_ASSERT(databaseIt == m_resourceDatabaseTypes.end(), "Database already registered.");
+		PR_ASSERT(databaseIt == m_resourceDatabaseTypes.end(), "Database already registered. Resource Type: " + std::string(typeid(T).name()));
 
 		m_resourceDatabaseTypes.insert({ typeid(T).hash_code(), std::move(p_database) });
 	}
@@ -207,7 +215,7 @@ namespace PrCore::Resources {
 	{
 		static_assert(std::is_base_of<IResourceData, T>::value, "T has to be base of IResourceData.");
 		auto databaseIt = m_resourceDatabaseTypes.find(typeid(T).hash_code());
-		PR_ASSERT(databaseIt != m_resourceDatabaseTypes.end(), "Database is not registered.");
+		PR_ASSERT(databaseIt != m_resourceDatabaseTypes.end(), "Database is not registered. Resource Type: " + std::string(typeid(T).name()));
 
 		m_resourceDatabaseTypes.erase(databaseIt);
 	}

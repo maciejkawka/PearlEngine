@@ -85,6 +85,9 @@ namespace PrCore::Resources {
 		bool Remove(ResourceID p_id);
 
 		template<class T>
+		bool Remove(const std::string& p_path);
+
+		template<class T>
 		void RemoveAll();
 
 
