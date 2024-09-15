@@ -3,7 +3,7 @@
 
 #include "Core/Events/WindowEvents.h"
 #include "Renderer/Core/LowRenderer.h"
-#include "Core/Resources/ResourceLoader.h"
+#include "Core/Resources/ResourceSystem.h"
 #include "Core/Windowing/Window.h"
 #include <Core/Events/EventManager.h>
 #include <random>
@@ -17,16 +17,16 @@ namespace PrRenderer::Core
 		IRenderBackend(p_settings)
 	{
 		//Prepare shaders
-		m_shadowMappingShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Shadows/ShadowMapping.shader");
-		m_ToneMappingShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/RenderFront.shader");
-		m_pbrLightShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/lightPass.shader");
-		m_pointshadowMappingShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Shadows/PointShadowMapping.shader");
-		m_SSAOShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/SSAO.shader");
-		m_SSAOBlurShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/SSAO_Blur.shader");
-		m_FXAAShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/FXAA.shader");
-		m_fogShdr = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/Fog.shader");
-		m_downsample = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/downsample.shader");
-		m_upsample = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("Deferred/upsample.shader");
+		m_shadowMappingShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Shadows/ShadowMapping.shader");
+		m_ToneMappingShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Deferred/RenderFront.shader");
+		m_pbrLightShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Deferred/lightPass.shader");
+		m_pointshadowMappingShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Shadows/PointShadowMapping.shader");
+		m_SSAOShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Deferred/SSAO.shader");
+		m_SSAOBlurShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Deferred/SSAO_Blur.shader");
+		m_FXAAShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Deferred/FXAA.shader");
+		m_fogShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Deferred/Fog.shader");
+		m_downsample = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Deferred/downsample.shader");
+		m_upsample = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Deferred/upsample.shader");
 
 		m_renderContext.quadMesh = Resources::Mesh::CreatePrimitive(Resources::Quad);
 		m_renderContext.settings = m_settings;
@@ -126,7 +126,7 @@ namespace PrRenderer::Core
 				mainLight->viewMatrices.push_back(lightMat);
 
 				PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-				PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr, lightMat, m_frame->mainDirectLight, &m_frame->shadowCasters, &m_renderContext));
+				PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr.GetData(), lightMat, m_frame->mainDirectLight, &m_frame->shadowCasters, &m_renderContext));
 			}
 
 			m_settings->cascadeShadowRadiusRatio[1] = m_settings->cascadeShadowRadiusRatio[0] / m_settings->cascadeShadowRadiusRatio[1];
@@ -160,7 +160,7 @@ namespace PrRenderer::Core
 				light->viewMatrices.push_back(lightMat);
 
 				PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-				PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr, lightMat, lightPtr, &m_frame->shadowCasters, &m_renderContext));
+				PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr.GetData(), lightMat, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 			}
 
 			m_settings->cascadeShadowRadiusRatio[1] = m_settings->cascadeShadowRadiusRatio[0] / m_settings->cascadeShadowRadiusRatio[1];
@@ -192,32 +192,32 @@ namespace PrRenderer::Core
 			auto lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(1.0f, 0.0f, 0.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
 			auto viewport = CalculateLightTexture(shadowMapPos + 0, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr.GetData(), lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(-1.0f, 0.0f, 0.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
 			viewport = CalculateLightTexture(shadowMapPos + 1, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr.GetData(), lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, 1.0f, 0.0), PrCore::Math::vec3(0.0f, 0.0f, 1.0f));
 			viewport = CalculateLightTexture(shadowMapPos + 2, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr.GetData(), lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, -1.0f, 0.0f), PrCore::Math::vec3(0.0f, 0.0f, -1.0f));
 			viewport = CalculateLightTexture(shadowMapPos + 3, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr.GetData(), lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, 0.0f, 1.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
 			viewport = CalculateLightTexture(shadowMapPos + 4, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr.GetData(), lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 
 			lightViewMatrix = PrCore::Math::lookAt(lightPos, lightPos + PrCore::Math::vec3(0.0f, 0.0f, -1.0f), PrCore::Math::vec3(0.0f, -1.0f, 0.0f));
 			viewport = CalculateLightTexture(shadowMapPos + 5, m_settings->pointLightShadowMapSize, m_settings->pointLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
+			PushCommand(CreateRC<RenderToPointShadowMapRC>(m_pointshadowMappingShdr.GetData(), lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 		}
 		
 
@@ -246,7 +246,7 @@ namespace PrRenderer::Core
 
 			auto viewport = CalculateLightTexture(light->shadowMapPos, m_settings->pointLightShadowMapSize, m_settings->spotLightCombineShadowMapSize);
 			PushCommand(CreateRC<LowRenderer::SetViewportRC>(viewport.x, viewport.y, viewport.z, viewport.w));
-			PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr, lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
+			PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr.GetData(), lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 		}
 
 		PushCommand(CreateRC<LowRenderer::SetViewportRC>(PrCore::Windowing::Window::GetMainWindow().GetWidth(),
@@ -293,10 +293,10 @@ namespace PrRenderer::Core
 
 		// SSAO
 		if(m_settings->enableSSAO)
-			PushCommand(CreateRC<RenderSSAORC>(m_SSAOShdr, m_SSAOBlurShdr, &m_renderContext));
+			PushCommand(CreateRC<RenderSSAORC>(m_SSAOShdr.GetData(), m_SSAOBlurShdr.GetData(), &m_renderContext));
 
 		// PBR Light Pass
-		PushCommand(CreateRC<RenderLightRC>(m_pbrLightShdr, m_frame->mainDirectLight, &m_frame->lights, &m_renderContext));
+		PushCommand(CreateRC<RenderLightRC>(m_pbrLightShdr.GetData(), m_frame->mainDirectLight, &m_frame->lights, &m_renderContext));
 
 		// Transparent Forward Pass
 		PushCommand(CreateRC<LambdaFunctionRC>([&]()
@@ -323,26 +323,26 @@ namespace PrRenderer::Core
 		if (m_settings->enableFog)
 		{
 			PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
-			PushCommand(CreateRC<RenderFogRC>(m_fogShdr, &m_renderContext));
+			PushCommand(CreateRC<RenderFogRC>(m_fogShdr.GetData(), &m_renderContext));
 		}
 
 		// Bloom
 		if(m_settings->enableBloom)
 		{
 			PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
-			PushCommand(CreateRC<RenderBloomRC>(m_downsample, m_upsample, &m_renderContext));
+			PushCommand(CreateRC<RenderBloomRC>(m_downsample.GetData(), m_upsample.GetData(), &m_renderContext));
 		}
 
 		// Tone Mapping
 		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
-		PushCommand(CreateRC<RenderToneMappingRC>(m_ToneMappingShdr, &m_renderContext));
+		PushCommand(CreateRC<RenderToneMappingRC>(m_ToneMappingShdr.GetData(), &m_renderContext));
 
 		//Render Debug
 		PushCommand(CreateRC<RenderDebugRC>(&m_frame->debugObjects, &m_renderContext));
 
 		// FXAA Anti-Aliasing and Render front
 		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
-		PushCommand(CreateRC<RenderFXAARC>(m_FXAAShdr, &m_renderContext));
+		PushCommand(CreateRC<RenderFXAARC>(m_FXAAShdr.GetData(), &m_renderContext));
 	}
 
 	void DeferRenderBackend::Render()
@@ -416,7 +416,7 @@ namespace PrRenderer::Core
 		mesh->Unbind();
 	}
 
-	void DeferRenderBackend::RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
+	void DeferRenderBackend::RenderToShadowMap(Resources::Shaderv2Ptr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
 	{
 		const auto frustrum = Frustrum(p_lightMatrix);
 		bool skipCulling = p_light->GetType() == Resources::LightType::Directional;
@@ -455,7 +455,7 @@ namespace PrRenderer::Core
 		p_shaderPtr->Unbind();
 	}
 
-	void DeferRenderBackend::RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightView, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
+	void DeferRenderBackend::RenderToPointShadowMap(Resources::Shaderv2Ptr p_pointShadowMapShader, PrCore::Math::mat4& p_lightView, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
 	{
 		const auto lightPos = p_light->GetPosition();
 		const auto frustrum = Frustrum(p_lightView);
@@ -541,7 +541,7 @@ namespace PrRenderer::Core
 		noiseTex->SetMagFiltering(Resources::TextureFiltering::Nearest);
 		noiseTex->SetMinFiltering(Resources::TextureFiltering::Nearest);
 		noiseTex->SetData(ssaoNoise.data());
-		noiseTex->IsMipMapped(false);
+		noiseTex->SetMipMap(false);
 		noiseTex->Apply();
 		m_renderContext.SSAONoiseTex = noiseTex;
 
@@ -756,7 +756,7 @@ namespace PrRenderer::Core
 		m_renderContext.shadowMapMainDirTex = m_renderContext.shadowMapMainDirBuff->GetDepthTexturePtr();
 	}
 
-	void DeferRenderBackend::RenderCubeMap(Resources::MaterialPtr p_material, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderCubeMap(Resources::Materialv2Ptr p_material, const RenderContext* p_renderContext)
 	{
 		LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::LessEqual);
 
@@ -773,7 +773,7 @@ namespace PrRenderer::Core
 		LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::Less);
 	}
 
-	void DeferRenderBackend::RenderToneMapping(Resources::ShaderPtr p_toneMapShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderToneMapping(Resources::Shaderv2Ptr p_toneMapShader, const RenderContext* p_renderContext)
 	{
 		LowRenderer::EnableDepth(false);
 		LowRenderer::EnableCullFace(false);
@@ -846,7 +846,7 @@ namespace PrRenderer::Core
 		material->Unbind();
 	}
 
-	void DeferRenderBackend::RenderSSAO(Resources::ShaderPtr p_SSAOShader, Resources::ShaderPtr p_BlurSSAOShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderSSAO(Resources::Shaderv2Ptr p_SSAOShader, Resources::Shaderv2Ptr p_BlurSSAOShader, const RenderContext* p_renderContext)
 	{
 		p_renderContext->SSAOBuff->Bind();
 		p_SSAOShader->Bind();
@@ -906,7 +906,7 @@ namespace PrRenderer::Core
 		p_renderContext->gBuffer.buffer->Unbind();
 	}
 
-	void DeferRenderBackend::RenderFXAA(Resources::ShaderPtr p_FXAAShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderFXAA(Resources::Shaderv2Ptr p_FXAAShader, const RenderContext* p_renderContext)
 	{
 		p_FXAAShader->Bind();
 
@@ -933,7 +933,7 @@ namespace PrRenderer::Core
 		p_FXAAShader->Unbind();
 	}
 
-	void DeferRenderBackend::RenderFog(Resources::ShaderPtr p_fogShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderFog(Resources::Shaderv2Ptr p_fogShader, const RenderContext* p_renderContext)
 	{
 		p_renderContext->otuputBuff->Bind();
 		p_fogShader->Bind();
@@ -960,7 +960,7 @@ namespace PrRenderer::Core
 		p_fogShader->Unbind();
 	}
 
-	void DeferRenderBackend::RenderBloom(Resources::ShaderPtr p_downsampleShader, Resources::ShaderPtr p_upsampleShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderBloom(Resources::Shaderv2Ptr p_downsampleShader, Resources::Shaderv2Ptr p_upsampleShader, const RenderContext* p_renderContext)
 	{
 		// downsample
 		float& threshold = p_renderContext->settings->bloomThreshold;
@@ -1073,7 +1073,7 @@ namespace PrRenderer::Core
 		p_renderContext->otuputBuff->Unbind();
 	}
 
-	void DeferRenderBackend::RenderLight(Resources::ShaderPtr p_lightShdr, DirLightObjectPtr p_mianDirectLight, std::vector<LightObjectPtr>* p_lights, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderLight(Resources::Shaderv2Ptr p_lightShdr, DirLightObjectPtr p_mianDirectLight, std::vector<LightObjectPtr>* p_lights, const RenderContext* p_renderContext)
 	{
 		p_renderContext->otuputBuff->Bind();
 
@@ -1231,7 +1231,7 @@ namespace PrRenderer::Core
 
 		auto framebuffer = Buffers::Framebufffer::Create(settings);
 
-		auto shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("IrradianceMap.shader");
+		auto shader = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("IrradianceMap.shader");
 		auto cube = Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
 		auto cubemap = m_frame->cubemapObject->material->GetTexture("skybox");
 
@@ -1270,7 +1270,7 @@ namespace PrRenderer::Core
 		cube->Unbind();
 		framebuffer->Unbind();
 
-		PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<Resources::Shader>("IrradianceMap.shader");
+		PrCore::Resources::ResourceSystem::GetInstance().Remove<Resources::Shader>("IrradianceMap.shader");
 	}
 
 	void DeferRenderBackend::GeneratePrefilterMap()
@@ -1291,7 +1291,7 @@ namespace PrRenderer::Core
 
 		auto framebuffer = Buffers::Framebufffer::Create(settings);
 
-		auto shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("prefilteredCube.shader");
+		auto shader = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("prefilteredCube.shader");
 		auto cube = Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
 		auto cubemap = m_frame->cubemapObject->material->GetTexture("skybox");
 
@@ -1335,7 +1335,7 @@ namespace PrRenderer::Core
 		cube->Unbind();
 		framebuffer->Unbind();
 
-		PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<Resources::Shader>(shader->GetName());
+		PrCore::Resources::ResourceSystem::GetInstance().Remove<Resources::Shader>(shader->GetName());
 	}
 
 	void DeferRenderBackend::GenerateLUTMap()
@@ -1352,7 +1352,7 @@ namespace PrRenderer::Core
 
 		auto framebuffer = Buffers::Framebufffer::Create(settings);
 
-		auto shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("LUTMap.shader");
+		auto shader = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("LUTMap.shader");
 		auto quad = Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Quad);
 
 		shader->Bind();
@@ -1368,7 +1368,7 @@ namespace PrRenderer::Core
 		quad->Unbind();
 		framebuffer->Unbind();
 
-		PrCore::Resources::ResourceLoader::GetInstance().DeleteResource<Resources::Shader>("LUTMap.shader");
+		PrCore::Resources::ResourceSystem::GetInstance().Remove<Resources::Shader>("LUTMap.shader");
 	}
 
 	PrCore::Math::vec4 DeferRenderBackend::CalculateLightTexture(size_t p_lightID, size_t p_lightMapSize, size_t p_comboMapSize)

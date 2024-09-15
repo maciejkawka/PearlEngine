@@ -3,10 +3,10 @@
 #include "Renderer/Resources/HdrCubemapLoader.h"
 
 #include "Core/Resources/ResourceSystem.h"
-#include "Renderer/Resources/Texture2Dv2.h"
-#include "Renderer/Resources/Cubemapv2.h"
-#include "Renderer/Resources/Shaderv2.h"
-#include "Renderer/Resources/Meshv2.h"
+#include "Renderer/Resources/Texture2D.h"
+#include "Renderer/Resources/Cubemap.h"
+#include "Renderer/Resources/Shader.h"
+#include "Renderer/Resources/Mesh.h"
 #include "Renderer/Buffers/Framebuffer.h"
 
 #include <Renderer/Core/LowRenderer.h>
@@ -14,18 +14,12 @@
 using namespace PrRenderer::Resources;
 using namespace PrCore::Resources;
 
-HdrCubemapLoader::HdrCubemapLoader()
-{
-	auto shader = ResourceSystem::GetInstance().Load<Shaderv2>("Cubemap/HDRToCubemap.shader");
-	m_shaderID = shader.GetID();
-}
-
 PrCore::Resources::IResourceDataPtr HdrCubemapLoader::LoadResource(const std::string& p_path)
 {
 	//Load HDR texture and shader
-	auto textureResource = ResourceSystem::GetInstance().Load<Texture2Dv2>(p_path);
+	auto textureResource = ResourceSystem::GetInstance().Load<Texture>(p_path);
 	auto texture = textureResource.GetData();
-	auto shader = ResourceSystem::GetInstance().Get<Shaderv2>("Cubemap/HDRToCubemap.shader").GetData();
+	auto shader = ResourceSystem::GetInstance().Load<Shader>("Cubemap/HDRToCubemap.shader").GetData();
 
 	//Create Framebuffer 
 	Buffers::FramebufferSettings fbSettings;
@@ -77,10 +71,8 @@ PrCore::Resources::IResourceDataPtr HdrCubemapLoader::LoadResource(const std::st
 	framebuffer->Unbind();
 	cube->Unbind();
 
-	ResourceSystem::GetInstance().Get<Shaderv2>(textureResource.GetID());
-
 	//Set cubemap
-	auto cubemap = Cubemapv2::Create(framebuffer->GetTextureID(), fbSettings.globalHeight, fbSettings.globalWidth, fbTex.format);
+	auto cubemap = Cubemap::Create(framebuffer->GetTextureID(), fbSettings.globalHeight, fbSettings.globalWidth, fbTex.format);
 	return cubemap;
 }
 

@@ -1,14 +1,13 @@
 #include "Core/Common/pearl_pch.h"
 
 #include "Renderer/Resources/Texture2DLoader.h"
-#include "Renderer/Resources/Texture2Dv2.h"
+#include "Renderer/Resources/Texture2D.h"
 #include "Renderer/OpenGL/GLUtils.h"
 
 #include "Core/Filesystem/FileSystem.h"
 #include "Core/Utils/PathUtils.h"
 
-// Change later
-//#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
 #include"stb/stb_image.h"
 
 using namespace PrRenderer::Resources;
@@ -73,7 +72,7 @@ PrCore::Resources::IResourceDataPtr Texture2DLoader::LoadResource(const std::str
 	}
 
 	// Create texture
-	auto texture = Texture2Dv2::Create();
+	auto texture = Texture2D::Create();
 
 	texture->SetFormat(format);
 	texture->SetWidth(width);

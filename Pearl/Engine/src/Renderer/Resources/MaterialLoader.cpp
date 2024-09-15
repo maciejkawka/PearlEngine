@@ -1,7 +1,7 @@
 #include "Core/Common/pearl_pch.h"
 
 #include "Renderer/Resources/MaterialLoader.h"
-#include "Renderer/Resources/Materialv2.h"
+#include "Renderer/Resources/Material.h"
 
 #include "Core/Filesystem/FileSystem.h"
 #include "Core/Utils/PathUtils.h"
@@ -27,7 +27,7 @@ PrCore::Resources::IResourceDataPtr MaterialLoader::LoadResource(const std::stri
 
 	auto json = JSON::json::parse(dataVector);
 
-	Materialv2Ptr mat = std::make_shared<Materialv2>(json);
+	Materialv2Ptr mat = std::make_shared<Material>(json);
 
 	return mat;
 }

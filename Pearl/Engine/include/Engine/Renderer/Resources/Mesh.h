@@ -1,19 +1,23 @@
 #pragma once
-#include"Core/Resources/Resource.h"
 
-#include"Renderer/Core/Defines.h"
-#include"Renderer/Core/Color.h"
-#include"Renderer/Buffers/VertexArray.h"
-#include"Renderer/Core/BoundingVolume.h"
+#include "Core/Resources/IResource.h"
 
-#include<array>
+#include "Renderer/Core/Defines.h"
+#include "Renderer/Core/Color.h"
+#include "Renderer/Buffers/VertexArray.h"
+#include "Renderer/Core/BoundingVolume.h"
+
+#include <array>
+
+//Remove later
+#include "Renderer/Resources/Mesh.h"
 
 #define MAX_UVs 8
 
 namespace PrRenderer::Resources {
 
 	class Mesh;
-	typedef std::shared_ptr<Mesh> MeshPtr;
+	using Meshv2Ptr = std::shared_ptr<Mesh>;
 
 	enum PrimitiveType
 	{
@@ -26,68 +30,60 @@ namespace PrRenderer::Resources {
 		Line
 	};
 
-	class Mesh : public PrCore::Resources::Resource {
-
-		typedef std::array<std::vector<PrCore::Math::vec2>, 8> UVArray;
-
+	class Mesh : public PrCore::Resources::IResourceData {
 	public:
-		Mesh() :
-			Resource("Mesh"),
-			m_indicesCount(0),
-			m_verticesCount(0),
-			m_stateChanged(false)
-		{}
+		using UVArray = std::array<std::vector<PrCore::Math::vec2>, 8>;
 
-		//Constructor for managed resource
-		Mesh(const std::string& p_name, PrCore::Resources::ResourceHandle p_handle) :
-			Resource(p_name, p_handle),
+		Mesh() :
 			m_indicesCount(0),
 			m_verticesCount(0),
 			m_stateChanged(false)
 		{}
-		
 
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
 
-		inline std::shared_ptr<Buffers::VertexArray> GetVertexArray() { return m_VA; }
+		inline const std::shared_ptr<Buffers::VertexArray>& GetVertexArray() const { return m_VA; }
 
-		inline const std::vector<PrCore::Math::vec3>& GetVertices() { return m_vertices; }
+		inline const std::vector<PrCore::Math::vec3>& GetVertices() const { return m_vertices; }
 		inline size_t GetVerticesCount() const { return m_verticesCount; }
 
-		inline std::vector<unsigned int> GetIndices() { return m_indices; }
+		inline const std::vector<unsigned int>& GetIndices() const { return m_indices; }
 		inline size_t GetIndicesCount() const { return m_indicesCount; }
 
-		inline std::vector<Core::Color> GetColors() const { return m_colors; }
-		inline std::vector<PrCore::Math::vec3> GetNormals() const { return m_normals; }
-		inline std::vector<PrCore::Math::vec4> GetTangents() const { return m_tangents; }
+		inline const std::vector<Core::Color>& GetColors() const { return m_colors; }
+		inline const std::vector<PrCore::Math::vec3>& GetNormals() const { return m_normals; }
+		inline const std::vector<PrCore::Math::vec4>& GetTangents() const { return m_tangents; }
 
 		inline const Core::BoxVolume& GetBoxVolume() { return m_boxVolume; }
 
-		void SetVertices(const std::vector<PrCore::Math::vec3>& p_vertices);
-		void SetIndices(const std::vector<unsigned int>& p_indices);
-		void SetColors(const std::vector<Core::Color>& p_colors);
-		void SetNormals(const std::vector<PrCore::Math::vec3>& p_normals);
-		void SetTangents(const std::vector<PrCore::Math::vec4>& p_tangents);
+		void SetVertices(std::vector<PrCore::Math::vec3>&& p_vertices);
+		void SetIndices(std::vector<unsigned int>&& p_indices);
+		void SetColors(std::vector<Core::Color>&& p_colors);
+		void SetNormals(std::vector<PrCore::Math::vec3>&& p_normals);
+		void SetTangents(std::vector<PrCore::Math::vec4>&& p_tangents);
 
-		void SetUVs(unsigned int p_UVSet, const std::vector<PrCore::Math::vec2>& p_UVs);
+		void SetUVs(unsigned int p_UVSet, std::vector<PrCore::Math::vec2>&& p_UVs);
 
 		virtual void RecalculateNormals() = 0;
 		virtual void RecalculateTangents() = 0;
 
-		static MeshPtr Create();
+		virtual void UpdateBuffers() = 0;
+		bool ValidateBuffers();
+
+		// Factories
+		static Meshv2Ptr Create();
 
 		// Returns a shared primitive, do not edit the vertices
 		// Copy the mesh first in order edit
-		static MeshPtr CreatePrimitive(PrimitiveType p_primitiveType);
+		static Meshv2Ptr CreatePrimitive(PrimitiveType p_primitiveType);
+
+		size_t GetByteSize() const override;
 
 	protected:
-		virtual void UpdateBuffers() = 0;
-
 		std::vector<PrCore::Math::vec4> CalculateTangents();
 		std::vector<PrCore::Math::vec3> CalculateNormals();
 		PrCore::Math::vec4 GenerateTangent(int a, int b, int c);
-		bool ValidateBuffers();
 
 		std::vector<unsigned int>				m_indices;
 		size_t									m_indicesCount;
@@ -108,12 +104,15 @@ namespace PrRenderer::Resources {
 		Core::BoxVolume                         m_boxVolume;
 
 	private:
-		static MeshPtr CreateCube();
-		static MeshPtr CreateSphere();
-		static MeshPtr CreateCapsule();
-		static MeshPtr CreateCylinder();
-		static MeshPtr CreatePlane();
-		static MeshPtr CreateQuad();
-		static MeshPtr CreateLine();
+		// Add later
+		static Meshv2Ptr CreateCube();
+		static Meshv2Ptr CreateSphere();
+		static Meshv2Ptr CreateCapsule();
+		static Meshv2Ptr CreateCylinder();
+		static Meshv2Ptr CreatePlane();
+		static Meshv2Ptr CreateQuad();
+		static Meshv2Ptr CreateLine();
 	};
+
+	REGISTRER_RESOURCE_HANDLE(Mesh);
 }

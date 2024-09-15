@@ -1,7 +1,7 @@
 #include"Core/Common/pearl_pch.h"
 
 #include "Core/ECS/Systems/MeshRendererSystem.h"
-#include"Core/Resources/ResourceLoader.h"
+#include"Core/Resources/ResourceSystem.h"
 
 #include"Renderer/Core/RenderSystem.h"
 

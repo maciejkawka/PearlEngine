@@ -1,10 +1,9 @@
-#pragma once
 #include"Editor/Components/TestFeatures.h"
 
 #include"Renderer/Resources/Light.h"
 #include"Renderer/Resources/Mesh.h"
 #include"Renderer/Resources/Material.h"
-#include"Core/Resources/ResourceLoader.h"
+#include"Core/Resources/ResourceSystem.h"
 #include"Core/ECS/SceneManager.h"
 #include"Core/ECS/Scene.h"
 #include"Core/ECS/Systems/TestSystem.h"
@@ -14,10 +13,73 @@
 #include"Core/Filesystem/FileSystem.h"
 #include"Core/Utils/PathUtils.h"
 
+// Temporary register loaders
+#include "Core/Resources/ResourceSystem.h"
+#include "Core/Resources/ResourceDatabase.h"
+
+#include "Renderer/Resources/Shader.h"
+#include "Renderer/Resources/Cubemap.h"
+#include "Renderer/Resources/Material.h"
+#include "Renderer/Resources/Mesh.h"
+#include "Renderer/Resources/Texture.h"
+
+#include "Renderer/Resources/BasicCubemapLoader.h"
+#include "Renderer/Resources/HdrCubemapLoader.h"
+#include "Renderer/Resources/MaterialLoader.h"
+#include "Renderer/Resources/MeshOBJLoader.h"
+#include "Renderer/Resources/ShaderLoader.h"
+#include "Renderer/Resources/Texture2DLoader.h"
+//
 using namespace PrEditor::Components;
 
 TestFeatures::TestFeatures()
 {
+	using namespace PrCore::Resources;
+	using namespace PrRenderer::Resources;
+
+	//Register resources
+	//{
+	//	auto textureDatabase = std::make_unique<ResourceDatabase>();
+	//	textureDatabase->RegisterLoader(".png", std::make_unique<Texture2DLoader>());
+	//	textureDatabase->RegisterLoader(".jpg", std::make_unique<Texture2DLoader>());
+	//	textureDatabase->RegisterLoader(".tga", std::make_unique<Texture2DLoader>());
+	//	textureDatabase->RegisterLoader(".hdr", std::make_unique<Texture2DLoader>());
+	//	ResourceSystem::GetInstance().RegisterDatabase<Texture2Dv2>(std::move(textureDatabase));
+
+	//	auto materialLoader = std::make_unique<ResourceDatabase>();
+	//	materialLoader->RegisterLoader(".mat", std::make_unique<MaterialLoader>());
+	//	ResourceSystem::GetInstance().RegisterDatabase<Materialv2>(std::move(materialLoader));
+
+	//	auto shaderLoader = std::make_unique<ResourceDatabase>();
+	//	shaderLoader->RegisterLoader(".shader", std::make_unique<ShaderLoader>());
+	//	ResourceSystem::GetInstance().RegisterDatabase<Shaderv2>(std::move(shaderLoader));
+
+	//	auto meshLoader = std::make_unique<ResourceDatabase>();
+	//	meshLoader->RegisterLoader(".obj", std::make_unique<MeshOBJLoader>());
+	//	ResourceSystem::GetInstance().RegisterDatabase<Meshv2>(std::move(meshLoader));
+
+	//	auto cubemapDatabase = std::make_unique<ResourceDatabase>();
+	//	cubemapDatabase->RegisterLoader(".cubemap", std::make_unique<BasicCubemapLoader>());
+	//	cubemapDatabase->RegisterLoader(".hdr", std::make_unique<HdrCubemapLoader>());
+	//	ResourceSystem::GetInstance().RegisterDatabase<Cubemapv2>(std::move(cubemapDatabase));
+	//}
+
+	//auto logoMat = ResourceSystem::GetInstance().Load<Materialv2>("StressTest/logo.mat");
+	//auto meshResourceData = ResourceSystem::GetInstance().Load<Meshv2>("sphere_lowPoly.obj");
+	//auto newTex = ResourceSystem::GetInstance().Load<Texture2Dv2>("emission.png");
+	//auto newShader = ResourceSystem::GetInstance().Load<Shaderv2>("IrradianceMap.shader");
+	//auto cubemap = ResourceSystem::GetInstance().Load<Cubemapv2>("SkyBox/skybox.cubemap");
+	//auto cubemapHdr = ResourceSystem::GetInstance().Load<Cubemapv2>("SkyBox/UnearthlyRed4k.hdr");
+
+	//auto elow = newTex->GetWidth();
+	//auto data = newTex.GetData();
+	//auto eloh = newTex->GetHeight();
+	//auto exist = newTex != nullptr;
+	//auto isnull = newTex == nullptr;
+	//ResourceSystem::GetInstance().Unload<Texture2Dv2>("emission.png");
+	//exist = newTex != nullptr;
+	//isnull = newTex == nullptr;
+
 	// Load Stress Test
 	auto scene10 = PrCore::ECS::SceneManager::GetInstance().LoadScene("RenderStressTest.pearl");
 
@@ -34,34 +96,34 @@ TestFeatures::TestFeatures()
 	//	parent->parent = parentEntity;
 	//}
 
-	std::string elo{ "Folder/File.ext" };
-	auto returnThat = PrCore::PathUtils::GetFilename(elo);
-	auto returnThatView = PrCore::PathUtils::GetFilenameInPlace(elo);
+	//std::string elo{ "Folder/File.ext" };
+	//auto returnThat = PrCore::PathUtils::GetFilename(elo);
+	//auto returnThatView = PrCore::PathUtils::GetFilenameInPlace(elo);
 
-	auto path = PrCore::PathUtils::MakePath("Directory", "FileName", "txt");
-	auto pat1 = PrCore::PathUtils::MakePath("Directory", "FileName.txt");
+	//auto path = PrCore::PathUtils::MakePath("Directory", "FileName", "txt");
+	//auto pat1 = PrCore::PathUtils::MakePath("Directory", "FileName.txt");
 
-	auto newPath = PrCore::PathUtils::ReplaceExtension("Elo/Elo1/Elo2/FileName.txt", "png");
-	auto newPath1 = PrCore::PathUtils::ReplaceExtension("FileName.txt", "png");
-	newPath1 = PrCore::PathUtils::ReplaceExtension("FileName", "png");
-	newPath1 = PrCore::PathUtils::ReplaceExtension("FileName", "..png");
-	newPath1 = PrCore::PathUtils::ReplaceExtension("FileName..", "..png");
-	newPath1 = PrCore::PathUtils::ReplaceExtension("FileName..txt", "..png");
+	//auto newPath = PrCore::PathUtils::ReplaceExtension("Elo/Elo1/Elo2/FileName.txt", "png");
+	//auto newPath1 = PrCore::PathUtils::ReplaceExtension("FileName.txt", "png");
+	//newPath1 = PrCore::PathUtils::ReplaceExtension("FileName", "png");
+	//newPath1 = PrCore::PathUtils::ReplaceExtension("FileName", "..png");
+	//newPath1 = PrCore::PathUtils::ReplaceExtension("FileName..", "..png");
+	//newPath1 = PrCore::PathUtils::ReplaceExtension("FileName..txt", "..png");
 
-	auto noExtension = PrCore::PathUtils::RemoveExtension("Directory/FileName.ext");
-	auto Newpath = "C:ELO1/ELO0/FileName.elo";
-	PrCore::PathUtils::IsAbsolute(Newpath);
-	PrCore::PathUtils::IsRelative(Newpath);
+	//auto noExtension = PrCore::PathUtils::RemoveExtension("Directory/FileName.ext");
+	//auto Newpath = "C:ELO1/ELO0/FileName.elo";
+	//PrCore::PathUtils::IsAbsolute(Newpath);
+	//PrCore::PathUtils::IsRelative(Newpath);
 
-	auto noExtension1 = PrCore::PathUtils::RemoveExtensionInPlace(Newpath);
+	//auto noExtension1 = PrCore::PathUtils::RemoveExtensionInPlace(Newpath);
 
-	auto pathNewName = PrCore::PathUtils::ReplaceFilename(Newpath, "NewName");
+	//auto pathNewName = PrCore::PathUtils::ReplaceFilename(Newpath, "NewName");
 
-	auto vec = PrCore::PathUtils::SplitPath(Newpath);
-	auto vec1 = PrCore::PathUtils::SplitPathInPlace(Newpath);
+	//auto vec = PrCore::PathUtils::SplitPath(Newpath);
+	//auto vec1 = PrCore::PathUtils::SplitPathInPlace(Newpath);
 
-	auto generation = PrCore::PathUtils::GetSubFolder(Newpath, 2);
-	auto generation1 = PrCore::PathUtils::GetSubFolderInPlace(Newpath, 2);
+	//auto generation = PrCore::PathUtils::GetSubFolder(Newpath, 2);
+	//auto generation1 = PrCore::PathUtils::GetSubFolderInPlace(Newpath, 2);
 
 	// Walls
 	auto logoEntity = scene10->CreateEntity("Logo1");
@@ -70,7 +132,7 @@ TestFeatures::TestFeatures()
 	logoTransform->SetPosition(PrCore::Math::vec3(20, 5.0f, -20));
 	logoTransform->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 0, 180))));
 	logoTransform->SetLocalScale(PrCore::Math::vec3(5, 5, 1.1f));
-	logoMesh->material = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("StressTest/logo.mat");
+	logoMesh->material = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("StressTest/logo.mat");
 	logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
 
 	logoEntity = scene10->CreateEntity("Logo2");
@@ -79,7 +141,7 @@ TestFeatures::TestFeatures()
 	logoTransform->SetPosition(PrCore::Math::vec3(20, 5.0f, 60));
 	logoTransform->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 0, 0))));
 	logoTransform->SetLocalScale(PrCore::Math::vec3(5, 5, 1.1));
-	logoMesh->material = PrCore::Resources::ResourceLoader::GetInstance().GetResource<PrRenderer::Resources::Material>("StressTest/logo.mat");
+	logoMesh->material = PrCore::Resources::ResourceSystem::GetInstance().Get<PrRenderer::Resources::Material>("StressTest/logo.mat");
 	logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
 
 	//logoEntity = scene10->CreateEntity("Logo3");
@@ -88,7 +150,7 @@ TestFeatures::TestFeatures()
 	//logoTransform->SetPosition(PrCore::Math::vec3(-20, 5.0f, 20));
 	//logoTransform->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 90, 0))));
 	//logoTransform->SetLocalScale(PrCore::Math::vec3(5, 5, 3));
-	//logoMesh->material = PrCore::Resources::ResourceLoader::GetInstance().GetResource<PrRenderer::Resources::Material>("StressTest/logo.mat");
+	//logoMesh->material = PrCore::Resources::ResourceSystem::GetInstance().Get<PrRenderer::Resources::Material>("StressTest/logo.mat");
 	//logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
 
 	logoEntity = scene10->CreateEntity("Logo4");
@@ -97,7 +159,7 @@ TestFeatures::TestFeatures()
 	logoTransform->SetPosition(PrCore::Math::vec3(60, 5.0f, 20));
 	logoTransform->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 90, 0))));
 	logoTransform->SetLocalScale(PrCore::Math::vec3(5, 5, 1.1));
-	logoMesh->material = PrCore::Resources::ResourceLoader::GetInstance().GetResource<PrRenderer::Resources::Material>("StressTest/logo.mat");
+	logoMesh->material = PrCore::Resources::ResourceSystem::GetInstance().Get<PrRenderer::Resources::Material>("StressTest/logo.mat");
 	logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
 
 	return;
@@ -107,7 +169,7 @@ TestFeatures::TestFeatures()
 	scene->RegisterSystem<PrCore::ECS::RenderStressTest>();
 
 	auto sphereMesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Sphere);
-	auto unlightmaterial = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("StressTest/light.mat");
+	auto unlightmaterial = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("StressTest/light.mat");
 
 	int lightCounter = 0;
 	// Point Lights
@@ -129,7 +191,7 @@ TestFeatures::TestFeatures()
 
 			meshComponent->material = unlightmaterial;
 			meshComponent->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Sphere);
-			meshComponent->shadowMesh = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Mesh>("sphere_lowPoly.obj");
+			meshComponent->shadowMesh = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>("sphere_lowPoly.obj");
 			meshComponent->shadowCaster = false;
 
 			lightCounter++;
@@ -178,7 +240,7 @@ TestFeatures::TestFeatures()
 	}
 
 	// Small capsules to see shadows
-	auto capsuleMaterial = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("StressTest/capsule.mat");
+	auto capsuleMaterial = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("StressTest/capsule.mat");
 	for (int i = 0; i < 20; i++)
 	{
 		for (int j = 0; j < 40; j++)
@@ -191,12 +253,12 @@ TestFeatures::TestFeatures()
 			transform->SetLocalScale(PrCore::Math::vec3(0.5f));
 			mesh->material = capsuleMaterial;
 			mesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Capsule);
-			mesh->shadowMesh = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Mesh>("capsule_lowPoly.obj");
+			mesh->shadowMesh = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>("capsule_lowPoly.obj");
 		}
 	}
 
 	// Overhead small objects
-	auto overheadObjectMat = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("StressTest/overheadSphere.mat");
+	auto overheadObjectMat = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("StressTest/overheadSphere.mat");
 	for (int i = 0; i < 10; i++)
 	{
 		for (int j = 0; j < 10; j++)
@@ -208,14 +270,14 @@ TestFeatures::TestFeatures()
 			transform->SetPosition(PrCore::Math::vec3(i * 8 - 20.0f, 10.0f, j * 8 - 20.0));
 			transform->SetLocalScale(PrCore::Math::vec3(0.5f));
 			mesh->material = overheadObjectMat;
-			mesh->shadowMesh = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Mesh>("sphere_lowPoly.obj");
+			mesh->shadowMesh = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>("sphere_lowPoly.obj");
 			mesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Sphere);
 		}
 	}
 
 	// Emission Capsules
 	//Create a new material
-	auto capsuleMaterialEmission = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("StressTest/emissionCapsule.mat");
+	auto capsuleMaterialEmission = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("StressTest/emissionCapsule.mat");
 	for (int i = 0; i < 12; i++)
 	{
 		auto capsule = scene->CreateEntity("Emission " + std::to_string(i));
@@ -228,7 +290,7 @@ TestFeatures::TestFeatures()
 
 		mesh->material = capsuleMaterialEmission;
 		mesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Capsule);
-		mesh->shadowMesh = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Mesh>("capsule_lowPoly.obj");
+		mesh->shadowMesh = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>("capsule_lowPoly.obj");
 	}
 
 
@@ -239,7 +301,7 @@ TestFeatures::TestFeatures()
 	quadTransform->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(90, 0, 0))));
 	quadTransform->SetLocalScale(PrCore::Math::vec3(40, 40, 40));
 	auto meshQuad = quad.AddComponent<PrCore::ECS::MeshRendererComponent>();
-	meshQuad->material = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("StressTest/floor.mat");
+	meshQuad->material = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("StressTest/floor.mat");
 	meshQuad->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Quad);
 
 	// Walls
@@ -249,7 +311,7 @@ TestFeatures::TestFeatures()
 	logoTransform->SetPosition(PrCore::Math::vec3(20, 5.0f, -20));
 	logoTransform->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 0, 0))));
 	logoTransform->SetLocalScale(PrCore::Math::vec3(80, 10, 1));
-	logoMesh->material = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("StressTest/brick.mat");
+	logoMesh->material = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("StressTest/brick.mat");
 	logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
 
 	logoEntity = scene->CreateEntity("Wall2");
@@ -258,7 +320,7 @@ TestFeatures::TestFeatures()
 	logoTransform->SetPosition(PrCore::Math::vec3(20, 5.0f, 60));
 	logoTransform->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 0, 0))));
 	logoTransform->SetLocalScale(PrCore::Math::vec3(80, 10, 1));
-	logoMesh->material = PrCore::Resources::ResourceLoader::GetInstance().GetResource<PrRenderer::Resources::Material>("StressTest/brick.mat");
+	logoMesh->material = PrCore::Resources::ResourceSystem::GetInstance().Get<PrRenderer::Resources::Material>("StressTest/brick.mat");
 	logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
 
 	logoEntity = scene->CreateEntity("Wall3");
@@ -267,7 +329,7 @@ TestFeatures::TestFeatures()
 	logoTransform->SetPosition(PrCore::Math::vec3(-20, 5.0f, 20));
 	logoTransform->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 90, 0))));
 	logoTransform->SetLocalScale(PrCore::Math::vec3(80, 10, 1));
-	logoMesh->material = PrCore::Resources::ResourceLoader::GetInstance().GetResource<PrRenderer::Resources::Material>("StressTest/brick.mat");
+	logoMesh->material = PrCore::Resources::ResourceSystem::GetInstance().Get<PrRenderer::Resources::Material>("StressTest/brick.mat");
 	logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
 
 	logoEntity = scene->CreateEntity("Wall4");
@@ -276,7 +338,7 @@ TestFeatures::TestFeatures()
 	logoTransform->SetPosition(PrCore::Math::vec3(60, 5.0f, 20));
 	logoTransform->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 90, 0))));
 	logoTransform->SetLocalScale(PrCore::Math::vec3(80, 10, 1));
-	logoMesh->material = PrCore::Resources::ResourceLoader::GetInstance().GetResource<PrRenderer::Resources::Material>("StressTest/brick.mat");
+	logoMesh->material = PrCore::Resources::ResourceSystem::GetInstance().Get<PrRenderer::Resources::Material>("StressTest/brick.mat");
 	logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);*/
 
 	// Pan
@@ -284,9 +346,9 @@ TestFeatures::TestFeatures()
 	auto transform = pan.AddComponent<PrCore::ECS::TransformComponent>();
 	auto mesh = pan.AddComponent<PrCore::ECS::MeshRendererComponent>();
 
-	auto panMeshShadow = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Mesh>("pan_lowPoly.obj");
-	auto panMesh = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Mesh>("pan.obj");
-	auto panMaterial = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("StressTest/pan.mat");
+	auto panMeshShadow = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>("pan_lowPoly.obj");
+	auto panMesh = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>("pan.obj");
+	auto panMaterial = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("StressTest/pan.mat");
 
 	transform->SetPosition({ 35, 1.0f, 20 });
 	transform->SetRotation(PrCore::Math::quat({ PrCore::Math::radians(0.0f), PrCore::Math::radians(0.f),PrCore::Math::radians(0.0f) }));
@@ -308,14 +370,14 @@ TestFeatures::TestFeatures()
 	// Load Stress Test
 	//PrCore::ECS::SceneManager::GetInstance().LoadScene("RenderStressTest.pearl");
 
-	//auto shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Shader>("Shadows/PointShadowMappingNew.shader");
+	//auto shader = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Shader>("Shadows/PointShadowMappingNew.shader");
 
 	//return;
 
 	//auto scene1 = PrCore::ECS::SceneManager::GetInstance().LoadScene("SceneDeferred.pearl");
 
 	////Add Sphere
-	//auto sphereMaterial1 = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("Deferred/PBR_IR_ValuesSphere_Transparent.mat");
+	//auto sphereMaterial1 = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("Deferred/PBR_IR_ValuesSphere_Transparent.mat");
 	//sphereMaterial1->SetProperty("albedoValue", PrCore::Math::vec4(1.0f,0.0f, 0.0f, 0.6f));
 	//sphereMaterial1->SetRenderType(PrRenderer::Resources::RenderType::Transparent);
 
@@ -345,11 +407,11 @@ TestFeatures::TestFeatures()
 	////	}
 	////}
 	////
-	//auto material2 = std::make_shared<PrRenderer::Resources::Material>(*PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("Deferred/PBR_IR_ValuesSphere.mat"));
+	//auto material2 = std::make_shared<PrRenderer::Resources::Material>(*PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("Deferred/PBR_IR_ValuesSphere.mat"));
 	//material2->SetProperty("albedoValue", PrCore::Math::vec4(0.0f, 1.0f, 0.5f, 0.0f));
 	//material2->SetProperty("roughnessValue", 0.7f);
 	//material2->SetProperty("metallicValue", 0.6f);
-	//auto emissionTex = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Texture>("emission.png");
+	//auto emissionTex = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Texture>("emission.png");
 	//material2->SetTexture("emissionMap", emissionTex);
 	//material2->SetProperty("emissionInt", 10.0f);
 	//material2->SetProperty("emissionColor", PrCore::Math::vec3(1.0f, 0.0f, 0.0f));
@@ -453,13 +515,13 @@ TestFeatures::TestFeatures()
 	//quadTransform->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(90,0,0))));
 	//quadTransform->SetLocalScale(PrCore::Math::vec3(40, 40, 40));
 	//auto meshQuad = quad.AddComponent<PrCore::ECS::MeshRendererComponent>();
-	//meshQuad->material = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("PBR_IR_UniversalCross.mat");
+	//meshQuad->material = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("PBR_IR_UniversalCross.mat");
 	//meshQuad->material->SetTexScale("albedoMap", PrCore::Math::vec2(10.f, 10.f));
 	//meshQuad->material->SetProperty("roughnessValue", 0.3f);
 	////meshQuad->material = material2;
 	//meshQuad->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Quad);
 
-	//auto unlightmaterial = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("Deferred/PBR_IR_ValuesSphere_Unlit.mat");
+	//auto unlightmaterial = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("Deferred/PBR_IR_ValuesSphere_Unlit.mat");
 	//auto lightObject = scene1->GetEntityByName("Light1");
 	//auto lightComponent = lightObject.GetComponent<PrCore::ECS::LightComponent>();
 	//auto lightRenderer = lightObject.AddComponent<PrCore::ECS::MeshRendererComponent>();
@@ -553,7 +615,7 @@ TestFeatures::TestFeatures()
 	//transformComponent->SetPosition({ 0, -2, 5 });
 	//
 	////Add Sphere
-	//auto sphereMaterial = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("PBR_IR_Values.mat");
+	//auto sphereMaterial = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("PBR_IR_Values.mat");
 	//sphereMaterial->SetProperty("roughnessValue", 0.6f);
 	//sphereMaterial->SetProperty("metallicValue", 0.99f);
 	//sphereMaterial->SetProperty("albedoValue", PrCore::Math::vec3(1.0f, 0.65f, 0.0f));
@@ -576,8 +638,8 @@ TestFeatures::TestFeatures()
 	//auto gunTransform = gun.AddComponent<PrCore::ECS::TransformComponent>();
 	//auto gunMeshRenderer = gun.AddComponent<PrCore::ECS::MeshRendererComponent>();
 	//
-	//auto gunMesh = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Mesh>("yo.obj");
-	//auto gunMaterial = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("PBR_IR_UniversalGun.mat");
+	//auto gunMesh = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>("yo.obj");
+	//auto gunMaterial = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("PBR_IR_UniversalGun.mat");
 	//gunMaterial->SetProperty("normalMapping", true);
 	//gunMaterial->SetProperty("aoValue", 1.0f);
 	//
@@ -593,8 +655,8 @@ TestFeatures::TestFeatures()
 	//auto panTransform = pan.AddComponent<PrCore::ECS::TransformComponent>();
 	//auto panMeshRenderer = pan.AddComponent<PrCore::ECS::MeshRendererComponent>();
 	//
-	//auto panMesh = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Mesh>("pan.obj");
-	//auto panMaterial = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("PBR_IR_UniversalPan.mat");
+	//auto panMesh = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>("pan.obj");
+	//auto panMaterial = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("PBR_IR_UniversalPan.mat");
 	//panMaterial->SetProperty("normalMapping", true);
 	//panMaterial->SetProperty("aoValue", 1.0f);
 	//

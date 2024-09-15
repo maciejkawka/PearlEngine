@@ -1,18 +1,18 @@
 #include "Core/Common/pearl_pch.h"
 
-#include "Renderer/OpenGL/GLCubemapv2.h"
+#include "Renderer/OpenGL/GLCubemap.h"
 #include"Renderer/OpenGL/GLUtils.h"
 
 #include"glad/glad.h"
 
 using namespace PrRenderer::OpenGL;
 
-GLCubemapv2::GLCubemapv2()
+GLCubemap::GLCubemap()
 {
 	glGenTextures(1, &m_ID);
 }
 
-GLCubemapv2::GLCubemapv2(RendererID p_id, size_t p_width, size_t p_height, Resources::TextureFormat p_format)
+GLCubemap::GLCubemap(RendererID p_id, size_t p_width, size_t p_height, Resources::TextureFormat p_format)
 {
 	m_ID = p_id;
 	m_width = p_width;
@@ -20,32 +20,32 @@ GLCubemapv2::GLCubemapv2(RendererID p_id, size_t p_width, size_t p_height, Resou
 	m_format = p_format;
 }
 
-GLCubemapv2::~GLCubemapv2()
+GLCubemap::~GLCubemap()
 {
 	if (m_ID != 0)
 		glDeleteTextures(1, &m_ID);
 }
 
-void GLCubemapv2::Unbind(unsigned int p_slot /*= 0*/)
+void GLCubemap::Unbind(unsigned int p_slot /*= 0*/)
 {
 	glActiveTexture(GL_TEXTURE0 + p_slot);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
-void GLCubemapv2::Bind(unsigned int p_slot /*= 0*/)
+void GLCubemap::Bind(unsigned int p_slot /*= 0*/)
 {
 	glActiveTexture(GL_TEXTURE0 + p_slot);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
 }
 
-size_t GLCubemapv2::GetByteSize() const
+size_t GLCubemap::GetByteSize() const
 {
 	return m_size;
 }
 
-void GLCubemapv2::CalculateSize()
+void GLCubemap::CalculateSize()
 {
-	m_size = sizeof(GLCubemapv2);
+	m_size = sizeof(GLCubemap);
 
 	switch (m_format)
 	{
@@ -66,7 +66,7 @@ void GLCubemapv2::CalculateSize()
 	}
 }
 
-void GLCubemapv2::Apply()
+void GLCubemap::Apply()
 {
 	PR_ASSERT(m_ID != 0, "Texture ID is not generated");
 
@@ -79,9 +79,10 @@ void GLCubemapv2::Apply()
 
 	if (m_rawDataArray)
 	{
+		auto dataPtr = reinterpret_cast<unsigned char**>(m_rawDataArray);
 		for (int i = 0; i < 6; i++)
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, TextureFormatToInternalGL(m_format), m_width, m_height, 0,
-				TextureFormatToGL(m_format), TextureFormatToDataTypeGL(m_format), m_rawDataArray[i]);
+				TextureFormatToGL(m_format), TextureFormatToDataTypeGL(m_format), dataPtr[i]);
 		CalculateSize();
 	}
 
@@ -95,7 +96,7 @@ void GLCubemapv2::Apply()
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
-void GLCubemapv2::GenerateMipMaps()
+void GLCubemap::GenerateMipMaps()
 {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID);
 	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);

@@ -1,7 +1,7 @@
 #include "Core/Common/pearl_pch.h"
 
 #include "Renderer/Resources/MeshOBJLoader.h"
-#include "Renderer/Resources/Meshv2.h"
+#include "Renderer/Resources/Mesh.h"
 
 #include "Core/Filesystem/FileSystem.h"
 #include "Core/Utils/PathUtils.h"
@@ -81,7 +81,7 @@ PrCore::Resources::IResourceDataPtr MeshOBJLoader::LoadResource(const std::strin
 	std::vector<PrCore::Math::vec3> normals;
 	std::vector<PrCore::Math::vec4> tangents;
 	std::vector<Core::Color> colors;
-	Meshv2::UVArray UVs;
+	Mesh::UVArray UVs;
 
 	for (const auto& shape : shapes)
 	{
@@ -150,12 +150,18 @@ PrCore::Resources::IResourceDataPtr MeshOBJLoader::LoadResource(const std::strin
 		}
 	}
 
-	Meshv2Ptr mesh = Meshv2::Create();
-	mesh->SetIndices(std::move(indices));
-	mesh->SetVertices(std::move(vertices));
-	mesh->SetNormals(std::move(normals));
-	mesh->SetTangents(std::move(tangents));
-	mesh->SetColors(std::move(colors));
+	Meshv2Ptr mesh = Mesh::Create();
+	if (!indices.empty())
+		mesh->SetIndices(std::move(indices));
+	if (!vertices.empty())
+		mesh->SetVertices(std::move(vertices));
+	if(!normals.empty())
+		mesh->SetNormals(std::move(normals));
+	if (!colors.empty())
+		mesh->SetColors(std::move(colors));
+	if(!UVs[0].empty())
+		mesh->SetUVs(0, std::move(UVs[0]));
+
 
 	if (!mesh->ValidateBuffers())
 	{

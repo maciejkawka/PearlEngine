@@ -28,7 +28,7 @@ DeferRenderFrontend::DeferRenderFrontend(RendererSettings& p_settings) :
 	m_nextSpotLightPos = 0;
 	m_nextDirLightPos = 0;
 
-	m_debugShader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Resources::Shader>("drawDebug.shader");
+	m_debugShader = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("drawDebug.shader").GetData();
 	m_debugMaterial = std::make_shared<Resources::Material>(m_debugShader);
 
 	m_rendererBackend = std::make_shared<DeferRenderBackend>(m_renderSettings);
@@ -136,7 +136,7 @@ void DeferRenderFrontend::SubmitMesh(ECS::Entity& p_entity)
 	PR_ASSERT(p_entity.HasComponent<ECS::MeshRendererComponent>(), "FrontendRenderer: entity does not have a MeshRendererComponent");
 	PR_ASSERT(p_entity.HasComponent<ECS::TransformComponent>(), "FrontendRenderer: entity does not have a TransformComponent");
 
-	//Preapre data
+	//Prepare data
 	auto meshComponent = p_entity.GetComponent<ECS::MeshRendererComponent>();
 	auto mesh = meshComponent->mesh;
 	auto shadowMesh = meshComponent->shadowMesh;
@@ -147,9 +147,9 @@ void DeferRenderFrontend::SubmitMesh(ECS::Entity& p_entity)
 	// Create renderObject
 	RenderObjectPtr object = std::make_shared<RenderObject>();
 	object->id = p_entity.GetID().GetID();
-	object->material = material;
-	object->mesh = mesh;
-	object->shadowMesh = shadowMesh;
+	object->material = material.GetData();
+	object->mesh = mesh.GetData();
+	object->shadowMesh = shadowMesh != nullptr ? shadowMesh.GetData() : nullptr;
 	object->type = RenderObjectType::Mesh;
 	object->worldMat = worldMatrix;
 
@@ -158,12 +158,12 @@ void DeferRenderFrontend::SubmitMesh(ECS::Entity& p_entity)
 	hash.SetDepth(RenderUtils::CalculateDepthValue(transformComponent->GetPosition(), m_camera));
 	object->sortingHash = hash;
 
-	// Add to shadowcasters
+	// Add to shadow casters
 	if(meshComponent->shadowCaster && material->GetRenderType() == Resources::RenderType::Opaque)
 		m_currentFrame->shadowCasters.push_back(object);
 
 	// Frustrum culling
-	// Discard objects that are not visable in the main m_camera
+	// Discard objects that are not visible in the main m_camera
 	//const auto frustrum = Frustrum(m_camera->GetProjectionMatrix(), m_camera->GetViewMatrix());
 	if (!mesh->GetBoxVolume().IsOnFrustrum(m_frustrum, worldMatrix))
 	{
@@ -178,7 +178,7 @@ void DeferRenderFrontend::SubmitMesh(ECS::Entity& p_entity)
 		m_currentFrame->transpatrentObjects.push_back(object);
 }
 
-void DeferRenderFrontend::SetCubemap(Resources::MaterialPtr p_cubemapMat)
+void DeferRenderFrontend::SetCubemap(Resources::Materialv2Ptr p_cubemapMat)
 {
 	if(p_cubemapMat == nullptr)
 	{
@@ -334,12 +334,12 @@ size_t DeferRenderFrontend::InstanciateObjectsByMaterial(RenderObjectVector& p_r
 		auto& hash = object->sortingHash;
 		const auto materiaHash = hash.GetMaterialHash();
 		const auto renderOrder = hash.GetRenderOrder();
-		auto meshName = object->mesh->GetNameHash();
+		auto meshName = std::hash<std::string>{}(object->mesh->GetName());
 
 		//Find instance candidates
 		size_t instancedCount = 0;
 		auto innerIt = objIt;
-		while(objIt != p_renderObjects.end() && (*objIt)->sortingHash.GetMaterialHash() == materiaHash && (*objIt)->mesh->GetNameHash() == meshName)
+		while(objIt != p_renderObjects.end() && (*objIt)->sortingHash.GetMaterialHash() == materiaHash && std::hash<std::string>{}((*objIt)->mesh->GetName()) == meshName)
 		{
 			instanciateCandidates.push_back(*objIt);
 			instancedCount++;
@@ -407,12 +407,12 @@ size_t DeferRenderFrontend::InstanciateObjectsByMesh(RenderObjectVector& p_rende
 	{
 		//First element data
 		const auto object = *objIt;
-		auto meshName = object->mesh->GetNameHash();
+		auto meshName = std::hash<std::string>{}(object->mesh->GetName());
 
 		//Find instance candidates
 		size_t instancedCount = 0;
 		auto innerIt = objIt;
-		while (objIt != p_renderObjects.end() && (*objIt)->mesh->GetNameHash() == meshName)
+		while (objIt != p_renderObjects.end() && std::hash<std::string>{}((*objIt)->mesh->GetName()) == meshName)
 		{
 			instanciateCandidates.push_back(*objIt);
 			instancedCount++;

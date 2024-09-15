@@ -1,19 +1,14 @@
 #pragma once
 
 #include"Renderer/Resources/Shader.h"
-#include<string>
 
 namespace PrRenderer::OpenGL {
 
 	class GLShader : public Resources::Shader {
 	public:
 		GLShader() = delete;
-		GLShader(Shader&) = delete;
-		GLShader(Shader&&) = delete;
-
-		//Constructor for managed resource
-		GLShader(const std::string& p_name, PrCore::Resources::ResourceHandle p_handle);
-
+		GLShader(const std::string& p_vertexShader, const std::string& p_fragmentShader);
+		GLShader(const std::string& p_vertexShader, const std::string& p_fragmentShader, const std::string& p_geometeryShader);
 
 		void Bind() override;
 		void Unbind() override;
@@ -44,25 +39,11 @@ namespace PrRenderer::OpenGL {
 		PrCore::Math::vec3 GetUniformVec3(const std::string& p_name) override;
 		PrCore::Math::vec2 GetUniformVec2(const std::string& p_name) override;
 
+		bool Compile() override;
+		size_t GetByteSize() const override;
+
 	private:
-		void PreLoadImpl() override;
-		bool LoadImpl() override;
-		void PostLoadImpl() override;
-
-		void PreUnloadImpl() override;
-		bool UnloadImpl() override;
-		void PostUnloadImpl() override;
-
-		void LoadCorruptedResource() override;
-
-		void CalculateSize() override;
-
-		bool Compile();
 		void ScanUniforms();
-		int GetUniformLocation(const std::string& p_name);
-
-		std::string m_vertexShader;
-		std::string m_geometryShader;
-		std::string m_fragmentShader;
+		int  GetUniformLocation(const std::string& p_name);
 	};
 }

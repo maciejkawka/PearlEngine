@@ -1,5 +1,6 @@
-#include"Core/Common/pearl_pch.h"
-#include"Renderer/Resources/Mesh.h"
+#include "Core/Common/pearl_pch.h"
+
+#include "Renderer/Resources/Mesh.h"
 
 #include "Renderer/Buffers/IndexBuffer.h"
 #include "Renderer/Core/RendererAPI.h"
@@ -10,23 +11,23 @@
 
 using namespace PrRenderer::Resources;
 
-void Mesh::SetVertices(const std::vector<PrCore::Math::vec3>& p_vertices)
+void Mesh::SetVertices(std::vector<PrCore::Math::vec3>&& p_vertices)
 {
-	m_vertices = p_vertices;
-	m_verticesCount = p_vertices.size();
+	m_vertices = std::move(p_vertices);
+	m_verticesCount = m_vertices.size();
 
 	m_stateChanged = true;
 }
 
-void Mesh::SetIndices(const std::vector<unsigned int>& p_indices)
+void Mesh::SetIndices(std::vector<unsigned int>&& p_indices)
 {
-	m_indices = p_indices;
-	m_indicesCount = p_indices.size();
+	m_indices = std::move(p_indices);
+	m_indicesCount = m_indices.size();
 
 	m_stateChanged = true;
 }
 
-void Mesh::SetColors(const std::vector<Core::Color>& p_colors)
+void Mesh::SetColors(std::vector<Core::Color>&& p_colors)
 {
 	if (p_colors.size() != m_verticesCount)
 	{
@@ -34,11 +35,11 @@ void Mesh::SetColors(const std::vector<Core::Color>& p_colors)
 		return;
 	}
 
-	m_colors = p_colors;
+	m_colors = std::move(p_colors);
 	m_stateChanged = true;
 }
 
-void Mesh::SetNormals(const std::vector<PrCore::Math::vec3>& p_normals)
+void Mesh::SetNormals(std::vector<PrCore::Math::vec3>&& p_normals)
 {
 	if (p_normals.size() != m_verticesCount)
 	{
@@ -46,11 +47,11 @@ void Mesh::SetNormals(const std::vector<PrCore::Math::vec3>& p_normals)
 		return;
 	}
 
-	m_normals = p_normals;
+	m_normals = std::move(p_normals);
 	m_stateChanged = true;
 }
 
-void Mesh::SetTangents(const std::vector<PrCore::Math::vec4>& p_tangents)
+void Mesh::SetTangents(std::vector<PrCore::Math::vec4>&& p_tangents)
 {
 	if (p_tangents.size() != m_verticesCount)
 	{
@@ -58,11 +59,11 @@ void Mesh::SetTangents(const std::vector<PrCore::Math::vec4>& p_tangents)
 		return;
 	}
 
-	m_tangents = p_tangents;
+	m_tangents = std::move(p_tangents);
 	m_stateChanged = true;
 }
 
-void Mesh::SetUVs(unsigned int p_UVSet, const std::vector<PrCore::Math::vec2>& p_UVs)
+void Mesh::SetUVs(unsigned int p_UVSet, std::vector<PrCore::Math::vec2>&& p_UVs)
 {
 	if (p_UVSet > m_maxUVs)
 	{
@@ -76,11 +77,11 @@ void Mesh::SetUVs(unsigned int p_UVSet, const std::vector<PrCore::Math::vec2>& p
 		return;
 	}
 
-	m_UVs[p_UVSet] = p_UVs;
+	m_UVs[p_UVSet] = std::move(p_UVs);
 	m_stateChanged = true;
 }
 
-MeshPtr Mesh::Create()
+Meshv2Ptr Mesh::Create()
 {
 	switch (Core::RendererAPI::GetGraphicsAPI())
 	{
@@ -207,4 +208,20 @@ bool Mesh::ValidateBuffers()
 	}
 
 	return true;
+}
+
+size_t Mesh::GetByteSize() const
+{
+	size_t size = sizeof(Mesh);
+
+	size += sizeof(unsigned int) * m_indices.size();
+	size += sizeof(PrCore::Math::vec3) * m_vertices.size();
+	size += sizeof(PrCore::Math::vec3) * m_normals.size();
+	size += sizeof(PrCore::Math::vec3) * m_tangents.size();
+	size += sizeof(PrCore::Math::vec4) * m_colors.size();
+
+	for (int i = 0; i < m_maxUVs; i++)
+		size += sizeof(PrCore::Math::vec2) * m_UVs[i].size();
+
+	return size;
 }

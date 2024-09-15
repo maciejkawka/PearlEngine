@@ -10,5 +10,8 @@
     <ClCompile Include="src\PathUtilsTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
+    <ClCompile Include="src\ResourceSystemTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

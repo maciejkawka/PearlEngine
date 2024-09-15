@@ -33,7 +33,7 @@ namespace PrRenderer::Core {
 		virtual void SubmitLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id) = 0;
 		virtual void SetCamera(Camera* p_camera) = 0;
 		virtual void SubmitMesh(ECS::Entity& p_entity) = 0;
-		virtual void SetCubemap(Resources::MaterialPtr p_cubemap) = 0;
+		virtual void SetCubemap(Resources::Materialv2Ptr p_cubemap) = 0;
 		///////////////////////////////////////
 
 		//Frame

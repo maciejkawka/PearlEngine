@@ -1,31 +1,30 @@
 #pragma once
-#include"Core/Resources/Resource.h"
-#include"Core/Math/Math.h"
 
-#include"Renderer/Resources/Uniform.h"
-#include"Renderer/Core/Defines.h"
+#include "Core/Resources/IResource.h"
 
-#include<vector>
-#include<map>
-#include<unordered_map>
-#include<string>
-#include<memory>
+#include "Core/Math/Math.h"
+
+#include "Renderer/Resources/Uniform.h"
+#include "Renderer/Core/Defines.h"
+
+#include <string>
+#include <vector>
+#include <map>
+#include <unordered_map>
+#include <string>
+#include <memory>
 
 namespace PrRenderer::Resources {
 
-	class Shader : public PrCore::Resources::Resource {
+	class Shader : public PrCore::Resources::IResourceData {
 	public:
 		Shader() = delete;
-		Shader(Shader&) = delete;
-		Shader(Shader&&) = delete;
+		Shader(const std::string& p_vertexShader, const std::string& p_fragmentShader);
+		Shader(const std::string& p_vertexShader, const std::string& p_fragmentShader, const std::string& p_geometeryShader);
 
-		//Constructor for managed resource 
-		Shader(const std::string& p_name, PrCore::Resources::ResourceHandle p_ID) :
-			Resource(p_name, p_ID),
-			m_ID(0)
-		{}
-
-		virtual ~Shader() override = default;
+		// Shader Factory
+		static std::shared_ptr<Shader> Create(const std::string& p_vertexShader, const std::string& p_fragmentShader);
+		static std::shared_ptr<Shader> Create(const std::string& p_vertexShader, const std::string& p_fragmentShader, const std::string& p_geometeryShader);
 
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
@@ -61,12 +60,19 @@ namespace PrRenderer::Resources {
 		virtual PrCore::Math::vec3 GetUniformVec3(const std::string& p_name) = 0;
 		virtual PrCore::Math::vec2 GetUniformVec2(const std::string& p_name) = 0;
 
+		virtual bool Compile() = 0;
+
 	protected:
 		RendererID m_ID;
 
 		std::map<std::string, Uniform> m_uniforms;
 		std::unordered_map<std::string, int> m_uniformLocation;
+
+		std::string m_vertexShader;
+		std::string m_geometryShader;
+		std::string m_fragmentShader;
 	};
 
-	typedef std::shared_ptr<Shader> ShaderPtr;
+	REGISTRER_RESOURCE_HANDLE(Shader);
+	using Shaderv2Ptr = std::shared_ptr<Shader>;
 }

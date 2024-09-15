@@ -84,9 +84,9 @@ namespace PrRenderer::Core {
 	struct RenderObject {
 		RenderObjectType       type;
 		size_t                 id;
-		Resources::MaterialPtr material;
-		Resources::MeshPtr     mesh;
-		Resources::MeshPtr     shadowMesh;
+		Resources::Materialv2Ptr material;
+		Resources::Meshv2Ptr     mesh;
+		Resources::Meshv2Ptr     shadowMesh;
 		SortingHash            sortingHash;
 		PrCore::Math::mat4     worldMat;
 		bool                   wiredframe = false;

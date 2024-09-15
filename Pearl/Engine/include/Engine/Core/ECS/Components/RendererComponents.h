@@ -1,7 +1,7 @@
 #pragma once
+
 #include"Core/ECS/BaseComponent.h"
-#include"Core/Resources/ResourceLoader.h"
-#include "Core/Resources/ResourceManager.h"
+#include"Core/Resources/ResourceSystem.h"
 #include"Renderer/Resources/Mesh.h"
 #include"Renderer/Resources/Material.h"
 #include"Renderer/Core/Color.h"
@@ -22,18 +22,18 @@ namespace PrCore::ECS {
 		~MeshRendererComponent() override = default;
 
 		bool shadowCaster = true;
-		std::shared_ptr<PrRenderer::Resources::Mesh> mesh;
-		std::shared_ptr<PrRenderer::Resources::Mesh> shadowMesh;
-		std::shared_ptr<PrRenderer::Resources::Material> material;
+		PrRenderer::Resources::MeshHandle mesh;
+		PrRenderer::Resources::MeshHandle shadowMesh;
+		PrRenderer::Resources::MaterialHandle material;
 
 		virtual void OnSerialize(Utils::JSON::json& p_serialized) override
 		{
 			if(shadowMesh != nullptr)
 			{
-				p_serialized["ShadowMesh"] = shadowMesh->GetName();
+				p_serialized["ShadowMesh"] = shadowMesh.GetPath();
 			}
-			p_serialized["Mesh"] = mesh->GetName();
-			p_serialized["Material"] = material->GetName();
+			p_serialized["Mesh"] = mesh.GetPath();
+			p_serialized["Material"] = material.GetPath();
 		}
 
 		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override
@@ -52,7 +52,7 @@ namespace PrCore::ECS {
 			else if (meshName.find("Primitive_Quad") != std::string::npos)
 				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Quad);
 			else
-				mesh = Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Mesh>(p_deserialized["Mesh"]);
+				mesh = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>(static_cast<std::string>(p_deserialized["Mesh"]));
 
 			auto shadowMeshIt = p_deserialized.find("ShadowMesh");
 			if(shadowMeshIt != p_deserialized.end())
@@ -71,10 +71,10 @@ namespace PrCore::ECS {
 				else if (meshName.find("Primitive_Quad") != std::string::npos)
 					shadowMesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Quad);
 				else
-					shadowMesh = Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Mesh>(p_deserialized["ShadowMesh"]);
+					shadowMesh = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>(static_cast<std::string>(p_deserialized["ShadowMesh"]));
 			}
 
-			material = Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>(p_deserialized["Material"]);
+			material = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>(static_cast<std::string>(p_deserialized["Material"]));
 		}
 	};
 

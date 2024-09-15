@@ -1,7 +1,7 @@
 #include "Core/Common/pearl_pch.h"
 
 #include "Renderer/Resources/ShaderLoader.h"
-#include "Renderer/Resources/Shaderv2.h"
+#include "Renderer/Resources/Shader.h"
 
 #include"Core/Filesystem/FileSystem.h"
 #include"Core/Utils/StringUtils.h"
@@ -35,14 +35,14 @@ PrCore::Resources::IResourceDataPtr ShaderLoader::LoadResource(const std::string
 		auto geometryShader = shader.substr(geometryShaderPos + geometryShaderKeyword.length(), fragmentShaderPos - geometryShaderPos - geometryShaderKeyword.length());
 		auto fragmentShader = shader.substr(fragmentShaderPos + fragmentShaderKeyword.length());
 		
-		shaderPtr = Shaderv2::Create(vertexShader, fragmentShader, geometryShader);
+		shaderPtr = Shader::Create(vertexShader, fragmentShader, geometryShader);
 	}
 	else
 	{
 		auto vertexShader = shader.substr(vertexShaderKeyword.length(), fragmentShaderPos - vertexShaderKeyword.length());
 		auto fragmentShader = shader.substr(fragmentShaderPos + fragmentShaderKeyword.length());
 
-		shaderPtr = Shaderv2::Create(vertexShader, fragmentShader);
+		shaderPtr = Shader::Create(vertexShader, fragmentShader);
 	}
 
 	if (!shaderPtr->Compile())

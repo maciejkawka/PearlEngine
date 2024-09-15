@@ -1,20 +1,22 @@
-#include"Core/Common/pearl_pch.h"
+#include "Core/Common/pearl_pch.h"
 
-#include"Renderer/OpenGL/GLShader.h"
-
-#include"Core/Filesystem/FileSystem.h"
-#include"Core/Filesystem/FileStream.h"
-#include"Core/Utils/StringUtils.h"
+#include "Renderer/OpenGL/GLShader.h"
+#include "Core/Utils/StringUtils.h"
 
 #include<any>
 #include"glad/glad.h"
 
 using namespace PrRenderer::OpenGL;
-using namespace PrCore::Filesystem;
 
-GLShader::GLShader(const std::string& p_name, PrCore::Resources::ResourceHandle p_handle):
-	Shader(p_name, p_handle)
-{}
+GLShader::GLShader(const std::string& p_vertexShader, const std::string& p_fragmentShader) :
+	Shader(p_vertexShader, p_fragmentShader)
+{
+}
+
+GLShader::GLShader(const std::string& p_vertexShader, const std::string& p_fragmentShader, const std::string& p_geometeryShader) :
+	Shader(p_vertexShader, p_fragmentShader, m_geometryShader)
+{
+}
 
 void GLShader::Bind()
 {
@@ -191,7 +193,10 @@ PrCore::Math::vec2 GLShader::GetUniformVec2(const std::string& p_name)
 bool GLShader::Compile()
 {
 	if (m_ID != 0)
+	{
+		PRLOG_WARN("Shader already compiled! Shader ID {0}", m_ID);
 		return true;
+	}
 
 	RendererID vertexShader;
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -205,14 +210,14 @@ bool GLShader::Compile()
 
 	if (!success)
 	{
-		char infoLog[512];	
+		char infoLog[512];
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
 		PRLOG_ERROR("Renderer: VertexShader " + m_name + " Error: " + infoLog);
 		return false;
 	}
 
 	RendererID geometryShader = 0;
-	if(!m_geometryShader.empty())
+	if (!m_geometryShader.empty())
 	{
 		geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
 
@@ -252,7 +257,7 @@ bool GLShader::Compile()
 
 	glAttachShader(m_ID, vertexShader);
 	glAttachShader(m_ID, fragmentShader);
-	if(geometryShader)
+	if (geometryShader)
 		glAttachShader(m_ID, geometryShader);
 	glLinkProgram(m_ID);
 
@@ -269,6 +274,8 @@ bool GLShader::Compile()
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 	glDeleteShader(geometryShader);
+
+	ScanUniforms();
 
 	return true;
 }
@@ -300,89 +307,89 @@ void GLShader::ScanUniforms()
 
 		switch (uniformType)
 		{
-			case GL_INT:
-				if (uniformSize == 1)
-				{
-					prUniformType = Resources::UniformType::Int;
-					uniformValue = std::make_any<int>(GetUniformInt(uniformName));
-				}
-				else
-					prUniformType = Resources::UniformType::Int_Array;
-				break;
-			case GL_BOOL:
-				prUniformType = Resources::UniformType::Bool;
-				uniformValue = std::make_any<bool>(GetUniformInt(uniformName));
-				
-				break;
-			case GL_FLOAT:
-				if (uniformSize == 1)
-				{
-					prUniformType = Resources::UniformType::Float;
-					uniformValue = std::make_any<float>(GetUniformFloat(uniformName));
-				}
-				else
-					prUniformType = Resources::UniformType::Float_Array;
-				break;
-			case GL_FLOAT_VEC2:
-				if (uniformSize == 1)
-				{
-					prUniformType = Resources::UniformType::Float_Vec2;
-					uniformValue = std::make_any<PrCore::Math::vec2>(GetUniformVec2(uniformName));
-				}
-				else
-					prUniformType = Resources::UniformType::Float_Vec2_Array;
-				break;
-			case GL_FLOAT_VEC3:
-				if (uniformSize == 1)
-				{
-					prUniformType = Resources::UniformType::Float_Vec3;
-					uniformValue = std::make_any<PrCore::Math::vec3>(GetUniformVec3(uniformName));
-				}
-				else
-					prUniformType = Resources::UniformType::Float_Vec3_Array;
-				break;
-			case GL_FLOAT_VEC4:
-				if (uniformSize == 1)
-				{
-					prUniformType = Resources::UniformType::Float_Vec4;
-					uniformValue = std::make_any<PrCore::Math::vec4>(GetUniformVec4(uniformName));
-				}
-				else
-					prUniformType = Resources::UniformType::Float_Vec4_Array;
-				break;
-			case GL_FLOAT_MAT4:
-				if (uniformSize == 1)
-				{
-					prUniformType = Resources::UniformType::Float_Mat4;
-					uniformValue = std::make_any<PrCore::Math::mat4>(GetUniformMat4(uniformName));
-				}
-				else
-					prUniformType = Resources::UniformType::Float_Mat4_Array;
-				break;
-			case GL_FLOAT_MAT3:
-				if (uniformSize == 1)
-				{
-					prUniformType = Resources::UniformType::Float_Mat3;
-					uniformValue = std::make_any<PrCore::Math::mat3>(GetUniformMat3(uniformName));
-				}
-				else
-					prUniformType = Resources::UniformType::Float_Mat3_Array;
-				break;
-			case GL_SAMPLER_2D:
-				prUniformType = Resources::UniformType::Texture2D;
-				break;
-			case GL_SAMPLER_3D:
-				prUniformType = Resources::UniformType::Texture3D;
-				break;
-			case GL_SAMPLER_CUBE:
-				prUniformType = Resources::UniformType::Cubemap;
-				break;
-			default:
+		case GL_INT:
+			if (uniformSize == 1)
 			{
-				PRLOG_INFO("Renderer Shader name:{0} Uniform {1} is not supported", m_name, uniformName);
-				continue;
-				break;
+				prUniformType = Resources::UniformType::Int;
+				uniformValue = std::make_any<int>(GetUniformInt(uniformName));
 			}
+			else
+				prUniformType = Resources::UniformType::Int_Array;
+			break;
+		case GL_BOOL:
+			prUniformType = Resources::UniformType::Bool;
+			uniformValue = std::make_any<bool>(GetUniformInt(uniformName));
+
+			break;
+		case GL_FLOAT:
+			if (uniformSize == 1)
+			{
+				prUniformType = Resources::UniformType::Float;
+				uniformValue = std::make_any<float>(GetUniformFloat(uniformName));
+			}
+			else
+				prUniformType = Resources::UniformType::Float_Array;
+			break;
+		case GL_FLOAT_VEC2:
+			if (uniformSize == 1)
+			{
+				prUniformType = Resources::UniformType::Float_Vec2;
+				uniformValue = std::make_any<PrCore::Math::vec2>(GetUniformVec2(uniformName));
+			}
+			else
+				prUniformType = Resources::UniformType::Float_Vec2_Array;
+			break;
+		case GL_FLOAT_VEC3:
+			if (uniformSize == 1)
+			{
+				prUniformType = Resources::UniformType::Float_Vec3;
+				uniformValue = std::make_any<PrCore::Math::vec3>(GetUniformVec3(uniformName));
+			}
+			else
+				prUniformType = Resources::UniformType::Float_Vec3_Array;
+			break;
+		case GL_FLOAT_VEC4:
+			if (uniformSize == 1)
+			{
+				prUniformType = Resources::UniformType::Float_Vec4;
+				uniformValue = std::make_any<PrCore::Math::vec4>(GetUniformVec4(uniformName));
+			}
+			else
+				prUniformType = Resources::UniformType::Float_Vec4_Array;
+			break;
+		case GL_FLOAT_MAT4:
+			if (uniformSize == 1)
+			{
+				prUniformType = Resources::UniformType::Float_Mat4;
+				uniformValue = std::make_any<PrCore::Math::mat4>(GetUniformMat4(uniformName));
+			}
+			else
+				prUniformType = Resources::UniformType::Float_Mat4_Array;
+			break;
+		case GL_FLOAT_MAT3:
+			if (uniformSize == 1)
+			{
+				prUniformType = Resources::UniformType::Float_Mat3;
+				uniformValue = std::make_any<PrCore::Math::mat3>(GetUniformMat3(uniformName));
+			}
+			else
+				prUniformType = Resources::UniformType::Float_Mat3_Array;
+			break;
+		case GL_SAMPLER_2D:
+			prUniformType = Resources::UniformType::Texture2D;
+			break;
+		case GL_SAMPLER_3D:
+			prUniformType = Resources::UniformType::Texture3D;
+			break;
+		case GL_SAMPLER_CUBE:
+			prUniformType = Resources::UniformType::Cubemap;
+			break;
+		default:
+		{
+			PRLOG_INFO("Renderer Shader name:{0} Uniform {1} is not supported", m_name, uniformName);
+			continue;
+			break;
+		}
 		}
 
 		Resources::Uniform uniform{
@@ -409,84 +416,7 @@ int GLShader::GetUniformLocation(const std::string& p_name)
 	return glLocation;
 }
 
-void GLShader::PreLoadImpl()
+size_t GLShader::GetByteSize() const
 {
-	//Load from file
-	std::string dir = SHADER_DIR;
-	dir += ("/" + m_name);
-
-	FileStreamPtr file = FileSystem::GetInstance().OpenFileStream(dir.c_str());
-	std::string shader;
-	shader.resize(file->GetSize());
-	file->Read(&shader[0]);
-
-	std::string vertexShaderKeyword = "#vertex";
-	std::string fragmentShaderKeyword = "#fragment";
-	std::string geometryShaderKeyword = "#geometry";
-
-	// check if geometry shader is avaliable
-	const auto fragmentShaderPos = shader.find(fragmentShaderKeyword);
-	const auto geometryShaderPos = shader.find(geometryShaderKeyword);
-	if(geometryShaderPos != std::string::npos)
-	{	
-		m_vertexShader = shader.substr(vertexShaderKeyword.length(), geometryShaderPos - vertexShaderKeyword.length());
-		m_geometryShader = shader.substr(geometryShaderPos + geometryShaderKeyword.length(), fragmentShaderPos - geometryShaderPos - geometryShaderKeyword.length());
-		m_fragmentShader = shader.substr(fragmentShaderPos + fragmentShaderKeyword.length());
-	}
-	else
-	{
-		m_vertexShader = shader.substr(vertexShaderKeyword.length(), fragmentShaderPos - vertexShaderKeyword.length());
-		m_fragmentShader = shader.substr(fragmentShaderPos + fragmentShaderKeyword.length());
-	}
-}
-
-bool GLShader::LoadImpl()
-{
-	if (m_vertexShader.empty() || m_fragmentShader.empty())
-		return false;
-
-	auto result = Compile();
-
-	return result;
-}
-
-void GLShader::PostLoadImpl()
-{
-	ScanUniforms();
-}
-
-void GLShader::PreUnloadImpl()
-{
-
-}
-
-bool GLShader::UnloadImpl()
-{
-	glDeleteProgram(m_ID);
-	m_ID = 0;
-
-	m_uniformLocation.clear();
-	m_uniforms.clear();
-	m_vertexShader.clear();
-	m_fragmentShader.clear();
-
-	return true;
-}
-
-void GLShader::PostUnloadImpl()
-{
-}
-
-void GLShader::LoadCorruptedResource()
-{
-}
-
-void GLShader::CalculateSize()
-{
-	m_size =
-		sizeof(m_vertexShader) + sizeof(char) * m_vertexShader.length() +
-		sizeof(m_fragmentShader) + sizeof(char) * m_fragmentShader.length() +
-		sizeof(m_uniforms) + m_uniformLocation.size() * sizeof(decltype(m_uniforms)::value_type) +
-		sizeof(m_uniformLocation) + m_uniformLocation.size() * (sizeof(decltype(m_uniformLocation)::key_type) + sizeof(decltype(m_uniformLocation)::mapped_type)) +
-		sizeof(m_name) + sizeof(char) * m_name.length();
+	return sizeof(GLShader) + m_vertexShader.size() + m_fragmentShader.size() + m_geometryShader.size();
 }

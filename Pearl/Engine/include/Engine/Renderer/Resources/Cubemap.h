@@ -1,60 +1,40 @@
 #pragma once
-#include"Renderer/Resources/Texture.h"
+
+#include "Renderer/Resources/Texture2D.h"
 
 #include<vector>
 
-namespace PrRenderer::Resources{
+namespace PrRenderer::Resources {
 
-	class Cubemap: public Texture{
+	class Cubemap : public Texture2D {
 	public:
-		Cubemap():
-			Texture(),
-			m_wrapR(TextureWrapMode::Clamp),
-			m_rawDataArray(nullptr)
+		Cubemap() :
+			Texture2D(),
+			m_rawDataArray(nullptr),
+			m_wrapR(TextureWrapMode::Clamp)
 		{}
 
-		//Constructor for managed resource
-		Cubemap(std::string p_name, PrCore::Resources::ResourceHandle p_handle):
-			Texture(p_name, p_handle),
-		m_rawDataArray(nullptr)
-		{
-			m_wrapU = TextureWrapMode::Clamp;
-			m_wrapV = TextureWrapMode::Clamp;
-			m_wrapR = TextureWrapMode::Clamp;
-			m_magFiltering = TextureFiltering::Linear;
-			m_minFiltering = TextureFiltering::Linear;
-		}
+		Cubemap(RendererID p_id, size_t p_width, size_t p_height, Resources::TextureFormat p_format):
+			Texture2D(),
+			m_rawDataArray(nullptr),
+			m_wrapR(TextureWrapMode::Clamp)
+		{}
 
-		virtual void Apply() {}
+		// Texture factories
+		static std::shared_ptr<Cubemap> Create();
+		static std::shared_ptr<Cubemap> Create(RendererID p_id, size_t p_width, size_t p_height, Resources::TextureFormat p_format);
+		static std::shared_ptr<Cubemap> CreateUnitTex(const Core::Color& p_unitColor);
 
-		inline void SetFace(int p_index, const std::string& p_name) { m_facesNames[p_index] = p_name; }
-		inline void Faces(std::vector<std::string> p_names) { m_facesNames = p_names; }
-
-		inline const std::vector<std::string>& GetFaces() const { return m_facesNames; }
-		inline const std::string& GetFace(int p_index) const { return m_facesNames[p_index]; }
-
-		virtual void SetWrapModeR(TextureWrapMode p_wrapR) = 0;
+		virtual void SetWrapModeR(TextureWrapMode p_wrapR) { m_wrapR = p_wrapR; }
 		TextureWrapMode GetWrapModeR() const { return m_wrapR; }
 
-		static TexturePtr GenerateBlackTexture();
-		static TexturePtr GenerateWhiteTexture();
-		static TexturePtr GenerateRedTexture();
-
-		//To implement in future
-		//void SetPixel(unsigned int p_u, unsigned int p_v);
-		//Core::Color GetPixel(unsigned int p_u, unsigned int p_v) const;
-
-		//void SetPixels(const Core::Color p_colorArray[]);
-		//const Core::Color* GetPixels();
+		void SetData(void* p_data) override;
 
 	protected:
-		unsigned char** m_rawDataArray;
-		std::vector<std::string> m_facesNames;
+		void** m_rawDataArray;
 		TextureWrapMode m_wrapR;
-
-	private:
-		static TexturePtr GenerateUnitTexture(Core::Color p_color);
 	};
 
-	typedef std::shared_ptr<Cubemap> CubemapPtr;
+	REGISTRER_RESOURCE_HANDLE(Cubemap);
+	using Cubemapv2Ptr = std::shared_ptr<Cubemap>;
 }

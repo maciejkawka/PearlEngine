@@ -24,10 +24,10 @@ namespace PrRenderer::Core {
 		struct gBuffer
 		{
 			Buffers::FramebuffferPtr buffer;
-			Resources::TexturePtr positionTex; //Position (RGB) + Depth (A)
-			Resources::TexturePtr albedoTex; //Albedo (RGB) + Roughness (A)
-			Resources::TexturePtr normalsTex; // Normals (RGB) + Metalness (A)
-			Resources::TexturePtr aoTex; // Emissive (RGB) + AO (A)
+			Resources::Texturev2Ptr positionTex; //Position (RGB) + Depth (A)
+			Resources::Texturev2Ptr albedoTex; //Albedo (RGB) + Roughness (A)
+			Resources::Texturev2Ptr normalsTex; // Normals (RGB) + Metalness (A)
+			Resources::Texturev2Ptr aoTex; // Emissive (RGB) + AO (A)
 		};
 
 		struct RenderContext {
@@ -36,42 +36,42 @@ namespace PrRenderer::Core {
 
 			// PBR Lighting
 			Buffers::FramebuffferPtr            otuputBuff;
-			Resources::TexturePtr               outputTex;
-			Resources::CubemapPtr               IRMap;
-			Resources::CubemapPtr               prefilterMap;
-			Resources::TexturePtr               brdfLUT;
+			Resources::Texturev2Ptr               outputTex;
+			Resources::Cubemapv2Ptr               IRMap;
+			Resources::Cubemapv2Ptr               prefilterMap;
+			Resources::Texturev2Ptr               brdfLUT;
 
 			// SSAO
 			Buffers::FramebuffferPtr            SSAOBuff;
-			Resources::TexturePtr               SSAOTex;
-			Resources::TexturePtr               SSAONoiseTex;
+			Resources::Texturev2Ptr               SSAOTex;
+			Resources::Texturev2Ptr               SSAONoiseTex;
 			std::vector<PrCore::Math::vec3>     ssaoKernel;
 
 			// Postprocess 
 			Buffers::FramebuffferPtr            postprocessBuff;
-			Resources::TexturePtr               postprocessTex;
+			Resources::Texturev2Ptr               postprocessTex;
 			Buffers::FramebuffferPtr            bloomDownscaleBuff[BLOOM_SIZE];
-			Resources::TexturePtr               bloomDownscaleTex[BLOOM_SIZE];
+			Resources::Texturev2Ptr               bloomDownscaleTex[BLOOM_SIZE];
 			Buffers::FramebuffferPtr            bloomBuff;
-			Resources::TexturePtr               bloomTex;
+			Resources::Texturev2Ptr               bloomTex;
 
 			// Shadow mapping
 			// One point light uses 6 subparts of the texture, so number of lights = TextureSize / (ShadowMapTexture * 6)
 			Buffers::FramebuffferPtr            shadowMapPointBuff;
-			Resources::TexturePtr               shadowMapPointTex;
+			Resources::Texturev2Ptr               shadowMapPointTex;
 
 			Buffers::FramebuffferPtr            shadowMapSpotBuff;
-			Resources::TexturePtr               shadowMapSpotTex;
+			Resources::Texturev2Ptr               shadowMapSpotTex;
 
 			Buffers::FramebuffferPtr            shadowMapDirBuff;
-			Resources::TexturePtr               shadowMapDirTex;
+			Resources::Texturev2Ptr               shadowMapDirTex;
 
 			Buffers::FramebuffferPtr            shadowMapMainDirBuff;
-			Resources::TexturePtr               shadowMapMainDirTex;
+			Resources::Texturev2Ptr               shadowMapMainDirTex;
 
 			//Aux
 			Camera*                             camera;
-			Resources::MeshPtr                  quadMesh;
+			Resources::Meshv2Ptr                  quadMesh;
 			RendererSettingsPtr                 settings;
 			FrameInfo*                          frameInfo;
 		};
@@ -83,44 +83,44 @@ namespace PrRenderer::Core {
 		REGISTER_RENDER_COMMAND(RenderOpaque, RenderObjectPtr, RenderContext*);
 
 		// Renders object into the directional and spotlight map
-		static void RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderToShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, LightObjectPtr, std::list<RenderObjectPtr>*, RenderContext*);
+		static void RenderToShadowMap(Resources::Shaderv2Ptr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData);
+		REGISTER_RENDER_COMMAND(RenderToShadowMap, Resources::Shaderv2Ptr, PrCore::Math::mat4, LightObjectPtr, std::list<RenderObjectPtr>*, RenderContext*);
 
 		// Renders object into the point light map
-		static void RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightView, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData);
-		REGISTER_RENDER_COMMAND(RenderToPointShadowMap, Resources::ShaderPtr, PrCore::Math::mat4, LightObjectPtr, std::list<RenderObjectPtr>*, RenderContext*);
+		static void RenderToPointShadowMap(Resources::Shaderv2Ptr p_pointShadowMapShader, PrCore::Math::mat4& p_lightView, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData);
+		REGISTER_RENDER_COMMAND(RenderToPointShadowMap, Resources::Shaderv2Ptr, PrCore::Math::mat4, LightObjectPtr, std::list<RenderObjectPtr>*, RenderContext*);
 
 		// After objects are rendered into GBuffer this pass calculates PBR Ligthing, with global iluminance
-		static void RenderLight(Resources::ShaderPtr p_lightShdr, DirLightObjectPtr p_mianDirectLight, std::vector<LightObjectPtr>* p_lights, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderLight, Resources::ShaderPtr, DirLightObjectPtr, std::vector<LightObjectPtr>*, const RenderContext*);
+		static void RenderLight(Resources::Shaderv2Ptr p_lightShdr, DirLightObjectPtr p_mianDirectLight, std::vector<LightObjectPtr>* p_lights, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderLight, Resources::Shaderv2Ptr, DirLightObjectPtr, std::vector<LightObjectPtr>*, const RenderContext*);
 
 		// Renders cubemap in background
-		static void RenderCubeMap(Resources::MaterialPtr p_material, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderCubeMap, Resources::MaterialPtr, const RenderContext*);
+		static void RenderCubeMap(Resources::Materialv2Ptr p_material, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderCubeMap, Resources::Materialv2Ptr, const RenderContext*);
 
 		// Renders a tone mapping and exposure
-		static void RenderToneMapping(Resources::ShaderPtr p_toneMapShader, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderToneMapping, Resources::ShaderPtr, const RenderContext*);
+		static void RenderToneMapping(Resources::Shaderv2Ptr p_toneMapShader, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderToneMapping, Resources::Shaderv2Ptr, const RenderContext*);
 
 		// Renders a transparent objects using froward rendering. Uses global ilumination, does not affected by light or shadows
 		static void RenderTransparent(RenderObjectPtr p_object, const RenderContext* p_renderContext);
 		REGISTER_RENDER_COMMAND(RenderTransparent, RenderObjectPtr, RenderContext*);
 
 		// Renders SSAO
-		static void RenderSSAO(Resources::ShaderPtr p_SSAOShader, Resources::ShaderPtr p_BlurSSAOShader, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderSSAO, Resources::ShaderPtr, Resources::ShaderPtr, RenderContext*);
+		static void RenderSSAO(Resources::Shaderv2Ptr p_SSAOShader, Resources::Shaderv2Ptr p_BlurSSAOShader, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderSSAO, Resources::Shaderv2Ptr, Resources::Shaderv2Ptr, RenderContext*);
 
 		// Renders FXAA
-		static void RenderFXAA(Resources::ShaderPtr p_FXAAShader, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderFXAA, Resources::ShaderPtr, RenderContext*);
+		static void RenderFXAA(Resources::Shaderv2Ptr p_FXAAShader, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderFXAA, Resources::Shaderv2Ptr, RenderContext*);
 
 		// Renders a logarithmic fog, does not put a fog on transparent objects that are rendered on top of the skymap
-		static void RenderFog(Resources::ShaderPtr p_fogShader, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderFog, Resources::ShaderPtr, RenderContext*);
+		static void RenderFog(Resources::Shaderv2Ptr p_fogShader, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderFog, Resources::Shaderv2Ptr, RenderContext*);
 
 		// Renders bloom
-		static void RenderBloom(Resources::ShaderPtr p_downsampleShader, Resources::ShaderPtr p_upsampleShader, const RenderContext* p_renderContext);
-		REGISTER_RENDER_COMMAND(RenderBloom, Resources::ShaderPtr, Resources::ShaderPtr, RenderContext*);
+		static void RenderBloom(Resources::Shaderv2Ptr p_downsampleShader, Resources::Shaderv2Ptr p_upsampleShader, const RenderContext* p_renderContext);
+		REGISTER_RENDER_COMMAND(RenderBloom, Resources::Shaderv2Ptr, Resources::Shaderv2Ptr, RenderContext*);
 
 		// Draw Debug
 		static void RenderDebug(RenderObjectVector* p_debugObjects, const RenderContext* p_renderContext);
@@ -142,16 +142,16 @@ namespace PrRenderer::Core {
 		RenderContext m_renderContext;
 
 		// Shaders
-		Resources::ShaderPtr m_ToneMappingShdr;
-		Resources::ShaderPtr m_pbrLightShdr;
-		Resources::ShaderPtr m_shadowMappingShdr;
-		Resources::ShaderPtr m_pointshadowMappingShdr;
-		Resources::ShaderPtr m_SSAOShdr;
-		Resources::ShaderPtr m_SSAOBlurShdr;
-		Resources::ShaderPtr m_FXAAShdr;
-		Resources::ShaderPtr m_fogShdr;
-		Resources::ShaderPtr m_downsample;
-		Resources::ShaderPtr m_upsample;
+		Resources::ShaderHandle m_ToneMappingShdr;
+		Resources::ShaderHandle m_pbrLightShdr;
+		Resources::ShaderHandle m_shadowMappingShdr;
+		Resources::ShaderHandle m_pointshadowMappingShdr;
+		Resources::ShaderHandle m_SSAOShdr;
+		Resources::ShaderHandle m_SSAOBlurShdr;
+		Resources::ShaderHandle m_FXAAShdr;
+		Resources::ShaderHandle m_fogShdr;
+		Resources::ShaderHandle m_downsample;
+		Resources::ShaderHandle m_upsample;
 
 		CascadeShadowUtility m_CSMUtility;
 	};

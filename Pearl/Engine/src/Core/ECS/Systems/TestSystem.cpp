@@ -35,7 +35,7 @@ void RenderStressTest::OnEnable()
 	//Randomize Lights
 	for (auto [entity, light, mesh]: m_entityViewer.EntitesWithComponents<LightComponent, MeshRendererComponent>())
 	{
-		mesh->material = std::make_shared<PrRenderer::Resources::Material>(*mesh->material);
+		mesh->material = std::make_shared<PrRenderer::Resources::Material>(*mesh->material.GetData());
 		PrRenderer::Core::Color color = randColor();
 		light->m_light->SetColor(color);
 		mesh->material->SetProperty("albedoValue", static_cast<PrCore::Math::vec4>(color));
@@ -78,12 +78,12 @@ void RenderStressTest::OnUpdate(float p_dt)
 
 		if (cubemap == 0)
 		{
-			renderSystem->SetCubemap(Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("skymapHDRMaterial.mat"));
+			renderSystem->SetCubemap(Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("skymapHDRMaterial.mat").GetData());
 			m_mainLightPtr->SetColor({ 0.8f, 0.8f, 0.8f, 1.0f });
 		}
 		else if (cubemap == 1)
 		{
-			renderSystem->SetCubemap(Resources::ResourceLoader::GetInstance().LoadResource<PrRenderer::Resources::Material>("cubemapMaterial.mat"));
+			renderSystem->SetCubemap(Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("cubemapMaterial.mat").GetData());
 			m_mainLightPtr->SetColor({ 0.8f, 0.8f, 0.8f, 1.0f });
 		}
 		else if (cubemap == 2)

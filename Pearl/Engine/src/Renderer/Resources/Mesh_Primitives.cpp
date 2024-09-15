@@ -4,43 +4,43 @@
 
 using namespace PrRenderer::Resources;
 
-MeshPtr Mesh::CreatePrimitive(PrimitiveType p_primitiveType)
+Meshv2Ptr Mesh::CreatePrimitive(PrimitiveType p_primitiveType)
 {
 	switch (p_primitiveType)
 	{
 	case Cube:
 	{
-		static MeshPtr mesh = CreateCube();
+		static Meshv2Ptr mesh = CreateCube();
 		return mesh;
 	}
 	case Sphere:
 	{
-		static MeshPtr mesh = CreateSphere();
+		static Meshv2Ptr mesh = CreateSphere();
 		return mesh;
 	}
 	case Capsule:
 	{
-		static MeshPtr mesh = CreateCapsule();
+		static Meshv2Ptr mesh = CreateCapsule();
 		return mesh;
 	}
 	case Cylinder:
 	{
-		static MeshPtr mesh = CreateCylinder();
+		static Meshv2Ptr mesh = CreateCylinder();
 		return mesh;
 	}
 	case Plane:
 	{
-		static MeshPtr mesh = CreatePlane();
+		static Meshv2Ptr mesh = CreatePlane();
 		return mesh;
 	}
 	case Quad:
 	{
-		static MeshPtr mesh = CreateQuad();
+		static Meshv2Ptr mesh = CreateQuad();
 		return mesh;
 	}
 	case Line:
 	{
-		static MeshPtr mesh = CreateLine();
+		static Meshv2Ptr mesh = CreateLine();
 		return mesh;
 	}
 	default:
@@ -51,9 +51,9 @@ MeshPtr Mesh::CreatePrimitive(PrimitiveType p_primitiveType)
 	}
 }
 
-MeshPtr Mesh::CreateCube()
+Meshv2Ptr Mesh::CreateCube()
 {
-	MeshPtr cube = Create();
+	Meshv2Ptr cube = Create();
 
 	std::vector<PrCore::Math::vec3> vertices =
 	{
@@ -163,9 +163,9 @@ MeshPtr Mesh::CreateCube()
 	return cube;
 }
 
-MeshPtr Mesh::CreateSphere()
+Meshv2Ptr Mesh::CreateSphere()
 {
-	MeshPtr sphere = Create();
+	Meshv2Ptr sphere = Create();
 
 	std::vector<PrCore::Math::vec3> vertices =
 	{
@@ -2073,9 +2073,9 @@ MeshPtr Mesh::CreateSphere()
 	return sphere;
 }
 
-MeshPtr Mesh::CreateCapsule()
+Meshv2Ptr Mesh::CreateCapsule()
 {
-	MeshPtr capsule = Create();
+	Meshv2Ptr capsule = Create();
 
 	std::vector<PrCore::Math::vec3> vertices =
 	{
@@ -4116,9 +4116,9 @@ MeshPtr Mesh::CreateCapsule()
 	return capsule;
 }
 
-MeshPtr Mesh::CreateCylinder()
+Meshv2Ptr Mesh::CreateCylinder()
 {
-	MeshPtr cylinder = Create();
+	Meshv2Ptr cylinder = Create();
 
 	std::vector<PrCore::Math::vec3> vertices =
 	{
@@ -4451,9 +4451,9 @@ MeshPtr Mesh::CreateCylinder()
 	return cylinder;
 }
 
-MeshPtr Mesh::CreatePlane()
+Meshv2Ptr Mesh::CreatePlane()
 {
-	MeshPtr plane = Create();
+	Meshv2Ptr plane = Create();
 
 	std::vector<PrCore::Math::vec3> vertices =
 	{
@@ -4936,9 +4936,9 @@ MeshPtr Mesh::CreatePlane()
 	return plane;
 }
 
-MeshPtr Mesh::CreateQuad()
+Meshv2Ptr Mesh::CreateQuad()
 {
-	MeshPtr quad = Create();
+	Meshv2Ptr quad = Create();
 
 	std::vector<PrCore::Math::vec3> vertices =
 	{
@@ -4985,9 +4985,9 @@ MeshPtr Mesh::CreateQuad()
 	return quad;
 }
 
-MeshPtr Mesh::CreateLine()
+Meshv2Ptr Mesh::CreateLine()
 {
-	MeshPtr line = Create();
+	Meshv2Ptr line = Create();
 
 	std::vector<PrCore::Math::vec3> vertices =
 	{

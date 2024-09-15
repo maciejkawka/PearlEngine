@@ -7,8 +7,8 @@ namespace PrRenderer::Core {
 
     struct MeshRenderObject {
 
-        Resources::MeshPtr mesh;
-        Resources::MaterialPtr material;
+        Resources::Meshv2Ptr mesh;
+        Resources::Materialv2Ptr material;
 
         PrCore::Math::mat4 worldMat;
         PrCore::Math::vec3 position;
@@ -18,8 +18,8 @@ namespace PrRenderer::Core {
 
     struct InstancedMeshObject {
 
-        Resources::MeshPtr mesh;
-        Resources::MaterialPtr material;
+        Resources::Meshv2Ptr mesh;
+        Resources::Materialv2Ptr material;
 
         size_t instanceCount;
         std::vector<PrCore::Math::mat4> wordMatrices;

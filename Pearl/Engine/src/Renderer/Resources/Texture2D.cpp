@@ -6,35 +6,16 @@
 
 using namespace PrRenderer::Resources;
 
-TexturePtr Texture2D::GenerateUnitTexture(Core::Color p_color)
+std::shared_ptr<Texture2D> Texture2D::Create()
 {
-	Resources::Texture2DPtr texture;
+	Texture2Dv2Ptr texture = nullptr;
 	switch (Core::RendererAPI::GetGraphicsAPI())
 	{
 	case Core::GraphicsAPI::OpenGL: texture = std::make_shared<OpenGL::GLTexture2D>(); break;
 
 	default:
 	{
-		PRLOG_ERROR("No such Graphics API");
-		break;
-	}
-	}
-
-	texture->LoadUnitTexture(p_color);
-
-	return std::static_pointer_cast<Texture>(texture);
-}
-
-Texture2DPtr Texture2D::Create()
-{
-	Resources::Texture2DPtr texture;
-	switch (Core::RendererAPI::GetGraphicsAPI())
-	{
-	case Core::GraphicsAPI::OpenGL: texture = std::make_shared<OpenGL::GLTexture2D>(); break;
-
-	default:
-	{
-		PRLOG_ERROR("No such Graphics API");
+		PR_ASSERT(false, "No such Graphics API");
 		break;
 	}
 	}
@@ -42,17 +23,28 @@ Texture2DPtr Texture2D::Create()
 	return texture;
 }
 
-TexturePtr Texture2D::GenerateBlackTexture()
+std::shared_ptr<Texture2D> Texture2D::CreateUnitTex(const Core::Color& p_unitColor)
 {
-	return GenerateUnitTexture(Core::Color::Black);
-}
+	// Create empty texture and fills it with unit data
+	auto texture = Create();
 
-TexturePtr Texture2D::GenerateWhiteTexture()
-{
-	return GenerateUnitTexture(Core::Color::White);
-}
+	unsigned char* rawImage = new unsigned char[4];
+	rawImage[0] = p_unitColor.r;
+	rawImage[1] = p_unitColor.g;
+	rawImage[2] = p_unitColor.b;
+	rawImage[3] = p_unitColor.a;
 
-TexturePtr Texture2D::GenerateRedTexture()
-{
-	return GenerateUnitTexture(Core::Color::Red);
+	texture->SetData(rawImage);
+	texture->SetFormat(TextureFormat::RGBA32);
+	texture->SetHeight(1);
+	texture->SetWidth(1);
+	texture->SetReadable(false);
+	texture->SetMipMap(false);
+
+	texture->Apply();
+	texture->SetData(nullptr);
+
+	delete[] rawImage;
+
+	return texture;
 }

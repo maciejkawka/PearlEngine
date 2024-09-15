@@ -6,13 +6,30 @@
 #include"Core/Utils/Clock.h"
 #include"Core/Filesystem/FileSystem.h"
 #include"Core/Filesystem/ConfigFile.h"
-#include"Core/Resources/ResourceLoader.h"
+#include"Core/Resources/ResourceSystem.h"
 #include"Core/Resources/ResourceSystem.h"
 #include"Core/ECS/SceneManager.h"
 
 #include"Renderer/OpenGL/GLContext.h"
 #include"Renderer/Core/DeferRenderFrontend.h"
 #include"Renderer/Core/RenderSystem.h"
+
+// TEMP REmove later
+#include "Core/Resources/ResourceDatabase.h"
+
+#include "Renderer/Resources/Shader.h"
+#include "Renderer/Resources/Cubemap.h"
+#include "Renderer/Resources/Material.h"
+#include "Renderer/Resources/Mesh.h"
+#include "Renderer/Resources/Texture.h"
+
+#include "Renderer/Resources/BasicCubemapLoader.h"
+#include "Renderer/Resources/HdrCubemapLoader.h"
+#include "Renderer/Resources/MaterialLoader.h"
+#include "Renderer/Resources/MeshOBJLoader.h"
+#include "Renderer/Resources/ShaderLoader.h"
+#include "Renderer/Resources/Texture2DLoader.h"
+//
 
 const std::string_view GraphicConfig{ "graphic.cfg" };
 const std::string_view RendererConfig{ "renderer.cfg" };
@@ -27,8 +44,37 @@ PrCore::Entry::AppContext::AppContext()
 	Filesystem::FileSystem::Init();
 	Events::EventManager::Init();
 
-	Resources::ResourceLoader::Init();
 	Resources::ResourceSystem::Init();
+
+	// TEMP
+	{
+		using namespace PrRenderer::Resources;
+		auto textureDatabase = std::make_unique<ResourceDatabase>();
+		auto ptr = textureDatabase.get();
+		textureDatabase->RegisterLoader(".png", std::make_unique<Texture2DLoader>());
+		textureDatabase->RegisterLoader(".jpg", std::make_unique<Texture2DLoader>());
+		textureDatabase->RegisterLoader(".tga", std::make_unique<Texture2DLoader>());
+		textureDatabase->RegisterLoader(".hdr", std::make_unique<Texture2DLoader>());
+		ResourceSystem::GetInstance().RegisterDatabase<Texture>(std::move(textureDatabase));
+
+		auto materialLoader = std::make_unique<ResourceDatabase>();
+		materialLoader->RegisterLoader(".mat", std::make_unique<MaterialLoader>());
+		ResourceSystem::GetInstance().RegisterDatabase<Material>(std::move(materialLoader));
+
+		auto shaderLoader = std::make_unique<ResourceDatabase>();
+		shaderLoader->RegisterLoader(".shader", std::make_unique<ShaderLoader>());
+		ResourceSystem::GetInstance().RegisterDatabase<Shader>(std::move(shaderLoader));
+
+		auto meshLoader = std::make_unique<ResourceDatabase>();
+		meshLoader->RegisterLoader(".obj", std::make_unique<MeshOBJLoader>());
+		ResourceSystem::GetInstance().RegisterDatabase<Mesh>(std::move(meshLoader));
+
+		auto cubemapDatabase = std::make_unique<ResourceDatabase>();
+		cubemapDatabase->RegisterLoader(".cubemap", std::make_unique<BasicCubemapLoader>());
+		cubemapDatabase->RegisterLoader(".hdr", std::make_unique<HdrCubemapLoader>());
+		ResourceSystem::GetInstance().RegisterDatabase<Cubemap>(std::move(cubemapDatabase));
+	}
+	//
 
 	Filesystem::ConfigFile contexConfig(GraphicConfig.data());
 	Windowing::WindowContext context;
@@ -141,7 +187,6 @@ PrCore::Entry::AppContext::~AppContext()
 	delete m_window;
 	Windowing::GLWindow::TerminateDevice();
 	Resources::ResourceSystem::Terminate();
-	Resources::ResourceLoader::Terminate();
 	Events::EventManager::Terminate();
 	Filesystem::FileSystem::Terminate();
 	Utils::Clock::Terminate();

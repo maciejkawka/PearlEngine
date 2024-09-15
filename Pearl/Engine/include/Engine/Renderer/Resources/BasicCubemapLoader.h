@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Resources/IResourceDataLoader.h"
-#include "Renderer/Resources/Texture2Dv2.h"
+#include "Renderer/Resources/Texture2D.h"
 
 namespace PrRenderer::Resources {
 

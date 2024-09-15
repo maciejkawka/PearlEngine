@@ -129,13 +129,7 @@
     <ClInclude Include="include\Engine\Core\Filesystem\MemoryStream.h">
       <Filter>Core\Filesystem</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Core\Resources\Resource.h">
-      <Filter>Core\Resources</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine\Core\Events\ResourceEvents.h">
-      <Filter>Core\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Core\Resources\ResourceManager.h">
       <Filter>Core\Resources</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Core\Math\Math.h">
@@ -162,47 +156,20 @@
     <ClInclude Include="include\Engine\Renderer\Buffers\VertexBuffer.h">
       <Filter>Renderer\Buffers</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\Shader.h">
-      <Filter>Renderer\Resources</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Resources\Uniform.h">
-      <Filter>Renderer\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\ShaderManager.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Core\Color.h">
       <Filter>Renderer\Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\Texture.h">
-      <Filter>Renderer\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\Texture2D.h">
-      <Filter>Renderer\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\TextureManager.h">
-      <Filter>Renderer\Resources</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Core\Camera.h">
       <Filter>Renderer\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\Material.h">
-      <Filter>Renderer\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\MaterialManager.h">
-      <Filter>Renderer\Resources</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Core\Utils\JSONParser.h">
       <Filter>Core\Utils</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Core\Utils\StringUtils.h">
       <Filter>Core\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\Mesh.h">
-      <Filter>Renderer\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\MeshManager.h">
-      <Filter>Renderer\Resources</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Buffers\Framebuffer.h">
       <Filter>Renderer\Buffers</Filter>
@@ -222,16 +189,7 @@
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLIndexBuffer.h">
       <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLMesh.h">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLRenderer.h">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLShader.h">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLTexture2D.h">
       <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLUtils.h">
@@ -245,18 +203,6 @@
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Resources\Light.h">
       <Filter>Renderer\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Core\Resources\ResourceLoader.h">
-      <Filter>Core\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\Cubemap.h">
-      <Filter>Renderer\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLCubemap.h">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\CubemapManager.h">
-      <Filter>Renderer\Resources</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Core\Utils\UUID.h">
       <Filter>Core\Utils</Filter>
@@ -390,43 +336,43 @@
     <ClInclude Include="include\Engine\Renderer\Resources\BasicCubemapLoader.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\Cubemapv2.h">
+    <ClInclude Include="include\Engine\Renderer\Resources\Cubemap.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Resources\Texture2DLoader.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\Texture2Dv2.h">
+    <ClInclude Include="include\Engine\Renderer\Resources\Texture2D.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\Texturev2.h">
+    <ClInclude Include="include\Engine\Renderer\Resources\Texture.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLCubemapv2.h">
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLCubemap.h">
       <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLTexture2Dv2.h">
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLTexture2D.h">
       <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\Meshv2.h">
+    <ClInclude Include="include\Engine\Renderer\Resources\Mesh.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Resources\MeshOBJLoader.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLMeshv2.h">
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLMesh.h">
       <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\OpenGL\GLShaderv2.h">
+    <ClInclude Include="include\Engine\Renderer\OpenGL\GLShader.h">
       <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\Shaderv2.h">
+    <ClInclude Include="include\Engine\Renderer\Resources\Shader.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Resources\ShaderLoader.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Resources\Materialv2.h">
+    <ClInclude Include="include\Engine\Renderer\Resources\Material.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Renderer\Resources\MaterialLoader.h">
@@ -476,41 +422,17 @@
     <ClCompile Include="src\Core\Filesystem\StandardFileStream.cpp">
       <Filter>Core\Filesystem</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Resources\Resource.cpp">
-      <Filter>Core\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Resources\ResourceManager.cpp">
-      <Filter>Core\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\ShaderManager.cpp">
-      <Filter>Renderer\Resources</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\Core\Color.cpp">
       <Filter>Renderer\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\TextureManager.cpp">
-      <Filter>Renderer\Resources</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\Core\Camera.cpp">
       <Filter>Renderer\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\Material.cpp">
-      <Filter>Renderer\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\MaterialManager.cpp">
-      <Filter>Renderer\Resources</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Utils\JSONParser.cpp">
       <Filter>Core\Utils</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Utils\StringUtils.cpp">
       <Filter>Core\Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\Mesh.cpp">
-      <Filter>Renderer\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\MeshManager.cpp">
-      <Filter>Renderer\Resources</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Core\LowRenderer.cpp">
       <Filter>Renderer\Core</Filter>
@@ -524,16 +446,7 @@
     <ClCompile Include="src\Renderer\OpenGL\GLIndexBuffer.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLMesh.cpp">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL\GLRenderer.cpp">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLShader.cpp">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLTexture2D.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL\GLUtils.cpp">
@@ -548,12 +461,6 @@
     <ClCompile Include="src\Renderer\Resources\Light.cpp">
       <Filter>Renderer\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Resources\ResourceLoader.cpp">
-      <Filter>Core\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLCubemap.cpp">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\Buffers\VertexBuffer.cpp">
       <Filter>Renderer\Buffers</Filter>
     </ClCompile>
@@ -567,18 +474,6 @@
       <Filter>Renderer\Buffers</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Resources\Mesh_Primitives.cpp">
-      <Filter>Renderer\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\CubemapManager.cpp">
-      <Filter>Renderer\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\Texture2D.cpp">
-      <Filter>Renderer\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\Texture.cpp">
-      <Filter>Renderer\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\Cubemap.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Utils\UUID.cpp">
@@ -638,40 +533,40 @@
     <ClCompile Include="src\Renderer\Resources\BasicCubemapLoader.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\Cubemapv2.cpp">
+    <ClCompile Include="src\Renderer\Resources\Cubemap.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Resources\Texture2DLoader.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\Texture2Dv2.cpp">
+    <ClCompile Include="src\Renderer\Resources\Texture2D.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\GLCubemapv2.cpp">
+    <ClCompile Include="src\Renderer\Resources\GLCubemap.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLTexture2Dv2.cpp">
+    <ClCompile Include="src\Renderer\OpenGL\GLTexture2D.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\Meshv2.cpp">
+    <ClCompile Include="src\Renderer\Resources\Mesh.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Resources\MeshOBJLoader.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLMeshv2.cpp">
+    <ClCompile Include="src\Renderer\OpenGL\GLMesh.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL\GLShaderv2.cpp">
+    <ClCompile Include="src\Renderer\OpenGL\GLShader.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\Shaderv2.cpp">
+    <ClCompile Include="src\Renderer\Resources\Shader.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Resources\ShaderLoader.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Resources\Materialv2.cpp">
+    <ClCompile Include="src\Renderer\Resources\Material.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Resources\MaterialLoader.cpp">

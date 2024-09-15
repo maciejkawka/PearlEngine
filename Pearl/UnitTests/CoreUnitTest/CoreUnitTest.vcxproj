@@ -124,7 +124,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine/include/Engine/;$(SolutionDir)../Dependencies/googletest/googletest/include;../CommonUnitTest/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine/include/Engine/;$(SolutionDir)../Dependencies/googletest/googletest/include;../CommonUnitTest/include;$(SolutionDir)../Dependencies/glm;$(SolutionDir)../Dependencies/json/include;$(SolutionDir)../Dependencies/spdlog/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -148,7 +148,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>%(AdditionalOptions) -J -utf-8 /Zc:__cplusplus </AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine/include/Engine/;$(SolutionDir)../Dependencies/googletest/googletest/include;../CommonUnitTest/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine/include/Engine/;$(SolutionDir)../Dependencies/googletest/googletest/include;../CommonUnitTest/include;$(SolutionDir)../Dependencies/spdlog/include;$(SolutionDir)../Dependencies/glm;$(SolutionDir)../Dependencies/json/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -160,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\PathUtilsTests.cpp" />
+    <ClCompile Include="src\ResourceSystemTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CommonUnitTest\CommonUnitTest.vcxproj">

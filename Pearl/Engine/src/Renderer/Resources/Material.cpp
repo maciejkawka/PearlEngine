@@ -1,7 +1,8 @@
 #include"Core/Common/pearl_pch.h"
 
 #include"Renderer/Resources/Material.h"
-#include"Core/Resources/ResourceLoader.h"
+
+#include"Core/Resources/ResourceSystem.h"
 #include"Renderer/Resources/Texture2D.h"
 #include"Renderer/Resources/Cubemap.h"
 
@@ -15,15 +16,8 @@
 using namespace PrRenderer::Resources;
 using namespace PrCore::Utils;
 
-Material::Material(const std::string& p_name, PrCore::Resources::ResourceHandle p_ID):
-	Resource(p_name, p_ID),
-	m_renderType(RenderType::Opaque),
-	m_renderOrder(0.f)
-{}
-
-Material::Material(ShaderPtr p_shader):
-	Resource("Material_"+ p_shader->GetName())
-{	
+Material::Material(Shaderv2Ptr p_shader)
+{
 	m_shader = p_shader;
 	m_uniforms = m_shader->GetAllUniforms();
 
@@ -36,12 +30,11 @@ Material::Material(ShaderPtr p_shader):
 		auto& uniform = unformPair.second;
 
 		if (uniform.type == UniformType::Texture2D)
-			m_textures[uniformName] = TexturePtr();
+			m_textures[uniformName] = Texturev2Ptr();
 	}
 }
 
-Material::Material(const Material& p_material):
-	Resource("Material_" + p_material.m_shader->GetName())
+Material::Material(const Material& p_material)
 {
 	m_shader = p_material.m_shader;
 	m_uniforms = p_material.m_uniforms;
@@ -50,6 +43,12 @@ Material::Material(const Material& p_material):
 	m_renderOrder = p_material.GetRenderOrder();
 
 	m_textures = p_material.m_textures;
+}
+
+Material::Material(JSON::json& p_seralizedMat)
+{
+	bool result = PopulateBasedOnShader(p_seralizedMat);
+	PR_ASSERT(result, "Cannot load material file corrupted");
 }
 
 void Material::SetColor(const Core::Color& p_color)
@@ -87,7 +86,7 @@ void Material::Bind()
 		texSlot++;
 
 		//Set Texture Usage Flag
-		if(HasProperty("use" + texture.first))
+		if (HasProperty("use" + texture.first))
 			SetProperty("use" + texture.first, true);
 	}
 
@@ -158,10 +157,10 @@ void Material::Unbind()
 	unsigned int texSlot = 0;
 	for (auto& texture : m_textures)
 		texture.second->Unbind(texSlot++);
-	
+
 }
 
-void Material::SetTexture(const std::string& p_name, TexturePtr p_texture)
+void Material::SetTexture(const std::string& p_name, Texturev2Ptr p_texture)
 {
 	auto find = m_textures.find(p_name);
 	if (find != m_textures.end())
@@ -176,15 +175,15 @@ void Material::SetTexture(const std::string& p_name, TexturePtr p_texture)
 
 }
 
-TexturePtr Material::GetTexture(const std::string& p_name)
+Texturev2Ptr Material::GetTexture(const std::string& p_name)
 {
 	auto find = m_textures.find(p_name);
-	
+
 	if (find != m_textures.end())
 		return find->second;
 
 	PRLOG_WARN("Renderer: Material {0}, missing texture {1}", m_name, p_name);
-	return TexturePtr();
+	return Texturev2Ptr();
 }
 
 void Material::SetTexScale(const std::string& p_name, const PrCore::Math::vec2& p_value)
@@ -234,61 +233,15 @@ void Material::CopyPropertiesFrom(const Material& p_material)
 	m_renderOrder = p_material.GetRenderOrder();
 	m_textures = p_material.m_textures;
 
-	for(auto& uniformObject : p_material.m_uniforms)
+	for (auto& uniformObject : p_material.m_uniforms)
 	{
 		auto& uniformName = uniformObject.first;
 		auto& unform = uniformObject.second;
 
 		auto find = m_uniforms.find(uniformName);
-		if(find != m_uniforms.end() && find->second.type == unform.type)
+		if (find != m_uniforms.end() && find->second.type == unform.type)
 			find->second.value = unform.value;
 	}
-}
-
-void Material::PreLoadImpl()
-{
-}
-
-bool Material::LoadImpl()
-{
-	auto jsonFile = ReadFile();
-	if (jsonFile == nullptr)
-		return false;
-
-	auto result = PopulateBasedOnShader(jsonFile);
-
-	return true;
-}
-
-void Material::PostLoadImpl()
-{
-}
-
-void Material::PreUnloadImpl()
-{
-}
-
-bool Material::UnloadImpl()
-{
-	m_shader.reset();
-	m_textures.clear();
-	m_uniforms.clear();
-	m_renderOrder = 0;
-	m_renderType = RenderType::Opaque;
-
-	return true;
-}
-
-void Material::PostUnloadImpl()
-{
-}
-
-void Material::LoadCorruptedResource()
-{
-}
-
-void Material::CalculateSize()
-{
 }
 
 bool Material::PopulateBasedOnShader(JSON::json& p_json)
@@ -300,8 +253,9 @@ bool Material::PopulateBasedOnShader(JSON::json& p_json)
 		return false;
 	}
 
+	// Change in the future
 	std::string shader = p_json["shader"];
-	m_shader = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Shader>(shader);
+	m_shader = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>(shader).GetData();
 	if (m_shader == nullptr)
 	{
 		PRLOG_ERROR("Renderer: Material {0}, shader {1} cannot be find", m_name, shader);
@@ -317,7 +271,7 @@ bool Material::PopulateBasedOnShader(JSON::json& p_json)
 	{
 		const auto& uniformName = uniformPair.first;
 		auto& uniform = uniformPair.second;
-		
+
 		switch (uniform.type)
 		{
 		case UniformType::Int:
@@ -493,12 +447,12 @@ bool Material::PopulateBasedOnShader(JSON::json& p_json)
 				auto& value = textures.value();
 				for (auto& texture : value.items())
 				{
-					if(texture.value()["texName"] == uniformName)
+					if (texture.value()["texName"] == uniformName)
 					{
 						auto texturePath = texture.value()["texPath"];
 
-						auto textureResource = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Texture>(texturePath);
-						if(textureResource)
+						auto textureResource = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(static_cast<std::string>(texturePath)).GetData();
+						if (textureResource != nullptr)
 						{
 							m_textures[uniformName] = textureResource;
 							uniformExist = true;
@@ -507,7 +461,7 @@ bool Material::PopulateBasedOnShader(JSON::json& p_json)
 				}
 			}
 			if (!uniformExist)
-				m_textures[uniformName] = Texture2D::GenerateBlackTexture();
+				m_textures[uniformName] = Texture2D::CreateUnitTex(PrRenderer::Core::Color::Black);
 
 			break;
 		}
@@ -524,17 +478,17 @@ bool Material::PopulateBasedOnShader(JSON::json& p_json)
 					{
 						auto cubemapPath = cubemap.value()["texPath"];
 
-						auto textureResource = PrCore::Resources::ResourceLoader::GetInstance().LoadResource<Cubemap>(cubemapPath);
-						if(textureResource)
+						auto textureResource = PrCore::Resources::ResourceSystem::GetInstance().Load<Cubemap>(static_cast<std::string>(cubemapPath));
+						if (textureResource != nullptr)
 						{
-							m_textures[uniformName] = textureResource;
+							m_textures[uniformName] = textureResource.GetData();
 							uniformExist = true;
 						}
 					}
 				}
 			}
 			if (!uniformExist)
-				m_textures[uniformName] = Cubemap::GenerateBlackTexture();
+				m_textures[uniformName] = Cubemap::CreateUnitTex(PrRenderer::Core::Color::Black);
 
 			break;
 		}
@@ -549,22 +503,7 @@ bool Material::PopulateBasedOnShader(JSON::json& p_json)
 	return true;
 }
 
-JSON::json Material::ReadFile()
+size_t Material::GetByteSize() const
 {
-	std::string dir = MATERIAL_DIR;
-	dir += ("/" + m_name);
-	PrCore::Filesystem::FileStreamPtr file = PrCore::Filesystem::FileSystem::GetInstance().OpenFileStream(dir.c_str());
-	if (file == nullptr)
-		return nullptr;
-
-	char* data = new char[file->GetSize()];
-	file->Read(data);
-
-	std::vector<uint8_t> dataVector;
-
-	for (auto i = 0; i < file->GetSize(); i++)
-		dataVector.push_back(*(data + i));
-	delete[] data;
-
-	return JSON::json::parse(dataVector);
+	return sizeof(Material);
 }

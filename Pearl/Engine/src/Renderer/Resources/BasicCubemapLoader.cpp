@@ -1,8 +1,8 @@
 #include "Core/Common/pearl_pch.h"
 
 #include "Renderer/Resources/BasicCubemapLoader.h"
-#include "Renderer/Resources/Cubemapv2.h"
-#include "Renderer/Resources/Texture2Dv2.h"
+#include "Renderer/Resources/Cubemap.h"
+#include "Renderer/Resources/Texture2D.h"
 #include "Renderer/OpenGL/GLUtils.h"
 
 #include "Core/Filesystem/FileSystem.h"
@@ -76,7 +76,7 @@ IResourceDataPtr BasicCubemapLoader::LoadResource(const std::string& p_path)
 
 	// All good create cubemap now
 
-	auto cubemap = Cubemapv2::Create();
+	auto cubemap = Cubemap::Create();
 
 	cubemap->SetFormat(texFormat);
 	cubemap->SetWidth(texWidth);
@@ -105,7 +105,7 @@ unsigned char* BasicCubemapLoader::LoadTexture(const std::string& p_path, int& p
 	std::string resourcePath = PrCore::PathUtils::MakePath(dir, TEXTURE_DIR);
 	resourcePath = PrCore::PathUtils::MakePath(resourcePath, p_path);
 
-	stbi_set_flip_vertically_on_load(true);
+	stbi_set_flip_vertically_on_load(false);
 	unsigned char* texData = stbi_load(resourcePath.c_str(), &p_width, &p_height, &channelsNumber, 0);
 
 	if (!texData)

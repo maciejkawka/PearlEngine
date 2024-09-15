@@ -7,9 +7,7 @@
 #include"Engine/Core/ECS/SceneManager.h"
 
 #include"Renderer/Core/RenderSystem.h"
-#include"Renderer/Resources/ShaderManager.h"
-#include"Renderer/Resources/TextureManager.h"
-#include"Renderer/Resources/MaterialManager.h"
+
 #include"Renderer/Resources/Shader.h"
 #include"Renderer/Resources/Material.h"
 

@@ -14,7 +14,7 @@ namespace PrEditor::Components {
 		void Update(float p_deltaTime);
 
 	private:
-		PrRenderer::Resources::MeshPtr m_mesh;
+		PrRenderer::Resources::Meshv2Ptr m_mesh;
 		float dir = 0.0f;
 	};
 }

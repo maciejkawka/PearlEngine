@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Resources/IResourceDataLoader.h"
-#include "Renderer/Resources/Meshv2.h"
+#include "Renderer/Resources/Mesh.h"
 
 namespace PrRenderer::Resources {
 
