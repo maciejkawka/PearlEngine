@@ -17,7 +17,7 @@
 namespace PrRenderer::Resources {
 
 	class Mesh;
-	using Meshv2Ptr = std::shared_ptr<Mesh>;
+	using MeshPtr = std::shared_ptr<Mesh>;
 
 	enum PrimitiveType
 	{
@@ -72,11 +72,11 @@ namespace PrRenderer::Resources {
 		bool ValidateBuffers();
 
 		// Factories
-		static Meshv2Ptr Create();
+		static MeshPtr Create();
 
 		// Returns a shared primitive, do not edit the vertices
 		// Copy the mesh first in order edit
-		static Meshv2Ptr CreatePrimitive(PrimitiveType p_primitiveType);
+		static MeshPtr CreatePrimitive(PrimitiveType p_primitiveType);
 
 		size_t GetByteSize() const override;
 
@@ -105,13 +105,13 @@ namespace PrRenderer::Resources {
 
 	private:
 		// Add later
-		static Meshv2Ptr CreateCube();
-		static Meshv2Ptr CreateSphere();
-		static Meshv2Ptr CreateCapsule();
-		static Meshv2Ptr CreateCylinder();
-		static Meshv2Ptr CreatePlane();
-		static Meshv2Ptr CreateQuad();
-		static Meshv2Ptr CreateLine();
+		static MeshPtr CreateCube();
+		static MeshPtr CreateSphere();
+		static MeshPtr CreateCapsule();
+		static MeshPtr CreateCylinder();
+		static MeshPtr CreatePlane();
+		static MeshPtr CreateQuad();
+		static MeshPtr CreateLine();
 	};
 
 	REGISTRER_RESOURCE_HANDLE(Mesh);

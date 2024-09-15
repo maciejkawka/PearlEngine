@@ -81,7 +81,7 @@ void Mesh::SetUVs(unsigned int p_UVSet, std::vector<PrCore::Math::vec2>&& p_UVs)
 	m_stateChanged = true;
 }
 
-Meshv2Ptr Mesh::Create()
+MeshPtr Mesh::Create()
 {
 	switch (Core::RendererAPI::GetGraphicsAPI())
 	{

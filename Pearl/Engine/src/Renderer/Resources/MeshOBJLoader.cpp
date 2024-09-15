@@ -150,7 +150,7 @@ PrCore::Resources::IResourceDataPtr MeshOBJLoader::LoadResource(const std::strin
 		}
 	}
 
-	Meshv2Ptr mesh = Mesh::Create();
+	MeshPtr mesh = Mesh::Create();
 	if (!indices.empty())
 		mesh->SetIndices(std::move(indices));
 	if (!vertices.empty())

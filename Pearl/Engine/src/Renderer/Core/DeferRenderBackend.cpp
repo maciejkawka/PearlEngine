@@ -416,7 +416,7 @@ namespace PrRenderer::Core
 		mesh->Unbind();
 	}
 
-	void DeferRenderBackend::RenderToShadowMap(Resources::Shaderv2Ptr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
+	void DeferRenderBackend::RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
 	{
 		const auto frustrum = Frustrum(p_lightMatrix);
 		bool skipCulling = p_light->GetType() == Resources::LightType::Directional;
@@ -455,7 +455,7 @@ namespace PrRenderer::Core
 		p_shaderPtr->Unbind();
 	}
 
-	void DeferRenderBackend::RenderToPointShadowMap(Resources::Shaderv2Ptr p_pointShadowMapShader, PrCore::Math::mat4& p_lightView, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
+	void DeferRenderBackend::RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightView, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
 	{
 		const auto lightPos = p_light->GetPosition();
 		const auto frustrum = Frustrum(p_lightView);
@@ -756,7 +756,7 @@ namespace PrRenderer::Core
 		m_renderContext.shadowMapMainDirTex = m_renderContext.shadowMapMainDirBuff->GetDepthTexturePtr();
 	}
 
-	void DeferRenderBackend::RenderCubeMap(Resources::Materialv2Ptr p_material, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderCubeMap(Resources::MaterialPtr p_material, const RenderContext* p_renderContext)
 	{
 		LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::LessEqual);
 
@@ -773,7 +773,7 @@ namespace PrRenderer::Core
 		LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::Less);
 	}
 
-	void DeferRenderBackend::RenderToneMapping(Resources::Shaderv2Ptr p_toneMapShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderToneMapping(Resources::ShaderPtr p_toneMapShader, const RenderContext* p_renderContext)
 	{
 		LowRenderer::EnableDepth(false);
 		LowRenderer::EnableCullFace(false);
@@ -846,7 +846,7 @@ namespace PrRenderer::Core
 		material->Unbind();
 	}
 
-	void DeferRenderBackend::RenderSSAO(Resources::Shaderv2Ptr p_SSAOShader, Resources::Shaderv2Ptr p_BlurSSAOShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderSSAO(Resources::ShaderPtr p_SSAOShader, Resources::ShaderPtr p_BlurSSAOShader, const RenderContext* p_renderContext)
 	{
 		p_renderContext->SSAOBuff->Bind();
 		p_SSAOShader->Bind();
@@ -906,7 +906,7 @@ namespace PrRenderer::Core
 		p_renderContext->gBuffer.buffer->Unbind();
 	}
 
-	void DeferRenderBackend::RenderFXAA(Resources::Shaderv2Ptr p_FXAAShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderFXAA(Resources::ShaderPtr p_FXAAShader, const RenderContext* p_renderContext)
 	{
 		p_FXAAShader->Bind();
 
@@ -933,7 +933,7 @@ namespace PrRenderer::Core
 		p_FXAAShader->Unbind();
 	}
 
-	void DeferRenderBackend::RenderFog(Resources::Shaderv2Ptr p_fogShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderFog(Resources::ShaderPtr p_fogShader, const RenderContext* p_renderContext)
 	{
 		p_renderContext->otuputBuff->Bind();
 		p_fogShader->Bind();
@@ -960,7 +960,7 @@ namespace PrRenderer::Core
 		p_fogShader->Unbind();
 	}
 
-	void DeferRenderBackend::RenderBloom(Resources::Shaderv2Ptr p_downsampleShader, Resources::Shaderv2Ptr p_upsampleShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderBloom(Resources::ShaderPtr p_downsampleShader, Resources::ShaderPtr p_upsampleShader, const RenderContext* p_renderContext)
 	{
 		// downsample
 		float& threshold = p_renderContext->settings->bloomThreshold;
@@ -1073,7 +1073,7 @@ namespace PrRenderer::Core
 		p_renderContext->otuputBuff->Unbind();
 	}
 
-	void DeferRenderBackend::RenderLight(Resources::Shaderv2Ptr p_lightShdr, DirLightObjectPtr p_mianDirectLight, std::vector<LightObjectPtr>* p_lights, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderLight(Resources::ShaderPtr p_lightShdr, DirLightObjectPtr p_mianDirectLight, std::vector<LightObjectPtr>* p_lights, const RenderContext* p_renderContext)
 	{
 		p_renderContext->otuputBuff->Bind();
 

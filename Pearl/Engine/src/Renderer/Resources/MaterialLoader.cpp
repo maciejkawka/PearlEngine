@@ -27,7 +27,7 @@ PrCore::Resources::IResourceDataPtr MaterialLoader::LoadResource(const std::stri
 
 	auto json = JSON::json::parse(dataVector);
 
-	Materialv2Ptr mat = std::make_shared<Material>(json);
+	MaterialPtr mat = std::make_shared<Material>(json);
 
 	return mat;
 }

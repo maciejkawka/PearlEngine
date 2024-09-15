@@ -4,19 +4,19 @@
 namespace PrCore::Resources {
 
 	template<class T>
-	Resourcev2<T> ResourceSystem::Load(const std::string& p_path, std::shared_ptr<IResourceDataLoader> p_loader /*= nullptr*/)
+	ResourceHandle<T> ResourceSystem::Load(const std::string& p_path, std::shared_ptr<IResourceDataLoader> p_loader /*= nullptr*/)
 	{
 		static_assert(std::is_base_of<IResourceData, T>::value, "T has to be base of IResourceData.");
 		auto resourceDesc = GetResourceDatabase<T>()->Load(p_path, p_loader);
-		return Resourcev2<T>(resourceDesc);
+		return ResourceHandle<T>(resourceDesc);
 	}
 	
 	template<class T>
-	Resourcev2<T> ResourceSystem::Load(ResourceID p_id, std::shared_ptr<IResourceDataLoader> p_loader /*= nullptr*/)
+	ResourceHandle<T> ResourceSystem::Load(ResourceID p_id, std::shared_ptr<IResourceDataLoader> p_loader /*= nullptr*/)
 	{
 		static_assert(std::is_base_of<IResourceData, T>::value, "T has to be base of IResourceData.");
 		auto resourceDesc = GetResourceDatabase<T>()->Load(p_id, p_loader);
-		return Resourcev2<T>(resourceDesc);
+		return ResourceHandle<T>(resourceDesc);
 	}
 
 	template<class T>
@@ -41,51 +41,51 @@ namespace PrCore::Resources {
 	}
 
 	template<class T>
-	Resourcev2<T> ResourceSystem::Get(ResourceID p_id)
+	ResourceHandle<T> ResourceSystem::Get(ResourceID p_id)
 	{
 		static_assert(std::is_base_of<IResourceData, T>::value, "T has to be base of IResourceData.");
 		auto resourceDesc = GetResourceDatabase<T>()->Get(p_id);
-		return Resourcev2<T>(resourceDesc);
+		return ResourceHandle<T>(resourceDesc);
 	}	
 	
 	template<class T>
-	Resourcev2<T> ResourceSystem::Get(const std::string& p_path)
+	ResourceHandle<T> ResourceSystem::Get(const std::string& p_path)
 	{
 		static_assert(std::is_base_of<IResourceData, T>::value, "T has to be base of IResourceData.");
 		auto resourceDesc = GetResourceDatabase<T>()->Get(p_path);
-		return Resourcev2<T>(resourceDesc);
+		return ResourceHandle<T>(resourceDesc);
 	}
 
 	template<class T>
-	Resourcev2<T> ResourceSystem::GetMetadata(ResourceID p_id)
+	ResourceHandle<T> ResourceSystem::GetMetadata(ResourceID p_id)
 	{
 		static_assert(std::is_base_of<IResourceData, T>::value, "T has to be base of IResourceData.");
 		auto resourceDesc = GetResourceDatabase<T>()->GetMetadata(p_id);
-		return Resourcev2<T>(resourceDesc);
+		return ResourceHandle<T>(resourceDesc);
 	}
 
 	template<class T>
-	Resourcev2<T> ResourceSystem::GetMetadata(const std::string& p_path)
+	ResourceHandle<T> ResourceSystem::GetMetadata(const std::string& p_path)
 	{
 		static_assert(std::is_base_of<IResourceData, T>::value, "T has to be base of IResourceData.");
 		auto resourceDesc = GetResourceDatabase<T>()->GetMetadata(p_path);
-		return Resourcev2<T>(resourceDesc);
+		return ResourceHandle<T>(resourceDesc);
 	}
 
 	template<class T>
-	Resourcev2<T> ResourceSystem::Register(IResourceDataPtr p_resourceData)
+	ResourceHandle<T> ResourceSystem::Register(IResourceDataPtr p_resourceData)
 	{
 		static_assert(std::is_base_of<IResourceData, T>::value, "T has to be base of IResourceData.");
 		auto resourceDesc = GetResourceDatabase<T>()->Register(p_resourceData);
-		return Resourcev2<T>(resourceDesc);
+		return ResourceHandle<T>(resourceDesc);
 	}
 
 	template<class T>
-	Resourcev2<T> ResourceSystem::Register(const std::string& p_path)
+	ResourceHandle<T> ResourceSystem::Register(const std::string& p_path)
 	{
 		static_assert(std::is_base_of<IResourceData, T>::value, "T has to be base of IResourceData.");
 		auto resourceDesc = GetResourceDatabase<T>()->Register(p_path);
-		return Resourcev2<T>(resourceDesc);
+		return ResourceHandle<T>(resourceDesc);
 	}
 
 	template<class T>
@@ -125,11 +125,11 @@ namespace PrCore::Resources {
 	}
 
 	template<class T>
-	Resourcev2<T> ResourceSystem::SaveToFileAndLoad(ResourceID p_sourceId, const std::string& p_path)
+	ResourceHandle<T> ResourceSystem::SaveToFileAndLoad(ResourceID p_sourceId, const std::string& p_path)
 	{
 		static_assert(std::is_base_of<IResourceData, T>::value, "T has to be base of IResourceData.");
 		auto resourceDesc = GetResourceDatabase<T>()->SaveToFileAndLoad(p_sourceId, p_path);
-		return Resourcev2<T>(resourceDesc);
+		return ResourceHandle<T>(resourceDesc);
 	}
 
 	template<class T>

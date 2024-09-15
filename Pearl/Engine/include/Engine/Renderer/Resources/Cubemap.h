@@ -36,5 +36,5 @@ namespace PrRenderer::Resources {
 	};
 
 	REGISTRER_RESOURCE_HANDLE(Cubemap);
-	using Cubemapv2Ptr = std::shared_ptr<Cubemap>;
+	using CubemapPtr = std::shared_ptr<Cubemap>;
 }

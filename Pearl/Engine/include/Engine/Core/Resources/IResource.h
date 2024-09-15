@@ -110,44 +110,44 @@ namespace PrCore::Resources {
 	// It is main resource access object 
 	// Manually created resources should also be assigned to this object
 	template<class T>
-	class Resourcev2 final {
+	class ResourceHandle final {
 	public:
-		Resourcev2() :
+		ResourceHandle() :
 			m_resourceDesc(nullptr)
 		{}
 
-		Resourcev2(const Resourcev2<T>& p_ref) :
+		ResourceHandle(const ResourceHandle<T>& p_ref) :
 			m_resourceDesc(p_ref.m_resourceDesc)
 		{}
 
-		Resourcev2(Resourcev2<T>&& p_ref) :
+		ResourceHandle(ResourceHandle<T>&& p_ref) :
 			m_resourceDesc(p_ref.m_resourceDesc)
 		{}
 
-		Resourcev2(const ResourceDescPtr& p_resourceDesc) :
+		ResourceHandle(const ResourceDescPtr& p_resourceDesc) :
 			m_resourceDesc(p_resourceDesc)
 		{}
 
 		// Create ResourceHandle from the stack allocated ResourceDesc
-		Resourcev2(const ResourceDesc& p_resourceDesc) :
+		ResourceHandle(const ResourceDesc& p_resourceDesc) :
 			m_resourceDesc(std::make_shared<ResourceDesc>(p_resourceDesc))
 		{}
 
 		// Create ResourceHandle from the stack allocated ResourceDesc 
-		Resourcev2(ResourceDesc&& p_resourceDesc) :
+		ResourceHandle(ResourceDesc&& p_resourceDesc) :
 			m_resourceDesc(std::make_shared<ResourceDesc>(std::move(p_resourceDesc)))
 		{}
 
 		// Create ResourceHandle from resource data 
 		// Useful when creating resource data manually and want to wrap with the handler
 		// IMPORTANT! This constructor is implicit
-		Resourcev2(std::shared_ptr<T> p_dataPtr)
+		ResourceHandle(std::shared_ptr<T> p_dataPtr)
 		{
 			m_resourceDesc = std::make_shared<ResourceDesc>(p_dataPtr);
 		}
 
 		// Assign operators
-		Resourcev2<T>& operator=(const Resourcev2<T>& p_ref)
+		ResourceHandle<T>& operator=(const ResourceHandle<T>& p_ref)
 		{
 			if (this != &p_ref)
 			{
@@ -157,7 +157,7 @@ namespace PrCore::Resources {
 			return *this;
 		}
 
-		Resourcev2<T>& operator=(Resourcev2<T>&& p_ref) noexcept
+		ResourceHandle<T>& operator=(ResourceHandle<T>&& p_ref) noexcept
 		{
 			if (this != &p_ref)
 			{
@@ -172,7 +172,18 @@ namespace PrCore::Resources {
 		ResourceState       GetState() const { return m_resourceDesc->state; }
 		ResourceOrigin      GetSource() const { return m_resourceDesc->origin; }
 		size_t              GetSize() const { return m_resourceDesc->size; }
-		std::shared_ptr<T>  GetData() { return std::static_pointer_cast<T>(m_resourceDesc->data); }
+
+		// Gets IResourceData from the descriptor. If descriptor is nullptr the function returns nullptr
+		std::shared_ptr<T>  GetData() 
+		{
+			if (m_resourceDesc == nullptr)
+				return nullptr;
+
+			return std::static_pointer_cast<T>(m_resourceDesc->data); 
+		}
+
+		// Checks if the handle holds valid resource descriptor
+		bool               IsEmpty() { return m_resourceDesc == nullptr; }
 
 		// Proxy functions to access IResourceData directly
 		// Use these functions instead of GetData()
@@ -185,7 +196,7 @@ namespace PrCore::Resources {
 	};
 
 #define REGISTRER_RESOURCE_HANDLE(ResourceName) \
-	using ResourceName ## Handle = PrCore::Resources::Resourcev2<ResourceName>
+	using ResourceName ## Handle = PrCore::Resources::ResourceHandle<ResourceName>
 
 	// Example usage
 	//

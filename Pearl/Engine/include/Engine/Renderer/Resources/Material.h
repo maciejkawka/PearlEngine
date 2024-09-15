@@ -30,20 +30,20 @@ namespace PrRenderer::Resources {
 	class Material : public PrCore::Resources::IResourceData {
 	public:
 		Material() = delete;
-		Material(Shaderv2Ptr p_shader);
+		Material(ShaderPtr p_shader);
 		Material(const Material& p_material);
 		Material(PrCore::Utils::JSON::json& p_seralizedMat);
 
 		void SetColor(const Core::Color& p_color);
 		const Core::Color& GetColor() const;
 
-		inline void SetShader(Shaderv2Ptr p_shader)
+		inline void SetShader(ShaderPtr p_shader)
 		{
 			m_shader = p_shader;
 			m_uniforms = m_shader->GetAllUniforms();
 		}
 
-		inline Shaderv2Ptr GetShader() { return m_shader; }
+		inline ShaderPtr GetShader() { return m_shader; }
 		inline bool HasShader() const { return m_shader != nullptr; }
 
 		inline void SetRenderOrder(size_t p_renderOrder) { m_renderOrder = p_renderOrder; }
@@ -55,8 +55,8 @@ namespace PrRenderer::Resources {
 		void Bind();
 		void Unbind();
 
-		void SetTexture(const std::string& p_name, Texturev2Ptr p_texture);
-		Texturev2Ptr GetTexture(const std::string& p_name);
+		void SetTexture(const std::string& p_name, TexturePtr p_texture);
+		TexturePtr GetTexture(const std::string& p_name);
 
 		void SetTexScale(const std::string& p_name, const PrCore::Math::vec2& p_value);
 		void SetTexOffset(const std::string& p_name, const PrCore::Math::vec2& p_value);
@@ -84,8 +84,8 @@ namespace PrRenderer::Resources {
 	protected:
 		bool PopulateBasedOnShader(PrCore::Utils::JSON::json& p_json);
 
-		Shaderv2Ptr m_shader;
-		std::map<std::string, Texturev2Ptr> m_textures;
+		ShaderPtr m_shader;
+		std::map<std::string, TexturePtr> m_textures;
 		std::map<std::string, Uniform> m_uniforms;
 		RenderType m_renderType;
 		size_t m_renderOrder;
@@ -94,7 +94,7 @@ namespace PrRenderer::Resources {
 	};
 
 	REGISTRER_RESOURCE_HANDLE(Material);
-	typedef std::shared_ptr<Material> Materialv2Ptr;
+	typedef std::shared_ptr<Material> MaterialPtr;
 
 
 	//Templated Implementation

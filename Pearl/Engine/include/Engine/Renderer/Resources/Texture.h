@@ -116,5 +116,5 @@ namespace PrRenderer::Resources {
 	};
 
 	REGISTRER_RESOURCE_HANDLE(Texture);
-	typedef std::shared_ptr<Texture> Texturev2Ptr;
+	typedef std::shared_ptr<Texture> TexturePtr;
 }

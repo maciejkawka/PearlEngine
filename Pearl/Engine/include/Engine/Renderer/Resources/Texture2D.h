@@ -12,5 +12,5 @@ namespace PrRenderer::Resources {
 	};
 
 	REGISTRER_RESOURCE_HANDLE(Texture2D);
-	using Texture2Dv2Ptr = std::shared_ptr<Texture2D>;
+	using Texture2DPtr = std::shared_ptr<Texture2D>;
 }

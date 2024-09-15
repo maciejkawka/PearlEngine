@@ -26,7 +26,7 @@ PrCore::Resources::IResourceDataPtr ShaderLoader::LoadResource(const std::string
 	std::string geometryShaderKeyword = "#geometry";
 
 	// check if geometry shader is available and create shader
-	Shaderv2Ptr shaderPtr = nullptr;
+	ShaderPtr shaderPtr = nullptr;
 	const auto fragmentShaderPos = shader.find(fragmentShaderKeyword);
 	const auto geometryShaderPos = shader.find(geometryShaderKeyword);
 	if (geometryShaderPos != std::string::npos)

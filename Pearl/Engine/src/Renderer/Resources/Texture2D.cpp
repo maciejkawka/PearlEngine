@@ -8,7 +8,7 @@ using namespace PrRenderer::Resources;
 
 std::shared_ptr<Texture2D> Texture2D::Create()
 {
-	Texture2Dv2Ptr texture = nullptr;
+	Texture2DPtr texture = nullptr;
 	switch (Core::RendererAPI::GetGraphicsAPI())
 	{
 	case Core::GraphicsAPI::OpenGL: texture = std::make_shared<OpenGL::GLTexture2D>(); break;

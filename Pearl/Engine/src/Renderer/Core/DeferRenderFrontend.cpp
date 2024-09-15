@@ -149,7 +149,7 @@ void DeferRenderFrontend::SubmitMesh(ECS::Entity& p_entity)
 	object->id = p_entity.GetID().GetID();
 	object->material = material.GetData();
 	object->mesh = mesh.GetData();
-	object->shadowMesh = shadowMesh != nullptr ? shadowMesh.GetData() : nullptr;
+	object->shadowMesh = shadowMesh.GetData();
 	object->type = RenderObjectType::Mesh;
 	object->worldMat = worldMatrix;
 
@@ -178,7 +178,7 @@ void DeferRenderFrontend::SubmitMesh(ECS::Entity& p_entity)
 		m_currentFrame->transpatrentObjects.push_back(object);
 }
 
-void DeferRenderFrontend::SetCubemap(Resources::Materialv2Ptr p_cubemapMat)
+void DeferRenderFrontend::SetCubemap(Resources::MaterialPtr p_cubemapMat)
 {
 	if(p_cubemapMat == nullptr)
 	{

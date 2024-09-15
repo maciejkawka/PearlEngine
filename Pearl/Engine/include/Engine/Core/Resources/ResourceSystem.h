@@ -17,10 +17,10 @@ namespace PrCore::Resources {
 		// Resources created manually in code should be Registered with IResourceDataPtr only
 		// Pass p_loader when want to load resource differently. This loader is bound to the resource Id until it is Removed from the database.
 		template<class T>
-		Resourcev2<T> Load(const std::string& p_path, std::shared_ptr<IResourceDataLoader> p_loader = nullptr);
+		ResourceHandle<T> Load(const std::string& p_path, std::shared_ptr<IResourceDataLoader> p_loader = nullptr);
 
 		template<class T>
-		Resourcev2<T> Load(ResourceID p_id, std::shared_ptr<IResourceDataLoader> p_loader = nullptr);
+		ResourceHandle<T> Load(ResourceID p_id, std::shared_ptr<IResourceDataLoader> p_loader = nullptr);
 
 		////Implement Later
 		////IResource LoadAsync(const std::string p_path, const IResourceLoader* p_loader = nullptr);
@@ -50,20 +50,20 @@ namespace PrCore::Resources {
 		// If the resource is fetched by this function and then removed from database with Remove() client is owner of the IResourceData
 		// IMPORTANT!! Avoid dangling shared pointers to the IResourceData, this prevents memory deallocations and might cause the memory usage increase
 		template<class T>
-		Resourcev2<T> Get(ResourceID p_id);
+		ResourceHandle<T> Get(ResourceID p_id);
 
 		template<class T>
-		Resourcev2<T> Get(const std::string& p_path);
+		ResourceHandle<T> Get(const std::string& p_path);
 
 
 		//-----------------------------------------------------------------------------
 		// Gets the ResourceMetadata
 		// Use to check resource metadata without fetching the ptr.
 		template<class T>
-		Resourcev2<T> GetMetadata(ResourceID p_id);
+		ResourceHandle<T> GetMetadata(ResourceID p_id);
 
 		template<class T>
-		Resourcev2<T> GetMetadata(const std::string& p_path);
+		ResourceHandle<T> GetMetadata(const std::string& p_path);
 
 
 		//-----------------------------------------------------------------------------
@@ -71,10 +71,10 @@ namespace PrCore::Resources {
 		// For memory originated resource the resource data ownership goes to the resource database and will be released after removing 
 		// For file originated resource the resource will be registered but not loaded. Use Load to load file into the memory
 		template<class T>
-		Resourcev2<T> Register(IResourceDataPtr p_resourceData);
+		ResourceHandle<T> Register(IResourceDataPtr p_resourceData);
 
 		template<class T>
-		Resourcev2<T> Register(const std::string& p_path);
+		ResourceHandle<T> Register(const std::string& p_path);
 
 
 		//-----------------------------------------------------------------------------
@@ -104,7 +104,7 @@ namespace PrCore::Resources {
 		bool SaveToFile(ResourceID p_sourceId, const std::string& p_path);
 
 		template<class T>
-		Resourcev2<T> SaveToFileAndLoad(ResourceID p_sourceId, const std::string& p_path);
+		ResourceHandle<T> SaveToFileAndLoad(ResourceID p_sourceId, const std::string& p_path);
 
 
 		//-----------------------------------------------------------------------------

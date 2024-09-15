@@ -74,5 +74,5 @@ namespace PrRenderer::Resources {
 	};
 
 	REGISTRER_RESOURCE_HANDLE(Shader);
-	using Shaderv2Ptr = std::shared_ptr<Shader>;
+	using ShaderPtr = std::shared_ptr<Shader>;
 }

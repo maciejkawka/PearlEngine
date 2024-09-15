@@ -87,8 +87,8 @@ namespace PrRenderer::Buffers {
 		virtual void Resize(size_t width, size_t height) = 0;
 		virtual void ClearAttachmentColor(unsigned int p_attachment, Core::Color p_color) = 0;
 		
-		virtual Resources::Texturev2Ptr GetTexturePtr(unsigned int p_index = 0) = 0;
-		virtual Resources::Texturev2Ptr GetDepthTexturePtr() = 0;
+		virtual Resources::TexturePtr GetTexturePtr(unsigned int p_index = 0) = 0;
+		virtual Resources::TexturePtr GetDepthTexturePtr() = 0;
 		virtual RendererID GetTextureID(unsigned int p_index = 0) = 0;
 
 		inline const FramebufferSettings& GetSettings() const { return m_settings; }

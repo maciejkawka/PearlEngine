@@ -87,7 +87,7 @@ void GLFramebuffer::ClearAttachmentColor(unsigned int p_attachment, Core::Color 
 		format, GL_FLOAT, &p_color);
 }
 
-PrRenderer::Resources::Texturev2Ptr GLFramebuffer::GetTexturePtr(unsigned int p_index)
+PrRenderer::Resources::TexturePtr GLFramebuffer::GetTexturePtr(unsigned int p_index)
 {
 	PR_ASSERT(p_index < m_colorTextureAttachments.size(), "Framebuffer attachemnt index over the size" + this->m_ID);
 
@@ -100,7 +100,7 @@ PrRenderer::Resources::Texturev2Ptr GLFramebuffer::GetTexturePtr(unsigned int p_
 	return m_colorTextures[p_index];
 }
 
-PrRenderer::Resources::Texturev2Ptr PrRenderer::OpenGL::GLFramebuffer::GetDepthTexturePtr()
+PrRenderer::Resources::TexturePtr PrRenderer::OpenGL::GLFramebuffer::GetDepthTexturePtr()
 {
 	if (m_depthTexture)
 		return m_depthTexture;
@@ -327,7 +327,7 @@ void GLFramebuffer::GenerateTexture(unsigned int p_index)
 		height = textureSettings.height;
 	}
 
-	Resources::Texturev2Ptr texture;
+	Resources::TexturePtr texture;
 	if (textureSettings.cubeTexture)
 	{
 		auto cubemap = std::make_shared<GLCubemap>(m_colorTextureIDs[p_index], width, height, textureSettings.format);
@@ -364,7 +364,7 @@ void GLFramebuffer::GenerateDepthTexture()
 		height = textureSettings.height;
 	}
 
-	Resources::Texturev2Ptr texture = std::make_shared<GLTexture2D>(m_depthTextureID, width, height, textureSettings.format);
+	Resources::TexturePtr texture = std::make_shared<GLTexture2D>(m_depthTextureID, width, height, textureSettings.format);
 
 	texture->SetMagFiltering(textureSettings.filteringMag);
 	texture->SetMinFiltering(textureSettings.filteringMin);

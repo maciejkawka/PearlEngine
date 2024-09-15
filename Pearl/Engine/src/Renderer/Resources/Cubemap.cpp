@@ -8,7 +8,7 @@ using namespace PrRenderer::Resources;
 
 std::shared_ptr<Cubemap> Cubemap::Create()
 {
-	Cubemapv2Ptr texture;
+	CubemapPtr texture;
 	switch (Core::RendererAPI::GetGraphicsAPI())
 	{
 	case Core::GraphicsAPI::OpenGL: texture = std::make_shared<OpenGL::GLCubemap>(); break;
@@ -25,7 +25,7 @@ std::shared_ptr<Cubemap> Cubemap::Create()
 
 std::shared_ptr<PrRenderer::Resources::Cubemap> Cubemap::Create(RendererID p_id, size_t p_width, size_t p_height, Resources::TextureFormat p_format)
 {
-	Cubemapv2Ptr texture;
+	CubemapPtr texture;
 	switch (Core::RendererAPI::GetGraphicsAPI())
 	{
 	case Core::GraphicsAPI::OpenGL: texture = std::make_shared<OpenGL::GLCubemap>(p_id, p_width, p_height, p_format); break;

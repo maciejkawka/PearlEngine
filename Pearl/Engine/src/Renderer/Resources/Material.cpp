@@ -16,7 +16,7 @@
 using namespace PrRenderer::Resources;
 using namespace PrCore::Utils;
 
-Material::Material(Shaderv2Ptr p_shader)
+Material::Material(ShaderPtr p_shader)
 {
 	m_shader = p_shader;
 	m_uniforms = m_shader->GetAllUniforms();
@@ -30,7 +30,7 @@ Material::Material(Shaderv2Ptr p_shader)
 		auto& uniform = unformPair.second;
 
 		if (uniform.type == UniformType::Texture2D)
-			m_textures[uniformName] = Texturev2Ptr();
+			m_textures[uniformName] = TexturePtr();
 	}
 }
 
@@ -160,7 +160,7 @@ void Material::Unbind()
 
 }
 
-void Material::SetTexture(const std::string& p_name, Texturev2Ptr p_texture)
+void Material::SetTexture(const std::string& p_name, TexturePtr p_texture)
 {
 	auto find = m_textures.find(p_name);
 	if (find != m_textures.end())
@@ -175,7 +175,7 @@ void Material::SetTexture(const std::string& p_name, Texturev2Ptr p_texture)
 
 }
 
-Texturev2Ptr Material::GetTexture(const std::string& p_name)
+TexturePtr Material::GetTexture(const std::string& p_name)
 {
 	auto find = m_textures.find(p_name);
 
@@ -183,7 +183,7 @@ Texturev2Ptr Material::GetTexture(const std::string& p_name)
 		return find->second;
 
 	PRLOG_WARN("Renderer: Material {0}, missing texture {1}", m_name, p_name);
-	return Texturev2Ptr();
+	return TexturePtr();
 }
 
 void Material::SetTexScale(const std::string& p_name, const PrCore::Math::vec2& p_value)
