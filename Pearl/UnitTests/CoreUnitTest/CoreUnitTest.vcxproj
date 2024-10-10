@@ -120,11 +120,11 @@
     <ClCompile>
       <WarningLevel>Level1</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>PR_ASSERTENABLE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine/include/Engine/;$(SolutionDir)../Dependencies/googletest/googletest/include;../CommonUnitTest/include;$(SolutionDir)../Dependencies/glm;$(SolutionDir)../Dependencies/json/include;$(SolutionDir)../Dependencies/spdlog/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../CommonUnitTest/include;$(SolutionDir)Engine/include/Engine/;$(SolutionDir)../Dependencies/googletest/googletest/include;$(SolutionDir)../Dependencies/googletest/googlemock/include;$(SolutionDir)../Dependencies/glm;$(SolutionDir)../Dependencies/json/include;$(SolutionDir)../Dependencies/spdlog/include;$(SolutionDir)../Dependencies/entt/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <AdditionalOptions>/Zc:__cplusplus</AdditionalOptions>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -148,7 +148,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>%(AdditionalOptions) -J -utf-8 /Zc:__cplusplus </AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine/include/Engine/;$(SolutionDir)../Dependencies/googletest/googletest/include;../CommonUnitTest/include;$(SolutionDir)../Dependencies/spdlog/include;$(SolutionDir)../Dependencies/glm;$(SolutionDir)../Dependencies/json/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)../Dependencies/googletest/googletest/include;$(SolutionDir)../Dependencies/googletest/googlemock/include;../CommonUnitTest/include;$(SolutionDir)Engine/include/Engine/;$(SolutionDir)../Dependencies/spdlog/include;$(SolutionDir)../Dependencies/glm;$(SolutionDir)../Dependencies/json/include;$(SolutionDir)../Dependencies/entt/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -49,7 +49,7 @@ ResourceDescPtr ResourceDatabase::Load(ResourceID p_id, std::shared_ptr<IResourc
 	}
 
 	if (resourceDesc->state == ResourceState::Corrupted)
-		PRLOG_WARN("Cannot load resource with ID {0} and path {1}. Resource is corrupted.", p_id, resourceDesc->filePath);
+		PRLOG_WARN("Cannot load resource with ID {0} and path \"{1}\".Resource is corrupted.", p_id, resourceDesc->filePath);
 
 	if (resourceDesc->state == ResourceState::Unloaded || resourceDesc->state == ResourceState::Registered)
 		LoadResourcePrivate(resourceDesc, p_loader);
@@ -64,18 +64,18 @@ void ResourceDatabase::Unload(const std::string& p_path)
 	auto resourceDesc = ResourceByPath(p_path);
 	if (resourceDesc == nullptr)
 	{
-		PRLOG_WARN("Cannot unload resource with path {0}. Resource does not exist.", p_path);
+		PRLOG_WARN("Cannot unload resource with path \"{0}\". Resource does not exist.", p_path);
 		return;
 	}
 
 	if (resourceDesc->origin != ResourceOrigin::File)
 	{
-		PRLOG_WARN("Cannot unload resource with ID {0}, path {1}. Only file resources can be loaded and unloaded. Use ResourceDatabase::Remove() to delete the memory resource.", resourceDesc->id, resourceDesc->filePath);
+		PRLOG_WARN("Cannot unload resource with ID {0}, path \"{1}\". Only file resources can be loaded and unloaded. Use ResourceDatabase::Remove() to delete the memory resource.", resourceDesc->id, resourceDesc->filePath);
 		return;
 	}
 
 	if (resourceDesc->state == ResourceState::Corrupted)
-		PRLOG_WARN("Cannot unload resource with ID {0} path {1}. Resource is corrupted.", resourceDesc->id, resourceDesc->filePath);
+		PRLOG_WARN("Cannot unload resource with ID {0} path \"{1}\". Resource is corrupted.", resourceDesc->id, resourceDesc->filePath);
 
 	if (resourceDesc->state == ResourceState::Loaded)
 		UnloadResourcePrivate(resourceDesc);
@@ -99,7 +99,7 @@ void ResourceDatabase::Unload(ResourceID p_id)
 	}
 
 	if (resourceDesc->state == ResourceState::Corrupted)
-		PRLOG_WARN("Cannot unload resource with ID {0} path {1}. Resource is corrupted.", p_id, resourceDesc->filePath);
+		PRLOG_WARN("Cannot unload resource with ID {0} path \"{1}\". Resource is corrupted.", p_id, resourceDesc->filePath);
 
 	if (resourceDesc->state == ResourceState::Loaded)
 		UnloadResourcePrivate(resourceDesc);
@@ -132,7 +132,7 @@ PrCore::Resources::ResourceDescPtr ResourceDatabase::Get(const std::string& p_pa
 	auto resourceDesc = ResourceByPath(p_path);
 	if (resourceDesc == nullptr)
 	{
-		PRLOG_WARN("Cannot load resource with path {0}. Resource is not registered.", p_path);
+		PRLOG_WARN("Cannot load resource with path \"{0}\". Resource is not registered.", p_path);
 		return nullptr;
 	}
 
@@ -152,6 +152,13 @@ PrCore::Resources::ResourceDescPtr ResourceDatabase::Register(IResourceDataPtr p
 
 PrCore::Resources::ResourceDescPtr ResourceDatabase::Register(const std::string& p_path)
 {
+	auto resourceDesc = ResourceByPath(p_path);
+	if (resourceDesc)
+	{
+		PRLOG_WARN("Resource with path \"{0}\" already registered. Returning already registered", p_path);
+		return resourceDesc;
+	}
+
 	return RegisterFileResourcePrivate(p_path);
 }
 
@@ -266,7 +273,7 @@ bool PrCore::Resources::ResourceDatabase::LoadResourcePrivate(const ResourceDesc
 
 	if (resourceData == nullptr)
 	{
-		PRLOG_WARN("Cannot load resource path: {0} with ID {1}", path, p_resourceDesc->id);
+		PRLOG_WARN("Cannot load resource path \"{0}\" with ID {1}", path, p_resourceDesc->id);
 		FireCorruptedEvent(p_resourceDesc->id, path);
 
 		p_resourceDesc->data = nullptr;
@@ -285,7 +292,7 @@ bool PrCore::Resources::ResourceDatabase::LoadResourcePrivate(const ResourceDesc
 	p_resourceDesc->state = ResourceState::Loaded;
 	p_resourceDesc->origin = ResourceOrigin::File;
 
-	PRLOG_INFO("Loaded resource path: {0} with UUID {1}", path, p_resourceDesc->id);
+	PRLOG_INFO("Loaded resource path \"{0}\" with UUID {1}", path, p_resourceDesc->id);
 	FireLoadedEvent(p_resourceDesc->id, p_resourceDesc->filePath);
 	
 	m_memoryUsage += p_resourceDesc->size;
@@ -294,15 +301,16 @@ bool PrCore::Resources::ResourceDatabase::LoadResourcePrivate(const ResourceDesc
 	return true;
 }
 
-std::unique_ptr<IResourceDataLoader>& ResourceDatabase::GetLoader(const std::string& p_fileExtension)
+PrCore::Resources::IResourceDataLoader* PrCore::Resources::ResourceDatabase::GetLoader(const std::string& p_fileExtension)
 {
 	PR_ASSERT(!p_fileExtension.empty(), "File extension is empty");
 
 	auto it = m_loaders.find(p_fileExtension);
+	if (it == m_loaders.end())
+		return nullptr;
 
-	PR_ASSERT(it != m_loaders.end(), "Loader is not registered. Cannot unregister the loader.");
-
-	return it->second;
+	// Return raw ptr, possible risk of deleting the ptr by the client.
+	return it->second.get();
 }
 
 PrCore::Resources::ResourceDescPtr ResourceDatabase::SaveToFileAndLoad(ResourceID p_sourceId, const std::string& p_path)
@@ -372,7 +380,7 @@ PrCore::Resources::ResourceDescPtr ResourceDatabase::GetMetadata(const std::stri
 	auto resourceDesc = ResourceByPath(p_path);
 	if (resourceDesc == nullptr)
 	{
-		PRLOG_WARN("Cannot unload resource with path {0}. Resource is not registered.", p_path);
+		PRLOG_WARN("Cannot unload resource with path \"{0}\". Resource is not registered.", p_path);
 		return nullptr;
 	}
 
@@ -416,7 +424,7 @@ void ResourceDatabase::UnregisterLoader(const std::string& p_fileExtension)
 
 	if (it == m_loaders.end())
 	{
-		PRLOG_WARN("Loader with extension {0} is not registered. Cannot unregister the loader.", p_fileExtension);
+		PRLOG_WARN("Loader with extension \"{0}\" is not registered. Cannot unregister the loader.", p_fileExtension);
 		return;
 	}
 
@@ -429,7 +437,7 @@ void ResourceDatabase::RegisterLoader(const std::string& p_fileExtension, std::u
 	PR_ASSERT(!p_fileExtension.empty(), "File extension is empty");
 
 	if (m_loaders.find(p_fileExtension) != m_loaders.end())
-		PRLOG_WARN("Loader with extension {0} already registered. Replacing the loader.", p_fileExtension);
+		PRLOG_WARN("Loader with extension \"{0}\" already registered. Replacing the loader.", p_fileExtension);
 
 	m_loaders.emplace(p_fileExtension, std::move(p_loader));
 }
@@ -467,7 +475,7 @@ void PrCore::Resources::ResourceDatabase::UnloadResourcePrivate(const ResourceDe
 	p_resourceDesc->size = 0;
 	p_resourceDesc->state = ResourceState::Unloaded;
 
-	PRLOG_INFO("Unloaded resource path: {0} with UUID {1}", path, p_resourceDesc->id);
+	PRLOG_INFO("Unloaded resource path \"{0}\" with UUID {1}", path, p_resourceDesc->id);
 	FireUnloadedEvent(p_resourceDesc->id, path);
 }
 

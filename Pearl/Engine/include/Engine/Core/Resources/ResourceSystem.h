@@ -156,6 +156,9 @@ namespace PrCore::Resources {
 		template<class T>
 		std::unique_ptr<IResourceDatabase>& GetResourceDatabase();
 
+		template<class T>
+		const std::unique_ptr<IResourceDatabase>& GetResourceDatabase() const;
+
 		using ResourceDatabaseTypeMap = std::map<size_t, std::unique_ptr<IResourceDatabase>>;
 
 		ResourceDatabaseTypeMap m_resourceDatabaseTypes;

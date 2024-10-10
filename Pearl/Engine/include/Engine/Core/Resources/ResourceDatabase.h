@@ -52,10 +52,10 @@ namespace PrCore::Resources {
 		void   SetMemoryBudget(size_t p_budget) override { m_memoryBudget = p_budget; }
 		size_t GetMemoryBudget() const override { return m_memoryBudget; }
 
-		void                                  RegisterLoader(const std::string& p_fileExtension, std::unique_ptr<IResourceDataLoader> p_loader) override;
-		std::unique_ptr<IResourceDataLoader>& GetLoader(const std::string& p_fileExtension) override;
-		void                                  UnregisterLoader(const std::string& p_fileExtension) override;
-		void                                  UnregisterAllLoaders() override;
+		void                                        RegisterLoader(const std::string& p_fileExtension, std::unique_ptr<IResourceDataLoader> p_loader) override;
+		IResourceDataLoader* GetLoader(const std::string& p_fileExtension) override;
+		void                                        UnregisterLoader(const std::string& p_fileExtension) override;
+		void                                        UnregisterAllLoaders() override;
 
 	private:
 		bool LoadResourcePrivate(const ResourceDescPtr& p_resourceDesc, std::shared_ptr<IResourceDataLoader> p_loader = nullptr);

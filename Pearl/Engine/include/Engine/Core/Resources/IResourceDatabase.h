@@ -53,7 +53,7 @@ namespace PrCore::Resources {
 		virtual size_t GetMemoryBudget() const = 0;
 
 		virtual void                                  RegisterLoader(const std::string& p_fileExtension, std::unique_ptr<IResourceDataLoader> p_loader) = 0;
-		virtual std::unique_ptr<IResourceDataLoader>& GetLoader(const std::string& p_fileExtension) = 0;
+		virtual IResourceDataLoader* GetLoader(const std::string& p_fileExtension) = 0;
 		virtual void                                  UnregisterLoader(const std::string& p_fileExtension) = 0;
 		virtual void                                  UnregisterAllLoaders() = 0;
 	};

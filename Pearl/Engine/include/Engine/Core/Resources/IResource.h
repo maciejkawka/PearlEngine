@@ -170,7 +170,7 @@ namespace PrCore::Resources {
 		ResourceID          GetID() const { return m_resourceDesc->id; }
 		const std::string&  GetPath() const { return m_resourceDesc->filePath; }
 		ResourceState       GetState() const { return m_resourceDesc->state; }
-		ResourceOrigin      GetSource() const { return m_resourceDesc->origin; }
+		ResourceOrigin      GetOrigin() const { return m_resourceDesc->origin; }
 		size_t              GetSize() const { return m_resourceDesc->size; }
 
 		// Gets IResourceData from the descriptor. If descriptor is nullptr the function returns nullptr
@@ -183,7 +183,7 @@ namespace PrCore::Resources {
 		}
 
 		// Checks if the handle holds valid resource descriptor
-		bool               IsEmpty() { return m_resourceDesc == nullptr; }
+		bool               IsValid() { return m_resourceDesc != nullptr; }
 
 		// Proxy functions to access IResourceData directly
 		// Use these functions instead of GetData()

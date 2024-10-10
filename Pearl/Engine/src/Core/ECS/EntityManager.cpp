@@ -66,7 +66,7 @@ int EntityManager::BasicHierarchicalView::RecursiveHierarchyCreation(Entity p_en
 		return p_depthIndex;
 
 	auto parent = p_entity.GetComponent<ParentComponent>();
-	if (!parent->parent.IsValid())
+	if (parent->parent.IsValid())
 		return p_depthIndex;
 
 	return RecursiveHierarchyCreation(parent->parent, ++p_depthIndex);

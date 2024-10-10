@@ -201,6 +201,16 @@ namespace PrCore::Resources {
 	}
 
 	template<class T>
+	const std::unique_ptr<IResourceDatabase>& ResourceSystem::GetResourceDatabase() const
+	{
+		static_assert(std::is_base_of<IResourceData, T>::value, "T has to be base of IResourceData.");
+		auto database = m_resourceDatabaseTypes.find(typeid(T).hash_code());
+		PR_ASSERT(database != m_resourceDatabaseTypes.end(), "Resource database is not registered. Resource Type: " + std::string(typeid(T).name()));
+
+		return database->second;
+	}
+
+	template<class T>
 	void ResourceSystem::RegisterDatabase(std::unique_ptr<IResourceDatabase> p_database)
 	{
 		static_assert(std::is_base_of<IResourceData, T>::value, "T has to be base of IResourceData.");
