@@ -11,6 +11,7 @@ namespace PrCore::Resources {
 	class ResourceSystem: public Utils::Singleton<ResourceSystem> {
 	public:
 		ResourceSystem() = default;
+		~ResourceSystem();
 
 		//-----------------------------------------------------------------------------
 		// Loads Resource into memory, only file originated resource can be loaded
@@ -48,7 +49,7 @@ namespace PrCore::Resources {
 		//-----------------------------------------------------------------------------
 		// Gets the registered resource, loads if it is unloaded and fires CacheMiss event
 		// If the resource is fetched by this function and then removed from database with Remove() client is owner of the IResourceData
-		// IMPORTANT!! Avoid dangling shared pointers to the IResourceData, this prevents memory deallocations and might cause the memory usage increase
+		// IMPORTANT!! Avoid dangling shared pointers to the IResourceData, this prevents memory deallocation and might cause the memory usage increase
 		template<class T>
 		ResourceHandle<T> Get(ResourceID p_id);
 

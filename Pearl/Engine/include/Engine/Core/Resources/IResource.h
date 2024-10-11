@@ -32,6 +32,27 @@ namespace PrCore::Resources {
 		Corrupted = 4
 	};
 
+	/*
+	=========== FILE RESOURCE LIFE CICLE ==================
+	 ______________________________________________________
+	| |---------|                                          |
+	| |		    |                           -->            |
+	| |Unmanaged| --> Registered --> Loaded <-- Unloaded   |
+	| |		    |        |          Corrupted       |      |
+	| |---------|  <---------------------------------      |
+	|______________________________________________________|
+	========================================================
+	
+	= MEMORY RESOURCE LIFE CICLE =
+	 ____________________________
+	| |---------|                |
+	| |		    | <--            |
+	| |Unmanaged| --> Registered |
+	| |		    |				 |
+	| |---------|                |
+	 ____________________________|
+	============================
+	*/
 
 	enum class ResourceOrigin : uint8_t
 	{
@@ -87,7 +108,7 @@ namespace PrCore::Resources {
 		// Resource data 
 		IResourceDataPtr data;
 
-		// Size in bytes snapshot created during loading, it is not refreshed if the resource data changes
+		// Size in bytes snapshot created during loading, it is not guaranteed to refresh if the resource data changes
 		size_t          size;
 
 		// Unique ID assigned by resource database
@@ -99,7 +120,7 @@ namespace PrCore::Resources {
 		// Resource origin can be file or memory
 		ResourceOrigin  origin;
 
-		// If resource origin is file this stores the file path
+		// If resource origin is file this stores the file path, empty otherwise
 		std::string     filePath;
 
 	};
@@ -197,12 +218,4 @@ namespace PrCore::Resources {
 
 #define REGISTRER_RESOURCE_HANDLE(ResourceName) \
 	using ResourceName ## Handle = PrCore::Resources::ResourceHandle<ResourceName>
-
-	// Example usage
-	//
-	//class Texture : public IResourceData
-	// using TextureResource = Resourcev2<Texture>;
-	// 
-	// TextureResource textureResource = ResourceSystem::Get<T>("TestPath/Elo.png");
-	// Texture texture = textureResource->GetData();
 }

@@ -33,7 +33,7 @@ namespace PrCore::Resources {
 		virtual ResourceDescPtr Get(ResourceID p_id) = 0;
 		virtual ResourceDescPtr Get(const std::string& p_path) = 0;
 
-		// Does not assures that resource data is loaded and available.
+		// Does not guarantee that resource data is loaded and available.
 		virtual ResourceDescPtr GetMetadata(ResourceID p_id) = 0;
 		virtual ResourceDescPtr GetMetadata(const std::string& p_path) = 0;
 

@@ -8,3 +8,8 @@ void ResourceSystem::UnregisterDatabasesAll()
 {
 	m_resourceDatabaseTypes.clear();
 }
+
+ResourceSystem::~ResourceSystem()
+{
+	UnregisterDatabasesAll();
+}
