@@ -414,6 +414,7 @@ namespace PrRenderer::Core
 		}
 
 		mesh->Unbind();
+		material->Unbind();
 	}
 
 	void DeferRenderBackend::RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)

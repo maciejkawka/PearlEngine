@@ -1,19 +1,9 @@
 #pragma once
 
-#include"Core/Resources/IResource.h"
-
-#include"Renderer/Core/Defines.h"
-#include"Renderer/Core/Color.h"
-#include"Renderer/Resources/Uniform.h"
 #include"Renderer/Resources/Shader.h"
 #include"Renderer/Resources/Cubemap.h"
-#include"Renderer/Resources/Texture.h"
-
-// Remove later
-#include"Renderer/Resources/Material.h"
 
 #include"Core/Utils/JSONParser.h"
-#include"Core/Math/Math.h"
 #include"Core/Utils/Logger.h"
 
 #include<vector>

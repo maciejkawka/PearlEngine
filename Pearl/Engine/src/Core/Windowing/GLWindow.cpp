@@ -66,7 +66,6 @@ GLWindow::GLWindow(const WindowSettings& p_settings) :
 	if (!s_init)
 	{
 		PRLOG_ERROR("Cannot create a window, GLFW not init!");
-		PRLOG_ERRORF("Cannot create a window, GLFW not init!");
 		return;
 	}
 
@@ -85,7 +84,6 @@ GLWindow::GLWindow(const WindowSettings& p_settings) :
 	if (!m_window)
 	{
 		PRLOG_ERROR("Cannot create window!");
-		PRLOG_ERRORF("Cannot create window!");
 		return;
 	}
 

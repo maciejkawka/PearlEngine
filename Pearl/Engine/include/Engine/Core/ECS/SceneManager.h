@@ -22,11 +22,13 @@ namespace PrCore::ECS {
 		Scene* GetScenebyUUID(Utils::UUID p_UUID);
 
 		size_t GetSceneCount() const;
+		Scene* GetActiveScene();
 		std::vector<Scene*> GetAllScenes();
 
 	private:
 		void SaveScene(Scene* p_scene, const std::string& p_path);
 
 		std::vector<Scene*> m_scenes;
+		Scene* m_activeScene;
 	};
 }

@@ -11,6 +11,12 @@
     <Filter Include="Resources">
       <UniqueIdentifier>{ca2f7c57-586e-4d05-9aac-bbb21ec5cbc8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{4b908ec6-d872-4b88-ba3f-d5c90d8dd6da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\FBX">
+      <UniqueIdentifier>{c6c113fa-e8ff-4c1a-9796-eb9d57c2ac4c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scr\Core\Editor.cpp">
@@ -28,6 +34,15 @@
     <ClCompile Include="scr\Components\TestFeatures.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="scr\Assets\FBX\FbxEntityGraph.cpp">
+      <Filter>Assets\FBX</Filter>
+    </ClCompile>
+    <ClCompile Include="scr\Assets\FBX\FbxResourceLoader.cpp">
+      <Filter>Assets\FBX</Filter>
+    </ClCompile>
+    <ClCompile Include="scr\Assets\FBX\FbxResource.cpp">
+      <Filter>Assets\FBX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Editor\Core\Editor.h">
@@ -44,6 +59,15 @@
     </ClInclude>
     <ClInclude Include="Resources\resource.h">
       <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Editor\Assets\FBX\FbxEntityGraph.h">
+      <Filter>Assets\FBX</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Editor\Assets\FBX\FbxResource.h">
+      <Filter>Assets\FBX</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Editor\Assets\FBX\FbxResourceLoader.h">
+      <Filter>Assets\FBX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

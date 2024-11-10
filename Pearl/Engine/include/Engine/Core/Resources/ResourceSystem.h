@@ -6,6 +6,8 @@
 
 #include "Core/Utils/Singleton.h"
 
+#include <map>
+
 namespace PrCore::Resources {
 
 	class ResourceSystem: public Utils::Singleton<ResourceSystem> {

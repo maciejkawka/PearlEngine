@@ -65,6 +65,8 @@ Scene* SceneManager::LoadScene(const std::string& p_path)
 	auto scene = CreateScene("");
 	scene->OnDeserialize(sceneJSON);
 
+	m_activeScene = scene;
+
 	return scene;
 }
 
@@ -112,6 +114,11 @@ Scene* SceneManager::GetScenebyUUID(Utils::UUID p_UUID)
 size_t SceneManager::GetSceneCount() const
 {
 	return m_scenes.size();
+}
+
+Scene* SceneManager::GetActiveScene()
+{
+	return m_activeScene;
 }
 
 std::vector<Scene*> SceneManager::GetAllScenes()

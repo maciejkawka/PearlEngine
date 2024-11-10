@@ -30,7 +30,7 @@ Material::Material(ShaderPtr p_shader)
 		auto& uniform = unformPair.second;
 
 		if (uniform.type == UniformType::Texture2D)
-			m_textures[uniformName] = TexturePtr();
+			m_textures[uniformName] = Texture2D::CreateUnitTex(PrRenderer::Core::Color::Black);
 	}
 }
 
@@ -81,13 +81,22 @@ void Material::Bind()
 	int texSlot = 0;
 	for (auto& texture : m_textures)
 	{
-		texture.second->Bind(texSlot);
-		m_shader->SetUniformInt(texture.first, texSlot);
-		texSlot++;
+		if (texture.second)
+		{
+			texture.second->Bind(texSlot);
+			m_shader->SetUniformInt(texture.first, texSlot);
+			texSlot++;
 
-		//Set Texture Usage Flag
-		if (HasProperty("use" + texture.first))
-			SetProperty("use" + texture.first, true);
+			//Set Texture Usage Flag
+			if (HasProperty("use" + texture.first))
+				SetProperty("use" + texture.first, true);
+		}
+		else
+		{
+			//Set Texture Usage Flag
+			if (HasProperty("use" + texture.first))
+				SetProperty("use" + texture.first, false);
+		}
 	}
 
 	//Bind Properties
@@ -156,7 +165,10 @@ void Material::Unbind()
 
 	unsigned int texSlot = 0;
 	for (auto& texture : m_textures)
-		texture.second->Unbind(texSlot++);
+	{
+		if(texture.second)
+			texture.second->Unbind(texSlot++);
+	}
 
 }
 

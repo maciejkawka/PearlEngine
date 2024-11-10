@@ -1,4 +1,7 @@
 #include"Editor/Components/TestFeatures.h"
+#include"Editor/Assets/FBX/FbxEntityGraph.h"
+#include"Editor/Assets/FBX/FbxResourceLoader.h"
+#include"Editor/Assets/FBX/FbxResource.h"
 
 #include"Renderer/Resources/Light.h"
 #include"Renderer/Resources/Mesh.h"
@@ -29,6 +32,7 @@
 #include "Renderer/Resources/MeshOBJLoader.h"
 #include "Renderer/Resources/ShaderLoader.h"
 #include "Renderer/Resources/Texture2DLoader.h"
+#include "Renderer/Resources/Light.h"
 //
 using namespace PrEditor::Components;
 
@@ -80,9 +84,92 @@ TestFeatures::TestFeatures()
 	//exist = newTex != nullptr;
 	//isnull = newTex == nullptr;
 
+	{
+
+		PrEditor::Assets::FbxEntityNode* root = new Assets::FbxEntityNode;
+		root->nodePath = "root";
+
+
+		PrEditor::Assets::FbxEntityNode* root1 = new Assets::FbxEntityNode;
+		root1->nodePath = "root/root1";
+		root->children.push_back(root1);
+
+
+		PrEditor::Assets::FbxEntityNode* root12 = new Assets::FbxEntityNode;
+		root12->nodePath = "root/root1/root2";
+		root1->children.push_back(root12);
+
+		PrEditor::Assets::FbxEntityNode* root123 = new Assets::FbxEntityNode;
+		root123->nodePath = "root/root1/root2/root3";
+		root12->children.push_back(root123);
+
+
+		PrEditor::Assets::FbxEntityNode* root1234 = new Assets::FbxEntityNode;
+		root1234->nodePath = "root/root1/root2/root4";
+		root12->children.push_back(root1234);
+
+		PrEditor::Assets::FbxEntityNode* root1234Elo = new Assets::FbxEntityNode;
+		root1234Elo->nodePath = "root/root1/root2/root3/root4";
+		root123->children.push_back(root1234Elo);
+
+		PrEditor::Assets::FbxEntityNode* root2 = new Assets::FbxEntityNode;
+		root2->nodePath = "root/root2";
+		root->children.push_back(root2);
+
+		PrEditor::Assets::FbxEntityGraph elo(root);
+		
+		elo.ForEachNodes([](const Assets::FbxEntityNode* node) {
+			PRLOG_WARN("{0}", node->nodePath);
+			});
+
+		elo.GetNode("root/root2");
+		elo.GetNode("root/root1/root2/root3/root4");
+		elo.GetNode("root/root1/root2/root4");
+	}
+
 	// Load Stress Test
 	auto scene10 = PrCore::ECS::SceneManager::GetInstance().LoadScene("RenderStressTest.pearl");
+	scene10->RegisterSystem<PrCore::ECS::HierarchyTransform>();
 
+	Assets::FbxResourceLoader loader;
+	auto eloLoader = std::static_pointer_cast<Assets::FbxResource>(loader.LoadResource("a.fbx"));
+	//eloLoader->GetEntityGraph()->GetRoot()->entity->scale = PrCore::Math::vec3(0.01f, 0.01f, 0.01f);
+	//eloLoader->GetEntityGraph()->GetRoot()->entity->rotation = PrCore::Math::vec3(-90, 0.01f, 0.01f);
+	eloLoader->AddEntitesToScene(scene10);
+
+	auto root = scene10->GetEntityByName("a").GetComponent<PrCore::ECS::TransformComponent>();
+	root->SetRotation(root->GetRotation()* PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 90, 0))));
+	root->SetLocalScale(PrCore::Math::vec3{ 0.01f });
+	root->SetPosition(PrCore::Math::vec3{ 0,5.0f,0 });
+
+	eloLoader = std::static_pointer_cast<Assets::FbxResource>(loader.LoadResource("b.fbx"));
+	//eloLoader->GetEntityGraph()->GetRoot()->entity->scale = PrCore::Math::vec3(0.01f, 0.01f, 0.01f);
+	//eloLoader->GetEntityGraph()->GetRoot()->entity->rotation = PrCore::Math::vec3(-90, 0.01f, 0.01f);
+	eloLoader->AddEntitesToScene(scene10);
+
+	root = scene10->GetEntityByName("b").GetComponent<PrCore::ECS::TransformComponent>();
+	root->SetRotation(root->GetRotation()* PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 90, 0))));
+	root->SetLocalScale(PrCore::Math::vec3{ 0.01f });
+	root->SetPosition(PrCore::Math::vec3{ 0,5.0f,0 });
+
+	eloLoader->GetEntityGraph()->ForEachNodes([&](const Assets::FbxEntityNode* node) {
+		if (node->entity->name.find("light") != std::string::npos)
+		{
+			auto entity = scene10->CreateEntity(node->entity->name);
+			auto light = entity.AddComponent<PrCore::ECS::LightComponent>();
+			light->m_light->SetType(PrRenderer::Resources::LightType::Point);
+			light->m_light->SetRange(40.0f);
+			light->m_light->SetColor(PrCore::Math::vec4{ 0.88f, 0.34f, 0.15f, 1.0f } *10.0f);
+			light->m_light->SetAttenuation(1, 1, 1);
+
+			auto transform = entity.AddComponent<PrCore::ECS::TransformComponent>();
+			transform->SetLocalPosition(node->entity->position);
+			transform->SetLocalScale(PrCore::Math::vec3{ 0.1f });
+
+			auto parent = entity.AddComponent<PrCore::ECS::ParentComponent>();
+			parent->parent = scene10->GetEntityByName("b");
+		}
+		});
 	//auto parentEntity = scene10->GetEntityByName("Light0");
 	//for (int i = 1; i < 56; i++)
 	//{
@@ -130,9 +217,11 @@ TestFeatures::TestFeatures()
 	auto logoTransform = logoEntity.AddComponent<PrCore::ECS::TransformComponent>();
 	auto logoMesh = logoEntity.AddComponent<PrCore::ECS::MeshRendererComponent>();
 	logoTransform->SetPosition(PrCore::Math::vec3(20, 5.0f, -20));
-	logoTransform->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 0, 180))));
-	logoTransform->SetLocalScale(PrCore::Math::vec3(5, 5, 1.1f));
+	logoTransform->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(-90, 0, 0))));
+	logoTransform->SetLocalScale(PrCore::Math::vec3(0.1f, 0.1f, 0.1f));
 	logoMesh->material = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("StressTest/logo.mat");
+	
+	//logoMesh->mesh = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>(Assets::FbxResourceLoader::gID);
 	logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
 
 	logoEntity = scene10->CreateEntity("Logo2");
@@ -141,7 +230,7 @@ TestFeatures::TestFeatures()
 	logoTransform->SetPosition(PrCore::Math::vec3(20, 5.0f, 60));
 	logoTransform->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 0, 0))));
 	logoTransform->SetLocalScale(PrCore::Math::vec3(5, 5, 1.1));
-	logoMesh->material = PrCore::Resources::ResourceSystem::GetInstance().Get<PrRenderer::Resources::Material>("StressTest/logo.mat");
+	logoMesh->material = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("StressTest/logo.mat");
 	logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
 
 	//logoEntity = scene10->CreateEntity("Logo3");

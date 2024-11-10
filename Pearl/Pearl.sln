@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencie
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommonUnitTest", "UnitTests\CommonUnitTest\CommonUnitTest.vcxproj", "{F16CD40D-AB6A-4ECB-BDE1-C0FEB7D9B0F4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenFBX", "..\Dependencies\OpenFBX\build\OpenFBX.vcxproj", "{D1D1621E-FBA1-3EF9-996E-12D6B4C0B990}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -55,6 +57,10 @@ Global
 		{F16CD40D-AB6A-4ECB-BDE1-C0FEB7D9B0F4}.Debug|x64.Build.0 = Debug|x64
 		{F16CD40D-AB6A-4ECB-BDE1-C0FEB7D9B0F4}.Release|x64.ActiveCfg = Release|x64
 		{F16CD40D-AB6A-4ECB-BDE1-C0FEB7D9B0F4}.Release|x64.Build.0 = Release|x64
+		{D1D1621E-FBA1-3EF9-996E-12D6B4C0B990}.Debug|x64.ActiveCfg = Debug|x64
+		{D1D1621E-FBA1-3EF9-996E-12D6B4C0B990}.Debug|x64.Build.0 = Debug|x64
+		{D1D1621E-FBA1-3EF9-996E-12D6B4C0B990}.Release|x64.ActiveCfg = Release|x64
+		{D1D1621E-FBA1-3EF9-996E-12D6B4C0B990}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -65,6 +71,7 @@ Global
 		{0928E47C-FF65-39B3-98CD-5B5C0D37CEFD} = {70F9CA2C-4CA2-4D72-AB35-448BD425208D}
 		{01AA3A3B-E66F-492C-B60E-0877971C4CB6} = {81B867D2-3000-4610-A09F-1C095E240293}
 		{F16CD40D-AB6A-4ECB-BDE1-C0FEB7D9B0F4} = {81B867D2-3000-4610-A09F-1C095E240293}
+		{D1D1621E-FBA1-3EF9-996E-12D6B4C0B990} = {70F9CA2C-4CA2-4D72-AB35-448BD425208D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DCF50A40-341B-484E-85AA-46BCF60D8D9F}

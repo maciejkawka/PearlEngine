@@ -162,14 +162,12 @@ PrCore::Resources::IResourceDataPtr MeshOBJLoader::LoadResource(const std::strin
 	if(!UVs[0].empty())
 		mesh->SetUVs(0, std::move(UVs[0]));
 
-
+	mesh->UpdateBuffers();
 	if (!mesh->ValidateBuffers())
 	{
 		PRLOG_ERROR("Renderer: Mesh {0} invalid", mesh->GetName());
 		return nullptr;
 	}
-
-	mesh->UpdateBuffers();
 
 	return mesh;
 }

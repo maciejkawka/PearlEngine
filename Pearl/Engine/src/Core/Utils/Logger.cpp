@@ -13,26 +13,17 @@ void Logger::Init()
 {
 	//Main logger
 	auto consoleSink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
-	consoleSink->set_pattern("<%T> %^%l: %v%$");
+	consoleSink->set_pattern("<%T> %v%$");
 
 	s_mainLogger = std::make_shared<spdlog::logger>("Pearl", consoleSink);
 	s_mainLogger->flush_on(spdlog::level::debug);
 	s_mainLogger->set_level(spdlog::level::debug);
 	spdlog::register_logger(s_mainLogger);
 
-	auto time = std::time(NULL);
-	std::tm* now = std::localtime(&time);
-	auto fileName = std::to_string(now->tm_year + 1900) + "-"
-		+ std::to_string(now->tm_mon) + "-"
-		+ std::to_string(now->tm_mday) + "_"
-		+ std::to_string(now->tm_hour) + "-"
-		+ std::to_string(now->tm_min) + "_"
-		+ "PearlLog.log";
-	auto directory = "Logging/";
-
 	//File logger
-	auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(directory + fileName, true);
-	fileSink->set_pattern("[%T %n Thread ID: %t] %l: %v");
+	auto fileName = "Logging/PearlLog.log";
+	auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(fileName, true);
+	fileSink->set_pattern("<%T> %v%$");
 	s_fileLogger = std::make_shared<spdlog::logger>("Pearl_File", fileSink);
 	s_fileLogger->flush_on(spdlog::level::debug);
 	s_fileLogger->set_level(spdlog::level::debug);
