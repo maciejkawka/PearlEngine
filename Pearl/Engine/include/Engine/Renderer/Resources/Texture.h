@@ -55,7 +55,7 @@ namespace PrRenderer::Resources {
 			m_readable(false),
 			m_mipmap(true),
 			m_format(TextureFormat::None),
-			m_minFiltering(TextureFiltering::Linear),
+			m_minFiltering(TextureFiltering::LinearMipMapLinear),
 			m_magFiltering(TextureFiltering::Linear),
 			m_wrapU(TextureWrapMode::Repeat),
 			m_wrapV(TextureWrapMode::Repeat),
