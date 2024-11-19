@@ -8,11 +8,10 @@
 using namespace PrEditor::Assets;
 
 FbxResource::FbxResource(std::unique_ptr<FbxEntityGraph>&& p_entityGraph, std::vector<PrRenderer::Resources::MaterialHandle>&& p_materials,
-	std::vector<PrRenderer::Resources::MeshHandle>&& p_meshes, std::vector<PrRenderer::Resources::TextureHandle>&& p_textures):
+	std::vector<PrRenderer::Resources::MeshHandle>&& p_meshes):
 	m_entityGraph(std::move(p_entityGraph)),
 	m_materials(std::move(p_materials)),
-	m_meshes(std::move(p_meshes)),
-	m_textures(std::move(p_textures))
+	m_meshes(std::move(p_meshes))
 {
 }
 
@@ -36,13 +35,6 @@ void FbxResource::AddEntitesToScene(PrCore::ECS::Scene* p_scene)
 			transform->SetLocalRotation(entity->rotation);
 			transform->SetLocalPosition(entity->position);
 			transform->SetLocalScale(entity->scale);
-
-			PRLOG_INFO("{}, Position: {}, {}, {}  Rotation: {}, {}, {}  Scale: {}, {}, {}", p_node->nodePath, transform->GetPosition().x, transform->GetPosition().y, transform->GetPosition().z,
-				transform->GetEulerRotation().x, transform->GetEulerRotation().y, transform->GetEulerRotation().z, 
-				transform->GetLocalScale().x, transform->GetLocalScale().y, transform->GetLocalScale().z);
-
-			if(!p_node->entity->materials.empty())
-				PRLOG_INFO("{}, Material {}", p_node->nodePath, p_node->entity->materials[0]->GetName());
 
 			if (parent)
 			{
@@ -80,7 +72,6 @@ size_t FbxResource::GetByteSize() const
 
 	size += m_materials.size() * sizeof(PrRenderer::Resources::MaterialHandle);
 	size += m_meshes.size() * sizeof(PrRenderer::Resources::MeshHandle);
-	size += m_textures.size() * sizeof(PrRenderer::Resources::TextureHandle);
 
 	return size;
 }

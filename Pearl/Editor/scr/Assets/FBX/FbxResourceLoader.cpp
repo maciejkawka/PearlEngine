@@ -77,7 +77,6 @@ struct FbxLoaderHelper
 {
 	std::unordered_map<uint64_t, PrRenderer::Resources::MaterialHandle> materialMap;
 	std::unordered_map<uint64_t, PrRenderer::Resources::MeshHandle>     meshMap;
-	std::unordered_map<uint64_t, PrRenderer::Resources::TextureHandle>  textureMap;
 
 	std::vector<const aiMesh*>     meshes;
 	std::vector<const aiMaterial*> materials;
@@ -144,7 +143,7 @@ PrRenderer::Resources::MaterialHandle FbxLoaderHelper::GetOrCreateMaterial(const
 		}
 	}
 
-	materialData->SetProperty("metallicValue", 0.5f);
+	materialData->SetProperty("metallicValue", 0.3f);
 	if (AI_SUCCESS == p_material->GetTexture(aiTextureType_METALNESS, 0, &texPath))
 	{
 		auto tex = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(texPath.C_Str());
@@ -155,7 +154,7 @@ PrRenderer::Resources::MaterialHandle FbxLoaderHelper::GetOrCreateMaterial(const
 		}
 	}
 
-	materialData->SetProperty("aoValue", 0.0f);
+	materialData->SetProperty("aoValue", 1.0f);
 	if (AI_SUCCESS == p_material->GetTexture(aiTextureType_AMBIENT_OCCLUSION, 0, &texPath))
 	{
 		auto tex = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(texPath.C_Str());
@@ -354,13 +353,11 @@ void FbxLoaderHelper::CreateEntityGraphRecursive(const aiNode* p_node, FbxEntity
 		fbxEntity->light = CreateLight(*it);
 	}
 
-
 	//Create node
 	FbxEntityNode* fbxNode = new FbxEntityNode();
 	fbxNode->parent = p_EntityNode;
 	fbxNode->nodePath = PrCore::PathUtils::MakePath(p_EntityNode->nodePath, p_node->mName.C_Str());
 	fbxNode->entity = fbxEntity;
-
 
 	p_EntityNode->children.push_back(fbxNode);
 	p_depth++;
@@ -432,14 +429,7 @@ PrCore::Resources::IResourceDataPtr FbxResourceLoader::LoadResource(const std::s
 		meshVec.push_back(pair.second);
 		});
 	
-	std::vector<TextureHandle> textureVec;
-	materialVec.reserve(helper.textureMap.size());
-	std::for_each(helper.textureMap.begin(), helper.textureMap.end(), [&textureVec](auto&& pair) {
-		textureVec.push_back(pair.second);
-		});
-	
-	auto fbxData = std::make_shared<FbxResource>(std::move(fbxEntityGraph), std::move(materialVec), std::move(meshVec), std::move(textureVec));
-
+	auto fbxData = std::make_shared<FbxResource>(std::move(fbxEntityGraph), std::move(materialVec), std::move(meshVec));
 	return fbxData;
 }
 
