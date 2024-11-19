@@ -130,29 +130,30 @@ TestFeatures::TestFeatures()
 	// Load Stress Test
 	auto scene10 = PrCore::ECS::SceneManager::GetInstance().LoadScene("RenderStressTest.pearl");
 	scene10->RegisterSystem<PrCore::ECS::HierarchyTransform>();
+	//scene10->RegisterSystem<PrCore::ECS::MeshRendererSystem>();
 
 	Assets::FbxResourceLoader loader;
-	auto eloLoader = std::static_pointer_cast<Assets::FbxResource>(loader.LoadResource("a.fbx"));
+	auto eloLoader = std::static_pointer_cast<Assets::FbxResource>(loader.LoadResource("b.fbx"));
 	//eloLoader->GetEntityGraph()->GetRoot()->entity->scale = PrCore::Math::vec3(0.01f, 0.01f, 0.01f);
 	//eloLoader->GetEntityGraph()->GetRoot()->entity->rotation = PrCore::Math::vec3(-90, 0.01f, 0.01f);
 	eloLoader->AddEntitesToScene(scene10);
 
-	auto root = scene10->GetEntityByName("a").GetComponent<PrCore::ECS::TransformComponent>();
+	auto root = scene10->GetEntityByName("b").GetComponent<PrCore::ECS::TransformComponent>();
 	root->SetRotation(root->GetRotation()* PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 90, 0))));
 	root->SetLocalScale(PrCore::Math::vec3{ 0.01f });
 	root->SetPosition(PrCore::Math::vec3{ 0,5.0f,0 });
 
-	eloLoader = std::static_pointer_cast<Assets::FbxResource>(loader.LoadResource("b.fbx"));
-	//eloLoader->GetEntityGraph()->GetRoot()->entity->scale = PrCore::Math::vec3(0.01f, 0.01f, 0.01f);
-	//eloLoader->GetEntityGraph()->GetRoot()->entity->rotation = PrCore::Math::vec3(-90, 0.01f, 0.01f);
-	eloLoader->AddEntitesToScene(scene10);
+	//eloLoader = std::static_pointer_cast<Assets::FbxResource>(loader.LoadResource("x1.fbx"));
+	////eloLoader->GetEntityGraph()->GetRoot()->entity->scale = PrCore::Math::vec3(0.01f, 0.01f, 0.01f);
+	////eloLoader->GetEntityGraph()->GetRoot()->entity->rotation = PrCore::Math::vec3(-90, 0.01f, 0.01f);
+	//eloLoader->AddEntitesToScene(scene10);
 
-	root = scene10->GetEntityByName("b").GetComponent<PrCore::ECS::TransformComponent>();
-	root->SetRotation(root->GetRotation()* PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 90, 0))));
-	root->SetLocalScale(PrCore::Math::vec3{ 0.01f });
-	root->SetPosition(PrCore::Math::vec3{ 0,5.0f,0 });
+	//root = scene10->GetEntityByName("x1").GetComponent<PrCore::ECS::TransformComponent>();
+	//root->SetRotation(root->GetRotation()* PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 90, 0))));
+	//root->SetLocalScale(PrCore::Math::vec3{ 0.01f });
+	//root->SetPosition(PrCore::Math::vec3{ 0,5.0f,0 });
 
-	eloLoader->GetEntityGraph()->ForEachNodes([&](const Assets::FbxEntityNode* node) {
+	/*eloLoader->GetEntityGraph()->ForEachNodes([&](const Assets::FbxEntityNode* node) {
 		if (node->entity->name.find("light") != std::string::npos)
 		{
 			auto entity = scene10->CreateEntity(node->entity->name);
@@ -167,9 +168,9 @@ TestFeatures::TestFeatures()
 			transform->SetLocalScale(PrCore::Math::vec3{ 0.1f });
 
 			auto parent = entity.AddComponent<PrCore::ECS::ParentComponent>();
-			parent->parent = scene10->GetEntityByName("b");
+			parent->parent = scene10->GetEntityByName("x1");
 		}
-		});
+		});*/
 	//auto parentEntity = scene10->GetEntityByName("Light0");
 	//for (int i = 1; i < 56; i++)
 	//{

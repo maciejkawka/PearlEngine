@@ -8,7 +8,8 @@ namespace PrRenderer::Resources {
 	enum class LightType{
 		Directional = 0,
 		Point = 1,
-		Spot = 2
+		Spot = 2,
+		Unknown = 3
 	};
 
 	class Light {

@@ -56,12 +56,13 @@ namespace PrEditor::Assets {
 		const FbxEntityNode* GetRoot();
 		void                 ForEachNodes(FbxNodeVisitor p_visitor);
 
+		const static size_t  s_maxDepth = 20;
+
 	private:
 		void                 ClearGraphRecursive(FbxEntityNode* p_node, int depth);
 		const FbxEntityNode* GetNodeRecursive(std::string_view p_nodePath, const FbxEntityNode* p_node, int depth);
 		void                 ForEachNodesRecursive(FbxNodeVisitor p_visitor, const FbxEntityNode* p_node, int depth);
 
 		FbxEntityNode*   m_root = nullptr;
-		const size_t     m_maxDepth = 20;
 	};
 }

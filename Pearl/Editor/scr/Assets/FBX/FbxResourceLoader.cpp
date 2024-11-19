@@ -9,114 +9,66 @@
 #include "Renderer/Resources/Material.h"
 #include "Renderer/Resources/Texture.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include <set>
-#include "ofbx.h"
 
 using namespace PrEditor::Assets;
 using namespace PrRenderer::Resources;
 
 
-struct Vec2Compare {
-	bool operator()(const glm::vec2& a, const glm::vec2& b) const {
-		if (a.x != b.x) return a.x < b.x;  // Compare x first
-		return a.y < b.y;                  // If x is equal, compare y
-	}
-};
-
-//Hash Function for map
-template <typename T, typename... Rest>
-void hash_combine(std::size_t& seed, const T& v, const Rest&... rest)
+PrRenderer::Core::Color ToColor(const aiColor4D& p_vec4)
 {
-	seed ^= std::hash<T>{}(v)+0x9e3779b9 + (seed << 6) + (seed >> 2);
-	(hash_combine(seed, rest), ...);
+	return { p_vec4.r, p_vec4.g, p_vec4.g, p_vec4.a };
 }
 
-struct VertexProxy
+PrRenderer::Core::Color ToColor(const aiColor3D& p_vec4)
 {
-	PrCore::Math::vec3 pos;
-	PrCore::Math::vec3 normal;
-	PrCore::Math::vec2 uv;
-	PrRenderer::Core::Color color;
-
-	VertexProxy()
-	{
-		pos = PrCore::Math::vec3(0.f);
-		normal = PrCore::Math::vec3(0.f);
-		uv = PrCore::Math::vec2(0.f);
-		color = PrRenderer::Core::Color::Black;
-	}
-
-	bool operator==(const VertexProxy& vertex) const
-	{
-		return vertex.uv == this->uv && vertex.pos == this->pos &&
-			vertex.normal == this->normal && vertex.color == this->color;
-	}
-};
-
-namespace std {
-	template<> struct hash<VertexProxy> {
-		size_t operator()(VertexProxy const& vertex) const {
-			size_t seed = 0;
-			hash_combine(seed, vertex.pos, (PrCore::Math::vec3)vertex.color, vertex.uv, vertex.normal);
-			return seed;
-		}
-	};
+	return { p_vec4.r, p_vec4.g, p_vec4.g, 1.0f };
 }
 
-PrCore::Math::vec4 ColorToVec4(const ofbx::Color& p_color)
-{
-	return { p_color.r, p_color.g, p_color.b, 1.0f };
-}
-
-PrCore::Math::vec4 ToVec4(const ofbx::Vec4& p_vec4)
-{
-	return { p_vec4.x, p_vec4.y, p_vec4.z, p_vec4.w };
-}
-
-PrCore::Math::vec3 ToVec3(const ofbx::Vec3& p_vec3)
+PrCore::Math::vec3 ToVec3(const aiVector3D& p_vec3)
 {
 	return { p_vec3.x, p_vec3.y, p_vec3.z };
 }
 
-PrCore::Math::vec3 ToVec3(const ofbx::DVec3& p_vec3)
+PrCore::Math::quat ToQuat(const aiQuaternion& p_quat)
 {
-	return { p_vec3.x, p_vec3.y, p_vec3.z };
+	return { p_quat.w, p_quat.x, p_quat.y, p_quat.z };
 }
 
-PrCore::Math::vec2 ToVec2(const ofbx::Vec2& p_vec2)
-{
-	return { p_vec2.x, p_vec2.y };
+glm::mat4 ToMat4(const aiMatrix4x4& p_mat) {
+
+	glm::mat4 retMat;
+
+	retMat[0][0] = p_mat.a1; retMat[1][0] = p_mat.a2; retMat[2][0] = p_mat.a3; retMat[3][0] = p_mat.a4;
+	retMat[0][1] = p_mat.b1; retMat[1][1] = p_mat.b2; retMat[2][1] = p_mat.b3; retMat[3][1] = p_mat.b4;
+	retMat[0][2] = p_mat.c1; retMat[1][2] = p_mat.c2; retMat[2][2] = p_mat.c3; retMat[3][2] = p_mat.c4;
+	retMat[0][3] = p_mat.d1; retMat[1][3] = p_mat.d2; retMat[2][3] = p_mat.d3; retMat[3][3] = p_mat.d4;
+
+	return retMat;
 }
 
-glm::mat4 ToMat4(const ofbx::DMatrix& openFBXMatrix) {
-
-	const double* m = openFBXMatrix.m;
-	glm::mat4 mat(
-		static_cast<float>(m[0]), static_cast<float>(m[1]), static_cast<float>(m[2]), static_cast<float>(m[3]),
-		static_cast<float>(m[4]), static_cast<float>(m[5]), static_cast<float>(m[6]), static_cast<float>(m[7]),
-		static_cast<float>(m[8]), static_cast<float>(m[9]), static_cast<float>(m[10]), static_cast<float>(m[11]),
-		static_cast<float>(m[12]), static_cast<float>(m[13]), static_cast<float>(m[14]), static_cast<float>(m[15])
-	);
-
-	return mat;
-}
-
-PrRenderer::Resources::LightType ToPearlLightType(ofbx::Light::LightType p_lightType)
+LightType ToLightType(aiLightSourceType p_sourceType)
 {
-	switch (p_lightType)
+	switch (p_sourceType)
 	{
-	case ofbx::Light::LightType::POINT:
-		return LightType::Point;
-		break;
-	case ofbx::Light::LightType::DIRECTIONAL:
+	case aiLightSource_DIRECTIONAL:
 		return LightType::Directional;
 		break;
-	case ofbx::Light::LightType::SPOT:
-		return LightType::Spot;
-		break;
-	default:
+	case aiLightSource_POINT:
 		return LightType::Point;
 		break;
+	case aiLightSource_SPOT:
+		return LightType::Spot;
+		break;
+	case aiLightSource_AMBIENT:
+	case aiLightSource_AREA:
+	case _aiLightSource_Force32Bit:
+	case aiLightSource_UNDEFINED:
+		return LightType::Unknown;
 	}
 }
 
@@ -127,215 +79,175 @@ struct FbxLoaderHelper
 	std::unordered_map<uint64_t, PrRenderer::Resources::MeshHandle>     meshMap;
 	std::unordered_map<uint64_t, PrRenderer::Resources::TextureHandle>  textureMap;
 
-	PrRenderer::Resources::TextureHandle GetOrCreateTexture(const ofbx::Texture* p_texture);
-	PrRenderer::Resources::MaterialHandle GetOrCreateMaterial(const ofbx::Material* p_material);
-	PrRenderer::Resources::MeshHandle GetOrCreateMesh(const ofbx::Mesh* p_mesh);
+	std::vector<const aiMesh*>     meshes;
+	std::vector<const aiMaterial*> materials;
+	std::vector<const aiLight*>    lights;
 
-	void CreateEntityHierarchy(const ofbx::Object* p_objectNode, FbxEntityNode* p_EntityNode, int depth = 0);
+	PrRenderer::Resources::MaterialHandle GetOrCreateMaterial(const aiMaterial* p_material);
+	PrRenderer::Resources::MeshHandle     GetOrCreateMesh(const aiNode* p_mesh);
+	LightPtr                              CreateLight(const aiLight* p_light);
+
+	void GatherMaterials(const aiScene* p_scene);
+	void GatherMeshes(const aiScene* p_scene);
+	void GatherLights(const aiScene* p_scene);
+
+	void CreateEntityGraph(const aiNode* p_objectNode, FbxEntityNode* p_EntityNode);
+	void CreateEntityGraphRecursive(const aiNode* p_objectNode, FbxEntityNode* p_EntityNode, int depth = 0);
 };
 
-PrRenderer::Resources::TextureHandle FbxLoaderHelper::GetOrCreateTexture(const ofbx::Texture* p_texture)
-{
-	PR_ASSERT(p_texture);
-
-	auto it = textureMap.find(p_texture->id);
-	if (it != textureMap.end())
-		return it->second;
-
-	char path[MAX_PATH];
-	p_texture->getFileName().toString(path);
-	auto textureHandle = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(path);
-	textureMap.insert({ p_texture->id, textureHandle });
-
-	if (textureHandle.GetState() == PrCore::Resources::ResourceState::Corrupted)
-		PRLOG_WARN("Texture {} is Corrupted!", std::string(path).c_str());
-
-	return textureHandle;
-}
-
-PrRenderer::Resources::MaterialHandle FbxLoaderHelper::GetOrCreateMaterial(const ofbx::Material* p_material)
+PrRenderer::Resources::MaterialHandle FbxLoaderHelper::GetOrCreateMaterial(const aiMaterial* p_material)
 {
 	PR_ASSERT(p_material);
 
-	auto it = materialMap.find(p_material->id);
+	// Check if already created
+	auto it = materialMap.find((uint64_t)p_material);
 	if (it != materialMap.end())
 		return it->second;
 
-	// Material not created yet, create one
-
-	// By default FBX files are loaded with StandarLit shader
 	auto shaderRes = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>("Deferred/StandardLit.shader");
 	PR_ASSERT(shaderRes != nullptr, "Cannot load standard shader!");
 
 	auto materialData = std::make_shared<Material>(shaderRes.GetData());
-	materialData->SetName(p_material->name);
+	materialData->SetName(p_material->GetName().C_Str());
 
-	// Values
-	materialData->SetProperty<PrCore::Math::vec4>("albedoValue", ColorToVec4(p_material->getDiffuseColor()));
-	materialData->SetProperty<float>("metallicValue", PrCore::Math::max(0.0f, (float)p_material->getSpecularFactor()));
-	materialData->SetProperty<float>("roughnessValue", 1.0f - PrCore::Math::max(0.0f, (float)p_material->getShininess()));
-	materialData->SetProperty<float>("aoValue", PrCore::Math::max(0.0f, (float)p_material->getAmbientFactor()));
-	materialData->SetProperty<float>("emissionInt", PrCore::Math::max(0.0f, (float)p_material->getEmissiveFactor()));
-	materialData->SetProperty<PrCore::Math::vec3>("emissionColor", PrCore::Math::vec3{ ColorToVec4(p_material->getDiffuseColor()) });
-
-	// Textures
-
-	// Conversion Assumtions
-	//   FBX ------ PBR
-	// DIFFUSE   -> DIFFUSE
-	// NORMAL    -> NORMAL
-	// SPECULAR  -> METALLIC
-	// SHININESS -> ROUGHNESS (Texture has to prpeared, factor is calculated 1 - value)
-	// EMISSIVE  -> EMISSION
-	// AMBIENT   -> AO
-
-	auto texPtr = p_material->getTexture(ofbx::Texture::DIFFUSE);
-	if (texPtr != nullptr)
+	aiString texPath;
+	materialData->SetProperty("albedoValue", PrCore::Math::vec4{ 0.5f });
+	if (AI_SUCCESS == p_material->GetTexture(aiTextureType_DIFFUSE, 0, &texPath))
 	{
-		auto texture = GetOrCreateTexture(texPtr);
-		if (texture != nullptr)
+		auto tex = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(texPath.C_Str());
+		if (tex.IsValid())
 		{
-			materialData->SetTexture("albedoMap", texture.GetData());
-		}
-	}
-	
-	texPtr = p_material->getTexture(ofbx::Texture::NORMAL);
-	materialData->SetProperty("normalMapping", texPtr != nullptr);
-	if (texPtr != nullptr)
-	{
-		auto texture = GetOrCreateTexture(texPtr);
-		if (texture != nullptr)
-		{
-			materialData->SetTexture("normalMap", texture.GetData());
-		}
-
-	}
-
-	texPtr = p_material->getTexture(ofbx::Texture::SPECULAR);
-	if (texPtr != nullptr)
-	{
-		auto texture = GetOrCreateTexture(texPtr);
-		if (texture != nullptr)
-		{
-			materialData->SetTexture("metallicMap", texture.GetData());
+			materialData->SetTexture("albedoMap", tex.GetData());
+			materialData->SetProperty("albedoValue", PrCore::Math::vec4{ 0.0f });
 		}
 	}
 
-	texPtr = p_material->getTexture(ofbx::Texture::SHININESS);
-	if (texPtr != nullptr)
+	materialData->SetProperty("normalMapping", false);
+	if (AI_SUCCESS == p_material->GetTexture(aiTextureType_NORMALS, 0, &texPath))
 	{
-		auto texture = GetOrCreateTexture(texPtr);
-		if (texture != nullptr)
+		auto tex = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(texPath.C_Str());
+		if (tex.IsValid())
 		{
-			materialData->SetTexture("roughnessMap", texture.GetData());
+			materialData->SetProperty("normalMapping", true);
+			materialData->SetTexture("normalMap", tex.GetData());
 		}
 	}
 
-	texPtr = p_material->getTexture(ofbx::Texture::EMISSIVE);
-	if (texPtr != nullptr)
+	materialData->SetProperty("roughnessValue", 0.5f);
+	if (AI_SUCCESS == p_material->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, 0, &texPath))
 	{
-		auto texture = GetOrCreateTexture(texPtr);
-		if (texture != nullptr)
+		auto tex = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(texPath.C_Str());
+		if (tex.IsValid())
 		{
-			materialData->SetTexture("emissionMap", texture.GetData());
+			materialData->SetTexture("roughnessMap", tex.GetData());
+			materialData->SetProperty("roughnessValue", 0.0f);
 		}
 	}
 
-	texPtr = p_material->getTexture(ofbx::Texture::AMBIENT);
-	if (texPtr != nullptr)
+	materialData->SetProperty("metallicValue", 0.5f);
+	if (AI_SUCCESS == p_material->GetTexture(aiTextureType_METALNESS, 0, &texPath))
 	{
-		auto texture = GetOrCreateTexture(texPtr);
-		if (texture != nullptr)
+		auto tex = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(texPath.C_Str());
+		if (tex.IsValid())
 		{
-			materialData->SetTexture("aoMap", texture.GetData());
+			materialData->SetTexture("metallicMap", tex.GetData());
+			materialData->SetProperty("metallicValue", 0.0f);
 		}
 	}
+
+	materialData->SetProperty("aoValue", 0.0f);
+	if (AI_SUCCESS == p_material->GetTexture(aiTextureType_AMBIENT_OCCLUSION, 0, &texPath))
+	{
+		auto tex = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(texPath.C_Str());
+		if (tex.IsValid())
+		{
+			materialData->SetTexture("aoMap", tex.GetData());
+			materialData->SetProperty("aoValue", 0.0f);
+		}
+	}
+
+
+	materialData->SetProperty("emissionInt", 0.0f);
+	materialData->SetProperty("emissionColor", PrCore::Math::vec3{ 0.0f });
+	if (AI_SUCCESS == p_material->GetTexture(aiTextureType_EMISSION_COLOR, 0, &texPath))
+	{
+		auto tex = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(texPath.C_Str());
+		if (tex.IsValid())
+		{
+			materialData->SetTexture("emissionMap", tex.GetData());
+			materialData->SetProperty("emissionInt", 5.0f);
+		}
+	}
+
 
 	auto materialHandle = PrCore::Resources::ResourceSystem::GetInstance().Register<Material>(materialData);
-	materialMap.insert({ p_material->id, materialHandle });
-
+	materialMap.insert({ (uint64_t)p_material, materialHandle });
 	return materialHandle;
 }
 
-PrRenderer::Resources::MeshHandle FbxLoaderHelper::GetOrCreateMesh(const ofbx::Mesh* p_mesh)
+PrRenderer::Resources::MeshHandle FbxLoaderHelper::GetOrCreateMesh(const aiNode* p_mesh)
 {
 	PR_ASSERT(p_mesh);
 
-	auto it = meshMap.find(p_mesh->id);
+	// Check if already created
+	auto it = meshMap.find((uint64_t)p_mesh);
 	if (it != meshMap.end())
 		return it->second;
 
 	auto meshData = Mesh::Create();
-	meshData->SetName(p_mesh->name);
+	meshData->SetName(p_mesh->mName.C_Str());
 
-	std::vector<PrCore::Math::vec3> verticesVec;
-	std::vector<PrCore::Math::vec3> normalsVec;
-	std::vector<unsigned int> indicesVec;
-	std::vector<PrCore::Math::vec2> UVsVec;
+	std::vector<PrCore::Math::vec3>      verticesVec;
+	std::vector<PrCore::Math::vec3>      normalsVec;
+	std::vector<unsigned int>            indicesVec;
+	std::vector<PrCore::Math::vec2>      UVsVec;
+	//std::vector<PrRenderer::Core::Color> colorsVec;
 
-	const ofbx::GeometryData& geom = p_mesh->getGeometryData();
-	const ofbx::Vec3Attributes positions = geom.getPositions();
-	const ofbx::Vec3Attributes normals = geom.getNormals();
-	const ofbx::Vec2Attributes uvs = geom.getUVs(0);
-
-	// Mesh vertices might be translated by geompetry matrix
-	// Transpose vertices positions, this might be probelm with normals but fuck it for now
-	auto geompetryMatrix = ToMat4(p_mesh->getGeometricMatrix());
-
-	std::unordered_map<VertexProxy, unsigned int> vertexMap;
-
-	for (int partition_idx = 0; partition_idx < geom.getPartitionCount(); ++partition_idx)
+	unsigned int indicesOffset = 0;
+	for (int i = 0; i < p_mesh->mNumMeshes; ++i)
 	{
-		const ofbx::GeometryPartition& partition = geom.getPartition(partition_idx);
-		for (int polygon_idx = 0; polygon_idx < partition.polygon_count; ++polygon_idx)
+		auto mesh = meshes[p_mesh->mMeshes[i]];
+		for (int vertId = 0; vertId < mesh->mNumVertices; ++vertId)
 		{
-			const ofbx::GeometryPartition::Polygon& polygon = partition.polygons[polygon_idx];
-
-			int tri_indices[32];
-			auto indices = ofbx::triangulate(geom, polygon, tri_indices);
-
-			for (int i = 0; i < indices; i++)
+			if (mesh->HasPositions())
 			{
-				VertexProxy vert;
+				verticesVec.push_back(ToVec3(mesh->mVertices[vertId]));
+			}
 
-				vert.pos = geompetryMatrix * PrCore::Math::vec4(ToVec3(positions.get(tri_indices[i])), 1.0f);
+			if (mesh->HasNormals())
+			{
+				normalsVec.push_back(ToVec3(mesh->mNormals[vertId]));
+			}
 
-				if (normals.values != nullptr)
-				{
-					vert.normal = ToVec3(normals.get(tri_indices[i]));
-				}
+			if (mesh->HasTextureCoords(0))
+			{
+				UVsVec.push_back(ToVec3(mesh->mTextureCoords[0][vertId]));
+			}
 
-				if (uvs.values != nullptr)
-				{
-					vert.uv = ToVec2(uvs.get(tri_indices[i]));
-				}
+			// Do not use colors for now
+			//if (mesh->HasVertexColors(0))
+			//{
+			//	colorsVec.push_back(PrRenderer::Core::Color::White);
+			//}
+		}
 
-				if (vertexMap.find(vert) == vertexMap.end())
-				{
-					verticesVec.push_back(vert.pos);
-
-					if (normals.values != nullptr)
-					{
-						normalsVec.push_back(vert.normal);
-					}
-
-					if (uvs.values != nullptr)
-					{
-						UVsVec.push_back(vert.uv);
-					}
-
-					vertexMap[vert] = (unsigned int)verticesVec.size() - 1;
-				}
-
-				indicesVec.push_back(vertexMap[vert]);
+		for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
+		{
+			const aiFace& face = mesh->mFaces[i];
+			for (unsigned int j = 0; j < face.mNumIndices; ++j)
+			{
+				indicesVec.push_back(face.mIndices[j] + indicesOffset);
 			}
 		}
+
+		indicesOffset = verticesVec.size();
 	}
 
 	meshData->SetVertices(std::move(verticesVec));
 	meshData->SetNormals(std::move(normalsVec));
 	meshData->SetUVs(0, std::move(UVsVec));
 	meshData->SetIndices(std::move(indicesVec));
+	//meshData->SetColors(std::move(colorsVec));
 
 	meshData->UpdateBuffers();
 	if (!meshData->ValidateBuffers())
@@ -345,132 +257,139 @@ PrRenderer::Resources::MeshHandle FbxLoaderHelper::GetOrCreateMesh(const ofbx::M
 	}
 
 	auto meshHandle = PrCore::Resources::ResourceSystem::GetInstance().Register<Mesh>(meshData);
-	meshMap.insert({ p_mesh->id, meshHandle });
+	meshMap.insert({ (uint64_t)p_mesh, meshHandle });
+
 	return meshHandle;
 }
 
-void FbxLoaderHelper::CreateEntityHierarchy(const ofbx::Object* p_objectNode, FbxEntityNode* p_EntityNode, int depth)
+void FbxLoaderHelper::GatherMaterials(const aiScene* p_scene)
 {
-	if (p_objectNode == nullptr)
-		return;
-
-	if (depth == 20)
-		return;
-
-	PR_ASSERT(p_EntityNode);
-	switch (p_objectNode->getType())
+	for (int i = 0; i < p_scene->mNumMaterials; i++)
 	{
-	case ofbx::Object::Type::ROOT:
-	{
-		// Set root
-		auto fbxEntity = new FbxEntity();
-		fbxEntity->name = p_objectNode->name;
-		fbxEntity->position = ToVec3(p_objectNode->getLocalTranslation());
-		fbxEntity->scale = ToVec3(p_objectNode->getLocalScaling());
-		fbxEntity->rotation = ToVec3(p_objectNode->getLocalRotation());
-
-		p_EntityNode->nodePath = p_objectNode->name;
-		p_EntityNode->entity = fbxEntity;
-	}
-	break;
-
-	case ofbx::Object::Type::MESH: 
-	{
-		// Create entity and set mesh
-		// We asume that mesh node indicates a new entity create
-		auto fbxEntity = new FbxEntity();
-		fbxEntity->name = p_objectNode->name;
-		fbxEntity->position = ToVec3(p_objectNode->getLocalTranslation());
-		fbxEntity->scale = ToVec3(p_objectNode->getLocalScaling());
-		fbxEntity->rotation = PrCore::Math::quat{ PrCore::Math::radians(ToVec3(p_objectNode->getPreRotation())) }
-			*PrCore::Math::quat{ PrCore::Math::radians(ToVec3(p_objectNode->getLocalRotation())) }
-		*PrCore::Math::quat{ PrCore::Math::radians(ToVec3(p_objectNode->getPostRotation())) };
-
-		fbxEntity->mesh = GetOrCreateMesh(static_cast<const ofbx::Mesh*>(p_objectNode));
-
-		auto entityNode = new FbxEntityNode();
-		entityNode->entity = fbxEntity;
-		entityNode->parent = p_EntityNode;
-		entityNode->nodePath = PrCore::PathUtils::MakePath(p_EntityNode->nodePath, p_objectNode->name);
-
-		p_EntityNode->children.push_back(entityNode);
-		p_EntityNode = entityNode;
-
-		// Gather materials for the mesh
-		const auto mesh = static_cast<const ofbx::Mesh*>(p_objectNode);
-		const auto& paritionData = mesh->getGeometry()->getGeometryData();
-		if (paritionData.getMaterialsCount() != 0)
-		{
-			// Get material per partition if present
-			for (int i = 0; i < paritionData.getMaterialsCount(); ++i)
-			{
-
-				auto material = mesh->getMaterial(paritionData.getPartitionMaterialIndex(i));
-				p_EntityNode->entity->materials.push_back(GetOrCreateMaterial(material));
-			}
-		}
-		else
-		{
-			// Get material from mesh
-			for (int i = 0; i < mesh->getMaterialCount(); ++i)
-			{
-				auto material = mesh->getMaterial(i);
-				p_EntityNode->entity->materials.push_back(GetOrCreateMaterial(material));
-			}
-		}
-	}
-	break;
-
-	case ofbx::Object::Type::LIGHT:
-	{
-		// Set light to the entity created upon mesh detection
-		auto light = std::make_shared<Light>();
-		auto lightNode = static_cast<const ofbx::Light*>(p_objectNode);
-
-		light->SetType(ToPearlLightType(lightNode->getLightType()));
-		light->SetColor(ColorToVec4(lightNode->getColor()));
-		light->SetInnerCone(lightNode->getInnerAngle());
-		light->SetOutterCone(lightNode->getOuterAngle());
-		light->SetRange(lightNode->getFarAttenuationEnd());
-
-		p_EntityNode->entity->light = light;
-	}
-	break;
-
-	case ofbx::Object::Type::NULL_NODE:
-	{
-		// Create empty entity in the hierarchy
-		auto fbxEntity = new FbxEntity();
-		fbxEntity->name = p_objectNode->name;
-		fbxEntity->position = ToVec3(p_objectNode->getLocalTranslation());
-		fbxEntity->position.x = -fbxEntity->position.x;
-		fbxEntity->scale = ToVec3(p_objectNode->getLocalScaling());
-		fbxEntity->rotation = PrCore::Math::quat{ PrCore::Math::radians(ToVec3(p_objectNode->getPreRotation())) }
-			*PrCore::Math::quat{ PrCore::Math::radians(ToVec3(p_objectNode->getLocalRotation())) }
-			*PrCore::Math::quat{ PrCore::Math::radians(ToVec3(p_objectNode->getPostRotation())) };
-
-		auto entityNode = new FbxEntityNode();
-		entityNode->entity = fbxEntity;
-		entityNode->parent = p_EntityNode;
-		entityNode->nodePath = PrCore::PathUtils::MakePath(p_EntityNode->nodePath, p_objectNode->name);
-
-		p_EntityNode->children.push_back(entityNode);
-		p_EntityNode = entityNode;
-	}
-	break;
-	}
-
-
-	// Loop children
-	int i = 0;
-	while (ofbx::Object* child = p_objectNode->resolveObjectLink(i))
-	{
-		CreateEntityHierarchy(child, p_EntityNode, depth + 1);
-		i++;
+		materials.push_back(p_scene->mMaterials[i]);
 	}
 }
-////////////////////////////////////////////////////
 
+void FbxLoaderHelper::GatherMeshes(const aiScene* p_scene)
+{
+	for (int i = 0; i < p_scene->mNumMeshes; i++)
+	{
+		meshes.push_back(p_scene->mMeshes[i]);
+	}
+}
+
+void FbxLoaderHelper::GatherLights(const aiScene* p_scene)
+{
+	for (int i = 0; i < p_scene->mNumLights; i++)
+	{
+		lights.push_back(p_scene->mLights[i]);
+	}
+}
+
+void FbxLoaderHelper::CreateEntityGraph(const aiNode* p_node, FbxEntityNode* p_EntityNode)
+{
+	FbxEntity* fbxEntity = new FbxEntity();
+	aiVector3D transform;
+	aiQuaternion rotation;
+	aiVector3D scale;
+	p_node->mTransformation.Decompose(scale, rotation, transform);
+	fbxEntity->position = ToVec3(transform);
+	fbxEntity->rotation = ToQuat(rotation);
+	fbxEntity->scale = ToVec3(scale);
+
+	p_EntityNode->entity = fbxEntity;
+
+	for (int i = 0; i < p_node->mNumChildren; i++)
+	{
+		CreateEntityGraphRecursive(p_node->mChildren[i], p_EntityNode, 1);
+	}
+}
+
+void FbxLoaderHelper::CreateEntityGraphRecursive(const aiNode* p_node, FbxEntityNode* p_EntityNode, int p_depth)
+{
+	PR_ASSERT(p_depth < FbxEntityGraph::s_maxDepth, "Looks like the FBX file has graph is too deep");
+
+	if (p_EntityNode == nullptr)
+		return;
+
+	if (p_node == nullptr)
+		return;
+
+	//CreateEntity
+	FbxEntity* fbxEntity = new FbxEntity();
+	fbxEntity->name = p_node->mName.C_Str();
+
+	aiVector3D transform;
+	aiQuaternion rotation;
+	aiVector3D scale;
+	p_node->mTransformation.Decompose(scale, rotation, transform);
+	fbxEntity->position = ToVec3(transform);
+	fbxEntity->rotation = ToQuat(rotation);
+	fbxEntity->scale = ToVec3(scale);
+
+	// Get mesh
+	if (p_node->mNumMeshes > 0)
+	{
+		fbxEntity->mesh = GetOrCreateMesh(p_node);
+	}
+
+	// Get material
+	for (int i = 0; i < p_node->mNumMeshes; i++)
+	{
+		auto meshIndex = p_node->mMeshes[i];
+		auto materialIndex = meshes[meshIndex]->mMaterialIndex;
+		auto material = materials[materialIndex];
+
+		fbxEntity->materials.push_back(GetOrCreateMaterial(material));
+	}
+
+	// Get Light
+	auto it = std::find_if(lights.begin(), lights.end(), [&nodeName = p_node->mName](const aiLight* p_light)
+	{
+		return nodeName == p_light->mName;
+	});
+
+	if (it != lights.end())
+	{
+		fbxEntity->light = CreateLight(*it);
+	}
+
+
+	//Create node
+	FbxEntityNode* fbxNode = new FbxEntityNode();
+	fbxNode->parent = p_EntityNode;
+	fbxNode->nodePath = PrCore::PathUtils::MakePath(p_EntityNode->nodePath, p_node->mName.C_Str());
+	fbxNode->entity = fbxEntity;
+
+
+	p_EntityNode->children.push_back(fbxNode);
+	p_depth++;
+	for (int i = 0; i < p_node->mNumChildren; i++)
+	{
+		CreateEntityGraphRecursive(p_node->mChildren[i], fbxNode, p_depth);
+	}
+}
+
+LightPtr FbxLoaderHelper::CreateLight(const aiLight* p_light)
+{
+	PR_ASSERT(p_light);
+
+	auto type = ToLightType(p_light->mType);
+	if (type == LightType::Unknown)
+		return nullptr;
+
+
+	auto light = std::make_shared<Light>();
+	light->SetType(type);
+	light->SetColor(ToColor(p_light->mColorDiffuse));
+	light->SetInnerCone(PrCore::Math::degrees(p_light->mAngleInnerCone));
+	light->SetOutterCone(PrCore::Math::degrees(p_light->mAngleOuterCone));
+
+	// Default
+	light->SetRange(10.0f);
+
+	return light;
+}
 
 PrCore::Resources::IResourceDataPtr FbxResourceLoader::LoadResource(const std::string& p_path)
 {
@@ -483,36 +402,22 @@ PrCore::Resources::IResourceDataPtr FbxResourceLoader::LoadResource(const std::s
 	char* data = new char[file->GetSize()];
 	file->Read(data);
 
-	ofbx::LoadFlags flags =
-//		ofbx::LoadFlags::IGNORE_MODELS |
-		ofbx::LoadFlags::IGNORE_BLEND_SHAPES |
-		ofbx::LoadFlags::IGNORE_CAMERAS |
-//		ofbx::LoadFlags::IGNORE_LIGHTS |
-//		ofbx::LoadFlags::IGNORE_TEXTURES |
-		ofbx::LoadFlags::IGNORE_SKIN |
-		ofbx::LoadFlags::IGNORE_BONES |
-		ofbx::LoadFlags::IGNORE_PIVOTS |
-//		ofbx::LoadFlags::IGNORE_MATERIALS |
-		ofbx::LoadFlags::IGNORE_POSES |
-		ofbx::LoadFlags::IGNORE_VIDEOS |
-		ofbx::LoadFlags::IGNORE_LIMBS |
-//		ofbx::LoadFlags::IGNORE_MESHES |
-//		ofbx::LoadFlags::IGNORE_GEOMETRY |
-		ofbx::LoadFlags::IGNORE_ANIMATIONS;
-
-	ofbx::IScene* scene = ofbx::load(reinterpret_cast<ofbx::u8*>(data), file->GetSize(), static_cast<ofbx::u16>(flags));
-
-	const ofbx::GlobalSettings* settings = scene->getGlobalSettings();
+	Assimp::Importer importer;
+	importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+	auto scene = importer.ReadFileFromMemory(data, file->GetSize(), aiProcess_Triangulate | aiProcess_ImproveCacheLocality | aiProcess_GenSmoothNormals, PrCore::PathUtils::GetExtension(p_path).c_str());
+	delete[] data;
 
 	FbxLoaderHelper helper;
+	helper.GatherMeshes(scene);
+	helper.GatherMaterials(scene);
+	helper.GatherLights(scene);
+
 	auto root = new FbxEntityNode();
+	root->nodePath = PrCore::PathUtils::GetFilenameInPlace(p_path);
+	helper.CreateEntityGraph(scene->mRootNode, root);
+	root->entity->name = root->nodePath;
+
 	auto fbxEntityGraph = std::make_unique<FbxEntityGraph>(root);
-
-	helper.CreateEntityHierarchy(scene->getRoot(), root, 0);
-	root->entity->name = PrCore::PathUtils::GetFilename(p_path);
-
-	scene->destroy();
-	delete[] data;
 
 	// Convert maps to vectors
 	std::vector<MaterialHandle> materialVec;
@@ -520,20 +425,21 @@ PrCore::Resources::IResourceDataPtr FbxResourceLoader::LoadResource(const std::s
 	std::for_each(helper.materialMap.begin(), helper.materialMap.end(), [&materialVec](auto&& pair) {
 		materialVec.push_back(pair.second);
 		});
-
+	
 	std::vector<MeshHandle> meshVec;
 	materialVec.reserve(helper.meshMap.size());
 	std::for_each(helper.meshMap.begin(), helper.meshMap.end(), [&meshVec](auto&& pair) {
 		meshVec.push_back(pair.second);
 		});
-
+	
 	std::vector<TextureHandle> textureVec;
 	materialVec.reserve(helper.textureMap.size());
 	std::for_each(helper.textureMap.begin(), helper.textureMap.end(), [&textureVec](auto&& pair) {
 		textureVec.push_back(pair.second);
 		});
-
+	
 	auto fbxData = std::make_shared<FbxResource>(std::move(fbxEntityGraph), std::move(materialVec), std::move(meshVec), std::move(textureVec));
+
 	return fbxData;
 }
 

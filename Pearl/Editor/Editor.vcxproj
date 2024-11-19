@@ -48,14 +48,14 @@
     <OutDir>../../Bin/$(Configuration)/</OutDir>
     <IntDir>../../Bin-int/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetName>PearlEditor</TargetName>
-    <LibraryPath>../../Dependencies/glfw/lib;../../Dependencies/OpenFBX/build/Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>../../Dependencies/glfw/lib;../../Dependencies/Assimp/lib/Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>../../Bin/$(Configuration)/</OutDir>
     <IntDir>../../Bin-int/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetName>PearlEditor</TargetName>
-    <LibraryPath>../../Dependencies/glad/lib;../../Dependencies/OpenFBX/build/Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>../../Dependencies/glad/lib;../../Dependencies/Assimp/lib/Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -64,7 +64,7 @@
       <PreprocessorDefinitions>PR_ASSERTENABLE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include;..\Engine\include;..\Engine\include\Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glm;../../Dependencies/json/include;../../Dependencies/tinyObj/include;../../Dependencies/glad/include;../../Dependencies/OpenFBX/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\Engine\include;..\Engine\include\Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glm;../../Dependencies/json/include;../../Dependencies/tinyObj/include;../../Dependencies/glad/include;../../Dependencies/Assimp/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
@@ -74,7 +74,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;OpenFBX.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -86,7 +86,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include;..\Engine\include;..\Engine\include\Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glm;../../Dependencies/json/include;../../Dependencies/tinyObj/include;../../Dependencies/glad/include;../../Dependencies/OpenFBX/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\Engine\include;..\Engine\include\Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glm;../../Dependencies/json/include;../../Dependencies/tinyObj/include;../../Dependencies/glad/include;../../Dependencies/Assimp/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
@@ -96,7 +96,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glad.lib;OpenFBX.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glad.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -120,9 +120,6 @@
     <ClInclude Include="Resources\resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Dependencies\OpenFBX\build\OpenFBX.vcxproj">
-      <Project>{d1d1621e-fba1-3ef9-996e-12d6b4c0b990}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\Engine\Engine.vcxproj">
       <Project>{4dafc13e-5ad2-4bbc-a0a4-55706bcecc7f}</Project>
     </ProjectReference>

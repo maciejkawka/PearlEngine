@@ -7,6 +7,6 @@
 [submodule "Dependencies/googletest"]
 	path = Dependencies/googletest
 	url = https://github.com/google/googletest.git
-[submodule "Dependencies/OpenFBX"]
-	path = Dependencies/OpenFBX
-	url = https://github.com/nem0/OpenFBX.git
+[submodule "Dependencies/Assimp"]
+	path = Dependencies/Assimp
+	url = https://github.com/assimp/assimp.git

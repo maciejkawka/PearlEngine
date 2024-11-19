@@ -30,7 +30,7 @@ void FbxResource::AddEntitesToScene(PrCore::ECS::Scene* p_scene)
 			auto entity = p_node->entity;
 			auto parent = p_node->parent;
 			auto sceneEntity = p_scene->CreateEntity(entity->name);
-			entityMap.insert({ entity->name , sceneEntity });
+			entityMap.insert({ p_node->nodePath , sceneEntity });
 
 			auto transform = sceneEntity.AddComponent<TransformComponent>();
 			transform->SetLocalRotation(entity->rotation);
@@ -46,9 +46,11 @@ void FbxResource::AddEntitesToScene(PrCore::ECS::Scene* p_scene)
 
 			if (parent)
 			{
-				auto it = entityMap.find(parent->entity->name);
+				auto it = entityMap.find(parent->nodePath);
 				if (it != entityMap.end())
 					sceneEntity.AddComponent<ParentComponent>()->parent = it->second;
+				else
+					PRLOG_ERROR("Cannot find parent");
 			}
 
 			if (!entity->materials.empty() && entity->mesh != nullptr)

@@ -5,7 +5,7 @@ using namespace PrEditor::Assets;
 
 const FbxEntityNode* PrEditor::Assets::FbxEntityGraph::GetNodeRecursive(std::string_view p_nodePath, const FbxEntityNode* p_node, int depth)
 {
-	if (depth > m_maxDepth)
+	if (depth > s_maxDepth)
 	{
 		PR_ASSERT(false, "Reached maximum FBX Hierarhy depth. Consider increasing depth or shrinking FBX file hierarchy");
 		return nullptr;
@@ -39,7 +39,7 @@ FbxEntityGraph::~FbxEntityGraph()
 
 void FbxEntityGraph::ClearGraphRecursive(FbxEntityNode* p_node, int depth)
 {
-	if (depth > m_maxDepth)
+	if (depth > s_maxDepth)
 	{
 		PR_ASSERT(false, "Reached maximum FBX Hierarhy depth. Consider increasing depth or shrinking FBX file hierarchy");
 		return;
@@ -58,7 +58,7 @@ void FbxEntityGraph::ForEachNodes(FbxNodeVisitor p_visitor)
 
 void FbxEntityGraph::ForEachNodesRecursive(FbxNodeVisitor p_visitor, const FbxEntityNode* p_node, int depth)
 {
-	if (depth > m_maxDepth)
+	if (depth > s_maxDepth)
 	{
 		PR_ASSERT(false, "Reached maximum FBX Hierarhy depth. Consider increasing depth or shrinking FBX file hierarchy");
 		return;
