@@ -86,16 +86,9 @@ void Material::Bind()
 			texture.second->Bind(texSlot);
 			m_shader->SetUniformInt(texture.first, texSlot);
 			texSlot++;
-
-			//Set Texture Usage Flag
-			if (HasProperty("use" + texture.first))
-				SetProperty("use" + texture.first, true);
 		}
 		else
 		{
-			//Set Texture Usage Flag
-			if (HasProperty("use" + texture.first))
-				SetProperty("use" + texture.first, false);
 		}
 	}
 
@@ -178,13 +171,7 @@ void Material::SetTexture(const std::string& p_name, TexturePtr p_texture)
 	if (find != m_textures.end())
 	{
 		find->second = p_texture;
-
-		//if (p_texture != nullptr)
-		//	SetProperty("use" + p_name, true);
-		//else
-		//	SetProperty("use" + p_name, false);
 	}
-
 }
 
 TexturePtr Material::GetTexture(const std::string& p_name)

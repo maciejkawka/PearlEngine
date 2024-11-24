@@ -90,6 +90,62 @@ PrCore::Resources::IResourceDataPtr Texture2DLoader::LoadResource(const std::str
 	return texture;
 }
 
+IResourceDataPtr Texture2DLoader::LoadFromMemoryResource(const void* p_buffer, size_t p_size, int p_flags)
+{
+	int width = 0;
+	int heigth = 0;
+	int channelsNumber = 0;
+	TextureFormat format = TextureFormat::RGBA32;
+
+	int desiredChannels = 0;
+	if (p_flags & FlagDesiredChannelsGrayScale)
+		desiredChannels = 1;
+	else if (p_flags & FlagDesiredChannelsRGB)
+		desiredChannels = 3;
+	else if (p_flags & FlagDesiredChannelsRGBA)
+		desiredChannels = 4;
+
+	unsigned char* data = stbi_load_from_memory(reinterpret_cast<const unsigned char*>(p_buffer), p_size, &width, &heigth, &channelsNumber, desiredChannels);
+	if (!data)
+		return nullptr;
+
+	switch (channelsNumber)
+	{
+	case 1:
+		format = Resources::TextureFormat::R8;
+		break;
+	case 2:
+		format = Resources::TextureFormat::RG16;
+		break;
+	case 3:
+		format = Resources::TextureFormat::RGB24;
+		break;
+	case 4:
+		format = Resources::TextureFormat::RGBA32;
+		break;
+	default:
+		format = Resources::TextureFormat::RGBA32;
+	}
+
+	// Create texture
+	auto texture = Texture2D::Create();
+
+	texture->SetFormat(format);
+	texture->SetWidth(width);
+	texture->SetHeight(heigth);
+	texture->SetData(data);
+
+	texture->SetReadable(false);
+	texture->SetMipMap(true);
+
+	texture->Apply();
+	texture->SetData(nullptr);
+
+	delete[] data;
+
+	return texture;
+}
+
 void Texture2DLoader::UnloadResource(IResourceDataPtr p_resourceData)
 {
 	p_resourceData.reset();

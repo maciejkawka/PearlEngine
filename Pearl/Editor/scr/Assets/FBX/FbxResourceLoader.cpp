@@ -8,6 +8,7 @@
 #include "Renderer/Resources/Mesh.h"
 #include "Renderer/Resources/Material.h"
 #include "Renderer/Resources/Texture.h"
+#include "Renderer/Resources/Texture2DLoader.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -77,22 +78,97 @@ struct FbxLoaderHelper
 {
 	std::unordered_map<uint64_t, PrRenderer::Resources::MaterialHandle> materialMap;
 	std::unordered_map<uint64_t, PrRenderer::Resources::MeshHandle>     meshMap;
+	std::unordered_map<uint64_t, PrRenderer::Resources::TextureHandle>     textureMap;
 
 	std::vector<const aiMesh*>     meshes;
 	std::vector<const aiMaterial*> materials;
 	std::vector<const aiLight*>    lights;
+	std::vector<const aiTexture*>  textures;
 
 	PrRenderer::Resources::MaterialHandle GetOrCreateMaterial(const aiMaterial* p_material);
 	PrRenderer::Resources::MeshHandle     GetOrCreateMesh(const aiNode* p_mesh);
+	PrRenderer::Resources::TextureHandle  GetOrCreateTexture(const aiMaterial* p_material, aiTextureType p_texType);
 	LightPtr                              CreateLight(const aiLight* p_light);
 
 	void GatherMaterials(const aiScene* p_scene);
 	void GatherMeshes(const aiScene* p_scene);
+	void GatherTextures(const aiScene* p_scene);
 	void GatherLights(const aiScene* p_scene);
 
 	void CreateEntityGraph(const aiNode* p_objectNode, FbxEntityNode* p_EntityNode);
 	void CreateEntityGraphRecursive(const aiNode* p_objectNode, FbxEntityNode* p_EntityNode, int depth = 0);
 };
+
+PrRenderer::Resources::TextureHandle  FbxLoaderHelper::GetOrCreateTexture(const aiMaterial* p_material, aiTextureType p_texType)
+{
+	aiString texPath;
+	TextureHandle texHandle;
+	if (AI_SUCCESS == p_material->GetTexture(p_texType, 0, &texPath))
+	{
+		// if path starts with '*' it is embedded texture and it should be loaded from the buffer
+		if (texPath.data[0] == '*')
+		{
+			int texIndex = std::stoi(std::string{ &texPath.data[1] });
+			auto texture = textures[texIndex];
+
+			auto texIt = textureMap.find((uint64_t)texture);
+			if (texIt != textureMap.end())
+				return texIt->second;
+
+			// if texture height is 0 texture is 0 the pointer is a compressed texture
+			if (texture->mHeight == 0)
+			{
+				PrRenderer::Resources::Texture2DLoader loader;
+				auto texData = loader.LoadFromMemoryResource(texture->pcData, texture->mWidth);
+				if (texData == nullptr)
+					return TextureHandle{};
+
+				texHandle = PrCore::Resources::ResourceSystem::GetInstance().Register<Texture>(texData);
+				textureMap.insert({ (uint64_t)texture, texHandle });
+			}
+			// else load textre directly from aiTexel array
+			else
+			{
+				auto texData = PrRenderer::Resources::Texture2D::Create();
+				texData->SetReadable(false);
+				texData->SetHeight(texture->mHeight);
+				texData->SetWidth(texture->mWidth);
+				texData->SetFormat(PrRenderer::Resources::TextureFormat::RGBA32);
+				texData->SetMipMap(true);
+
+				size_t texSize = texture->mHeight * texture->mWidth;
+				unsigned char* data = new unsigned char[texSize * 4];
+				for (unsigned int i = 0; i < texSize; i++)
+				{
+					aiTexel texel = texture->pcData[i];
+					unsigned int offset = i * 4;
+
+					data[offset] = texel.r;
+					data[offset + 1] = texel.g;
+					data[offset + 2] = texel.b;
+					data[offset + 3] = texel.a;
+
+				}
+
+				texData->SetData(data);
+				texData->Apply();
+				texData->SetData(nullptr);
+
+				delete[]data;
+
+				texHandle = PrCore::Resources::ResourceSystem::GetInstance().Register<Texture>(texData);
+				textureMap.insert({ (uint64_t)texture, texHandle });
+			}
+		}
+		// Load texture from file
+		else
+		{
+			texHandle = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(texPath.C_Str());
+		}
+	}
+
+	return texHandle;
+}
 
 PrRenderer::Resources::MaterialHandle FbxLoaderHelper::GetOrCreateMaterial(const aiMaterial* p_material)
 {
@@ -109,73 +185,114 @@ PrRenderer::Resources::MaterialHandle FbxLoaderHelper::GetOrCreateMaterial(const
 	auto materialData = std::make_shared<Material>(shaderRes.GetData());
 	materialData->SetName(p_material->GetName().C_Str());
 
-	aiString texPath;
-	materialData->SetProperty("albedoValue", PrCore::Math::vec4{ 0.5f });
-	if (AI_SUCCESS == p_material->GetTexture(aiTextureType_DIFFUSE, 0, &texPath))
+	// Get PBR Material Properties
+
+	//Diffuse
+	auto diffuseTex = GetOrCreateTexture(p_material, aiTextureType_DIFFUSE);
+	if (diffuseTex != nullptr)
 	{
-		auto tex = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(texPath.C_Str());
-		if (tex.IsValid())
+		materialData->SetTexture("albedoMap", diffuseTex.GetData());
+		materialData->SetProperty("albedoValue", PrCore::Math::vec4{ 0.0f });
+	}
+	else 
+	{
+		aiColor3D baseColor;
+		if (AI_SUCCESS == p_material->Get(AI_MATKEY_BASE_COLOR, baseColor))
 		{
-			materialData->SetTexture("albedoMap", tex.GetData());
-			materialData->SetProperty("albedoValue", PrCore::Math::vec4{ 0.0f });
+			materialData->SetProperty("albedoValue", (PrCore::Math::vec4)ToColor(baseColor));
+			materialData->SetTexture("albedoMap", nullptr);
 		}
 	}
+	
 
-	materialData->SetProperty("normalMapping", false);
-	if (AI_SUCCESS == p_material->GetTexture(aiTextureType_NORMALS, 0, &texPath))
+	// Normals
+	auto normalTex = GetOrCreateTexture(p_material, aiTextureType_NORMALS);
+	if (normalTex != nullptr)
 	{
-		auto tex = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(texPath.C_Str());
-		if (tex.IsValid())
-		{
-			materialData->SetProperty("normalMapping", true);
-			materialData->SetTexture("normalMap", tex.GetData());
-		}
+		materialData->SetProperty("normalMapping", true);
+		materialData->SetTexture("normalMap", normalTex.GetData());
+	}
+	else
+	{
+		materialData->SetProperty("normalMapping", false);
+		materialData->SetTexture("normalMap", nullptr);
 	}
 
-	materialData->SetProperty("roughnessValue", 0.5f);
-	if (AI_SUCCESS == p_material->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, 0, &texPath))
-	{
-		auto tex = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(texPath.C_Str());
-		if (tex.IsValid())
-		{
-			materialData->SetTexture("roughnessMap", tex.GetData());
-			materialData->SetProperty("roughnessValue", 0.0f);
-		}
-	}
 
-	materialData->SetProperty("metallicValue", 0.3f);
-	if (AI_SUCCESS == p_material->GetTexture(aiTextureType_METALNESS, 0, &texPath))
+	// Roughness
+	auto roughnessTex = GetOrCreateTexture(p_material, aiTextureType_DIFFUSE_ROUGHNESS);
+	if (roughnessTex != nullptr)
 	{
-		auto tex = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(texPath.C_Str());
-		if (tex.IsValid())
-		{
-			materialData->SetTexture("metallicMap", tex.GetData());
-			materialData->SetProperty("metallicValue", 0.0f);
-		}
+		materialData->SetTexture("roughnessMap", roughnessTex.GetData());
+		materialData->SetProperty("roughnessValue", 0.0f);
 	}
-
-	materialData->SetProperty("aoValue", 1.0f);
-	if (AI_SUCCESS == p_material->GetTexture(aiTextureType_AMBIENT_OCCLUSION, 0, &texPath))
+	else
 	{
-		auto tex = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(texPath.C_Str());
-		if (tex.IsValid())
+		materialData->SetTexture("roughnessMap", nullptr);
+		float roughnessValue = 0.5f;
+		if (AI_SUCCESS == p_material->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughnessValue))
 		{
-			materialData->SetTexture("aoMap", tex.GetData());
-			materialData->SetProperty("aoValue", 0.0f);
+			materialData->SetProperty("roughnessValue", roughnessValue);
 		}
 	}
 
 
-	materialData->SetProperty("emissionInt", 0.0f);
-	materialData->SetProperty("emissionColor", PrCore::Math::vec3{ 0.0f });
-	if (AI_SUCCESS == p_material->GetTexture(aiTextureType_EMISSION_COLOR, 0, &texPath))
+	// Metallic
+	auto metallicTex = GetOrCreateTexture(p_material, aiTextureType_METALNESS);
+	if (metallicTex != nullptr)
 	{
-		auto tex = PrCore::Resources::ResourceSystem::GetInstance().Load<Texture>(texPath.C_Str());
-		if (tex.IsValid())
+		materialData->SetTexture("metallicMap", metallicTex.GetData());
+		materialData->SetProperty("metallicValue", 0.0f);
+	}
+	else
+	{
+		materialData->SetTexture("metallicMap", nullptr);
+		float metallicValue = 0.5f;
+		if (AI_SUCCESS == p_material->Get(AI_MATKEY_METALLIC_FACTOR, metallicValue))
 		{
-			materialData->SetTexture("emissionMap", tex.GetData());
-			materialData->SetProperty("emissionInt", 5.0f);
+			materialData->SetProperty("metallicValue", metallicValue);
 		}
+	}
+
+
+	// AO
+	auto aoTex = GetOrCreateTexture(p_material, aiTextureType_AMBIENT_OCCLUSION);
+	if (aoTex != nullptr)
+	{
+		materialData->SetTexture("aoMap", aoTex.GetData());
+		materialData->SetProperty("aoValue", 0.0f);
+	}
+	else
+	{
+		materialData->SetTexture("aoMap", nullptr);
+		materialData->SetProperty("aoValue", 1.0f);
+	}
+
+
+	//Emission
+	auto emissionTex = GetOrCreateTexture(p_material, aiTextureType_EMISSIVE);
+	if (emissionTex != nullptr)
+	{
+		materialData->SetTexture("emissionMap", emissionTex.GetData());
+	}
+	else
+	{
+		materialData->SetTexture("emissionMap", nullptr);
+		aiColor4D emissionColor;
+		if (AI_SUCCESS == p_material->Get(AI_MATKEY_COLOR_EMISSIVE, emissionColor))
+		{
+			materialData->SetProperty("emissionColor", (PrCore::Math::vec3)ToColor(emissionColor));
+			materialData->SetTexture("emissionMap", nullptr);
+		}
+	}
+	float emissionInt;
+	if (AI_SUCCESS == p_material->Get(AI_MATKEY_EMISSIVE_INTENSITY, emissionInt))
+	{
+		materialData->SetProperty("emissionInt", emissionInt);
+	}
+	else
+	{
+		materialData->SetProperty("emissionInt", 0.0f);
 	}
 
 
@@ -285,23 +402,24 @@ void FbxLoaderHelper::GatherLights(const aiScene* p_scene)
 	}
 }
 
+void FbxLoaderHelper::GatherTextures(const aiScene* p_scene)
+{
+	for (int i = 0; i < p_scene->mNumTextures; i++)
+	{
+		textures.push_back(p_scene->mTextures[i]);
+	}
+}
+
 void FbxLoaderHelper::CreateEntityGraph(const aiNode* p_node, FbxEntityNode* p_EntityNode)
 {
 	FbxEntity* fbxEntity = new FbxEntity();
-	aiVector3D transform;
-	aiQuaternion rotation;
-	aiVector3D scale;
-	p_node->mTransformation.Decompose(scale, rotation, transform);
-	fbxEntity->position = ToVec3(transform);
-	fbxEntity->rotation = ToQuat(rotation);
-	fbxEntity->scale = ToVec3(scale);
+	fbxEntity->position = PrCore::Math::vec3{ 0.0f };
+	fbxEntity->rotation = PrCore::Math::quat();
+	fbxEntity->scale = PrCore::Math::vec3{ 1.0f };
 
 	p_EntityNode->entity = fbxEntity;
 
-	for (int i = 0; i < p_node->mNumChildren; i++)
-	{
-		CreateEntityGraphRecursive(p_node->mChildren[i], p_EntityNode, 1);
-	}
+	CreateEntityGraphRecursive(p_node, p_EntityNode, 1);
 }
 
 void FbxLoaderHelper::CreateEntityGraphRecursive(const aiNode* p_node, FbxEntityNode* p_EntityNode, int p_depth)
@@ -401,13 +519,14 @@ PrCore::Resources::IResourceDataPtr FbxResourceLoader::LoadResource(const std::s
 
 	Assimp::Importer importer;
 	importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
-	auto scene = importer.ReadFileFromMemory(data, file->GetSize(), aiProcess_Triangulate | aiProcess_ImproveCacheLocality | aiProcess_GenSmoothNormals, PrCore::PathUtils::GetExtension(p_path).c_str());
+	auto scene = importer.ReadFileFromMemory(data, file->GetSize(), aiProcess_Triangulate | aiProcess_ImproveCacheLocality | aiProcess_GenSmoothNormals, PrCore::PathUtils::GetExtensionInPlace(p_path).data());
 	delete[] data;
 
 	FbxLoaderHelper helper;
 	helper.GatherMeshes(scene);
 	helper.GatherMaterials(scene);
 	helper.GatherLights(scene);
+	helper.GatherTextures(scene);
 
 	auto root = new FbxEntityNode();
 	root->nodePath = PrCore::PathUtils::GetFilenameInPlace(p_path);

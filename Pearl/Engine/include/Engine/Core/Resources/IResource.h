@@ -209,8 +209,21 @@ namespace PrCore::Resources {
 		// Proxy functions to access IResourceData directly
 		// Use these functions instead of GetData()
 		std::shared_ptr<T> operator->() { return GetData(); }
-		bool               operator==(const IResourceDataPtr& p_ptr) const { return m_resourceDesc != nullptr && std::static_pointer_cast<const T>(m_resourceDesc->data) == p_ptr; }
-		bool               operator!=(const IResourceDataPtr& p_ptr) const { return m_resourceDesc != nullptr && std::static_pointer_cast<const T>(m_resourceDesc->data) != p_ptr; }
+		bool operator==(const IResourceDataPtr& p_ptr) const 
+		{ 
+			if (m_resourceDesc == nullptr)
+				return p_ptr == nullptr;
+
+			return std::static_pointer_cast<const T>(m_resourceDesc->data) == p_ptr; 
+		}
+
+		bool operator!=(const IResourceDataPtr& p_ptr) const
+		{
+			if (m_resourceDesc == nullptr)
+				return p_ptr != nullptr;
+
+			return std::static_pointer_cast<const T>(m_resourceDesc->data) != p_ptr;
+		}
 
 	protected:
 		ResourceDescPtr m_resourceDesc;
