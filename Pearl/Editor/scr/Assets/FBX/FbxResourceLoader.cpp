@@ -85,6 +85,8 @@ struct FbxLoaderHelper
 	std::vector<const aiLight*>    lights;
 	std::vector<const aiTexture*>  textures;
 
+	const aiScene* scene;
+
 	PrRenderer::Resources::MaterialHandle GetOrCreateMaterial(const aiMaterial* p_material);
 	PrRenderer::Resources::MeshHandle     GetOrCreateMesh(const aiNode* p_mesh);
 	PrRenderer::Resources::TextureHandle  GetOrCreateTexture(const aiMaterial* p_material, aiTextureType p_texType);
@@ -105,42 +107,42 @@ PrRenderer::Resources::TextureHandle  FbxLoaderHelper::GetOrCreateTexture(const 
 	TextureHandle texHandle;
 	if (AI_SUCCESS == p_material->GetTexture(p_texType, 0, &texPath))
 	{
-		// if path starts with '*' it is embedded texture and it should be loaded from the buffer
-		if (texPath.data[0] == '*')
+		// check if embedded
+		auto textureEmbedded = scene->GetEmbeddedTexture(texPath.C_Str());
+		if (textureEmbedded)
 		{
-			int texIndex = std::stoi(std::string{ &texPath.data[1] });
-			auto texture = textures[texIndex];
-
-			auto texIt = textureMap.find((uint64_t)texture);
+			auto texIt = textureMap.find((uint64_t)textureEmbedded);
 			if (texIt != textureMap.end())
 				return texIt->second;
 
 			// if texture height is 0 texture is 0 the pointer is a compressed texture
-			if (texture->mHeight == 0)
+			if (textureEmbedded->mHeight == 0)
 			{
 				PrRenderer::Resources::Texture2DLoader loader;
-				auto texData = loader.LoadFromMemoryResource(texture->pcData, texture->mWidth);
+				auto texData = loader.LoadFromMemoryResource(textureEmbedded->pcData, textureEmbedded->mWidth);
 				if (texData == nullptr)
 					return TextureHandle{};
 
+				texData->SetName(textureEmbedded->mFilename.C_Str());
 				texHandle = PrCore::Resources::ResourceSystem::GetInstance().Register<Texture>(texData);
-				textureMap.insert({ (uint64_t)texture, texHandle });
+				textureMap.insert({ (uint64_t)textureEmbedded, texHandle });
 			}
 			// else load textre directly from aiTexel array
 			else
 			{
 				auto texData = PrRenderer::Resources::Texture2D::Create();
+				texData->SetName(textureEmbedded->mFilename.C_Str());
 				texData->SetReadable(false);
-				texData->SetHeight(texture->mHeight);
-				texData->SetWidth(texture->mWidth);
+				texData->SetHeight(textureEmbedded->mHeight);
+				texData->SetWidth(textureEmbedded->mWidth);
 				texData->SetFormat(PrRenderer::Resources::TextureFormat::RGBA32);
 				texData->SetMipMap(true);
 
-				size_t texSize = texture->mHeight * texture->mWidth;
+				size_t texSize = textureEmbedded->mHeight * textureEmbedded->mWidth;
 				unsigned char* data = new unsigned char[texSize * 4];
 				for (unsigned int i = 0; i < texSize; i++)
 				{
-					aiTexel texel = texture->pcData[i];
+					aiTexel texel = textureEmbedded->pcData[i];
 					unsigned int offset = i * 4;
 
 					data[offset] = texel.r;
@@ -157,7 +159,7 @@ PrRenderer::Resources::TextureHandle  FbxLoaderHelper::GetOrCreateTexture(const 
 				delete[]data;
 
 				texHandle = PrCore::Resources::ResourceSystem::GetInstance().Register<Texture>(texData);
-				textureMap.insert({ (uint64_t)texture, texHandle });
+				textureMap.insert({ (uint64_t)textureEmbedded, texHandle });
 			}
 		}
 		// Load texture from file
@@ -501,7 +503,7 @@ LightPtr FbxLoaderHelper::CreateLight(const aiLight* p_light)
 	light->SetOutterCone(PrCore::Math::degrees(p_light->mAngleOuterCone));
 
 	// Default
-	light->SetRange(10.0f);
+	light->SetRange(100.0f);
 
 	return light;
 }
@@ -523,6 +525,7 @@ PrCore::Resources::IResourceDataPtr FbxResourceLoader::LoadResource(const std::s
 	delete[] data;
 
 	FbxLoaderHelper helper;
+	helper.scene = scene;
 	helper.GatherMeshes(scene);
 	helper.GatherMaterials(scene);
 	helper.GatherLights(scene);
