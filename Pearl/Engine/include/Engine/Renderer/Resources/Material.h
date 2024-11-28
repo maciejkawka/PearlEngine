@@ -81,6 +81,7 @@ namespace PrRenderer::Resources {
 		size_t m_renderOrder;
 
 		const float m_materialVersion = 0.1f;
+		inline static TexturePtr blackTexture = nullptr;
 	};
 
 	REGISTRER_RESOURCE_HANDLE(Material);

@@ -32,6 +32,9 @@ Material::Material(ShaderPtr p_shader)
 		if (uniform.type == UniformType::Texture2D)
 			m_textures[uniformName] = Texture2D::CreateUnitTex(PrRenderer::Core::Color::Black);
 	}
+
+	if (blackTexture == nullptr)
+		blackTexture = Texture2D::CreateUnitTex(Core::Color::Black);
 }
 
 Material::Material(const Material& p_material)
@@ -43,12 +46,18 @@ Material::Material(const Material& p_material)
 	m_renderOrder = p_material.GetRenderOrder();
 
 	m_textures = p_material.m_textures;
+
+	if (blackTexture == nullptr)
+		blackTexture = Texture2D::CreateUnitTex(Core::Color::Black);
 }
 
 Material::Material(JSON::json& p_seralizedMat)
 {
 	bool result = PopulateBasedOnShader(p_seralizedMat);
 	PR_ASSERT(result, "Cannot load material file corrupted");
+
+	if (blackTexture == nullptr)
+		blackTexture = Texture2D::CreateUnitTex(Core::Color::Black);
 }
 
 void Material::SetColor(const Core::Color& p_color)
@@ -89,6 +98,10 @@ void Material::Bind()
 		}
 		else
 		{
+			// Pipeline expects to bind black texture is not assigned
+			blackTexture->Bind(texSlot);
+			m_shader->SetUniformInt(texture.first, texSlot);
+			texSlot++;
 		}
 	}
 
