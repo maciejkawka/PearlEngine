@@ -13,6 +13,11 @@
 using namespace PrRenderer::Resources;
 using namespace PrCore::Resources;
 
+Texture2DLoader::Texture2DLoader()
+{
+	stbi_set_flip_vertically_on_load(true);
+}
+
 PrCore::Resources::IResourceDataPtr Texture2DLoader::LoadResource(const std::string& p_path)
 {
 	int width = 0;
@@ -20,13 +25,11 @@ PrCore::Resources::IResourceDataPtr Texture2DLoader::LoadResource(const std::str
 	int channelsNumber = 0;
 	TextureFormat format = TextureFormat::None;
 
-
 	// Change that in future
 	std::string dir = PrCore::Filesystem::FileSystem::GetInstance().GetResourcesPath();
 	std::string resourcePath = PrCore::PathUtils::MakePath(dir, TEXTURE_DIR);
 	resourcePath = PrCore::PathUtils::MakePath(resourcePath, p_path);
 
-	stbi_set_flip_vertically_on_load(true);
 	unsigned char* data = stbi_load(resourcePath.c_str(), &width, &heigth, &channelsNumber, 0);
 
 	if (!data)

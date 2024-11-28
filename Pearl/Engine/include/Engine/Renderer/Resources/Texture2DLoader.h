@@ -16,7 +16,7 @@ namespace PrRenderer::Resources {
 			FlagDesiredChannelsRGBA = 4
 		};
 
-		Texture2DLoader() = default;
+		Texture2DLoader();
 
 		IResourceDataPtr LoadResource(const std::string& p_path) override;
 
