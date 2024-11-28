@@ -1,5 +1,5 @@
-#include "Editor/Assets/FBX/FbxResourceLoader.h"
-#include "Editor/Assets/FBX/FBXResource.h"
+#include "Editor/Assets/Model/ModelResourceLoader.h"
+#include "Editor/Assets/Model/ModelResource.h"
 
 #include "Core/Filesystem/FileSystem.h"
 #include "Core/Resources/ResourceSystem.h"
@@ -74,7 +74,7 @@ LightType ToLightType(aiLightSourceType p_sourceType)
 }
 
 ////////////////////////////////////////////////////
-struct FbxLoaderHelper
+struct ModelLoaderHelper
 {
 	std::unordered_map<uint64_t, PrRenderer::Resources::MaterialHandle> materialMap;
 	std::unordered_map<uint64_t, PrRenderer::Resources::MeshHandle>     meshMap;
@@ -97,11 +97,11 @@ struct FbxLoaderHelper
 	void GatherTextures(const aiScene* p_scene);
 	void GatherLights(const aiScene* p_scene);
 
-	void CreateEntityGraph(const aiNode* p_objectNode, FbxEntityNode* p_EntityNode);
-	void CreateEntityGraphRecursive(const aiNode* p_objectNode, FbxEntityNode* p_EntityNode, int depth = 0);
+	void CreateEntityGraph(const aiNode* p_objectNode, ModelEntityNode* p_EntityNode);
+	void CreateEntityGraphRecursive(const aiNode* p_objectNode, ModelEntityNode* p_EntityNode, int depth = 0);
 };
 
-PrRenderer::Resources::TextureHandle  FbxLoaderHelper::GetOrCreateTexture(const aiMaterial* p_material, aiTextureType p_texType)
+PrRenderer::Resources::TextureHandle  ModelLoaderHelper::GetOrCreateTexture(const aiMaterial* p_material, aiTextureType p_texType)
 {
 	aiString texPath;
 	TextureHandle texHandle;
@@ -172,7 +172,7 @@ PrRenderer::Resources::TextureHandle  FbxLoaderHelper::GetOrCreateTexture(const 
 	return texHandle;
 }
 
-PrRenderer::Resources::MaterialHandle FbxLoaderHelper::GetOrCreateMaterial(const aiMaterial* p_material)
+PrRenderer::Resources::MaterialHandle ModelLoaderHelper::GetOrCreateMaterial(const aiMaterial* p_material)
 {
 	PR_ASSERT(p_material);
 
@@ -313,7 +313,7 @@ PrRenderer::Resources::MaterialHandle FbxLoaderHelper::GetOrCreateMaterial(const
 	return materialHandle;
 }
 
-PrRenderer::Resources::MeshHandle FbxLoaderHelper::GetOrCreateMesh(const aiNode* p_mesh)
+PrRenderer::Resources::MeshHandle ModelLoaderHelper::GetOrCreateMesh(const aiNode* p_mesh)
 {
 	PR_ASSERT(p_mesh);
 
@@ -390,7 +390,7 @@ PrRenderer::Resources::MeshHandle FbxLoaderHelper::GetOrCreateMesh(const aiNode*
 	return meshHandle;
 }
 
-void FbxLoaderHelper::GatherMaterials(const aiScene* p_scene)
+void ModelLoaderHelper::GatherMaterials(const aiScene* p_scene)
 {
 	for (int i = 0; i < p_scene->mNumMaterials; i++)
 	{
@@ -398,7 +398,7 @@ void FbxLoaderHelper::GatherMaterials(const aiScene* p_scene)
 	}
 }
 
-void FbxLoaderHelper::GatherMeshes(const aiScene* p_scene)
+void ModelLoaderHelper::GatherMeshes(const aiScene* p_scene)
 {
 	for (int i = 0; i < p_scene->mNumMeshes; i++)
 	{
@@ -406,7 +406,7 @@ void FbxLoaderHelper::GatherMeshes(const aiScene* p_scene)
 	}
 }
 
-void FbxLoaderHelper::GatherLights(const aiScene* p_scene)
+void ModelLoaderHelper::GatherLights(const aiScene* p_scene)
 {
 	for (int i = 0; i < p_scene->mNumLights; i++)
 	{
@@ -414,7 +414,7 @@ void FbxLoaderHelper::GatherLights(const aiScene* p_scene)
 	}
 }
 
-void FbxLoaderHelper::GatherTextures(const aiScene* p_scene)
+void ModelLoaderHelper::GatherTextures(const aiScene* p_scene)
 {
 	for (int i = 0; i < p_scene->mNumTextures; i++)
 	{
@@ -422,21 +422,21 @@ void FbxLoaderHelper::GatherTextures(const aiScene* p_scene)
 	}
 }
 
-void FbxLoaderHelper::CreateEntityGraph(const aiNode* p_node, FbxEntityNode* p_EntityNode)
+void ModelLoaderHelper::CreateEntityGraph(const aiNode* p_node, ModelEntityNode* p_EntityNode)
 {
-	FbxEntity* fbxEntity = new FbxEntity();
-	fbxEntity->position = PrCore::Math::vec3{ 0.0f };
-	fbxEntity->rotation = PrCore::Math::quat();
-	fbxEntity->scale = PrCore::Math::vec3{ 1.0f };
+	ModelEntity* modelEntity = new ModelEntity();
+	modelEntity->position = PrCore::Math::vec3{ 0.0f };
+	modelEntity->rotation = PrCore::Math::quat();
+	modelEntity->scale = PrCore::Math::vec3{ 1.0f };
 
-	p_EntityNode->entity = fbxEntity;
+	p_EntityNode->entity = modelEntity;
 
 	CreateEntityGraphRecursive(p_node, p_EntityNode, 1);
 }
 
-void FbxLoaderHelper::CreateEntityGraphRecursive(const aiNode* p_node, FbxEntityNode* p_EntityNode, int p_depth)
+void ModelLoaderHelper::CreateEntityGraphRecursive(const aiNode* p_node, ModelEntityNode* p_EntityNode, int p_depth)
 {
-	PR_ASSERT(p_depth < FbxEntityGraph::s_maxDepth, "Looks like the FBX file has graph is too deep");
+	PR_ASSERT(p_depth < ModelEntityGraph::s_maxDepth, "Looks like the model file has graph is too deep");
 
 	if (p_EntityNode == nullptr)
 		return;
@@ -445,21 +445,21 @@ void FbxLoaderHelper::CreateEntityGraphRecursive(const aiNode* p_node, FbxEntity
 		return;
 
 	//CreateEntity
-	FbxEntity* fbxEntity = new FbxEntity();
-	fbxEntity->name = p_node->mName.C_Str();
+	ModelEntity* modelEntity = new ModelEntity();
+	modelEntity->name = p_node->mName.C_Str();
 
 	aiVector3D transform;
 	aiQuaternion rotation;
 	aiVector3D scale;
 	p_node->mTransformation.Decompose(scale, rotation, transform);
-	fbxEntity->position = ToVec3(transform);
-	fbxEntity->rotation = ToQuat(rotation);
-	fbxEntity->scale = ToVec3(scale);
+	modelEntity->position = ToVec3(transform);
+	modelEntity->rotation = ToQuat(rotation);
+	modelEntity->scale = ToVec3(scale);
 
 	// Get mesh
 	if (p_node->mNumMeshes > 0)
 	{
-		fbxEntity->mesh = GetOrCreateMesh(p_node);
+		modelEntity->mesh = GetOrCreateMesh(p_node);
 	}
 
 	// Get material
@@ -469,7 +469,7 @@ void FbxLoaderHelper::CreateEntityGraphRecursive(const aiNode* p_node, FbxEntity
 		auto materialIndex = meshes[meshIndex]->mMaterialIndex;
 		auto material = materials[materialIndex];
 
-		fbxEntity->materials.push_back(GetOrCreateMaterial(material));
+		modelEntity->materials.push_back(GetOrCreateMaterial(material));
 	}
 
 	// Get Light
@@ -480,24 +480,24 @@ void FbxLoaderHelper::CreateEntityGraphRecursive(const aiNode* p_node, FbxEntity
 
 	if (it != lights.end())
 	{
-		fbxEntity->light = CreateLight(*it);
+		modelEntity->light = CreateLight(*it);
 	}
 
 	//Create node
-	FbxEntityNode* fbxNode = new FbxEntityNode();
-	fbxNode->parent = p_EntityNode;
-	fbxNode->nodePath = PrCore::PathUtils::MakePath(p_EntityNode->nodePath, p_node->mName.C_Str());
-	fbxNode->entity = fbxEntity;
+	ModelEntityNode* modelNode = new ModelEntityNode();
+	modelNode->parent = p_EntityNode;
+	modelNode->nodePath = PrCore::PathUtils::MakePath(p_EntityNode->nodePath, p_node->mName.C_Str());
+	modelNode->entity = modelEntity;
 
-	p_EntityNode->children.push_back(fbxNode);
+	p_EntityNode->children.push_back(modelNode);
 	p_depth++;
 	for (int i = 0; i < p_node->mNumChildren; i++)
 	{
-		CreateEntityGraphRecursive(p_node->mChildren[i], fbxNode, p_depth);
+		CreateEntityGraphRecursive(p_node->mChildren[i], modelNode, p_depth);
 	}
 }
 
-LightPtr FbxLoaderHelper::CreateLight(const aiLight* p_light)
+LightPtr ModelLoaderHelper::CreateLight(const aiLight* p_light)
 {
 	PR_ASSERT(p_light);
 
@@ -518,7 +518,7 @@ LightPtr FbxLoaderHelper::CreateLight(const aiLight* p_light)
 	return light;
 }
 
-PrCore::Resources::IResourceDataPtr FbxResourceLoader::LoadResource(const std::string& p_path)
+PrCore::Resources::IResourceDataPtr ModelResourceLoader::LoadResource(const std::string& p_path)
 {
 	auto file = PrCore::Filesystem::FileSystem::GetInstance().OpenFileStream(p_path.c_str());
 
@@ -534,19 +534,19 @@ PrCore::Resources::IResourceDataPtr FbxResourceLoader::LoadResource(const std::s
 	auto scene = importer.ReadFileFromMemory(data, file->GetSize(), aiProcess_Triangulate | aiProcess_ImproveCacheLocality | aiProcess_GenSmoothNormals, PrCore::PathUtils::GetExtensionInPlace(p_path).data());
 	delete[] data;
 
-	FbxLoaderHelper helper;
+	ModelLoaderHelper helper;
 	helper.scene = scene;
 	helper.GatherMeshes(scene);
 	helper.GatherMaterials(scene);
 	helper.GatherLights(scene);
 	helper.GatherTextures(scene);
 
-	auto root = new FbxEntityNode();
+	auto root = new ModelEntityNode();
 	root->nodePath = PrCore::PathUtils::GetFilenameInPlace(p_path);
 	helper.CreateEntityGraph(scene->mRootNode, root);
 	root->entity->name = root->nodePath;
 
-	auto fbxEntityGraph = std::make_unique<FbxEntityGraph>(root);
+	auto modelEntityGraph = std::make_unique<ModelEntityGraph>(root);
 
 	// Convert maps to vectors
 	std::vector<MaterialHandle> materialVec;
@@ -561,16 +561,16 @@ PrCore::Resources::IResourceDataPtr FbxResourceLoader::LoadResource(const std::s
 		meshVec.push_back(pair.second);
 		});
 	
-	auto fbxData = std::make_shared<FbxResource>(std::move(fbxEntityGraph), std::move(materialVec), std::move(meshVec));
-	return fbxData;
+	auto modelData = std::make_shared<ModelResource>(std::move(modelEntityGraph), std::move(materialVec), std::move(meshVec));
+	return modelData;
 }
 
-void FbxResourceLoader::UnloadResource(PrCore::Resources::IResourceDataPtr p_resourceData)
+void ModelResourceLoader::UnloadResource(PrCore::Resources::IResourceDataPtr p_resourceData)
 {
 	p_resourceData.reset();
 }
 
-bool FbxResourceLoader::SaveResourceOnDisc(PrCore::Resources::IResourceDataPtr p_resourceData, const std::string& p_path)
+bool ModelResourceLoader::SaveResourceOnDisc(PrCore::Resources::IResourceDataPtr p_resourceData, const std::string& p_path)
 {
 	return false;
 }

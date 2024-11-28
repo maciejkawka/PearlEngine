@@ -1,4 +1,4 @@
-#include "Editor/Assets/FBX/FbxResource.h"
+#include "Editor/Assets/Model/ModelResource.h"
 
 #include "Core/ECS/Scene.h"
 #include "Core/ECS/Components/CoreComponents.h"
@@ -7,7 +7,7 @@
 
 using namespace PrEditor::Assets;
 
-FbxResource::FbxResource(std::unique_ptr<FbxEntityGraph>&& p_entityGraph, std::vector<PrRenderer::Resources::MaterialHandle>&& p_materials,
+ModelResource::ModelResource(std::unique_ptr<ModelEntityGraph>&& p_entityGraph, std::vector<PrRenderer::Resources::MaterialHandle>&& p_materials,
 	std::vector<PrRenderer::Resources::MeshHandle>&& p_meshes):
 	m_entityGraph(std::move(p_entityGraph)),
 	m_materials(std::move(p_materials)),
@@ -15,14 +15,14 @@ FbxResource::FbxResource(std::unique_ptr<FbxEntityGraph>&& p_entityGraph, std::v
 {
 }
 
-void FbxResource::AddEntitesToScene(PrCore::ECS::Scene* p_scene)
+void ModelResource::AddEntitesToScene(PrCore::ECS::Scene* p_scene)
 {
 	PR_ASSERT(p_scene != nullptr, "Scene pointer is null");
 
 	std::unordered_map<std::string_view, PrCore::ECS::Entity> entityMap;
 	if (m_entityGraph)
 	{
-		m_entityGraph->ForEachNodes([&p_scene, &entityMap](const FbxEntityNode* p_node) {
+		m_entityGraph->ForEachNodes([&p_scene, &entityMap](const ModelEntityNode* p_node) {
 
 			using namespace PrCore::ECS;
 
@@ -63,11 +63,11 @@ void FbxResource::AddEntitesToScene(PrCore::ECS::Scene* p_scene)
 	}
 }
 
-size_t FbxResource::GetByteSize() const
+size_t ModelResource::GetByteSize() const
 {
 	size_t size = 0;
-	m_entityGraph->ForEachNodes([&size](const FbxEntityNode* p_node) {
-		size += sizeof(FbxEntityNode);
+	m_entityGraph->ForEachNodes([&size](const ModelEntityNode* p_node) {
+		size += sizeof(ModelEntityNode);
 		});
 
 	size += m_materials.size() * sizeof(PrRenderer::Resources::MaterialHandle);

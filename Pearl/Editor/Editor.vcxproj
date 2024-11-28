@@ -100,9 +100,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="scr\Assets\FBX\FbxEntityGraph.cpp" />
-    <ClCompile Include="scr\Assets\FBX\FbxResource.cpp" />
-    <ClCompile Include="scr\Assets\FBX\FbxResourceLoader.cpp" />
+    <ClCompile Include="scr\Assets\Model\ModelEntityGraph.cpp" />
+    <ClCompile Include="scr\Assets\Model\ModelResource.cpp" />
+    <ClCompile Include="scr\Assets\Model\ModelResourceLoader.cpp" />
     <ClCompile Include="scr\Components\BasicCamera.cpp" />
     <ClCompile Include="scr\Components\TestFeatures.cpp" />
     <ClCompile Include="scr\EditorApp.cpp" />
@@ -110,9 +110,9 @@
     <ClCompile Include="scr\Core\EditorContext.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Editor\Assets\FBX\FbxEntityGraph.h" />
-    <ClInclude Include="include\Editor\Assets\FBX\FbxResource.h" />
-    <ClInclude Include="include\Editor\Assets\FBX\FbxResourceLoader.h" />
+    <ClInclude Include="include\Editor\Assets\Model\ModelEntityGraph.h" />
+    <ClInclude Include="include\Editor\Assets\Model\ModelResource.h" />
+    <ClInclude Include="include\Editor\Assets\Model\ModelResourceLoader.h" />
     <ClInclude Include="include\Editor\Components\BasicCamera.h" />
     <ClInclude Include="include\Editor\Components\TestFeatures.h" />
     <ClInclude Include="include\Editor\Core\Editor.h" />

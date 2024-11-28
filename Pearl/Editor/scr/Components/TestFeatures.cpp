@@ -1,7 +1,7 @@
 #include"Editor/Components/TestFeatures.h"
-#include"Editor/Assets/FBX/FbxEntityGraph.h"
-#include"Editor/Assets/FBX/FbxResourceLoader.h"
-#include"Editor/Assets/FBX/FbxResource.h"
+#include"Editor/Assets/Model/ModelEntityGraph.h"
+#include"Editor/Assets/Model/ModelResourceLoader.h"
+#include"Editor/Assets/Model/ModelResource.h"
 
 #include"Renderer/Resources/Light.h"
 #include"Renderer/Resources/Mesh.h"
@@ -84,66 +84,70 @@ TestFeatures::TestFeatures()
 	//exist = newTex != nullptr;
 	//isnull = newTex == nullptr;
 
-	{
+	/*{
 
-		PrEditor::Assets::FbxEntityNode* root = new Assets::FbxEntityNode;
+		PrEditor::Assets::ModelEntityNode* root = new Assets::ModelEntityNode;
 		root->nodePath = "root";
 
 
-		PrEditor::Assets::FbxEntityNode* root1 = new Assets::FbxEntityNode;
+		PrEditor::Assets::ModelEntityNode* root1 = new Assets::ModelEntityNode;
 		root1->nodePath = "root/root1";
 		root->children.push_back(root1);
 
 
-		PrEditor::Assets::FbxEntityNode* root12 = new Assets::FbxEntityNode;
+		PrEditor::Assets::ModelEntityNode* root12 = new Assets::ModelEntityNode;
 		root12->nodePath = "root/root1/root2";
 		root1->children.push_back(root12);
 
-		PrEditor::Assets::FbxEntityNode* root123 = new Assets::FbxEntityNode;
+		PrEditor::Assets::ModelEntityNode* root123 = new Assets::ModelEntityNode;
 		root123->nodePath = "root/root1/root2/root3";
 		root12->children.push_back(root123);
 
 
-		PrEditor::Assets::FbxEntityNode* root1234 = new Assets::FbxEntityNode;
+		PrEditor::Assets::ModelEntityNode* root1234 = new Assets::ModelEntityNode;
 		root1234->nodePath = "root/root1/root2/root4";
 		root12->children.push_back(root1234);
 
-		PrEditor::Assets::FbxEntityNode* root1234Elo = new Assets::FbxEntityNode;
+		PrEditor::Assets::ModelEntityNode* root1234Elo = new Assets::ModelEntityNode;
 		root1234Elo->nodePath = "root/root1/root2/root3/root4";
 		root123->children.push_back(root1234Elo);
 
-		PrEditor::Assets::FbxEntityNode* root2 = new Assets::FbxEntityNode;
+		PrEditor::Assets::ModelEntityNode* root2 = new Assets::ModelEntityNode;
 		root2->nodePath = "root/root2";
 		root->children.push_back(root2);
 
-		PrEditor::Assets::FbxEntityGraph elo(root);
+		PrEditor::Assets::ModelEntityGraph elo(root);
 		
-		elo.ForEachNodes([](const Assets::FbxEntityNode* node) {
+		elo.ForEachNodes([](const Assets::ModelEntityNode* node) {
 			PRLOG_WARN("{0}", node->nodePath);
 			});
 
 		elo.GetNode("root/root2");
 		elo.GetNode("root/root1/root2/root3/root4");
 		elo.GetNode("root/root1/root2/root4");
-	}
+	}*/
 
 	// Load Stress Test
 	auto scene10 = PrCore::ECS::SceneManager::GetInstance().LoadScene("RenderStressTest.pearl");
 	scene10->RegisterSystem<PrCore::ECS::HierarchyTransform>();
-	//scene10->RegisterSystem<PrCore::ECS::MeshRendererSystem>();
+	scene10->RegisterSystem<PrCore::ECS::MeshRendererSystem>();
+	scene10->RegisterSystem<PrCore::ECS::RenderStressTest>();
 
-	Assets::FbxResourceLoader loader;
-	auto eloLoader = std::static_pointer_cast<Assets::FbxResource>(loader.LoadResource("b.fbx"));
+	auto modeHandl = PrCore::Resources::ResourceSystem::GetInstance().Load<Assets::ModelResource>("house.gltf");
+	modeHandl->AddEntitesToScene(scene10);
+
+	//Assets::ModelResourceLoader loader;
+	//auto eloLoader = std::static_pointer_cast<Assets::ModelResource>(loader.LoadResource("house.gltf"));
 	//eloLoader->GetEntityGraph()->GetRoot()->entity->scale = PrCore::Math::vec3(0.01f, 0.01f, 0.01f);
 	//eloLoader->GetEntityGraph()->GetRoot()->entity->rotation = PrCore::Math::vec3(-90, 0.01f, 0.01f);
-	eloLoader->AddEntitesToScene(scene10);
+	//eloLoader->AddEntitesToScene(scene10);
 
-	auto root = scene10->GetEntityByName("b").GetComponent<PrCore::ECS::TransformComponent>();
+	auto root = scene10->GetEntityByName("house").GetComponent<PrCore::ECS::TransformComponent>();
 	root->SetRotation(root->GetRotation()* PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 90, 0))));
-	root->SetLocalScale(PrCore::Math::vec3{ 0.01f });
+	//root->SetLocalScale(PrCore::Math::vec3{ 0.01f });
 	root->SetPosition(PrCore::Math::vec3{ 0,5.0f,0 });
-
-	//eloLoader = std::static_pointer_cast<Assets::FbxResource>(loader.LoadResource("x1.fbx"));
+	return;
+	//eloLoader = std::static_pointer_cast<Assets::ModelResource>(loader.LoadResource("x1.fbx"));
 	////eloLoader->GetEntityGraph()->GetRoot()->entity->scale = PrCore::Math::vec3(0.01f, 0.01f, 0.01f);
 	////eloLoader->GetEntityGraph()->GetRoot()->entity->rotation = PrCore::Math::vec3(-90, 0.01f, 0.01f);
 	//eloLoader->AddEntitesToScene(scene10);
@@ -153,7 +157,7 @@ TestFeatures::TestFeatures()
 	//root->SetLocalScale(PrCore::Math::vec3{ 0.01f });
 	//root->SetPosition(PrCore::Math::vec3{ 0,5.0f,0 });
 
-	/*eloLoader->GetEntityGraph()->ForEachNodes([&](const Assets::FbxEntityNode* node) {
+	/*eloLoader->GetEntityGraph()->ForEachNodes([&](const Assets::ModelEntityNode* node) {
 		if (node->entity->name.find("light") != std::string::npos)
 		{
 			auto entity = scene10->CreateEntity(node->entity->name);
@@ -222,7 +226,7 @@ TestFeatures::TestFeatures()
 	logoTransform->SetLocalScale(PrCore::Math::vec3(0.1f, 0.1f, 0.1f));
 	logoMesh->material = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("StressTest/logo.mat");
 	
-	//logoMesh->mesh = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>(Assets::FbxResourceLoader::gID);
+	//logoMesh->mesh = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>(Assets::ModelResourceLoader::gID);
 	logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
 
 	logoEntity = scene10->CreateEntity("Logo2");

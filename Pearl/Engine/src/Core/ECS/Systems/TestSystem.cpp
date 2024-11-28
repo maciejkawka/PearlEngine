@@ -49,6 +49,9 @@ void RenderStressTest::OnEnable()
 			m_mainLightPtr->SetColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 		}
 	}
+
+	if (m_mainLightPtr == nullptr)
+		m_mainLightPtr = std::make_shared<PrRenderer::Resources::Light>();
 }
 
 void RenderStressTest::OnDisable()

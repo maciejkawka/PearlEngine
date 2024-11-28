@@ -1,13 +1,14 @@
-#include "Editor/Assets/FBX/FbxEntityGraph.h"
+#include "Editor/Assets/Model/ModelEntityGraph.h"
 
 #include "Core/Utils/PathUtils.h"
+
 using namespace PrEditor::Assets;
 
-const FbxEntityNode* PrEditor::Assets::FbxEntityGraph::GetNodeRecursive(std::string_view p_nodePath, const FbxEntityNode* p_node, int depth)
+const ModelEntityNode* PrEditor::Assets::ModelEntityGraph::GetNodeRecursive(std::string_view p_nodePath, const ModelEntityNode* p_node, int depth)
 {
 	if (depth > s_maxDepth)
 	{
-		PR_ASSERT(false, "Reached maximum FBX Hierarhy depth. Consider increasing depth or shrinking FBX file hierarchy");
+		PR_ASSERT(false, "Reached maximum imported model Hierarhy depth. Consider increasing depth or shrinking model file hierarchy");
 		return nullptr;
 	}
 
@@ -32,16 +33,16 @@ const FbxEntityNode* PrEditor::Assets::FbxEntityGraph::GetNodeRecursive(std::str
 	return nullptr;
 }
 
-FbxEntityGraph::~FbxEntityGraph()
+ModelEntityGraph::~ModelEntityGraph()
 {
 	ClearGraphRecursive(m_root, 0);
 }
 
-void FbxEntityGraph::ClearGraphRecursive(FbxEntityNode* p_node, int depth)
+void ModelEntityGraph::ClearGraphRecursive(ModelEntityNode* p_node, int depth)
 {
 	if (depth > s_maxDepth)
 	{
-		PR_ASSERT(false, "Reached maximum FBX Hierarhy depth. Consider increasing depth or shrinking FBX file hierarchy");
+		PR_ASSERT(false, "Reached maximum model hierarhy depth. Consider increasing depth or shrinking model file hierarchy");
 		return;
 	}
 
@@ -51,16 +52,16 @@ void FbxEntityGraph::ClearGraphRecursive(FbxEntityNode* p_node, int depth)
 	delete p_node;
 }
 
-void FbxEntityGraph::ForEachNodes(FbxNodeVisitor p_visitor)
+void ModelEntityGraph::ForEachNodes(ModelNodeVisitor p_visitor)
 {
 	ForEachNodesRecursive(p_visitor, m_root, 0);
 }
 
-void FbxEntityGraph::ForEachNodesRecursive(FbxNodeVisitor p_visitor, const FbxEntityNode* p_node, int depth)
+void ModelEntityGraph::ForEachNodesRecursive(ModelNodeVisitor p_visitor, const ModelEntityNode* p_node, int depth)
 {
 	if (depth > s_maxDepth)
 	{
-		PR_ASSERT(false, "Reached maximum FBX Hierarhy depth. Consider increasing depth or shrinking FBX file hierarchy");
+		PR_ASSERT(false, "Reached maximum model hierarhy depth. Consider increasing depth or shrinking model file hierarchy");
 		return;
 	}
 
@@ -68,16 +69,16 @@ void FbxEntityGraph::ForEachNodesRecursive(FbxNodeVisitor p_visitor, const FbxEn
 	// Root is visited first
 	p_visitor(p_node);
 
-	for (const FbxEntityNode* node : p_node->children)
+	for (const ModelEntityNode* node : p_node->children)
 		ForEachNodesRecursive(p_visitor, node, depth + 1);
 }
 
-const PrEditor::Assets::FbxEntityNode* FbxEntityGraph::GetNode(const std::string& p_entityPath)
+const PrEditor::Assets::ModelEntityNode* ModelEntityGraph::GetNode(const std::string& p_entityPath)
 {
 	return GetNodeRecursive(p_entityPath, m_root, 0);
 }
 
-const PrEditor::Assets::FbxEntityNode* FbxEntityGraph::GetRoot()
+const PrEditor::Assets::ModelEntityNode* ModelEntityGraph::GetRoot()
 {
 	return m_root;
 }
