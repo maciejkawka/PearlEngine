@@ -7,12 +7,17 @@ namespace PrCore::ECS {
 	template<class System>
 	void SystemManager::RegisterSystem()
 	{
+		static_assert(std::is_base_of<BaseSystem, System>::value, "System must expand PrCore::ECS::BaseSystem");
+
 		PR_ASSERT(m_systemTypeCounter < MAX_SYSTEMS, "Cannot register more systems");
 
-		if(!std::is_base_of<BaseSystem, System>::value)
-			PR_ASSERT(false, "System must expand PrCore::ECS::BaseSystem");
-
 		auto systemID = GetSystemID<System>();
+		if (m_systems[systemID] != nullptr)
+		{
+			PR_ASSERT(false, "System already registered");
+			return;
+		}
+
 		auto system = new System();
 		system->Init(m_entityManager);
 		system->OnCreate();
@@ -34,6 +39,8 @@ namespace PrCore::ECS {
 	template<class System>
 	void SystemManager::UpdateSystem(float p_dt)
 	{
+		static_assert(std::is_base_of<BaseSystem, System>::value, "System must expand PrCore::ECS::BaseSystem");
+
 		auto systemID = GetSystemID<System>();
 		if (m_systems[systemID] != nullptr)
 			m_systems[systemID]->OnUpdate(p_dt);
@@ -43,6 +50,8 @@ namespace PrCore::ECS {
 	template<class System>
 	void SystemManager::SetActiveSystem(bool p_isActive)
 	{
+		static_assert(std::is_base_of<BaseSystem, System>::value, "System must expand PrCore::ECS::BaseSystem");
+
 		auto systemID = GetSystemID<System>();
 		auto system = m_systems[systemID];
 		if (system != nullptr)
@@ -60,6 +69,8 @@ namespace PrCore::ECS {
 	template<class System>
 	bool SystemManager::IsActiveSystem() const
 	{
+		static_assert(std::is_base_of<BaseSystem, System>::value, "System must expand PrCore::ECS::BaseSystem");
+
 		auto systemID = GetSystemID<System>();
 		return m_systems[systemID]->IsActive();
 	}
@@ -67,6 +78,7 @@ namespace PrCore::ECS {
 	template<class System>
 	size_t SystemManager::GetSystemID()
 	{
+		static_assert(std::is_base_of<BaseSystem, System>::value, "System must expand PrCore::ECS::BaseSystem");
 		static size_t s_SystemID = m_systemTypeCounter++;
 		return s_SystemID;
 	}
