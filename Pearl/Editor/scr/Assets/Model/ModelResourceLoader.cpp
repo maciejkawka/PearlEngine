@@ -22,12 +22,12 @@ using namespace PrRenderer::Resources;
 
 PrRenderer::Core::Color ToColor(const aiColor4D& p_vec4)
 {
-	return { p_vec4.r, p_vec4.g, p_vec4.g, p_vec4.a };
+	return { p_vec4.r, p_vec4.g, p_vec4.b, p_vec4.a };
 }
 
 PrRenderer::Core::Color ToColor(const aiColor3D& p_vec4)
 {
-	return { p_vec4.r, p_vec4.g, p_vec4.g, 1.0f };
+	return { p_vec4.r, p_vec4.g, p_vec4.b, 1.0f };
 }
 
 PrCore::Math::vec3 ToVec3(const aiVector3D& p_vec3)
@@ -181,13 +181,51 @@ PrRenderer::Resources::MaterialHandle ModelLoaderHelper::GetOrCreateMaterial(con
 	if (it != materialMap.end())
 		return it->second;
 
-	auto shaderRes = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>("Deferred/StandardLit.shader");
-	PR_ASSERT(shaderRes != nullptr, "Cannot load standard shader!");
+	float opacity = 1.0f;
+	if (AI_FAILURE == p_material->Get(AI_MATKEY_OPACITY, opacity))
+	{
+		opacity = 1.0f;
+	}
 
-	auto materialData = std::make_shared<Material>(shaderRes.GetData());
+	PrRenderer::Resources::ShaderHandle shaderHndl;
+	aiShadingMode shadingMode = aiShadingMode::aiShadingMode_PBR_BRDF;
+	if (AI_SUCCESS == p_material->Get(AI_MATKEY_SHADING_MODEL, shadingMode))
+	{
+		if (shadingMode == aiShadingMode::aiShadingMode_PBR_BRDF)
+		{
+			if (opacity == 1.0f)
+			{
+				shaderHndl = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>("Deferred/StandardLit.shader");
+			}
+			else
+			{
+				shaderHndl = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>("Deferred/StandardTransparent.shader");
+			}
+		}
+		else if (shadingMode == aiShadingMode::aiShadingMode_Unlit)
+		{
+			shaderHndl = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>("Deferred/StandardUnlit.shader");
+			opacity = 1.0f;
+		}
+	}
+	else
+	{
+		// Assume PBR and force to be opaque
+		shaderHndl = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>("Deferred/StandardLit.shader");
+		opacity = 1.0f;
+	}
+
+	PR_ASSERT(shaderHndl != nullptr, "Cannot load standard shader!");
+	auto materialData = std::make_shared<Material>(shaderHndl.GetData());
 	materialData->SetName(p_material->GetName().C_Str());
 
 	// Get PBR Material Properties
+
+	// Set transparency
+	if (opacity != 1.0f)
+		materialData->SetRenderType(PrRenderer::Resources::RenderType::Transparent);
+	else
+		materialData->SetRenderType(PrRenderer::Resources::RenderType::Opaque);
 
 	//Diffuse
 	auto diffuseTex = GetOrCreateTexture(p_material, aiTextureType_DIFFUSE);
@@ -198,7 +236,7 @@ PrRenderer::Resources::MaterialHandle ModelLoaderHelper::GetOrCreateMaterial(con
 	}
 	else 
 	{
-		aiColor3D baseColor;
+		aiColor4D baseColor;
 		if (AI_SUCCESS == p_material->Get(AI_MATKEY_BASE_COLOR, baseColor))
 		{
 			materialData->SetProperty("albedoValue", (PrCore::Math::vec4)ToColor(baseColor));
@@ -329,9 +367,10 @@ PrRenderer::Resources::MeshHandle ModelLoaderHelper::GetOrCreateMesh(const aiNod
 	std::vector<PrCore::Math::vec3>      normalsVec;
 	std::vector<unsigned int>            indicesVec;
 	std::vector<PrCore::Math::vec2>      UVsVec;
-	//std::vector<PrRenderer::Core::Color> colorsVec;
+	std::vector<PrRenderer::Resources::SubMesh> subMeshes;
 
 	unsigned int indicesOffset = 0;
+	unsigned int subMeshIndexOffset = 0;
 	for (int i = 0; i < p_mesh->mNumMeshes; ++i)
 	{
 		auto mesh = meshes[p_mesh->mMeshes[i]];
@@ -351,12 +390,6 @@ PrRenderer::Resources::MeshHandle ModelLoaderHelper::GetOrCreateMesh(const aiNod
 			{
 				UVsVec.push_back(ToVec3(mesh->mTextureCoords[0][vertId]));
 			}
-
-			// Do not use colors for now
-			//if (mesh->HasVertexColors(0))
-			//{
-			//	colorsVec.push_back(PrRenderer::Core::Color::White);
-			//}
 		}
 
 		for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
@@ -368,6 +401,12 @@ PrRenderer::Resources::MeshHandle ModelLoaderHelper::GetOrCreateMesh(const aiNod
 			}
 		}
 
+		PrRenderer::Resources::SubMesh submesh;
+		submesh.indicesCount = indicesVec.size() - subMeshIndexOffset;
+		submesh.firstIndex = subMeshIndexOffset;
+		subMeshes.push_back(submesh);
+
+		subMeshIndexOffset = indicesVec.size();
 		indicesOffset = verticesVec.size();
 	}
 
@@ -375,7 +414,7 @@ PrRenderer::Resources::MeshHandle ModelLoaderHelper::GetOrCreateMesh(const aiNod
 	meshData->SetNormals(std::move(normalsVec));
 	meshData->SetUVs(0, std::move(UVsVec));
 	meshData->SetIndices(std::move(indicesVec));
-	//meshData->SetColors(std::move(colorsVec));
+	meshData->SetSubmeshes(std::move(subMeshes));
 
 	meshData->UpdateBuffers();
 	if (!meshData->ValidateBuffers())
@@ -513,7 +552,7 @@ LightPtr ModelLoaderHelper::CreateLight(const aiLight* p_light)
 	light->SetOutterCone(PrCore::Math::degrees(p_light->mAngleOuterCone));
 
 	// Default
-	light->SetRange(100.0f);
+	light->SetRange(10.0f);
 
 	return light;
 }

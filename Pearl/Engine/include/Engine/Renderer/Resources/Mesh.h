@@ -19,6 +19,17 @@ namespace PrRenderer::Resources {
 	class Mesh;
 	using MeshPtr = std::shared_ptr<Mesh>;
 
+	struct SubMesh {
+
+		SubMesh() :
+			firstIndex(0),
+			indicesCount(0)
+		{}
+
+		unsigned int    firstIndex;    // First index in the indices elements that submesh contains
+		size_t          indicesCount;  // Number all of indices in the submesh
+	};
+
 	enum PrimitiveType
 	{
 		Cube,
@@ -46,16 +57,21 @@ namespace PrRenderer::Resources {
 		inline const std::shared_ptr<Buffers::VertexArray>& GetVertexArray() const { return m_VA; }
 
 		inline const std::vector<PrCore::Math::vec3>& GetVertices() const { return m_vertices; }
-		inline size_t GetVerticesCount() const { return m_verticesCount; }
+		inline size_t                                 GetVerticesCount() const { return m_verticesCount; }
 
 		inline const std::vector<unsigned int>& GetIndices() const { return m_indices; }
-		inline size_t GetIndicesCount() const { return m_indicesCount; }
+		inline size_t                           GetIndicesCount() const { return m_indicesCount; }
 
-		inline const std::vector<Core::Color>& GetColors() const { return m_colors; }
+		inline const std::vector<Core::Color>&        GetColors() const { return m_colors; }
 		inline const std::vector<PrCore::Math::vec3>& GetNormals() const { return m_normals; }
 		inline const std::vector<PrCore::Math::vec4>& GetTangents() const { return m_tangents; }
 
 		inline const Core::BoxVolume& GetBoxVolume() { return m_boxVolume; }
+
+		// Submesh is always al least 1 in size, it contains a submesh covering whole vertexArray in that case
+		size_t                        GetSubmeshCount() { return m_submeshes.size(); }
+		const SubMesh&                GetSubmesh(size_t p_index);
+		const std::vector<SubMesh>&   GetSubmeshes() { return m_submeshes; }
 
 		void SetVertices(std::vector<PrCore::Math::vec3>&& p_vertices);
 		void SetIndices(std::vector<unsigned int>&& p_indices);
@@ -65,11 +81,15 @@ namespace PrRenderer::Resources {
 
 		void SetUVs(unsigned int p_UVSet, std::vector<PrCore::Math::vec2>&& p_UVs);
 
+		void SetSubmesh(size_t p_index, const SubMesh& p_submesh);
+		void SetSubmeshSize(size_t p_size) { m_submeshes.resize(p_size); }
+		void SetSubmeshes(const std::vector<SubMesh>& p_submeshes) { m_submeshes = p_submeshes; }
+
 		virtual void RecalculateNormals() = 0;
 		virtual void RecalculateTangents() = 0;
 
 		virtual void UpdateBuffers() = 0;
-		bool ValidateBuffers();
+		bool         ValidateBuffers();
 
 		// Factories
 		static MeshPtr Create();
@@ -85,23 +105,25 @@ namespace PrRenderer::Resources {
 		std::vector<PrCore::Math::vec3> CalculateNormals();
 		PrCore::Math::vec4 GenerateTangent(int a, int b, int c);
 
-		std::vector<unsigned int>				m_indices;
-		size_t									m_indicesCount;
+		std::vector<unsigned int>             m_indices;
+		size_t                                m_indicesCount;
 
-		std::vector<PrCore::Math::vec3>			m_vertices;
-		size_t									m_verticesCount;
-		std::vector<Core::Color>	m_colors;
-		std::vector<PrCore::Math::vec3>			m_normals;
-		std::vector<PrCore::Math::vec4>			m_tangents;
+		std::vector<PrCore::Math::vec3>       m_vertices;
+		size_t                                m_verticesCount;
+		std::vector<Core::Color>              m_colors;
+		std::vector<PrCore::Math::vec3>       m_normals;
+		std::vector<PrCore::Math::vec4>       m_tangents;
 
-		UVArray									m_UVs;
-		size_t									m_maxUVs = MAX_UVs;
+		std::vector<SubMesh>                  m_submeshes;
 
-		bool									m_stateChanged;
+		UVArray                               m_UVs;
+		size_t                                m_maxUVs = MAX_UVs;
 
-		std::shared_ptr<Buffers::VertexArray>   m_VA;
+		bool                                  m_stateChanged;
 
-		Core::BoxVolume                         m_boxVolume;
+		std::shared_ptr<Buffers::VertexArray> m_VA;
+
+		Core::BoxVolume                       m_boxVolume;
 
 	private:
 		// Add later

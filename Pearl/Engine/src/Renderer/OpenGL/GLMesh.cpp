@@ -116,5 +116,20 @@ void GLMesh::UpdateBuffers()
 
 	m_boxVolume = Core::BoxVolume(m_vertices);
 
+	// Submesh should always be at least 1 covering whole VertexArray
+	if (m_submeshes.size() == 0)
+	{
+		Resources::SubMesh submesh;
+		submesh.firstIndex = 0;
+		submesh.indicesCount = m_indicesCount;
+
+		m_submeshes.push_back(submesh);
+	}
+	else if (m_submeshes.size() == 1)
+	{
+		m_submeshes[0].firstIndex = 0;
+		m_submeshes[0].indicesCount = m_indicesCount;
+	}
+
 	m_stateChanged = false;
 }

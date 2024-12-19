@@ -94,13 +94,17 @@ void GLRenderer::SetColorMask(bool p_red, bool p_green, bool p_blue, bool p_alph
 	glColorMask(BoolToGL(p_red), BoolToGL(p_green), BoolToGL(p_blue), BoolToGL(p_alpha));
 }
 
-void GLRenderer::Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives)
+void GLRenderer::Draw(Buffers::VertexArrayPtr p_vertexArray, size_t p_indicesCount, unsigned int p_indicesOffset, Core::Primitives p_primitives)
 {
 	auto indices = p_vertexArray->GetIndexBuffer();
 	if (indices == nullptr)
 		glDrawArrays(PrimitiveToGL(p_primitives), 0, p_vertexArray->GetVertexBuffers()[0]->GetVertexNumber());
 	else
-		glDrawElements(PrimitiveToGL(p_primitives), indices->GetSize(), GL_UNSIGNED_INT, 0);
+	{
+		if (p_indicesCount == 0)
+			p_indicesCount = indices->GetSize();
+		glDrawElements(PrimitiveToGL(p_primitives), p_indicesCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * p_indicesOffset));
+	}
 }
 
 void GLRenderer::DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives)

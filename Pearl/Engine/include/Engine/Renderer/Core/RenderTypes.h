@@ -82,17 +82,19 @@ namespace PrRenderer::Core {
 	};
 
 	struct RenderObject {
-		RenderObjectType       type;
-		size_t                 id;
-		Resources::MaterialPtr material;
-		Resources::MeshPtr     mesh;
-		Resources::MeshPtr     shadowMesh;
-		SortingHash            sortingHash;
-		PrCore::Math::mat4     worldMat;
-		bool                   wiredframe = false;
+		RenderObjectType         type;
+		size_t                   id;
+		Resources::MaterialPtr   material;
+		Buffers::VertexArrayPtr  vertexArrayPtr;
+		Buffers::VertexArrayPtr  vertexArrayShadowPtr;
+		Resources::SubMesh       subMesh;
+		BoxVolume                boxVolume;
+		SortingHash              sortingHash;
+		PrCore::Math::mat4       worldMat;
+		bool                     wiredframe = false;
 
 		//Instanced to be moved
-		size_t                 instanceSize;
+		size_t                             instanceSize;
 		std::vector<PrCore::Math::mat4>    worldMatrices;
 
 

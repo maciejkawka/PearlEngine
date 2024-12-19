@@ -35,10 +35,10 @@ void RenderStressTest::OnEnable()
 	//Randomize Lights
 	for (auto [entity, light, mesh]: m_entityViewer.EntitesWithComponents<LightComponent, MeshRendererComponent>())
 	{
-		mesh->material = std::make_shared<PrRenderer::Resources::Material>(*mesh->material.GetData());
+		mesh->mainMaterial = std::make_shared<PrRenderer::Resources::Material>(*mesh->mainMaterial.GetData());
 		PrRenderer::Core::Color color = randColor();
 		light->m_light->SetColor(color);
-		mesh->material->SetProperty("albedoValue", static_cast<PrCore::Math::vec4>(color));
+		mesh->mainMaterial->SetProperty("albedoValue", static_cast<PrCore::Math::vec4>(color));
 	}
 
 	for (auto [entity, light] : m_entityViewer.EntitesWithComponents<LightComponent>())
@@ -148,7 +148,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 
 			light->m_light->SetColor(color);
 
-			mesh->material->SetProperty("albedoValue", static_cast<PrCore::Math::vec4>(PrCore::Math::max(static_cast<PrCore::Math::vec4>(color), 0.0f)));
+			mesh->mainMaterial->SetProperty("albedoValue", static_cast<PrCore::Math::vec4>(PrCore::Math::max(static_cast<PrCore::Math::vec4>(color), 0.0f)));
 
 			transform->SetPosition(position);
 			transform->GenerateWorldMatrix();

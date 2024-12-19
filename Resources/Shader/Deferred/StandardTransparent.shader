@@ -86,15 +86,15 @@ uniform float metallicValue;
 uniform float roughnessValue;
 uniform float aoValue = 1.0;
 
-uniform vec3 ambientColor; //To be add in future
-
 // Universal uniform set by pipeline
 uniform vec3 PIPELINE_CAMPOS;
 
-uniform samplerCube PIPELINE_IRRADIANCE_MAP;
-uniform samplerCube PIPELINE_PREFILTER_MAP;
-uniform sampler2D PIPELINE_BRDF_LUT;
-
+// IBL
+uniform samplerCube PBR_irradianceMap;
+uniform samplerCube PBR_prefilterMap;
+uniform sampler2D   PBR_brdfLUT;
+uniform float       PBR_cubemapIntensity = 1.0f;
+uniform vec3        PBR_ambientColor;
 
 vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 {
@@ -137,30 +137,27 @@ void main()
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
 
-    vec3 Lo = vec3(0.0);
+    vec3 Lo = albedo;
 
     //IR diffuse 
     vec3 F = fresnelSchlickRoughness(max(dot(N,V), 0.0), F0, roughness);
     vec3 kS = F;
     vec3 kD = 1.0-kS;
     kD *= 1.0-metallic;
-    vec3 irradiance = texture(PIPELINE_IRRADIANCE_MAP, N).rgb;
+    vec3 irradiance = texture(PBR_irradianceMap, N).rgb;
     vec3 diffuse = irradiance * albedo;
+
+    if(diffuse == vec3(0.0f))
+        diffuse = PBR_ambientColor * albedo;
 
     //Indirect lighting specular
     const float MAX_REFLECTION_LOD = 4.0;
-    vec3 prefilteredColor = textureLod(PIPELINE_PREFILTER_MAP, R,  roughness * MAX_REFLECTION_LOD).rgb;    
-    vec2 brdf  = texture(PIPELINE_BRDF_LUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+    vec3 prefilteredColor = textureLod(PBR_prefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;    
+    vec2 brdf  = texture(PBR_brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
-    vec3 ambient = (kD * diffuse * transparency + specular) * ao;
+    vec3 ambient = (kD * diffuse + specular) * ao * PBR_cubemapIntensity;
     
-    vec3 color = ambient + Lo * transparency;
-
-    //tone maping    
-    color = color/(color + vec3(1.0));
-    
-    //gamma correction
-    color = pow(color, vec3(1.0/2.2));
-
-    FragColor = vec4(color,transparency);
+    vec3 color = ambient + Lo;
+    color = max(color, vec3(0.0f)); // Avoid negatve values
+    FragColor = vec4(color, transparency);
 }

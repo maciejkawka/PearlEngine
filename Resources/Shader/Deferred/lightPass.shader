@@ -30,7 +30,7 @@ const float      PI = 3.14159265359;
 
 
 //Main Uniforms
-uniform vec3     camPos;
+uniform vec3     PIPELINE_CAMPOS;
 
 
 //gBuff textures
@@ -553,7 +553,7 @@ void main()
     }
       
     N = normalize(N);
-    vec3 V = normalize(camPos - pos);
+    vec3 V = normalize(PIPELINE_CAMPOS - pos);
     vec3 R = reflect(-V,N);
 
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 

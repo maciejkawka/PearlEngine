@@ -10,36 +10,64 @@
 
 namespace PrCore::ECS {
 
-	enum class LightType {
-		Directional = 0,
-		Point = 1,
-		Spot = 2
-	};
+// Access first material in the component
+#define mainMaterial materials[0]
 
 	class MeshRendererComponent: public BaseComponent {
 	public:
-		MeshRendererComponent() = default;
+		MeshRendererComponent()
+		{
+			materials.resize(1);
+		}
 		~MeshRendererComponent() override = default;
 
-		bool shadowCaster = true;
-		PrRenderer::Resources::MeshHandle mesh;
-		PrRenderer::Resources::MeshHandle shadowMesh;
-		PrRenderer::Resources::MaterialHandle material;
+		bool                                               shadowCaster = true;
+		PrRenderer::Resources::MeshHandle                  mesh;
+		PrRenderer::Resources::MeshHandle                  shadowMesh;
+		std::vector<PrRenderer::Resources::MaterialHandle> materials;
 
 		virtual void OnSerialize(Utils::JSON::json& p_serialized) override
 		{
-			if(shadowMesh != nullptr)
+			if (shadowMesh != nullptr)
 			{
-				p_serialized["ShadowMesh"] = shadowMesh.GetPath();
+				if (shadowMesh.GetOrigin() == PrCore::Resources::ResourceOrigin::Memory)
+					p_serialized["ShadowMesh"] = shadowMesh->GetName();
+				else
+					p_serialized["ShadowMesh"] = shadowMesh.GetPath();
 			}
-			p_serialized["Mesh"] = mesh.GetPath();
-			p_serialized["Material"] = material.GetPath();
+
+			if(mesh.GetOrigin() == PrCore::Resources::ResourceOrigin::Memory)
+			{
+				p_serialized["Mesh"] = mesh->GetName();
+			}
+			else
+			{
+				p_serialized["Mesh"] = mesh.GetPath();
+			}
+
+			Utils::JSON::json jsonMaterials;
+			for (auto& mat : materials)
+			{
+				if (mat.GetOrigin() == PrCore::Resources::ResourceOrigin::File)
+				{
+					Utils::JSON::json jsonMatElement;
+					jsonMatElement["Path"] = mat.GetPath();
+
+					jsonMaterials.push_back(jsonMatElement);
+				}
+				else
+				{
+					PRLOG_WARN("Material {} is not a file origin, cannot serialize", mat->GetName());
+				}
+			}
+
+			p_serialized["MaterialList"] = jsonMaterials;
 		}
 
 		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override
 		{
 			std::string meshName = p_deserialized["Mesh"];
-			if(meshName.find("Primitive_Cube") != std::string::npos)
+			if (meshName.find("Primitive_Cube") != std::string::npos)
 				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
 			else if (meshName.find("Primitive_Sphere") != std::string::npos)
 				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Sphere);
@@ -55,7 +83,7 @@ namespace PrCore::ECS {
 				mesh = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>(static_cast<std::string>(p_deserialized["Mesh"]));
 
 			auto shadowMeshIt = p_deserialized.find("ShadowMesh");
-			if(shadowMeshIt != p_deserialized.end())
+			if (shadowMeshIt != p_deserialized.end())
 			{
 				std::string meshName = p_deserialized["ShadowMesh"];
 				if (meshName.find("Primitive_Cube") != std::string::npos)
@@ -74,7 +102,13 @@ namespace PrCore::ECS {
 					shadowMesh = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>(static_cast<std::string>(p_deserialized["ShadowMesh"]));
 			}
 
-			material = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>(static_cast<std::string>(p_deserialized["Material"]));
+			auto materialJson = p_deserialized["MaterialList"];
+			materials.resize(materialJson.size());
+			for (int i = 0; i < materialJson.size(); ++i)
+			{
+				auto mat = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>(static_cast<std::string>(materialJson.at(i)["Path"]));
+				materials[i] = mat;
+			}
 		}
 	};
 

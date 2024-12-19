@@ -377,13 +377,16 @@ namespace PrRenderer::Core
 
 	void DeferRenderBackend::RenderOpaque(RenderObjectPtr p_object, const RenderContext* p_renderContext)
 	{
-		auto mesh = p_object->mesh;
-		auto material = p_object->material;
-		auto shader = p_object->material->GetShader();
+		const auto& renderVA = p_object->vertexArrayPtr;
+		const auto& material = p_object->material;
+		const auto& submesh = p_object->subMesh;
+		const auto& shader = p_object->material->GetShader();
 
 		p_renderContext->gBuffer.buffer->Bind();
 
 		material->Bind();
+		renderVA->Bind();
+
 		shader->SetUniformMat4("PIPELINE_VP_MAT", p_renderContext->camera->GetCameraMatrix());
 		shader->SetUniformFloat("PIPELINE_NEAR", p_renderContext->camera->GetNear());
 		shader->SetUniformFloat("PIPELINE_FAR", p_renderContext->camera->GetFar());
@@ -392,11 +395,10 @@ namespace PrRenderer::Core
 		{
 			shader->SetUniformMat4("PIPELINE_MODEL_MAT", p_object->worldMat);
 			shader->SetUniformInt("PIPELINE_INTANCE_COUNT", 0);
+	
+			LowRenderer::Draw(renderVA, submesh.indicesCount, submesh.firstIndex);
 
-			mesh->Bind();
-			LowRenderer::Draw(mesh->GetVertexArray());
-
-			p_renderContext->frameInfo->drawTriangles += mesh->GetIndicesCount() / 3;
+			p_renderContext->frameInfo->drawTriangles += submesh.indicesCount / 3;
 			p_renderContext->frameInfo->objectDrawCalls++;
 			p_renderContext->frameInfo->drawCalls++;
 		}
@@ -405,15 +407,14 @@ namespace PrRenderer::Core
 			shader->SetUniformMat4Array("PIPELINE_MODEL_MAT_ARRAY[0]", p_object->worldMatrices.data(), p_object->worldMatrices.size());
 			shader->SetUniformInt("PIPELINE_INTANCE_COUNT", p_object->instanceSize);
 
-			mesh->Bind();
-			LowRenderer::DrawInstanced(mesh->GetVertexArray(), p_object->instanceSize);
+			LowRenderer::DrawInstanced(renderVA, p_object->instanceSize);
 
-			p_renderContext->frameInfo->drawTriangles += mesh->GetIndicesCount() / 3 * p_object->instanceSize;
+			p_renderContext->frameInfo->drawTriangles += renderVA->GetIndexBuffer()->GetSize() / 3 * p_object->instanceSize;
 			p_renderContext->frameInfo->objectDrawCalls++;
 			p_renderContext->frameInfo->drawCalls++;
 		}
 
-		mesh->Unbind();
+		renderVA->Unbind();
 		material->Unbind();
 	}
 
@@ -427,29 +428,30 @@ namespace PrRenderer::Core
 
 		for (auto& object : *p_objects)
 		{
-			auto& renderMesh = object->shadowMesh ? object->shadowMesh : object->mesh;
+			const auto& renderVA = object->vertexArrayShadowPtr ? object->vertexArrayShadowPtr : object->vertexArrayPtr;
+			auto submesh = object->vertexArrayShadowPtr ? Resources::SubMesh() : object->subMesh;
 
 			if (object->type == RenderObjectType::Mesh)
 			{
 				// Cull if out of camera
-				if (!skipCulling && !object->mesh->GetBoxVolume().IsOnFrustrum(frustrum, object->worldMat))
+				if (!skipCulling && !object->boxVolume.IsOnFrustrum(frustrum, object->worldMat))
 					continue;
 
 				p_shaderPtr->SetUniformMat4("PIPELINE_MODEL_MAT", object->worldMat);
 				p_shaderPtr->SetUniformInt("PIPELINE_INTANCE_COUNT", 0);
-				renderMesh->Bind();
-				LowRenderer::Draw(renderMesh->GetVertexArray());
+				renderVA->Bind();
+				LowRenderer::Draw(renderVA, submesh.indicesCount, submesh.firstIndex);
 				p_renderData->frameInfo->drawCalls++;
-				renderMesh->Unbind();
+				renderVA->Unbind();
 			}
 			else if (object->type == RenderObjectType::InstancedMesh)
 			{
 				p_shaderPtr->SetUniformMat4Array("PIPELINE_MODEL_MAT_ARRAY[0]", object->worldMatrices.data(), object->worldMatrices.size());
 				p_shaderPtr->SetUniformInt("PIPELINE_INTANCE_COUNT", object->instanceSize);
-				renderMesh->Bind();
-				LowRenderer::DrawInstanced(renderMesh->GetVertexArray(), object->instanceSize);
+				renderVA->Bind();
+				LowRenderer::DrawInstanced(renderVA, object->instanceSize);
 				p_renderData->frameInfo->drawCalls++;
-				renderMesh->Unbind();
+				renderVA->Unbind();
 			}
 		}
 
@@ -467,12 +469,13 @@ namespace PrRenderer::Core
 
 		for (auto& object : *p_objects)
 		{
-			auto& renderMesh = object->shadowMesh ? object->shadowMesh : object->mesh;
+			const auto& renderVA = object->vertexArrayShadowPtr ? object->vertexArrayShadowPtr : object->vertexArrayPtr;
+			auto submesh = object->vertexArrayShadowPtr ? Resources::SubMesh() : object->subMesh;
 
 			if (object->type == RenderObjectType::Mesh)
 			{
 				// Cull if out of camera
-				if (!object->mesh->GetBoxVolume().IsOnFrustrum(frustrum, object->worldMat))
+				if (!object->boxVolume.IsOnFrustrum(frustrum, object->worldMat))
 					continue;
 
 				// Naive way to cull object, this should be a AABB-SPHERE Intersection in the future
@@ -483,17 +486,17 @@ namespace PrRenderer::Core
 
 				p_pointShadowMapShader->SetUniformMat4("PIPELINE_MODEL_MAT", object->worldMat);
 				p_pointShadowMapShader->SetUniformInt("PIPELINE_INTANCE_COUNT", 0);
-				renderMesh->Bind();
-				LowRenderer::Draw(renderMesh->GetVertexArray());
-				renderMesh->Unbind();
+				renderVA->Bind();
+				LowRenderer::Draw(renderVA, submesh.indicesCount, submesh.firstIndex);
+				renderVA->Unbind();
 			}
 			else if (object->type == RenderObjectType::InstancedMesh)
 			{
 				p_pointShadowMapShader->SetUniformMat4Array("PIPELINE_MODEL_MAT_ARRAY[0]", object->worldMatrices.data(), object->worldMatrices.size());
 				p_pointShadowMapShader->SetUniformInt("PIPELINE_INTANCE_COUNT", object->instanceSize);
-				renderMesh->Bind();
-				LowRenderer::DrawInstanced(renderMesh->GetVertexArray(), object->instanceSize);
-				renderMesh->Unbind();
+				renderVA->Bind();
+				LowRenderer::DrawInstanced(renderVA, object->instanceSize);
+				renderVA->Unbind();
 			}
 		}
 
@@ -766,7 +769,7 @@ namespace PrRenderer::Core
 
 		p_material->Bind();
 		p_renderContext->quadMesh->Bind();
-		LowRenderer::Draw(p_renderContext->quadMesh->GetVertexArray(), Primitives::TriangleStrip);
+		LowRenderer::Draw(p_renderContext->quadMesh->GetVertexArray());
 		p_renderContext->frameInfo->drawCalls++;
 
 		p_renderContext->quadMesh->Unbind();
@@ -804,46 +807,51 @@ namespace PrRenderer::Core
 
 	void DeferRenderBackend::RenderTransparent(RenderObjectPtr p_object, const RenderContext* p_renderContext)
 	{
-		auto material = p_object->material;
-		auto mesh = p_object->mesh;
-
-		material->SetProperty("PIPELINE_VP_MAT", p_renderContext->camera->GetCameraMatrix());
-		material->SetProperty("PIPELINE_CAMPOS", p_renderContext->camera->GetPosition());
+		const auto& renderVA = p_object->vertexArrayPtr;
+		const auto& material = p_object->material;
+		const auto& submesh = p_object->subMesh;
+		const auto& shader = p_object->material->GetShader();
 
 		if (p_renderContext->IRMap && p_renderContext->prefilterMap && p_renderContext->brdfLUT)
 		{
-			material->SetTexture("PIPELINE_IRRADIANCE_MAP", p_renderContext->IRMap);
-			material->SetTexture("PIPELINE_PREFILTER_MAP", p_renderContext->prefilterMap);
-			material->SetTexture("PIPELINE_BRDF_LUT", p_renderContext->brdfLUT);
+			material->SetTexture("PBR_irradianceMap", p_renderContext->IRMap);
+			material->SetTexture("PBR_prefilterMap", p_renderContext->prefilterMap);
+			material->SetTexture("PBR_brdfLUT", p_renderContext->brdfLUT);
 		}
+
+		material->Bind();
+		renderVA->Bind();
+
+		shader->SetUniformMat4("PIPELINE_VP_MAT", p_renderContext->camera->GetCameraMatrix());
+		shader->SetUniformVec3("PIPELINE_CAMPOS", p_renderContext->camera->GetPosition());
+
+		shader->SetUniformVec3("PBR_ambientColor", p_renderContext->settings->ambientColor);
+		shader->SetUniformFloat("PBR_cubemapIntensity", p_renderContext->settings->ambientIntensity);
 
 		if (p_object->type == RenderObjectType::Mesh)
 		{
-			material->SetProperty("PIPELINE_MODEL_MAT", p_object->worldMat);
-			material->SetProperty("PIPELINE_INTANCE_COUNT", 0);
-			material->Bind();
-			mesh->Bind();
-			LowRenderer::Draw(mesh->GetVertexArray());
-			mesh->Unbind();
+			shader->SetUniformMat4("PIPELINE_MODEL_MAT", p_object->worldMat);
+			shader->SetUniformInt("PIPELINE_INTANCE_COUNT", 0);
 
-			p_renderContext->frameInfo->drawTriangles += mesh->GetIndicesCount() / 3;
+			LowRenderer::Draw(renderVA, submesh.indicesCount, submesh.firstIndex);
+			
+			p_renderContext->frameInfo->drawTriangles += submesh.indicesCount / 3;
 			p_renderContext->frameInfo->objectDrawCalls++;
 			p_renderContext->frameInfo->drawCalls++;
 		}
 		else if (p_object->type == RenderObjectType::InstancedMesh)
 		{
-			material->SetPropertyArray("PIPELINE_MODEL_MAT_ARRAY[0]", p_object->worldMatrices.data(), p_object->worldMatrices.size());
-			material->SetProperty("PIPELINE_INTANCE_COUNT", (int)p_object->instanceSize);
-			material->Bind();
-			mesh->Bind();
-			LowRenderer::DrawInstanced(mesh->GetVertexArray(), p_object->instanceSize);
-			mesh->Unbind();
+			shader->SetUniformMat4Array("PIPELINE_MODEL_MAT_ARRAY[0]", p_object->worldMatrices.data(), p_object->worldMatrices.size());
+			shader->SetUniformInt("PIPELINE_INTANCE_COUNT", (int)p_object->instanceSize);
 
-			p_renderContext->frameInfo->drawTriangles += mesh->GetIndicesCount() / 3 * p_object->instanceSize;
+			LowRenderer::DrawInstanced(renderVA, p_object->instanceSize);
+
+			p_renderContext->frameInfo->drawTriangles += renderVA->GetIndexBuffer()->GetSize() / 3 * p_object->instanceSize;
 			p_renderContext->frameInfo->objectDrawCalls++;
 			p_renderContext->frameInfo->drawCalls++;
 		}
 
+		renderVA->Unbind();
 		material->Unbind();
 	}
 
@@ -1041,7 +1049,7 @@ namespace PrRenderer::Core
 		{
 			auto material = object->material;
 			auto shader = material->GetShader();
-			auto mesh = object->mesh;
+			auto renderVA = object->vertexArrayPtr;
 			auto primitives = object->wiredframe ? Primitives::LineStrip : Primitives::Triangles;
 
 			material->Bind();
@@ -1054,21 +1062,21 @@ namespace PrRenderer::Core
 				shader->SetUniformMat4("PIPELINE_MODEL_MAT", object->worldMat);
 				shader->SetUniformInt("PIPELINE_INTANCE_COUNT", 0);
 
-				mesh->Bind();
+				renderVA->Bind();
 				
-				LowRenderer::Draw(mesh->GetVertexArray(), primitives);
+				LowRenderer::Draw(renderVA, 0, 0, primitives);
 			}
 			else if (object->type == RenderObjectType::InstancedMesh)
 			{
 				shader->SetUniformMat4Array("PIPELINE_MODEL_MAT_ARRAY[0]", object->worldMatrices.data(), object->worldMatrices.size());
 				shader->SetUniformInt("PIPELINE_INTANCE_COUNT", object->instanceSize);
 
-				mesh->Bind();
-				LowRenderer::DrawInstanced(mesh->GetVertexArray(), object->instanceSize, primitives);
+				renderVA->Bind();
+				LowRenderer::DrawInstanced(renderVA, object->instanceSize, primitives);
 			}
 
 			material->Unbind();
-			mesh->Unbind();
+			renderVA->Unbind();
 		}
 
 		p_renderContext->otuputBuff->Unbind();
@@ -1107,7 +1115,7 @@ namespace PrRenderer::Core
 			p_lightShdr->SetUniformInt("PBR_brdfLUT", 10);
 		}
 
-		p_lightShdr->SetUniformVec3("camPos", p_renderContext->camera->GetPosition());
+		p_lightShdr->SetUniformVec3("PIPELINE_CAMPOS", p_renderContext->camera->GetPosition());
 		p_lightShdr->SetUniformVec3("PBR_ambientColor", p_renderContext->settings->ambientColor);
 		p_lightShdr->SetUniformFloat("PBR_cubemapIntensity", p_renderContext->settings->ambientIntensity);
 

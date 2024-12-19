@@ -86,9 +86,9 @@ void LowRenderer::SetColorMask(bool p_red, bool p_green, bool p_blue, bool p_alp
 	m_rendererAPI->SetColorMask(p_red, p_green, p_blue, p_alpha);
 }
 
-void LowRenderer::Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives)
+void LowRenderer::Draw(Buffers::VertexArrayPtr p_vertexArray, size_t p_indicesCount , unsigned int p_indicesOffset, Core::Primitives p_primitives)
 {
-	m_rendererAPI->Draw(p_vertexArray, p_primitives);
+	m_rendererAPI->Draw(p_vertexArray, p_indicesCount, p_indicesOffset, p_primitives);
 }
 
 void LowRenderer::DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives)

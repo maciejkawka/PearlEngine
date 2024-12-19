@@ -31,6 +31,8 @@ Material::Material(ShaderPtr p_shader)
 
 		if (uniform.type == UniformType::Texture2D)
 			m_textures[uniformName] = Texture2D::CreateUnitTex(PrRenderer::Core::Color::Black);
+		if(uniform.type == UniformType::Cubemap)
+			m_textures[uniformName] = nullptr;
 	}
 
 	if (blackTexture == nullptr)

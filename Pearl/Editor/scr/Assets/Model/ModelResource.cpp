@@ -48,7 +48,7 @@ void ModelResource::AddEntitesToScene(PrCore::ECS::Scene* p_scene)
 			if (!entity->materials.empty() && entity->mesh != nullptr)
 			{
 				auto meshRenderer = sceneEntity.AddComponent<MeshRendererComponent>();
-				meshRenderer->material = entity->materials[0];
+				meshRenderer->materials = entity->materials;
 				meshRenderer->mesh = entity->mesh;
 			}
 

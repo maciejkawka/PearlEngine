@@ -26,7 +26,7 @@ namespace PrRenderer::OpenGL {
 
 		void SetColorMask(bool p_red, bool p_green, bool p_blue, bool p_alpha) override;
 
-		void Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles) override;
+		void Draw(Buffers::VertexArrayPtr p_vertexArray, size_t p_indicesCount = 0, unsigned int p_indicesOffset = 0, Core::Primitives p_primitives = Core::Primitives::Triangles) override;
 		void DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles) override;
 		void DrawInstanced(Buffers::VertexArrayPtr p_vertexArray, size_t p_instanceCount, Core::Primitives p_primitives) override;
 

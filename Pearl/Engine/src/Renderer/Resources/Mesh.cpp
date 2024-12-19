@@ -81,6 +81,28 @@ void Mesh::SetUVs(unsigned int p_UVSet, std::vector<PrCore::Math::vec2>&& p_UVs)
 	m_stateChanged = true;
 }
 
+const SubMesh& Mesh::GetSubmesh(size_t p_index)
+{
+	if (p_index >= m_submeshes.size())
+	{
+		PR_ASSERT(false, "Submesh index is out of the submesh vector size");
+		return SubMesh{};
+	}
+
+	return m_submeshes[p_index];
+}
+
+void Mesh::SetSubmesh(size_t p_index, const SubMesh& p_submesh)
+{
+	if (p_index >= m_submeshes.size())
+	{
+		PR_ASSERT(false, "Submesh index is out of the submesh vector size");
+		return;
+	}
+
+	m_submeshes[p_index] = p_submesh;
+}
+
 MeshPtr Mesh::Create()
 {
 	switch (Core::RendererAPI::GetGraphicsAPI())

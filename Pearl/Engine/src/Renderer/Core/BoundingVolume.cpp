@@ -183,13 +183,13 @@ BoxVolume::BoxVolume(const std::vector<PrCore::Math::vec3>&p_vertices)
 
 BoxVolume::BoxVolume(const PrCore::Math::vec3& p_min, const PrCore::Math::vec3 & p_max):
 	m_min(p_min),
-	m_max(p_min)
+	m_max(p_max)
 {
-	m_center = (p_max + p_min) * 0.5f;
+	m_center = (m_max + m_min) * 0.5f;
 	m_extends = PrCore::Math::vec3(
-		p_max.x - m_center.x,
-		p_max.y - m_center.y,
-		p_max.z - m_center.z
+		PrCore::Math::max(m_max.x - m_center.x, 0.01f),
+		PrCore::Math::max(m_max.y - m_center.y, 0.01f),
+		PrCore::Math::max(m_max.z - m_center.z, 0.01f)
 	);
 	m_size = m_extends * 2.0f;
 }

@@ -47,7 +47,7 @@ namespace PrRenderer::Core {
 		// static void SetColorMask() 
 		
 		//Draw
-		static void Draw(Buffers::VertexArrayPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles);
+		static void Draw(Buffers::VertexArrayPtr p_vertexArray, size_t p_indicesCount = 0, unsigned int p_indicesOffset = 0, Core::Primitives p_primitives = Core::Primitives::Triangles);
 		static void DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles);
 		static void DrawInstanced(Buffers::VertexArrayPtr p_vertexArray, size_t p_instanceCount, Primitives p_primitives = Primitives::Triangles);
 
@@ -73,7 +73,7 @@ namespace PrRenderer::Core {
 		REGISTER_RENDER_COMMAND(EnableBlending, bool);
 		REGISTER_RENDER_COMMAND(SetBlendingAlgorythm, BlendingAlgorithm, BlendingAlgorithm);
 
-		REGISTER_RENDER_COMMAND(Draw, Buffers::VertexArrayPtr, Core::Primitives);
+		REGISTER_RENDER_COMMAND(Draw, Buffers::VertexArrayPtr, size_t, unsigned int, Core::Primitives);
 		REGISTER_RENDER_COMMAND(DrawArray, Buffers::VertexBufferPtr, Core::Primitives);
 		REGISTER_RENDER_COMMAND(DrawInstanced, Buffers::VertexArrayPtr, size_t, Core::Primitives);
 

@@ -44,7 +44,7 @@ void DeferRenderFrontend::SubmitLight(ECS::LightComponent* p_lightComponent, ECS
 
 		auto lightObject = std::make_shared<DirLightObject>();
 		lightObject->id = p_id;
-		lightObject->packedMat = p_lightComponent->m_light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
+		lightObject->packedMat = p_lightComponent->m_light->CreatePackedMatrix(p_transformComponent->GetPosition(), -p_transformComponent->GetForwardVector());
 		lightObject->shadowMapPos = SIZE_MAX; // ShadowMapPos is not important in main light
 		lightObject->castShadow = p_lightComponent->m_shadowCast;
 		m_currentFrame->mainDirectLight = lightObject;
@@ -64,7 +64,7 @@ void DeferRenderFrontend::SubmitLight(ECS::LightComponent* p_lightComponent, ECS
 		}
 
 		lightObject = std::make_shared<DirLightObject>();
-		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
+		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), -p_transformComponent->GetForwardVector());
 		lightObject->id = p_id;
 		m_dirLightNumber++;
 
@@ -86,7 +86,7 @@ void DeferRenderFrontend::SubmitLight(ECS::LightComponent* p_lightComponent, ECS
 		}
 
 		lightObject = std::make_shared<LightObject>();
-		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
+		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), -p_transformComponent->GetForwardVector());
 		lightObject->id = p_id;
 		m_pointLightNumber++;
 
@@ -108,7 +108,7 @@ void DeferRenderFrontend::SubmitLight(ECS::LightComponent* p_lightComponent, ECS
 		}
 
 		lightObject = std::make_shared<SpotLightObject>();
-		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
+		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), -p_transformComponent->GetForwardVector());
 		lightObject->id = p_id;
 		m_spotLightNumber++;
 
@@ -136,46 +136,56 @@ void DeferRenderFrontend::SubmitMesh(ECS::Entity& p_entity)
 	PR_ASSERT(p_entity.HasComponent<ECS::MeshRendererComponent>(), "FrontendRenderer: entity does not have a MeshRendererComponent");
 	PR_ASSERT(p_entity.HasComponent<ECS::TransformComponent>(), "FrontendRenderer: entity does not have a TransformComponent");
 
-	//Prepare data
 	auto meshComponent = p_entity.GetComponent<ECS::MeshRendererComponent>();
 	auto mesh = meshComponent->mesh;
-	auto shadowMesh = meshComponent->shadowMesh;
-	auto material = meshComponent->material;
+	if (mesh == nullptr)
+		return;
+
 	auto transformComponent = p_entity.GetComponent<ECS::TransformComponent>();
 	auto worldMatrix = transformComponent->GetWorldMatrix();
+	auto shadowMesh = meshComponent->shadowMesh;
+	bool shouldCull = !mesh->GetBoxVolume().IsOnFrustrum(m_frustrum, worldMatrix);
 
-	// Create renderObject
-	RenderObjectPtr object = std::make_shared<RenderObject>();
-	object->id = p_entity.GetID().GetID();
-	object->material = material.GetData();
-	object->mesh = mesh.GetData();
-	object->shadowMesh = shadowMesh.GetData();
-	object->type = RenderObjectType::Mesh;
-	object->worldMat = worldMatrix;
-
-	// Calculate sorting hash
-	SortingHash hash(*object);
-	hash.SetDepth(RenderUtils::CalculateDepthValue(transformComponent->GetPosition(), m_camera));
-	object->sortingHash = hash;
-
-	// Add to shadow casters
-	if(meshComponent->shadowCaster && material->GetRenderType() == Resources::RenderType::Opaque)
-		m_currentFrame->shadowCasters.push_back(object);
-
-	// Frustrum culling
-	// Discard objects that are not visible in the main m_camera
-	//const auto frustrum = Frustrum(m_camera->GetProjectionMatrix(), m_camera->GetViewMatrix());
-	if (!mesh->GetBoxVolume().IsOnFrustrum(m_frustrum, worldMatrix))
+	// Create RenderObject for each submesh
+	for (int i = 0; i < mesh->GetSubmeshCount() && i < meshComponent->materials.size(); ++i)
 	{
-		m_currentFrame->frameInfo.culledObjects++;
-		return;
-	}
+		auto material = meshComponent->materials[i];
+		if (material == nullptr)
+			continue;
 
-	// Add object to the objects lists
-	if (material->GetRenderType() == Resources::RenderType::Opaque)
-		m_currentFrame->opaqueObjects.push_back(object);
-	else
-		m_currentFrame->transpatrentObjects.push_back(object);
+		// Create renderObject
+		RenderObjectPtr object = std::make_shared<RenderObject>();
+		object->id = p_entity.GetID().GetID();
+		object->material = material.GetData();
+		object->vertexArrayPtr = mesh->GetVertexArray();
+		object->vertexArrayShadowPtr = shadowMesh != nullptr ? shadowMesh->GetVertexArray() : nullptr;
+		object->subMesh = mesh->GetSubmeshCount() > 0 ? mesh->GetSubmesh(i): Resources::SubMesh();
+		object->boxVolume = mesh->GetBoxVolume();
+		object->type = RenderObjectType::Mesh;
+		object->worldMat = worldMatrix;
+
+		// Calculate sorting hash
+		SortingHash hash(*object);
+		hash.SetDepth(RenderUtils::CalculateDepthValue(transformComponent->GetPosition(), m_camera));
+		object->sortingHash = hash;
+
+		// Add to shadow casters
+		if (meshComponent->shadowCaster && material->GetRenderType() == Resources::RenderType::Opaque)
+			m_currentFrame->shadowCasters.push_back(object);
+
+		// Frustrum culling
+		if (shouldCull)
+		{
+			m_currentFrame->frameInfo.culledObjects++;
+			continue;
+		}
+
+		// Add object to the objects lists
+		if (material->GetRenderType() == Resources::RenderType::Opaque)
+			m_currentFrame->opaqueObjects.push_back(object);
+		else
+			m_currentFrame->transpatrentObjects.push_back(object);
+	}
 }
 
 void DeferRenderFrontend::SetCubemap(Resources::MaterialPtr p_cubemapMat)
@@ -270,7 +280,7 @@ void DeferRenderFrontend::DrawDebugCube(const Math::mat4& p_transformMat, bool p
 	renderObj->material = m_debugMaterial;
 	renderObj->worldMat = p_transformMat;
 	renderObj->id = 0;
-	renderObj->mesh = Resources::Mesh::CreatePrimitive(Resources::Cube);
+	renderObj->vertexArrayPtr = Resources::Mesh::CreatePrimitive(Resources::Cube)->GetVertexArray();
 	renderObj->wiredframe = p_wireframe;
 
 	m_currentFrame->debugObjects.push_back(renderObj);
@@ -294,7 +304,7 @@ void DeferRenderFrontend::DrawDebugSphere(const Math::vec3& p_center, float p_ra
 	renderObj->material = m_debugMaterial;
 	renderObj->worldMat = transformMat;
 	renderObj->id = 0;
-	renderObj->mesh = Resources::Mesh::CreatePrimitive(Resources::Sphere);
+	renderObj->vertexArrayPtr = Resources::Mesh::CreatePrimitive(Resources::Sphere)->GetVertexArray();
 	renderObj->wiredframe = p_wireframe;
 
 	m_currentFrame->debugObjects.push_back(renderObj);
@@ -311,7 +321,7 @@ void DeferRenderFrontend::DrawDebugLine(const Math::vec3& p_start, const Math::v
 	renderObj->worldMat = transformMat;
 	renderObj->id = 0;
 	renderObj->wiredframe = true;
-	renderObj->mesh = Resources::Mesh::CreatePrimitive(Resources::Line);
+	renderObj->vertexArrayPtr = Resources::Mesh::CreatePrimitive(Resources::Line)->GetVertexArray();
 
 	m_currentFrame->debugObjects.push_back(renderObj);
 }
@@ -331,15 +341,13 @@ size_t DeferRenderFrontend::InstanciateObjectsByMaterial(RenderObjectVector& p_r
 	{
 		//First element data
  		const auto object = *objIt;
-		auto& hash = object->sortingHash;
-		const auto materiaHash = hash.GetMaterialHash();
-		const auto renderOrder = hash.GetRenderOrder();
-		auto meshName = std::hash<std::string>{}(object->mesh->GetName());
+		const auto materiaHash = object->sortingHash.GetMaterialHash();
+		auto vertexArrayID = object->vertexArrayPtr->GetID();
 
 		//Find instance candidates
 		size_t instancedCount = 0;
 		auto innerIt = objIt;
-		while(objIt != p_renderObjects.end() && (*objIt)->sortingHash.GetMaterialHash() == materiaHash && std::hash<std::string>{}((*objIt)->mesh->GetName()) == meshName)
+		while(objIt != p_renderObjects.end() && (*objIt)->sortingHash.GetMaterialHash() == materiaHash && (*objIt)->vertexArrayPtr->GetID() == vertexArrayID)
 		{
 			instanciateCandidates.push_back(*objIt);
 			instancedCount++;
@@ -365,14 +373,14 @@ size_t DeferRenderFrontend::InstanciateObjectsByMaterial(RenderObjectVector& p_r
 				}
 
 				//Create material for instanced group
-				const auto instancedMesh = instnaceFront->mesh;
-				const auto instancedMeshShadow = instnaceFront->shadowMesh;
+				const auto instancedVA = instnaceFront->vertexArrayPtr;
+				const auto instancedShadowVA = instnaceFront->vertexArrayShadowPtr;
 				const auto instancedMat = instnaceFront->material;
 
 				RenderObjectPtr instncedObj = std::make_shared<RenderObject>();
 				instncedObj->material = instancedMat;
-				instncedObj->mesh = instancedMesh;
-				instncedObj->shadowMesh = instancedMeshShadow;
+				instncedObj->vertexArrayPtr = instancedVA;
+				instncedObj->vertexArrayShadowPtr = instancedShadowVA;
 				instncedObj->id = 0;
 				instncedObj->sortingHash = instnaceFront->sortingHash;
 				instncedObj->type = RenderObjectType::InstancedMesh;
@@ -407,12 +415,12 @@ size_t DeferRenderFrontend::InstanciateObjectsByMesh(RenderObjectVector& p_rende
 	{
 		//First element data
 		const auto object = *objIt;
-		auto meshName = std::hash<std::string>{}(object->mesh->GetName());
+		auto vertexArrayID = object->vertexArrayPtr->GetID();
 
 		//Find instance candidates
 		size_t instancedCount = 0;
 		auto innerIt = objIt;
-		while (objIt != p_renderObjects.end() && std::hash<std::string>{}((*objIt)->mesh->GetName()) == meshName)
+		while (objIt != p_renderObjects.end() && (*objIt)->vertexArrayPtr->GetID() == vertexArrayID)
 		{
 			instanciateCandidates.push_back(*objIt);
 			instancedCount++;
@@ -438,12 +446,12 @@ size_t DeferRenderFrontend::InstanciateObjectsByMesh(RenderObjectVector& p_rende
 				}
 
 				//Create material for instanced group
-				const auto instancedMesh = instnaceFront->mesh;
-				const auto instancedMeshShadow = instnaceFront->shadowMesh;
+				const auto instancedVA = instnaceFront->vertexArrayPtr;
+				const auto instancedShadowVA = instnaceFront->vertexArrayShadowPtr;
 
 				RenderObjectPtr instncedObj = std::make_shared<RenderObject>();
-				instncedObj->mesh = instancedMesh;
-				instncedObj->shadowMesh = instancedMeshShadow;
+				instncedObj->vertexArrayPtr = instancedVA;
+				instncedObj->vertexArrayShadowPtr = instancedShadowVA;
 				instncedObj->id = 0;
 				instncedObj->type = RenderObjectType::InstancedMesh;
 				instncedObj->instanceSize = matrices.size();
