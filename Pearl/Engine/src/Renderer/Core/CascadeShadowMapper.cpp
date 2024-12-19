@@ -24,7 +24,7 @@ PrCore::Math::mat4 CascadeShadowUtility::ClaculateFrustrums(float& p_cascadeShad
 			{1.0f,	1.0f,	1.0f,	1.0f}
 	};
 
-	//Frustrum corners Clip space to world space
+	//Frustrum corners clip space to world space
 	for (auto& vert : boundingVertices)
 	{
 		vert = invView * vert;
@@ -32,33 +32,35 @@ PrCore::Math::mat4 CascadeShadowUtility::ClaculateFrustrums(float& p_cascadeShad
 	}
 
 	//Center of the frustrum
-	glm::vec3 center = glm::vec3(0, 0, 0);
+	Math::vec3 center = Math::vec3(0.0f, 0.0f, 0.0f);
 	for (const auto& v : boundingVertices)
 	{
-		center += glm::vec3(v);
+		center += Math::vec3(v);
 	}
 	center /= boundingVertices.size();
 
-	float radius = Math::length(boundingVertices[2] - boundingVertices[5]) / 2.0f;
-	float texelsPerUnit = p_mapSize / (2.0f * radius);
-	auto scale = Math::scale(Math::mat4(1.1f), Math::vec3(texelsPerUnit));
+	// Compute bounding sphere radius
+	float radius = 0.0f;
+	for (const auto& v : boundingVertices)
+	{
+		float distance = Math::length(Math::vec3(v) - center);
+		radius = Math::max(radius, distance);
+	}
 
-	auto lookView = Math::lookAt(Math::vec3(0.0f) - p_lightDir, Math::vec3(0.0f), Math::vec3(0.0f, 1.0f, 0.0f));
-	lookView = scale * lookView;
-	auto lookViewInv = Math::inverse(lookView);
+	radius = Math::ceil(radius * p_mapSize) / p_mapSize;
+	float texelsPerUnit = static_cast<float>(p_mapSize) / (2.0f * radius);
 
-	Math::vec4 centerVec4 = lookView * Math::vec4(center, 1.0f);
-	center = centerVec4 / centerVec4.w;
-	center.x = Math::floor(center.x);
-	center.y = Math::floor(center.y);
+	// Snap frustum center to shadow map texel grid
+	Math::vec4 snappedCenter = Math::vec4(center, 1.0f);
+	auto lightView = Math::lookAt(Math::vec3(0.0f) - p_lightDir, Math::vec3(0.0f), Math::vec3(0.0f, 1.0f, 0.0f));
+	snappedCenter = lightView * snappedCenter;
+	snappedCenter.x = Math::floor(snappedCenter.x * texelsPerUnit) / texelsPerUnit;
+	snappedCenter.y = Math::floor(snappedCenter.y * texelsPerUnit) / texelsPerUnit;
+	snappedCenter = Math::inverse(lightView) * snappedCenter;
 
-	centerVec4 = lookViewInv * Math::vec4(center, 1.0f);
-	center = centerVec4 / centerVec4.w;
-
-	Math::vec3 eye = center - (p_lightDir * radius * 2.0f);
-
-	auto viewMat = Math::lookAt(eye, center, Math::vec3(0.0f, 1.0f, 0.0f));
-	auto projMat = Math::ortho(-radius, radius,-radius, radius, -radius * ZExtend, radius * ZExtend);
+	Math::vec3 lightEye = Math::vec3(snappedCenter) - p_lightDir * radius * 2.0f;
+	auto viewMat = Math::lookAt(lightEye, Math::vec3(snappedCenter), Math::vec3(0.0f, 1.0f, 0.0f));
+	auto projMat = Math::ortho(-radius, radius, -radius, radius, -radius * ZExtend, radius * ZExtend);
 
 	p_cascadeShadowRadiusRatio = radius;
 	return projMat * viewMat;

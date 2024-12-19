@@ -84,10 +84,6 @@ namespace PrRenderer::Core
 			m_renderContext.brdfLUT != nullptr
 			)
 		{
-			m_renderContext.IRMap->Unbind(4);
-			m_renderContext.prefilterMap->Unbind(5);
-			m_renderContext.brdfLUT->Unbind(6);
-
 			m_renderContext.IRMap.reset();
 			m_renderContext.prefilterMap.reset();
 			m_renderContext.brdfLUT.reset();
@@ -155,7 +151,7 @@ namespace PrRenderer::Core
 
 			for (int i = 0; i < SHADOW_CASCADES_COUNT; i++)
 			{
-				auto lightMat = m_CSMUtility.ClaculateFrustrums(m_settings->cascadeShadowRadiusRatio[i], i, lightDir, camera->GetViewMatrix(), m_settings->dirLightCombineMapSize, m_settings->dirLightCascadeExtend);
+				auto lightMat = m_CSMUtility.ClaculateFrustrums(m_settings->cascadeShadowRadiusRatio[i], i, lightDir, camera->GetViewMatrix(), m_settings->dirLightShadowsMapSize, m_settings->dirLightCascadeExtend);
 				auto viewport = CalculateLightTexture(light->shadowMapPos * SHADOW_CASCADES_COUNT + i, m_settings->dirLightShadowsMapSize, m_settings->dirLightCombineMapSize);
 				light->viewMatrices.push_back(lightMat);
 
@@ -818,6 +814,12 @@ namespace PrRenderer::Core
 			material->SetTexture("PBR_prefilterMap", p_renderContext->prefilterMap);
 			material->SetTexture("PBR_brdfLUT", p_renderContext->brdfLUT);
 		}
+		else
+		{
+			material->SetTexture("PBR_irradianceMap", nullptr);
+			material->SetTexture("PBR_prefilterMap", nullptr);
+			material->SetTexture("PBR_brdfLUT", nullptr);
+		}
 
 		material->Bind();
 		renderVA->Bind();
@@ -1218,6 +1220,13 @@ namespace PrRenderer::Core
 		p_renderContext->quadMesh->Bind();
 		LowRenderer::Draw(p_renderContext->quadMesh->GetVertexArray());
 		p_renderContext->frameInfo->drawCalls++;
+
+		if (p_renderContext->IRMap && p_renderContext->prefilterMap && p_renderContext->brdfLUT)
+		{
+			p_renderContext->IRMap->Unbind(8);
+			p_renderContext->prefilterMap->Unbind(9);
+			p_renderContext->brdfLUT->Unbind(10);
+		}
 
 		p_renderContext->quadMesh->Unbind();
 
