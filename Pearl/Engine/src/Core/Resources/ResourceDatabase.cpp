@@ -3,6 +3,7 @@
 #include "Core/Resources/ResourceDatabase.h"
 #include "Core/Resources/IResourceDataLoader.h"
 #include "Core/Utils/PathUtils.h"
+#include "Core/Utils/StringUtils.h"
 
 #include "Core/Events/EventManager.h"
 #include "Core/Events/ResourceEvents.h"
@@ -20,10 +21,11 @@ ResourceDatabase::~ResourceDatabase()
 ResourceDescPtr ResourceDatabase::Load(const std::string& p_path, std::shared_ptr<IResourceDataLoader> p_loader /*= nullptr*/)
 {
 	PR_ASSERT(!p_path.empty(), "Resource path is empty");
+	auto lowerPath = PrCore::StringUtils::ToLower(p_path);
 
-	auto resourceDesc = ResourceByPath(p_path);
+	auto resourceDesc = ResourceByPath(lowerPath);
 	if (resourceDesc == nullptr)
-		resourceDesc = RegisterFileResourcePrivate(p_path);
+		resourceDesc = RegisterFileResourcePrivate(lowerPath);
 	
 	if (resourceDesc->state == ResourceState::Unloaded || resourceDesc->state == ResourceState::Registered)
 		LoadResourcePrivate(resourceDesc, p_loader);
@@ -60,11 +62,12 @@ ResourceDescPtr ResourceDatabase::Load(ResourceID p_id, std::shared_ptr<IResourc
 void ResourceDatabase::Unload(const std::string& p_path)
 {
 	PR_ASSERT(!p_path.empty(), "Resource path is empty");
+	auto lowerPath = PrCore::StringUtils::ToLower(p_path);
 
-	auto resourceDesc = ResourceByPath(p_path);
+	auto resourceDesc = ResourceByPath(lowerPath);
 	if (resourceDesc == nullptr)
 	{
-		PRLOG_WARN("Cannot unload resource with path \"{0}\". Resource does not exist.", p_path);
+		PRLOG_WARN("Cannot unload resource with path \"{0}\". Resource does not exist.", lowerPath);
 		return;
 	}
 
@@ -128,11 +131,12 @@ PrCore::Resources::ResourceDescPtr ResourceDatabase::Get(ResourceID p_id)
 PrCore::Resources::ResourceDescPtr ResourceDatabase::Get(const std::string& p_path)
 {
 	PR_ASSERT(!p_path.empty(), "Resource path is empty");
+	auto lowerPath = PrCore::StringUtils::ToLower(p_path);
 
-	auto resourceDesc = ResourceByPath(p_path);
+	auto resourceDesc = ResourceByPath(lowerPath);
 	if (resourceDesc == nullptr)
 	{
-		PRLOG_WARN("Cannot load resource with path \"{0}\". Resource is not registered.", p_path);
+		PRLOG_WARN("Cannot load resource with path \"{0}\". Resource is not registered.", lowerPath);
 		return nullptr;
 	}
 
@@ -152,14 +156,17 @@ PrCore::Resources::ResourceDescPtr ResourceDatabase::Register(IResourceDataPtr p
 
 PrCore::Resources::ResourceDescPtr ResourceDatabase::Register(const std::string& p_path)
 {
-	auto resourceDesc = ResourceByPath(p_path);
+	PR_ASSERT(!p_path.empty(), "Resource path is empty");
+	auto lowerPath = PrCore::StringUtils::ToLower(p_path);
+
+	auto resourceDesc = ResourceByPath(lowerPath);
 	if (resourceDesc)
 	{
-		PRLOG_WARN("Resource with path \"{0}\" already registered. Returning already registered", p_path);
+		PRLOG_WARN("Resource with path \"{0}\" already registered. Returning already registered", lowerPath);
 		return resourceDesc;
 	}
 
-	return RegisterFileResourcePrivate(p_path);
+	return RegisterFileResourcePrivate(lowerPath);
 }
 
 
@@ -304,8 +311,9 @@ bool PrCore::Resources::ResourceDatabase::LoadResourcePrivate(const ResourceDesc
 PrCore::Resources::IResourceDataLoader* PrCore::Resources::ResourceDatabase::GetLoader(const std::string& p_fileExtension)
 {
 	PR_ASSERT(!p_fileExtension.empty(), "File extension is empty");
+	auto lowerExt = PrCore::StringUtils::ToLower(p_fileExtension);
 
-	auto it = m_loaders.find(p_fileExtension);
+	auto it = m_loaders.find(lowerExt);
 	if (it == m_loaders.end())
 		return nullptr;
 
@@ -315,8 +323,11 @@ PrCore::Resources::IResourceDataLoader* PrCore::Resources::ResourceDatabase::Get
 
 PrCore::Resources::ResourceDescPtr ResourceDatabase::SaveToFileAndLoad(ResourceID p_sourceId, const std::string& p_path)
 {
+	PR_ASSERT(!p_path.empty(), "File path is empty");
+	auto lowerPath = PrCore::StringUtils::ToLower(p_path);
+
 	// Save to File
-	bool success = SaveToFile(p_sourceId, p_path);
+	bool success = SaveToFile(p_sourceId, lowerPath);
 
 	if (!success)
 	{
@@ -326,11 +337,14 @@ PrCore::Resources::ResourceDescPtr ResourceDatabase::SaveToFileAndLoad(ResourceI
 
 	auto customLoaderIt = m_customLoaders.find(p_sourceId);
 	auto customLoader = customLoaderIt != m_customLoaders.end() ? customLoaderIt->second : nullptr;
-	return Load(p_path, customLoader);
+	return Load(lowerPath, customLoader);
 }
 
 bool ResourceDatabase::SaveToFile(ResourceID p_sourceId, const std::string& p_path)
 {
+	PR_ASSERT(!p_path.empty(), "File path is empty");
+	auto lowerPath = PrCore::StringUtils::ToLower(p_path);
+
 	// Get Load if necessary
 	auto resourceDesc = Get(p_sourceId);
 	if (resourceDesc == nullptr)
@@ -341,15 +355,15 @@ bool ResourceDatabase::SaveToFile(ResourceID p_sourceId, const std::string& p_pa
 	auto customLoaderIt = m_customLoaders.find(resourceDesc->id);
 	if (customLoaderIt != m_customLoaders.end())
 	{
-		success = customLoaderIt->second->SaveResourceOnDisc(resourceDesc->data, p_path);
+		success = customLoaderIt->second->SaveResourceOnDisc(resourceDesc->data, lowerPath);
 	}
 	else
 	{
-		auto loaderIt = m_loaders.find(PathUtils::GetExtension(p_path));
+		auto loaderIt = m_loaders.find(PathUtils::GetExtension(lowerPath));
 		PR_ASSERT(loaderIt != m_loaders.end(), "Cannot unload resource. Resource loader not registered.");
 
 		if (loaderIt != m_loaders.end())
-			success = loaderIt->second->SaveResourceOnDisc(resourceDesc->data, p_path);
+			success = loaderIt->second->SaveResourceOnDisc(resourceDesc->data, lowerPath);
 	}
 	
 	return success;
@@ -376,11 +390,12 @@ void ResourceDatabase::RemoveAll()
 PrCore::Resources::ResourceDescPtr ResourceDatabase::GetMetadata(const std::string& p_path)
 {
 	PR_ASSERT(!p_path.empty(), "Resource path is empty");
+	auto lowerPath = PrCore::StringUtils::ToLower(p_path);
 
-	auto resourceDesc = ResourceByPath(p_path);
+	auto resourceDesc = ResourceByPath(lowerPath);
 	if (resourceDesc == nullptr)
 	{
-		PRLOG_WARN("Cannot unload resource with path \"{0}\". Resource is not registered.", p_path);
+		PRLOG_WARN("Cannot unload resource with path \"{0}\". Resource is not registered.", lowerPath);
 		return nullptr;
 	}
 
@@ -419,12 +434,13 @@ void ResourceDatabase::UnloadAll()
 void ResourceDatabase::UnregisterLoader(const std::string& p_fileExtension)
 {
 	PR_ASSERT(!p_fileExtension.empty(), "File extension is empty");
+	auto lowerExt = PrCore::StringUtils::ToLower(p_fileExtension);
 
-	auto it = m_loaders.find(p_fileExtension);
+	auto it = m_loaders.find(lowerExt);
 
 	if (it == m_loaders.end())
 	{
-		PRLOG_WARN("Loader with extension \"{0}\" is not registered. Cannot unregister the loader.", p_fileExtension);
+		PRLOG_WARN("Loader with extension \"{0}\" is not registered. Cannot unregister the loader.", lowerExt);
 		return;
 	}
 

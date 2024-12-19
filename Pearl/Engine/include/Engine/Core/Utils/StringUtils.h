@@ -18,6 +18,18 @@ namespace PrCore::StringUtils {
 		}
 	}
 
+	inline std::string ToLower(const std::string& p_text)
+	{
+		std::string retPath;
+		retPath.resize(p_text.size());
+		for (int i=0;i< p_text.size(); i++)
+		{
+			retPath[i] = static_cast<char>(std::tolower(static_cast<unsigned int>(p_text[i])));
+		}
+
+		return retPath;
+	}
+
 	inline void ToLower(std::string& p_text)
 	{
 		for(auto& ch : p_text)
@@ -42,6 +54,18 @@ namespace PrCore::StringUtils {
 		{
 			ch = static_cast<char>(std::toupper(static_cast<unsigned int>(ch)));
 		}
+	}
+
+	inline std::string ToUpper(const std::string& p_text)
+	{
+		std::string retPath;
+		retPath.resize(p_text.size());
+		for (int i = 0; i < p_text.size(); i++)
+		{
+			retPath[i] = static_cast<char>(std::toupper(static_cast<unsigned int>(p_text[i])));
+		}
+
+		return retPath;
 	}
 
 	template<typename T>
