@@ -110,12 +110,12 @@ void RenderStressTest::OnUpdate(float p_dt)
 		}
 	}
 
-	for (auto [entity, transform, light, mesh] : m_entityViewer.EntitesWithComponents<TransformComponent, LightComponent, MeshRendererComponent>())
+	for (auto [entity, transform, light] : m_entityViewer.EntitesWithComponents<TransformComponent, LightComponent>())
 	{
 		//This is selected light
 		if (entity.GetComponent<NameComponent>()->name == "Light" + std::to_string(m_selectedLight))
 		{
-			auto box = mesh->mesh->GetBoxVolume();
+			//auto box = mesh->mesh->GetBoxVolume();
 
 			auto position = transform->GetPosition();
 			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::UP))
@@ -148,15 +148,15 @@ void RenderStressTest::OnUpdate(float p_dt)
 
 			light->m_light->SetColor(color);
 
-			mesh->mainMaterial->SetProperty("albedoValue", static_cast<PrCore::Math::vec4>(PrCore::Math::max(static_cast<PrCore::Math::vec4>(color), 0.0f)));
+			//mesh->mainMaterial->SetProperty("albedoValue", static_cast<PrCore::Math::vec4>(PrCore::Math::max(static_cast<PrCore::Math::vec4>(color), 0.0f)));
 
 			transform->SetPosition(position);
 			transform->GenerateWorldMatrix();
 
-			Math::mat4 transformMat = Math::translate(Math::mat4(1.0f), box.GetCenter())
-				* Math::scale(Math::mat4(1.0f), box.GetSize() * 1.2f);
+			//Math::mat4 transformMat = Math::translate(Math::mat4(1.0f), box.GetCenter())
+				//* Math::scale(Math::mat4(1.0f), box.GetSize() * 1.2f);
 
-			renderSystem->DrawDebugCube(transform->GetWorldMatrix() * transformMat, true);
+			renderSystem->DrawDebugCube(transform->GetWorldMatrix(), true);
 			if(light->m_shadowCast)
 				renderSystem->DrawDebugSphere(position + 0.5f, 0.2f, true);
 		}

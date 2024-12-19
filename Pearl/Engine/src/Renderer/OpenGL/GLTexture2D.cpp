@@ -60,6 +60,11 @@ void GLTexture2D::Apply()
 		glTexImage2D(GL_TEXTURE_2D, 0, TextureFormatToInternalGL(m_format), m_width, m_height, 0, TextureFormatToGL(m_format), TextureFormatToDataTypeGL(m_format), m_rawData);
 		CalculateSize();
 	}
+	else
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, TextureFormatToInternalGL(m_format), m_width, m_height, 0, TextureFormatToGL(m_format), TextureFormatToDataTypeGL(m_format), nullptr);
+		CalculateSize();
+	}
 
 	if (m_mipmap)
 		glGenerateMipmap(GL_TEXTURE_2D);
@@ -67,28 +72,34 @@ void GLTexture2D::Apply()
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void GLTexture2D::ClearWithColor(const PrRenderer::Core::Color& p_color)
+{
+	glClearTexImage(m_ID, 0, TextureFormatToGL(m_format), GL_FLOAT, &p_color);
+}
+
 void GLTexture2D::CalculateSize()
 {
-	PR_ASSERT(m_rawData != nullptr, "Texture data is not loaded");
-
 	m_size = sizeof(GLTexture2D);
 
-	switch (m_format)
+	if (m_rawData)
 	{
-	case Resources::TextureFormat::R8:
-		m_size += m_width * m_height * 8;
-		break;
-	case Resources::TextureFormat::RG16:
-		m_size += m_width * m_height * 2 * 8;
-		break;
-	case Resources::TextureFormat::RGB24:
-		m_size += m_width * m_height * 3 * 8;
-		break;
-	case Resources::TextureFormat::RGBA32:
-		m_size += m_width * m_height * 4 * 8;
-		break;
-	default:
-		break;
+		switch (m_format)
+		{
+		case Resources::TextureFormat::R8:
+			m_size = m_width * m_height * 8;
+			break;
+		case Resources::TextureFormat::RG16:
+			m_size = m_width * m_height * 2 * 8;
+			break;
+		case Resources::TextureFormat::RGB24:
+			m_size = m_width * m_height * 3 * 8;
+			break;
+		case Resources::TextureFormat::RGBA32:
+			m_size = m_width * m_height * 4 * 8;
+			break;
+		default:
+			break;
+		}
 	}
 }
 

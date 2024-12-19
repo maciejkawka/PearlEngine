@@ -81,8 +81,19 @@ void GLCubemap::Apply()
 	{
 		auto dataPtr = reinterpret_cast<unsigned char**>(m_rawDataArray);
 		for (int i = 0; i < 6; i++)
+		{
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, TextureFormatToInternalGL(m_format), m_width, m_height, 0,
 				TextureFormatToGL(m_format), TextureFormatToDataTypeGL(m_format), dataPtr[i]);
+		}
+		CalculateSize();
+	}
+	else
+	{
+		for (int i = 0; i < 6; i++)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, TextureFormatToInternalGL(m_format), m_width, m_height, 0,
+				TextureFormatToGL(m_format), TextureFormatToDataTypeGL(m_format), nullptr);
+		}
 		CalculateSize();
 	}
 
@@ -94,6 +105,11 @@ void GLCubemap::Apply()
 	}
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
+void GLCubemap::ClearWithColor(const Core::Color& p_color)
+{
+	glClearTexImage(m_ID, 0, TextureFormatToGL(m_format), GL_FLOAT, &p_color);
 }
 
 void GLCubemap::GenerateMipMaps()

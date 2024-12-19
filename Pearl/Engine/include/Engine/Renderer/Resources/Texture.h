@@ -69,6 +69,8 @@ namespace PrRenderer::Resources {
 		virtual void GenerateMipMaps() = 0;
 		virtual void Apply() = 0;
 
+		virtual void ClearWithColor(const Core::Color& p_color) = 0;
+
 		inline virtual void SetMipMap(bool p_mipmap) { m_mipmap = p_mipmap; }
 		inline virtual void SetReadable(bool p_readable) { m_readable = p_readable; }
 

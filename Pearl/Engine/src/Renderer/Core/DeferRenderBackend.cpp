@@ -475,10 +475,10 @@ namespace PrRenderer::Core
 					continue;
 
 				// Naive way to cull object, this should be a AABB-SPHERE Intersection in the future
-				PrCore::Math::vec3 objectPos{ object->worldMat[3].x, object->worldMat[3].y, object->worldMat[3].z };
-				auto dist = PrCore::Math::length(objectPos - lightPos);
-				if (dist > p_light->GetRange())
-					continue;
+				//PrCore::Math::vec3 objectPos{ object->worldMat[3].x, object->worldMat[3].y, object->worldMat[3].z };
+				//auto dist = PrCore::Math::length(objectPos - lightPos);
+				//if (dist > p_light->GetRange())
+					//continue;
 
 				p_pointShadowMapShader->SetUniformMat4("PIPELINE_MODEL_MAT", object->worldMat);
 				p_pointShadowMapShader->SetUniformInt("PIPELINE_INTANCE_COUNT", 0);

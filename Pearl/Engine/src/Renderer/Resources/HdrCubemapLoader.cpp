@@ -71,9 +71,7 @@ PrCore::Resources::IResourceDataPtr HdrCubemapLoader::LoadResource(const std::st
 	framebuffer->Unbind();
 	cube->Unbind();
 
-	//Set cubemap
-	auto cubemap = Cubemap::Create(framebuffer->GetTextureID(), fbSettings.globalHeight, fbSettings.globalWidth, fbTex.format);
-	return cubemap;
+	return std::static_pointer_cast<Resources::Cubemap>(framebuffer->GetTexturePtr());
 }
 
 void HdrCubemapLoader::UnloadResource(PrCore::Resources::IResourceDataPtr p_resourceData)

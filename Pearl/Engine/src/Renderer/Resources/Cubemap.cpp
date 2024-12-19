@@ -45,13 +45,16 @@ std::shared_ptr<Cubemap> Cubemap::CreateUnitTex(const Core::Color& p_unitColor)
 	// Create empty texture and fills it with unit data
 	auto texture = Create();
 
-	unsigned char* rawImage = new unsigned char[4];
+	unsigned char** rawImage = new unsigned char*[6];
 
-	//Pink color
-	rawImage[0] = p_unitColor.r;
-	rawImage[1] = p_unitColor.g;
-	rawImage[2] = p_unitColor.b;
-	rawImage[3] = p_unitColor.a;
+	for (int i = 0; i < 6; i++)
+	{
+		rawImage[i] = new unsigned char[4];
+		rawImage[i][0] = p_unitColor.r;
+		rawImage[i][1] = p_unitColor.g;
+		rawImage[i][2] = p_unitColor.b;
+		rawImage[i][3] = p_unitColor.a;
+	}
 
 	texture->SetData(rawImage);
 	texture->SetFormat(TextureFormat::RGBA32);
@@ -63,6 +66,10 @@ std::shared_ptr<Cubemap> Cubemap::CreateUnitTex(const Core::Color& p_unitColor)
 	texture->Apply();
 	texture->SetData(nullptr);
 
+	for (int i = 0; i < 6; i++)
+	{
+		delete[] rawImage[i];
+	}
 	delete[] rawImage;
 
 	return texture;

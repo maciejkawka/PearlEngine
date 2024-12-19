@@ -85,23 +85,21 @@ namespace PrRenderer::Buffers {
 		virtual void Unbind() = 0;
 		virtual void SetAttachmentDetails(int p_attachment, int p_textureTarget, int p_mipLevel = 0) = 0;
 		virtual void Resize(size_t width, size_t height) = 0;
-		virtual void ClearAttachmentColor(unsigned int p_attachment, Core::Color p_color) = 0;
+		virtual void ClearAttachmentColor(unsigned int p_attachemntIndex, const Core::Color& p_color) = 0;
 		
 		virtual Resources::TexturePtr GetTexturePtr(unsigned int p_index = 0) = 0;
 		virtual Resources::TexturePtr GetDepthTexturePtr() = 0;
-		virtual RendererID GetTextureID(unsigned int p_index = 0) = 0;
 
 		inline const FramebufferSettings& GetSettings() const { return m_settings; }
-		inline RendererID GetID() const { return m_ID; }
+		inline RendererID                 GetID() const { return m_ID; }
 
 		static FramebuffferPtr Create(const FramebufferSettings& p_settings);
 
 	protected:
-		RendererID m_ID;
-		std::vector<RendererID> m_colorTextureIDs;
-		RendererID m_depthTextureID;
-
-		FramebufferSettings m_settings;
+		RendererID                          m_ID;
+		FramebufferSettings                 m_settings;
+		Resources::TexturePtr               m_depthTexture;
+		std::vector<Resources::TexturePtr>  m_colorTextures;
 	};
 
 	typedef std::shared_ptr<Framebufffer> FramebuffferPtr;
