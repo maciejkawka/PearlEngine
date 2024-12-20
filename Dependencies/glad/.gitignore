@@ -1,0 +1,9 @@
+#VisualStudio
+.vs/
+
+
+#Binaries
+lib/
+lib-int/
+
+

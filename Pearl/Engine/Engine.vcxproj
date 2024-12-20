@@ -198,6 +198,11 @@
     <None Include="include\Engine\Core\ECS\SystemManager.inl" />
     <None Include="include\Engine\Core\Resources\ResourceSystem.inl" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Dependencies\glad\glad.vcxproj">
+      <Project>{791f9e27-64b0-4b70-aa00-faf547a97ad0}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -266,8 +271,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfw3.lib;physfs-static.lib;opengl32.lib;glad.lib;Shlwapi.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../../Dependencies/glfw/lib;../../Dependencies/glad/lib;../../Dependencies/physfs/lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;physfs-static.lib;Shlwapi.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../Dependencies/glfw/lib/Debug;../../Dependencies/physfs/lib/Debug</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -296,7 +301,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>glfw3.lib;physfs-static.lib;Shlwapi.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../../Dependencies/glfw/lib;../../Dependencies/physfs/lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../Dependencies/glfw/lib/Release;../../Dependencies/physfs/lib/Release</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
