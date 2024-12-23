@@ -31,3 +31,11 @@ void Logger::Init()
 
 	PRLOG_INFO("Init Logger");
 }
+
+void Logger::Terminate()
+{
+	s_mainLogger.reset();
+	s_fileLogger.reset();
+
+	spdlog::shutdown();
+}

@@ -19,6 +19,7 @@ namespace PrCore::Utils {
 		~Logger() = delete;
 
 		static void Init();
+		static void Terminate();
 
 		inline static std::shared_ptr<spdlog::logger> GetMainLogger() { return s_mainLogger; }
 		inline static std::shared_ptr<spdlog::logger> GetFileLogger() { return s_fileLogger; }

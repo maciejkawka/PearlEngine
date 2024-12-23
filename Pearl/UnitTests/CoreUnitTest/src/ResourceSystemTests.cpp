@@ -148,7 +148,7 @@ TEST_F(ResourceSystemTest, LoadFromFile)
 
 	// Load the first
 	ResourceDescPtr resource = dataBase.Load("Foo.test");
-	EXPECT_TRUE(resource->filePath == "Foo.test");
+	EXPECT_TRUE(resource->filePath == "foo.test");
 	EXPECT_TRUE(resource->origin == ResourceOrigin::File);
 	EXPECT_TRUE(resource->size == sizeof(TestResource));
 	EXPECT_TRUE(resource->state == ResourceState::Loaded);
@@ -161,7 +161,7 @@ TEST_F(ResourceSystemTest, LoadFromFile)
 
 	// Load the second
 	ResourceDescPtr resource1 = dataBase.Load("Bar.test1");
-	EXPECT_TRUE(resource1->filePath == "Bar.test1");
+	EXPECT_TRUE(resource1->filePath == "bar.test1");
 	EXPECT_TRUE(resource1->origin == ResourceOrigin::File);
 	EXPECT_TRUE(resource1->size == sizeof(TestResource));
 	EXPECT_TRUE(resource1->state == ResourceState::Loaded);
@@ -175,7 +175,7 @@ TEST_F(ResourceSystemTest, LoadFromFile)
 	// Load with custom loader
 	auto customLoader = std::make_shared<CustomTestLoader>();
 	ResourceDescPtr resource2 = dataBase.Load("Dar.test", customLoader);
-	EXPECT_TRUE(resource2->filePath == "Dar.test");
+	EXPECT_TRUE(resource2->filePath == "dar.test");
 	EXPECT_TRUE(resource2->origin == ResourceOrigin::File);
 	EXPECT_TRUE(resource2->size == sizeof(TestResource));
 	EXPECT_TRUE(resource2->state == ResourceState::Loaded);
@@ -199,7 +199,7 @@ TEST_F(ResourceSystemTest, UnloadFromFile)
 	ResourceDescPtr resource = dataBase.Load("Foo.test");
 	dataBase.Unload("Foo.test");
 	EXPECT_TRUE(resource->data == nullptr);
-	EXPECT_TRUE(resource->filePath == "Foo.test");
+	EXPECT_TRUE(resource->filePath == "foo.test");
 	EXPECT_TRUE(resource->origin == ResourceOrigin::File);
 	EXPECT_TRUE(resource->state == ResourceState::Unloaded);
 	EXPECT_TRUE(resource->size == 0);
@@ -207,7 +207,7 @@ TEST_F(ResourceSystemTest, UnloadFromFile)
 	
 	//Load Again
 	dataBase.Load("Foo.test");
-	EXPECT_TRUE(resource->filePath == "Foo.test");
+	EXPECT_TRUE(resource->filePath == "foo.test");
 	EXPECT_TRUE(resource->origin == ResourceOrigin::File);
 	EXPECT_TRUE(resource->size == sizeof(TestResource));
 	EXPECT_TRUE(resource->state == ResourceState::Loaded);
@@ -215,7 +215,7 @@ TEST_F(ResourceSystemTest, UnloadFromFile)
 	
 	//Unload by ID
 	dataBase.Unload(resource->id);
-	EXPECT_TRUE(resource->filePath == "Foo.test");
+	EXPECT_TRUE(resource->filePath == "foo.test");
 	EXPECT_TRUE(resource->origin == ResourceOrigin::File);
 	EXPECT_TRUE(resource->size == 0);
 	EXPECT_TRUE(resource->state == ResourceState::Unloaded);
@@ -256,7 +256,7 @@ TEST_F(ResourceSystemTest, RegisterFromFile)
 
 	// Register resource
 	auto resource = dataBase.Register("Foo.test");
-	EXPECT_TRUE(resource->filePath == "Foo.test");
+	EXPECT_TRUE(resource->filePath == "foo.test");
 	EXPECT_TRUE(resource->origin == ResourceOrigin::File);
 	EXPECT_TRUE(resource->size == 0);
 	EXPECT_TRUE(resource->state == ResourceState::Registered);
@@ -269,7 +269,7 @@ TEST_F(ResourceSystemTest, RegisterFromFile)
 
 	// Unregister without unloading
 	dataBase.Remove(resource->id);
-	EXPECT_TRUE(resource->filePath == "Foo.test");
+	EXPECT_TRUE(resource->filePath == "foo.test");
 	EXPECT_TRUE(resource->origin == ResourceOrigin::File);
 	EXPECT_TRUE(resource->size == 0);
 	EXPECT_TRUE(resource->state == ResourceState::Unmanaged);
@@ -281,7 +281,7 @@ TEST_F(ResourceSystemTest, RegisterFromFile)
 	resource = dataBase.Load(resource->id);
 	dataBase.Unload(resource->id);
 	dataBase.Remove(resource->id);
-	EXPECT_TRUE(resource->filePath == "Foo.test");
+	EXPECT_TRUE(resource->filePath == "foo.test");
 	EXPECT_TRUE(resource->origin == ResourceOrigin::File);
 	EXPECT_TRUE(resource->size == 0);
 	EXPECT_TRUE(resource->state == ResourceState::Unmanaged);
@@ -303,9 +303,9 @@ TEST_F(ResourceSystemTest, RegisterFromFile)
 	EXPECT_TRUE(resource3->data == nullptr);
 	EXPECT_TRUE(resource3->state == ResourceState::Unmanaged);
 
-	// Register the same, it should return the previously registered
+	// Register the same, it should return the previously registered spelling should does not matter
 	auto sameRes = dataBase.Register("Same.test");
-	auto sameRes1 = dataBase.Register("Same.test");
+	auto sameRes1 = dataBase.Register("same.test");
 	EXPECT_EQ(sameRes->id, sameRes1->id);
 	// Check if logged warning
 	
@@ -325,14 +325,14 @@ TEST_F(ResourceSystemTest, GetFromFile)
 	auto resource = dataBase.Register("Foo.test");
 	dataBase.Load(resource->id);
 	auto getResourceId = dataBase.Get(resource->id);
-	EXPECT_TRUE(getResourceId->filePath == "Foo.test");
+	EXPECT_TRUE(getResourceId->filePath == "foo.test");
 	EXPECT_TRUE(getResourceId->origin == ResourceOrigin::File);
 	EXPECT_TRUE(getResourceId->size == sizeof(TestResource));
 	EXPECT_TRUE(getResourceId->state == ResourceState::Loaded);
 	EXPECT_TRUE(getResourceId->data != nullptr);
 
 	auto getResourcePath = dataBase.Get("Foo.test");
-	EXPECT_TRUE(getResourcePath->filePath == "Foo.test");
+	EXPECT_TRUE(getResourcePath->filePath == "foo.test");
 	EXPECT_TRUE(getResourcePath->origin == ResourceOrigin::File);
 	EXPECT_TRUE(getResourcePath->size == sizeof(TestResource));
 	EXPECT_TRUE(getResourcePath->state == ResourceState::Loaded);
@@ -342,7 +342,7 @@ TEST_F(ResourceSystemTest, GetFromFile)
 	// Get without loading by ID and path
 	resource = dataBase.Register("Foo.test");
 	getResourceId = dataBase.Get(resource->id);
-	EXPECT_TRUE(getResourceId->filePath == "Foo.test");
+	EXPECT_TRUE(getResourceId->filePath == "foo.test");
 	EXPECT_TRUE(getResourceId->origin == ResourceOrigin::File);
 	EXPECT_TRUE(getResourceId->size == sizeof(TestResource));
 	EXPECT_TRUE(getResourceId->state == ResourceState::Loaded);
@@ -350,7 +350,7 @@ TEST_F(ResourceSystemTest, GetFromFile)
 	// Check if FireCacheMiss event was triggered
 
 	getResourcePath = dataBase.Get("Foo.test");
-	EXPECT_TRUE(getResourcePath->filePath == "Foo.test");
+	EXPECT_TRUE(getResourcePath->filePath == "foo.test");
 	EXPECT_TRUE(getResourcePath->origin == ResourceOrigin::File);
 	EXPECT_TRUE(getResourcePath->size == sizeof(TestResource));
 	EXPECT_TRUE(getResourcePath->state == ResourceState::Loaded);
@@ -437,7 +437,7 @@ TEST_F(ResourceSystemTest, ResourcesFromMemory)
 
 	// Save to file
 	auto loaderPtr = static_cast<TestLoader*>(dataBase.GetLoader(".test"));
-	EXPECT_CALL(*loaderPtr, SaveResourceOnDisc(::testing::_, "Save.test")).Times(2).WillRepeatedly(::testing::Return(true));
+	EXPECT_CALL(*loaderPtr, SaveResourceOnDisc(::testing::_, "save.test")).Times(2).WillRepeatedly(::testing::Return(true));
 
 	auto resourceSave = dataBase.Register(resourceData);
 	dataBase.SaveToFile(resourceSave->id, "Save.test");
@@ -448,10 +448,10 @@ TEST_F(ResourceSystemTest, ResourcesFromMemory)
 	EXPECT_TRUE(resourceSave->data == resourceData);
 
 	// Calling with wrong extension will break
-	EXPECT_DEATH(dataBase.SaveToFile(resourceSave->id, "Save.shouldNotWork"), ".*");
+	EXPECT_DEATH(dataBase.SaveToFile(resourceSave->id, "save.shouldNotWork"), ".*");
 
 	auto savedAndLoadedResource = dataBase.SaveToFileAndLoad(resourceSave->id, "Save.test");
-	EXPECT_TRUE(savedAndLoadedResource->filePath == "Save.test");
+	EXPECT_TRUE(savedAndLoadedResource->filePath == "save.test");
 	EXPECT_TRUE(savedAndLoadedResource->origin == ResourceOrigin::File);
 	EXPECT_TRUE(savedAndLoadedResource->size == sizeof(TestResource));
 	EXPECT_TRUE(savedAndLoadedResource->state == ResourceState::Loaded);
@@ -471,7 +471,7 @@ TEST_F(ResourceSystemTest, GeneralResourceSystem)
 
 	// FileResource operations
 	TestResourceHandle resHandle = resourceSystem->Register<TestResource>("Foo.test");
-	EXPECT_TRUE(resHandle.GetPath() == "Foo.test");
+	EXPECT_TRUE(resHandle.GetPath() == "foo.test");
 	EXPECT_TRUE(resHandle.GetOrigin() == ResourceOrigin::File);
 	EXPECT_TRUE(resHandle.GetSize() == 0);
 	EXPECT_TRUE(resHandle.GetState() == ResourceState::Registered);
@@ -479,7 +479,7 @@ TEST_F(ResourceSystemTest, GeneralResourceSystem)
 	EXPECT_TRUE(resHandle == nullptr);
 
 	resourceSystem->Load<TestResource>(resHandle.GetID());
-	EXPECT_TRUE(resHandle.GetPath() == "Foo.test");
+	EXPECT_TRUE(resHandle.GetPath() == "foo.test");
 	EXPECT_TRUE(resHandle.GetOrigin() == ResourceOrigin::File);
 	EXPECT_TRUE(resHandle.GetSize() == sizeof(TestResource));
 	EXPECT_TRUE(resHandle.GetState() == ResourceState::Loaded);
@@ -490,7 +490,7 @@ TEST_F(ResourceSystemTest, GeneralResourceSystem)
 	EXPECT_TRUE(resHandle->c == 3);
 
 	resourceSystem->Unload<TestResource>(resHandle.GetID());
-	EXPECT_TRUE(resHandle.GetPath() == "Foo.test");
+	EXPECT_TRUE(resHandle.GetPath() == "foo.test");
 	EXPECT_TRUE(resHandle.GetOrigin() == ResourceOrigin::File);
 	EXPECT_TRUE(resHandle.GetSize() == 0);
 	EXPECT_TRUE(resHandle.GetState() == ResourceState::Unloaded);
@@ -498,7 +498,7 @@ TEST_F(ResourceSystemTest, GeneralResourceSystem)
 	EXPECT_TRUE(resHandle == nullptr);
 
 	TestResourceHandle resHandleGet = resourceSystem->Get<TestResource>(resHandle.GetID());
-	EXPECT_TRUE(resHandleGet.GetPath() == "Foo.test");
+	EXPECT_TRUE(resHandleGet.GetPath() == "foo.test");
 	EXPECT_TRUE(resHandleGet.GetOrigin() == ResourceOrigin::File);
 	EXPECT_TRUE(resHandleGet.GetSize() == sizeof(TestResource));
 	EXPECT_TRUE(resHandleGet.GetState() == ResourceState::Loaded);
@@ -509,7 +509,7 @@ TEST_F(ResourceSystemTest, GeneralResourceSystem)
 	EXPECT_TRUE(resHandleGet->c == 3);
 
 	resourceSystem->Remove<TestResource>(resHandle.GetID());
-	EXPECT_TRUE(resHandle.GetPath() == "Foo.test");
+	EXPECT_TRUE(resHandle.GetPath() == "foo.test");
 	EXPECT_TRUE(resHandle.GetOrigin() == ResourceOrigin::File);
 	EXPECT_TRUE(resHandle.GetSize() == 0);
 	EXPECT_TRUE(resHandle.GetState() == ResourceState::Unmanaged);
@@ -567,7 +567,7 @@ TEST_F(ResourceSystemTest, GeneralResourceSystem)
 
 	
 	// Save to file
-	EXPECT_CALL(*loaderPtr, SaveResourceOnDisc(::testing::_, "Save.test")).Times(2).WillRepeatedly(::testing::Return(true));
+	EXPECT_CALL(*loaderPtr, SaveResourceOnDisc(::testing::_, "save.test")).Times(2).WillRepeatedly(::testing::Return(true));
 
 	auto resourceSave = resourceSystem->Register<TestResource>(resourceData);
 	resourceSystem->SaveToFile<TestResource>(resourceSave.GetID(), "Save.test");
@@ -581,7 +581,7 @@ TEST_F(ResourceSystemTest, GeneralResourceSystem)
 	EXPECT_DEATH(resourceSystem->SaveToFile<TestResource>(resourceSave.GetID(), "Save.shouldNotWork"), ".*");
 
 	auto savedAndLoadedResource = resourceSystem->SaveToFileAndLoad<TestResource>(resourceSave.GetID(), "Save.test");
-	EXPECT_TRUE(savedAndLoadedResource.GetPath() == "Save.test");
+	EXPECT_TRUE(savedAndLoadedResource.GetPath() == "save.test");
 	EXPECT_TRUE(savedAndLoadedResource.GetOrigin() == ResourceOrigin::File);
 	EXPECT_TRUE(savedAndLoadedResource.GetSize() == sizeof(TestResource));
 	EXPECT_TRUE(savedAndLoadedResource.GetState() == ResourceState::Loaded);
