@@ -381,6 +381,12 @@
     <ClInclude Include="include\Engine\Renderer\Resources\HdrCubemapLoader.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\Filesystem\FileSystemNew.h">
+      <Filter>Core\Filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Filesystem\FileWrapper.h">
+      <Filter>Core\Filesystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -574,6 +580,12 @@
     </ClCompile>
     <ClCompile Include="src\Renderer\Resources\HdrCubemapLoader.cpp">
       <Filter>Renderer\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Filesystem\FileSystemNew.cpp">
+      <Filter>Core\Filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Filesystem\FileWrapper.cpp">
+      <Filter>Core\Filesystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

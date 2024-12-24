@@ -13,5 +13,8 @@
     <ClCompile Include="src\ResourceSystemTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
+    <ClCompile Include="src\FileSystemTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

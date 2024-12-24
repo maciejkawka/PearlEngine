@@ -107,6 +107,7 @@ public:
 	{
 		//This will be replaced with mocked versions in the future when I implement system localizer 
 		PrCore::Events::EventManager::Terminate();
+		PrCore::Utils::Logger::Terminate();
 	}
 };
 
