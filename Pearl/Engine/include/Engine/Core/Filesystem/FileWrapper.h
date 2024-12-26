@@ -40,7 +40,7 @@ namespace PrCore::File {
 		int       GetSize();
 		FileStats GetStat();
 
-		const std::string& GetPath() const { return m_path; }
+		std::string_view GetPath() const { return m_path; }
 
 	private:
 		void PrintError();

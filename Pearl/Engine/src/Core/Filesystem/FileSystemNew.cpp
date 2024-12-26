@@ -30,33 +30,33 @@ void PrCore::File::FileSystemNew::PrintError()
 	}
 }
 
-void FileSystemNew::MountDir(const char* p_path, const char* p_mountPoint)
+void FileSystemNew::MountDir(std::string_view p_path, std::string_view p_mountPoint)
 {
-	if(!PHYSFS_mount(p_path, p_mountPoint, 1))
+	if(!PHYSFS_mount(p_path.data(), p_mountPoint.data(), 1))
 		PrintError();
 }
 
-void FileSystemNew::UnmountDir(const char* p_path)
+void FileSystemNew::UnmountDir(std::string_view p_path)
 {
-	if(!PHYSFS_unmount(p_path))
+	if(!PHYSFS_unmount(p_path.data()))
 		PrintError();
 }
 
-void FileSystemNew::OpenArchive(const char* p_path, const char* p_mountPoint)
+void FileSystemNew::OpenArchive(std::string_view p_path, std::string_view p_mountPoint)
 {
-	if(!PHYSFS_mount(p_path, p_mountPoint, 1))
+	if(!PHYSFS_mount(p_path.data(), p_mountPoint.data(), 1))
 		PrintError();
 }
 
-void FileSystemNew::CloseArchive(const char* p_path)
+void FileSystemNew::CloseArchive(std::string_view p_path)
 {
-	if(!PHYSFS_unmount(p_path))
+	if(!PHYSFS_unmount(p_path.data()))
 		PrintError();
 }
 
-void FileSystemNew::SetWriteDir(const char* p_path)
+void FileSystemNew::SetWriteDir(std::string_view p_path)
 {
-	if(!PHYSFS_setWriteDir(p_path))
+	if(!PHYSFS_setWriteDir(p_path.data()))
 		PrintError();
 }
 
@@ -77,22 +77,22 @@ const std::vector<std::string_view> FileSystemNew::GetMountPaths()
 	return retVec;
 }
 
-void FileSystemNew::CreateDir(const char* p_path)
+void FileSystemNew::CreateDir(std::string_view p_path)
 {
-	if(!PHYSFS_mkdir(p_path))
+	if(!PHYSFS_mkdir(p_path.data()))
 		PrintError();
 }
 
-void FileSystemNew::DeleteDir(const char* p_path)
+void FileSystemNew::DeleteDir(std::string_view p_path)
 {
-	if(!PHYSFS_delete(p_path))
+	if(!PHYSFS_delete(p_path.data()))
 		PrintError();
 }
 
-bool PrCore::File::FileSystemNew::IsDir(const char* p_path)
+bool PrCore::File::FileSystemNew::IsDir(std::string_view p_path)
 {
 	PHYSFS_Stat stat;
-	if (!PHYSFS_stat(p_path, &stat))
+	if (!PHYSFS_stat(p_path.data(), &stat))
 	{
 		PrintError();
 		return false;
@@ -101,21 +101,21 @@ bool PrCore::File::FileSystemNew::IsDir(const char* p_path)
 	return stat.filetype == PHYSFS_FILETYPE_DIRECTORY;
 }
 
-void PrCore::File::FileSystemNew::FileDelete(const char* p_path)
+void PrCore::File::FileSystemNew::FileDelete(std::string_view p_path)
 {
-	if(!PHYSFS_delete(p_path))
+	if(!PHYSFS_delete(p_path.data()))
 		PrintError();
 }
 
-bool PrCore::File::FileSystemNew::FileExist(const char* p_path)
+bool PrCore::File::FileSystemNew::FileExist(std::string_view p_path)
 {
-	return PHYSFS_exists(p_path);
+	return PHYSFS_exists(p_path.data());
 }
 
-bool PrCore::File::FileSystemNew::IsFile(const char* p_path)
+bool PrCore::File::FileSystemNew::IsFile(std::string_view p_path)
 {
 	PHYSFS_Stat stat;
-	if (!PHYSFS_stat(p_path, &stat))
+	if (!PHYSFS_stat(p_path.data(), &stat))
 	{
 		PrintError();
 		return false;
@@ -124,10 +124,10 @@ bool PrCore::File::FileSystemNew::IsFile(const char* p_path)
 	return stat.filetype == PHYSFS_FILETYPE_REGULAR;
 }
 
-FileStats FileSystemNew::GetStat(const char* p_path)
+FileStats FileSystemNew::GetStat(std::string_view p_path)
 {
 	PHYSFS_Stat physStat;
-	if (!PHYSFS_stat(p_path, &physStat))
+	if (!PHYSFS_stat(p_path.data(), &physStat))
 	{
 		PrintError();
 		return FileStats();
@@ -146,9 +146,9 @@ FileStats FileSystemNew::GetStat(const char* p_path)
 	}
 }
 
-std::vector<std::string> PrCore::File::FileSystemNew::EnumerateFiles(const char* p_path)
+std::vector<std::string> PrCore::File::FileSystemNew::EnumerateFiles(std::string_view p_path)
 {
-	char** rc = PHYSFS_enumerateFiles(p_path);
+	char** rc = PHYSFS_enumerateFiles(p_path.data());
 	char** i;
 	
 	if (rc == nullptr)
@@ -169,7 +169,7 @@ std::string_view PrCore::File::FileSystemNew::GetExecutablePath()
 	return PHYSFS_getBaseDir();
 }
 
-PrFilePtr PrCore::File::FileSystemNew::OpenFileWrapper(const char* p_path)
+PrFilePtr PrCore::File::FileSystemNew::OpenFileWrapper(std::string_view p_path)
 {
 	FileHandle handle = FileOpen(p_path, OpenMode::Read);
 	if (handle == nullptr)
@@ -179,20 +179,20 @@ PrFilePtr PrCore::File::FileSystemNew::OpenFileWrapper(const char* p_path)
 	return file;
 }
 
-FileHandle PrCore::File::FileSystemNew::FileOpen(const char* p_path, OpenMode p_openMode)
+FileHandle PrCore::File::FileSystemNew::FileOpen(std::string_view p_path, OpenMode p_openMode)
 {
 	FileHandle handle;
 	if (p_openMode == OpenMode::Append)
 	{
-		handle = PHYSFS_openAppend(p_path);
+		handle = PHYSFS_openAppend(p_path.data());
 	}
 	else if (p_openMode == OpenMode::Write)
 	{
-		handle = PHYSFS_openWrite(p_path);
+		handle = PHYSFS_openWrite(p_path.data());
 	}
 	else if (p_openMode == OpenMode::Read)
 	{
-		handle = PHYSFS_openRead(p_path);
+		handle = PHYSFS_openRead(p_path.data());
 	}
 	else
 	{

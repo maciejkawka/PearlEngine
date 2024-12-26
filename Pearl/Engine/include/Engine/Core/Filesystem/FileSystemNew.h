@@ -15,55 +15,55 @@ namespace PrCore::File {
 		Invalid    = 0,
 	};
 
+	// IMPORTANT!! FileSystem expects string_view paths to be NULL-terminated
 	class FileSystemNew : public Utils::Singleton<FileSystemNew> {
 	public:
 		// Mounts the directory to the seach paths, last opened has the highest priority
-		void MountDir(const char* p_path, const char* p_mountPoint = NULL);
+		void MountDir(std::string_view p_path, std::string_view p_mountPoint = "/");
+		
 		// Unmounts the directory from the seach path
-		void UnmountDir(const char* p_path);
+		void UnmountDir(std::string_view p_path);
 
-		// To be used later
-		void OpenArchive(const char* p_path, const char* p_mountPoint = NULL);
-		void CloseArchive(const char* p_path);
+		// To be used later, open and close zip archives, bind the zip to the mountPoint
+		void OpenArchive(std::string_view p_path, std::string_view p_mountPoint = "/");
+		void CloseArchive(std::string_view p_path);
 
 		// Writing directory is a directory where file system can write files
-		void                   SetWriteDir(const char* p_path);
+		void                   SetWriteDir(std::string_view p_path);
 		std::string_view       GetWriteDir();
 		
 		const std::vector<std::string_view> GetMountPaths();
 
-		void     CreateDir(const char* p_path);
-		void     DeleteDir(const char* p_path);
-		bool     IsDir(const char* p_path);
+		void     CreateDir(std::string_view p_path);
+		void     DeleteDir(std::string_view p_path);
+		bool     IsDir(std::string_view p_path);
 
-		void     FileDelete(const char* p_path);
-		bool     FileExist(const char* p_path);
-		bool     IsFile(const char* p_path);
+		void     FileDelete(std::string_view p_path);
+		bool     FileExist(std::string_view p_path);
+		bool     IsFile(std::string_view p_path);
 
-		FileStats                 GetStat(const char* p_path);
+		FileStats                 GetStat(std::string_view p_path);
 
 		// Enumerates files and dirs inside the p_path directory
-		std::vector<std::string>  EnumerateFiles(const char* p_path = "/");
+		std::vector<std::string>  EnumerateFiles(std::string_view p_path = "/");
 
 		// Main Engine Paths
-		void              SetEngineRoot(const char* p_root) { m_engineRoot = p_root; }
+		void              SetEngineRoot(std::string_view p_root) { m_engineRoot = p_root; }
 		std::string_view  GetEngineRoot() { return m_engineRoot; }
 
-		void              SetEngineAssetsPath(const char* p_assetPath) { m_engineAssets = p_assetPath; }
+		void              SetEngineAssetsPath(std::string_view p_assetPath) { m_engineAssets = p_assetPath; }
 		std::string_view  GetEngineAssetsPath() { return m_engineAssets; }
 
-		void              SetGameAssetsPath(const char* p_assetPath) { m_gameAssets = p_assetPath; }
+		void              SetGameAssetsPath(std::string_view p_assetPath) { m_gameAssets = p_assetPath; }
 		std::string_view  GetGameAssetsPath() { return m_gameAssets; }
 
 		std::string_view  GetExecutablePath();
 
-		// File manipulations
-
 		// Opens read only file handle wrapper to easier read contents 
-		PrFilePtr    OpenFileWrapper(const char* p_path);
+		PrFilePtr    OpenFileWrapper(std::string_view p_path);
 
 		// Opens write/read file returns handle, use below functions to read/write file
-		FileHandle   FileOpen(const char* p_path, OpenMode p_openMode = OpenMode::Read);
+		FileHandle   FileOpen(std::string_view p_path, OpenMode p_openMode = OpenMode::Read);
 		void         FileClose(FileHandle p_handle);
 
 		size_t       FileRead(FileHandle p_handle, void* p_buffer, size_t p_length);

@@ -20,8 +20,8 @@ public:
 		// Create UnitTests files
 		auto fileSystem = PrCore::File::FileSystemNew::GetInstancePtr();
 		auto exePath = fileSystem->GetExecutablePath();
-		fileSystem->SetWriteDir(exePath.data());
-		fileSystem->MountDir(exePath.data());
+		fileSystem->SetWriteDir(exePath);
+		fileSystem->MountDir(exePath);
 		
 		fileSystem->CreateDir(g_unitTestPath);
 		fileSystem->CreateDir(g_subUnitTestPath);
@@ -29,22 +29,22 @@ public:
 		{
 			{
 				auto path = PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(i));
-				FileHandle handle = fileSystem->FileOpen(path.c_str(), OpenMode::Write);
+				FileHandle handle = fileSystem->FileOpen(path, OpenMode::Write);
 				const char* text = "Test Text";
 				fileSystem->FileWrite(handle, text, strlen(text));
 				fileSystem->FileClose(handle);
 
-				EXPECT_TRUE(fileSystem->FileExist(path.c_str()));
+				EXPECT_TRUE(fileSystem->FileExist(path));
 			}
 
 			{
 				auto path = PrCore::PathUtils::MakePath(g_subUnitTestPath, PrCore::StringUtils::ToString(i * 10));
-				FileHandle handle = fileSystem->FileOpen(path.c_str(), OpenMode::Write);
+				FileHandle handle = fileSystem->FileOpen(path, OpenMode::Write);
 				const char* text = "Test Text";
 				fileSystem->FileWrite(handle, text, strlen(text));
 				fileSystem->FileClose(handle);
 
-				EXPECT_TRUE(fileSystem->FileExist(path.c_str()));
+				EXPECT_TRUE(fileSystem->FileExist(path));
 			}
 		}
 	}
@@ -57,16 +57,16 @@ public:
 		{
 			{
 				auto path = PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(i));
-				fileSystem->FileDelete(path.c_str());
+				fileSystem->FileDelete(path);
 				
-				EXPECT_FALSE(fileSystem->FileExist(path.c_str()));
+				EXPECT_FALSE(fileSystem->FileExist(path));
 			}
 
 			{
 				auto path = PrCore::PathUtils::MakePath(g_subUnitTestPath, PrCore::StringUtils::ToString(i * 10));
-				fileSystem->FileDelete(path.c_str());
+				fileSystem->FileDelete(path);
 				
-				EXPECT_FALSE(fileSystem->FileExist(path.c_str()));
+				EXPECT_FALSE(fileSystem->FileExist(path));
 			}
 		}
 		fileSystem->DeleteDir(g_subUnitTestPath);
@@ -82,7 +82,7 @@ TEST_F(FileSystemTest, FileRead)
 {
 	auto fileSystem = FileSystemNew::GetInstancePtr();
 
-	auto handle = fileSystem->FileOpen(PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(0)).c_str(), OpenMode::Read);
+	auto handle = fileSystem->FileOpen(PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(0)), OpenMode::Read);
 	EXPECT_TRUE(handle);
 
 	int size = fileSystem->FileSize(handle);
@@ -112,7 +112,7 @@ TEST_F(FileSystemTest, FileRead)
 	pos = fileSystem->FileTell(handle);
 	EXPECT_EQ(pos, 20);
 
-	auto stat = fileSystem->GetStat(PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(0)).c_str());
+	auto stat = fileSystem->GetStat(PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(0)));
 	EXPECT_EQ(stat.fileSize, size);
 	EXPECT_FALSE(stat.readOnly);
 	EXPECT_EQ(stat.type, FileType::RegularFile);
@@ -124,7 +124,7 @@ TEST_F(FileSystemTest, FileWrapper)
 {
 	auto fileSystem = FileSystemNew::GetInstancePtr();
 
-	auto file = fileSystem->OpenFileWrapper(PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(0)).c_str());
+	auto file = fileSystem->OpenFileWrapper(PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(0)));
 	EXPECT_TRUE(file);
 
 	int size = file->GetSize();
@@ -155,7 +155,7 @@ TEST_F(FileSystemTest, FileWrapper)
 	EXPECT_EQ(pos, 20);
 
 	auto path = file->GetPath();
-	EXPECT_STRCASEEQ(path.c_str(), PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(0)).c_str());
+	EXPECT_STRCASEEQ(path.data(), PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(0)).data());
 
 	auto stat = file->GetStat();
 	EXPECT_EQ(stat.fileSize, size);
@@ -171,14 +171,14 @@ TEST_F(FileSystemTest, SystemFeatures)
 	auto filePath = PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(5));
 	auto wrongFilePath = PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(20));
 	{
-		bool fileExist = fileSystem->FileExist(filePath.c_str());
+		bool fileExist = fileSystem->FileExist(filePath);
 		EXPECT_TRUE(fileExist);
-		fileExist = fileSystem->FileExist(wrongFilePath.c_str());
+		fileExist = fileSystem->FileExist(wrongFilePath);
 		EXPECT_FALSE(fileExist);
 
-		bool isFile = fileSystem->IsFile(filePath.c_str());
+		bool isFile = fileSystem->IsFile(filePath);
 		EXPECT_TRUE(isFile);
-		bool isDir = fileSystem->IsDir(filePath.c_str());
+		bool isDir = fileSystem->IsDir(filePath);
 		EXPECT_FALSE(isDir);
 	}
 
@@ -186,7 +186,7 @@ TEST_F(FileSystemTest, SystemFeatures)
 	{
 		bool isDir = fileSystem->IsDir(g_unitTestPath);
 		EXPECT_TRUE(isDir);
-		isDir = fileSystem->IsDir(PrCore::PathUtils::MakePath(g_unitTestPath, "").c_str());
+		isDir = fileSystem->IsDir(PrCore::PathUtils::MakePath(g_unitTestPath, ""));
 		EXPECT_TRUE(isDir);
 		bool isFile = fileSystem->IsFile(g_unitTestPath);
 		EXPECT_FALSE(isFile);
@@ -198,7 +198,7 @@ TEST_F(FileSystemTest, SystemFeatures)
 		int i = 0;
 		for(auto file : files)
 		{
-			if (fileSystem->IsFile(PrCore::PathUtils::MakePath(g_unitTestPath, file).c_str()))
+			if (fileSystem->IsFile(PrCore::PathUtils::MakePath(g_unitTestPath, file)))
 			{
 				auto expectedFileName = PrCore::StringUtils::ToString(i);
 				EXPECT_TRUE(file == expectedFileName);
@@ -210,7 +210,7 @@ TEST_F(FileSystemTest, SystemFeatures)
 		i = 0;
 		for (auto file : files)
 		{
-			if (fileSystem->IsFile(PrCore::PathUtils::MakePath(g_subUnitTestPath, file).c_str()))
+			if (fileSystem->IsFile(PrCore::PathUtils::MakePath(g_subUnitTestPath, file)))
 			{
 				auto expectedFileName = PrCore::StringUtils::ToString(i * 10);
 				EXPECT_TRUE(file == expectedFileName);
@@ -225,8 +225,8 @@ TEST_F(FileSystemTest, BufferedWrite)
 	auto fileSystem = FileSystemNew::GetInstancePtr();
 
 	auto filePath = PrCore::PathUtils::MakePath(g_unitTestPath, "BufferedWrite.txt");
-	auto writeHandle = fileSystem->FileOpen(filePath.c_str(), Write);
-	auto readHandle = fileSystem->FileOpen(filePath.c_str(), Read);
+	auto writeHandle = fileSystem->FileOpen(filePath, Write);
+	auto readHandle = fileSystem->FileOpen(filePath, Read);
 
 	// Write to file only on flush
 	{
@@ -260,13 +260,13 @@ TEST_F(FileSystemTest, BufferedWrite)
 
 	fileSystem->FileClose(writeHandle);
 	fileSystem->FileClose(readHandle);
-	fileSystem->FileDelete(filePath.c_str());
+	fileSystem->FileDelete(filePath);
 }
 TEST_F(FileSystemTest, MountPriority)
 {
 	auto fileSystem = FileSystemNew::GetInstancePtr();
 	auto exePath = fileSystem->GetExecutablePath();
-	fileSystem->UnmountDir(exePath.data());
+	fileSystem->UnmountDir(exePath);
 
 	const char* fileName = "text.txt";
 	const char* engine = "EnginePath";
@@ -279,19 +279,19 @@ TEST_F(FileSystemTest, MountPriority)
 
 	// Prepare Files
 	{
-		auto handle = fileSystem->FileOpen(PrCore::PathUtils::MakePath(engine, fileName).c_str(), Write);
+		auto handle = fileSystem->FileOpen(PrCore::PathUtils::MakePath(engine, fileName), Write);
 		fileSystem->FileWrite(handle, engineText, 20);
 		fileSystem->FileClose(handle);
 
-		handle = fileSystem->FileOpen(PrCore::PathUtils::MakePath(game, fileName).c_str(), Write);
+		handle = fileSystem->FileOpen(PrCore::PathUtils::MakePath(game, fileName), Write);
 		fileSystem->FileWrite(handle, gameText, 18);
 		fileSystem->FileClose(handle);
 	}
 
 	// Mount Engine -> Game
 	{
-		fileSystem->MountDir(PrCore::PathUtils::MakePath(exePath, engine).c_str());
-		fileSystem->MountDir(PrCore::PathUtils::MakePath(exePath, game).c_str());
+		fileSystem->MountDir(PrCore::PathUtils::MakePath(exePath, engine));
+		fileSystem->MountDir(PrCore::PathUtils::MakePath(exePath, game));
 
 		char* buffer = new char[20];
 		auto file = fileSystem->OpenFileWrapper(fileName);
@@ -299,17 +299,17 @@ TEST_F(FileSystemTest, MountPriority)
 		file.reset();
 
 		auto comapreStr = std::string{ buffer, 20 };
-		EXPECT_STRCASEEQ(comapreStr.c_str(), engineText);
+		EXPECT_STRCASEEQ(comapreStr.data(), engineText);
 
-		fileSystem->UnmountDir(PrCore::PathUtils::MakePath(exePath, engine).c_str());
-		fileSystem->UnmountDir(PrCore::PathUtils::MakePath(exePath, game).c_str());
+		fileSystem->UnmountDir(PrCore::PathUtils::MakePath(exePath, engine));
+		fileSystem->UnmountDir(PrCore::PathUtils::MakePath(exePath, game));
 		delete[] buffer;
 	}
 
 	// Mount Game -> Engine
 	{
-		fileSystem->MountDir(PrCore::PathUtils::MakePath(exePath, game).c_str());
-		fileSystem->MountDir(PrCore::PathUtils::MakePath(exePath, engine).c_str());
+		fileSystem->MountDir(PrCore::PathUtils::MakePath(exePath, game));
+		fileSystem->MountDir(PrCore::PathUtils::MakePath(exePath, engine));
 
 		char* buffer = new char[20];
 		auto file = fileSystem->OpenFileWrapper(fileName);
@@ -317,16 +317,16 @@ TEST_F(FileSystemTest, MountPriority)
 		file.reset();
 
 		auto comapreStr = std::string{ buffer, 20 };
-		EXPECT_STRCASEEQ(comapreStr.c_str(), gameText);
+		EXPECT_STRCASEEQ(comapreStr.data(), gameText);
 
-		fileSystem->UnmountDir(PrCore::PathUtils::MakePath(exePath, engine).c_str());
-		fileSystem->UnmountDir(PrCore::PathUtils::MakePath(exePath, game).c_str());
+		fileSystem->UnmountDir(PrCore::PathUtils::MakePath(exePath, engine));
+		fileSystem->UnmountDir(PrCore::PathUtils::MakePath(exePath, game));
 		delete[] buffer;
 	}
 
 	// Mount Game Only
 	{
-		fileSystem->MountDir(PrCore::PathUtils::MakePath(exePath, game).c_str());
+		fileSystem->MountDir(PrCore::PathUtils::MakePath(exePath, game));
 
 		char* buffer = new char[20];
 		auto file = fileSystem->OpenFileWrapper(fileName);
@@ -334,16 +334,16 @@ TEST_F(FileSystemTest, MountPriority)
 		file.reset();
 
 		auto comapreStr = std::string{ buffer, 20 };
-		EXPECT_STRCASEEQ(comapreStr.c_str(), gameText);
+		EXPECT_STRCASEEQ(comapreStr.data(), gameText);
 
-		fileSystem->UnmountDir(PrCore::PathUtils::MakePath(exePath, game).c_str());
+		fileSystem->UnmountDir(PrCore::PathUtils::MakePath(exePath, game));
 		delete[] buffer;
 	}
 
-	fileSystem->MountDir(exePath.data());
+	fileSystem->MountDir(exePath);
 
-	fileSystem->FileDelete(PrCore::PathUtils::MakePath(engine, fileName).c_str());
-	fileSystem->FileDelete(PrCore::PathUtils::MakePath(game, fileName).c_str());
+	fileSystem->FileDelete(PrCore::PathUtils::MakePath(engine, fileName));
+	fileSystem->FileDelete(PrCore::PathUtils::MakePath(game, fileName));
 	fileSystem->DeleteDir(engine);
 	fileSystem->DeleteDir(game);
 }
