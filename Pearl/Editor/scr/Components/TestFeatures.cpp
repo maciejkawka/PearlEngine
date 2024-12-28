@@ -13,7 +13,6 @@
 #include"Core/ECS/Systems/TransformSystem.h"
 #include"Core/ECS/Systems/MeshRendererSystem.h"
 #include"Core/Utils/JSONParser.h"
-#include"Core/Filesystem/FileSystem.h"
 #include"Core/Utils/PathUtils.h"
 
 // Temporary register loaders

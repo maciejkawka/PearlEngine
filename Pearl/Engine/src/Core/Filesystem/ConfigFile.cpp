@@ -1,56 +1,39 @@
 #include"Core/Common/pearl_pch.h"
 
 #include"Core/Filesystem/ConfigFile.h"
-#include"Core/Filesystem/FileSystem.h"
+#include"Core/Filesystem/FileSystemNew.h"
 
-using namespace PrCore::Filesystem;
+using namespace PrCore::File;
 
-ConfigFile::ConfigFile(const std::string& p_fileName)
+bool ConfigFile::OpenFromFile(std::string_view p_filePath)
 {
-	Open(p_fileName);
-	m_fileName = p_fileName;
-}
-
-bool ConfigFile::Open(const std::string& p_fileName)
-{
-	std::string dir = CONFIG_DIR;
-	dir += ("/" + p_fileName);
-	FileStreamPtr file = FileSystem::GetInstance().OpenFileStream(dir.c_str());
+	auto file = File::FileSystemNew::GetInstance().OpenFileWrapper(p_filePath);
 	if (file == nullptr)
-	{
-		m_isValid = false;
 		return false;
-	}
 
-	m_fileName = p_fileName;
+	m_filePath = p_filePath;
 	char* data = new char[file->GetSize()];
-	file->Read(data);
+	file->Read(data, file->GetSize());
 
 	std::vector<uint8_t> dataVector;
-
 	for (auto i = 0; i < file->GetSize(); i++)
 		dataVector.push_back(*(data + i));
 	delete[] data;
 
 	m_jsonFile = json::parse(dataVector);
-
-	m_isValid = true;
 	return true;
 }
 
-void ConfigFile::Create(const std::string& p_fileName)
+bool ConfigFile::SaveToFile(std::string_view p_filePath)
 {
-	FileStreamPtr file = FileSystem::GetInstance().OpenFileStream(CONFIG_DIR + '/' + p_fileName, DataAccess::Write);
-	m_fileName = p_fileName;
+	auto file = File::FileSystemNew::GetInstance().FileOpen(p_filePath, File::OpenMode::Write);
+	if (file == nullptr)
+		return false;
+
+	m_jsonFile = p_filePath;
 	std::string dumpJson = m_jsonFile.dump(4);
 	int lenght = dumpJson.length();
-	file->Write(dumpJson.c_str(), lenght);
-}
-
-void ConfigFile::Override()
-{
-	if (m_fileName.empty())
-		return;
-
-	Create(m_fileName);
+	File::FileSystemNew::GetInstance().FileWrite(file, dumpJson.c_str(), lenght);
+	File::FileSystemNew::GetInstance().FileClose(file);
+	return true;
 }

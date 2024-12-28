@@ -13,9 +13,6 @@
     <Filter Include="Core\Events">
       <UniqueIdentifier>{6e14f417-2935-44cc-8ae3-1c65a5668077}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Filesystem">
-      <UniqueIdentifier>{bc90fd0b-a3a3-425a-92ba-faaa2886d93f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Input">
       <UniqueIdentifier>{6a97908e-ed8a-4117-83ce-08f3976b684b}</UniqueIdentifier>
     </Filter>
@@ -54,6 +51,9 @@
     </Filter>
     <Filter Include="Core\ECS\Systems">
       <UniqueIdentifier>{42e6eb27-5723-4725-8204-a05365a90990}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\File">
+      <UniqueIdentifier>{bc90fd0b-a3a3-425a-92ba-faaa2886d93f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -111,23 +111,17 @@
     <ClInclude Include="include\Engine\Core\Utils\Clock.h">
       <Filter>Core\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Core\Filesystem\StandardFileStream.h">
-      <Filter>Core\Filesystem</Filter>
+    <ClInclude Include="include\Engine\Core\File\StandardFileStream.h">
+      <Filter>Core\File</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Core\Filesystem\ConfigFile.h">
-      <Filter>Core\Filesystem</Filter>
+    <ClInclude Include="include\Engine\Core\File\ConfigFile.h">
+      <Filter>Core\File</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Core\Filesystem\DataStream.h">
-      <Filter>Core\Filesystem</Filter>
+    <ClInclude Include="include\Engine\Core\File\DataStream.h">
+      <Filter>Core\File</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Core\Filesystem\FileStream.h">
-      <Filter>Core\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Core\Filesystem\FileSystem.h">
-      <Filter>Core\Filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\Core\Filesystem\MemoryStream.h">
-      <Filter>Core\Filesystem</Filter>
+    <ClInclude Include="include\Engine\Core\File\MemoryStream.h">
+      <Filter>Core\File</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\Core\Events\ResourceEvents.h">
       <Filter>Core\Resources</Filter>
@@ -381,11 +375,11 @@
     <ClInclude Include="include\Engine\Renderer\Resources\HdrCubemapLoader.h">
       <Filter>Renderer\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Core\Filesystem\FileSystemNew.h">
-      <Filter>Core\Filesystem</Filter>
+    <ClInclude Include="include\Engine\Core\File\FileSystem.h">
+      <Filter>Core\File</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Core\Filesystem\FileWrapper.h">
-      <Filter>Core\Filesystem</Filter>
+    <ClInclude Include="include\Engine\Core\File\FileWrapper.h">
+      <Filter>Core\File</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -413,20 +407,14 @@
     <ClCompile Include="src\Core\Utils\Clock.cpp">
       <Filter>Core\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Filesystem\ConfigFile.cpp">
-      <Filter>Core\Filesystem</Filter>
+    <ClCompile Include="src\Core\File\ConfigFile.cpp">
+      <Filter>Core\File</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Filesystem\FileStream.cpp">
-      <Filter>Core\Filesystem</Filter>
+    <ClCompile Include="src\Core\File\MemoryStream.cpp">
+      <Filter>Core\File</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Filesystem\Filesystem.cpp">
-      <Filter>Core\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Filesystem\MemoryStream.cpp">
-      <Filter>Core\Filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Filesystem\StandardFileStream.cpp">
-      <Filter>Core\Filesystem</Filter>
+    <ClCompile Include="src\Core\File\StandardFileStream.cpp">
+      <Filter>Core\File</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Core\Color.cpp">
       <Filter>Renderer\Core</Filter>
@@ -581,11 +569,11 @@
     <ClCompile Include="src\Renderer\Resources\HdrCubemapLoader.cpp">
       <Filter>Renderer\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Filesystem\FileSystemNew.cpp">
-      <Filter>Core\Filesystem</Filter>
+    <ClCompile Include="src\Core\File\FileSystem.cpp">
+      <Filter>Core\File</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Filesystem\FileWrapper.cpp">
-      <Filter>Core\Filesystem</Filter>
+    <ClCompile Include="src\Core\File\FileWrapper.cpp">
+      <Filter>Core\File</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

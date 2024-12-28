@@ -1,7 +1,7 @@
 #pragma once
 #include<string>
 
-namespace PrCore::Filesystem {
+namespace PrCore::File {
 
 	enum class DataAccess {
 		Write,

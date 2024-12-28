@@ -1,10 +1,8 @@
 #include "Core/Common/pearl_pch.h"
 
 #include"Core/ECS/SceneManager.h"
-#include"Core/Filesystem/FileSystem.h"
+#include"Core/File/FileSystem.h"
 #include"Core/ECS/Scene.h"
-
-#include"Core/Filesystem/FileSystem.h"
 
 using namespace PrCore::ECS;
 
@@ -19,11 +17,6 @@ SceneManager::~SceneManager()
 Scene* SceneManager::CreateScene(const std::string& p_name)
 {
 	auto scene = new Scene(p_name);
-
-	std::string dir = SCENE_DIR;
-	dir += "/" + p_name;
-	scene->SetScenePath(dir);
-
 	m_scenes.push_back(scene);
 
 	return scene; 
@@ -45,18 +38,19 @@ void SceneManager::DeleteScene(const Scene* p_scene)
 
 Scene* SceneManager::LoadScene(const std::string& p_path)
 {
-	std::string dir = SCENE_DIR;
-	dir += ("/" + p_path);
+	auto file = PrCore::File::FileSystem::GetInstance().OpenFileWrapper(p_path);
+	
+	PR_ASSERT(file != nullptr, "File cannot be opened! Path " + p_path);
+	if (file == nullptr)
+		return nullptr;
 
-	Filesystem::FileStreamPtr file = Filesystem::FileSystem::GetInstance().OpenFileStream(dir.c_str());
-	PR_ASSERT(file != nullptr, "File cannot be opened! Path " + dir);
-
-	char* data = new char[file->GetSize()];
-	file->Read(data);
+	size_t fileSize = file->GetSize();
+	char* data = new char[fileSize];
+	file->Read(data, fileSize);
 
 	std::vector<uint8_t> dataVector;
 
-	for (auto i = 0; i < file->GetSize(); i++)
+	for (auto i = 0; i < fileSize; i++)
 		dataVector.push_back(*(data + i));
 	delete[] data;
 
@@ -135,9 +129,7 @@ void SceneManager::SaveScene(Scene* p_scene, const std::string& p_path)
 
 	auto sceneStr = sceneJSON.dump(4);
 
-	std::string dir = SCENE_DIR;
-	dir += ('/' + p_path);
-	Filesystem::FileStreamPtr file = Filesystem::FileSystem::GetInstance().OpenFileStream(dir, Filesystem::DataAccess::Write);
-	int lenght = sceneStr.length();
-	file->Write(sceneStr.c_str(), lenght);
+	auto file = File::FileSystem::GetInstance().FileOpen(p_path, File::OpenMode::Write);
+	File::FileSystem::GetInstance().FileWrite(file, sceneStr.c_str(), sceneStr.length());
+	File::FileSystem::GetInstance().FileClose(file);
 }

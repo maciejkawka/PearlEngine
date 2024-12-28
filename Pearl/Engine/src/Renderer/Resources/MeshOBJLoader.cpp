@@ -3,7 +3,7 @@
 #include "Renderer/Resources/MeshOBJLoader.h"
 #include "Renderer/Resources/Mesh.h"
 
-#include "Core/Filesystem/FileSystem.h"
+#include "Core/File/FileSystem.h"
 #include "Core/Utils/PathUtils.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
@@ -53,13 +53,12 @@ namespace std {
 
 PrCore::Resources::IResourceDataPtr MeshOBJLoader::LoadResource(const std::string& p_path)
 {
-	std::string resourcePath = PrCore::PathUtils::MakePath(MESH_DIR, p_path);
-	PrCore::Filesystem::FileStreamPtr file = PrCore::Filesystem::FileSystem::GetInstance().OpenFileStream(resourcePath.c_str());
+	auto file = PrCore::File::FileSystem::GetInstance().OpenFileWrapper(p_path);
 	if (file == nullptr)
 		return nullptr;
 
 	char* data = new char[file->GetSize()];
-	file->Read(data);
+	file->Read(data, file->GetSize());
 	std::string objFile = std::string(data, file->GetSize());
 	delete[] data;
 

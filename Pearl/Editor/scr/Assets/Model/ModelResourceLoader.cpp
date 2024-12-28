@@ -1,7 +1,7 @@
 #include "Editor/Assets/Model/ModelResourceLoader.h"
 #include "Editor/Assets/Model/ModelResource.h"
 
-#include "Core/Filesystem/FileSystem.h"
+#include "Core/File/FileSystem.h"
 #include "Core/Resources/ResourceSystem.h"
 #include "Core/Utils/PathUtils.h"
 
@@ -195,23 +195,23 @@ PrRenderer::Resources::MaterialHandle ModelLoaderHelper::GetOrCreateMaterial(con
 		{
 			if (opacity == 1.0f)
 			{
-				shaderHndl = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>("Deferred/StandardLit.shader");
+				shaderHndl = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>("shader/deffered/standard_lit.shader");
 			}
 			else
 			{
-				shaderHndl = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>("Deferred/StandardTransparent.shader");
+				shaderHndl = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>("shader/deffered/standard_transparent_unlit.shader");
 			}
 		}
 		else if (shadingMode == aiShadingMode::aiShadingMode_Unlit)
 		{
-			shaderHndl = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>("Deferred/StandardUnlit.shader");
+			shaderHndl = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>("shader/deffered/standard_unlit.shader");
 			opacity = 1.0f;
 		}
 	}
 	else
 	{
 		// Assume PBR and force to be opaque
-		shaderHndl = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>("Deferred/StandardLit.shader");
+		shaderHndl = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>("shader/deffered/standard_lit.shader");
 		opacity = 1.0f;
 	}
 
@@ -559,14 +559,13 @@ LightPtr ModelLoaderHelper::CreateLight(const aiLight* p_light)
 
 PrCore::Resources::IResourceDataPtr ModelResourceLoader::LoadResource(const std::string& p_path)
 {
-	auto file = PrCore::Filesystem::FileSystem::GetInstance().OpenFileStream(p_path.c_str());
-
+	auto file = PrCore::File::FileSystem::GetInstance().OpenFileWrapper(p_path);
 	if (file == nullptr)
 		return nullptr;
 
-	size_t size = file->Tell();
-	char* data = new char[file->GetSize()];
-	file->Read(data);
+	size_t size = file->GetSize();
+	char* data = new char[size];
+	file->Read(data, size);
 
 	Assimp::Importer importer;
 	importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);

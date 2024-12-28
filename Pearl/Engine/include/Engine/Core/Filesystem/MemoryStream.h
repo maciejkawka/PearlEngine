@@ -1,7 +1,7 @@
 #pragma once
 #include"Core/Filesystem/DataStream.h"
 
-namespace PrCore::Filesystem {
+namespace PrCore::File {
 
 	class MemoryStream : public DataStream {
 	public:

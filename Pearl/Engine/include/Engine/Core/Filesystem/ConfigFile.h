@@ -6,22 +6,17 @@
 
 using json = nlohmann::json;
 
-namespace PrCore::Filesystem {
+namespace PrCore::File {
 
 	class ConfigFile {
 	public:
-		ConfigFile(const std::string& p_fileName);
-		ConfigFile() :
-			m_isValid(false)
-		{}
+		ConfigFile() = default;
+		~ConfigFile() = default;
 
-		~ConfigFile() {}
+		bool SaveToFile(std::string_view p_filePath);
+		bool OpenFromFile(std::string_view p_filePath);
 
-		bool Open(const std::string& p_fileName);
-		void Create(const std::string& p_fileName);
-		void Override();
-
-		inline bool IsValid() const { return m_isValid; }
+		std::string_view GetFilePath() { return m_filePath; }
 
 		template<typename T>
 		void SetSetting(const std::string& p_settingName, T settingValue)
@@ -60,9 +55,8 @@ namespace PrCore::Filesystem {
 		}
 
 	private:
-		json m_jsonFile;
-		std::string m_fileName;
-		bool m_isValid;
+		json        m_jsonFile;
+		std::string m_filePath;
 	};
 
 	template<>

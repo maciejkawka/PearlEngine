@@ -4,19 +4,18 @@
 #include"Core/Events/EventManager.h"
 #include"Core/Utils/Logger.h"
 #include"Core/Utils/Clock.h"
-#include"Core/Filesystem/FileSystem.h"
-#include"Core/Filesystem/ConfigFile.h"
-#include"Core/Resources/ResourceSystem.h"
-#include"Core/Resources/ResourceSystem.h"
-#include"Core/ECS/SceneManager.h"
+#include"Core/Utils/PathUtils.h"
+#include "Core/File/ConfigFile.h"
+#include "Core/File/FileSystem.h"
+#include "Core/ECS/SceneManager.h"
 
-#include"Renderer/OpenGL/GLContext.h"
 #include"Renderer/Core/DeferRenderFrontend.h"
 #include"Renderer/Core/RenderSystem.h"
+#include"Renderer/OpenGL/GLContext.h"
 
-// TEMP REmove later
 #include "Core/Resources/ResourceDatabase.h"
 
+#include "Core/Resources/ResourceSystem.h"
 #include "Renderer/Resources/Shader.h"
 #include "Renderer/Resources/Cubemap.h"
 #include "Renderer/Resources/Material.h"
@@ -31,26 +30,52 @@
 #include "Renderer/Resources/Texture2DLoader.h"
 //
 
-const std::string_view GraphicConfig{ "graphic.cfg" };
-const std::string_view RendererConfig{ "renderer.cfg" };
+const std::string_view GraphicConfig{ "config/graphic.cfg" };
+const std::string_view RendererConfig{ "config/renderer.cfg" };
 
 PrCore::Entry::AppContext::AppContext()
 {
+	m_window = nullptr;
+	m_rendererContext = nullptr;
+
 	Utils::Logger::Init();
 	Utils::Clock::Init();
 	PRLOG_INFO("Building AppContext");
 
 	//Init Engine Subsystems
-	Filesystem::FileSystem::Init();
-	Events::EventManager::Init();
 
+	//-----------------------
+	// Init File System
+	std::string_view engineAssetsPath = "engine_assets";
+	std::string_view gameAssetPath = "game_assets";
+
+	File::FileSystem::Init();
+	auto filePtr = File::FileSystem::GetInstancePtr();
+
+	auto binView = filePtr->GetExecutablePath();
+	auto sanitized = PrCore::PathUtils::Sanitize(binView.data());
+
+	auto rootEngine = PrCore::PathUtils::RemoveSubFolderInPlace(sanitized, 2);
+	auto engineAssets = PrCore::PathUtils::MakePath(rootEngine, engineAssetsPath);
+	filePtr->SetEngineRoot(rootEngine);
+	filePtr->SetEngineAssetsPath(engineAssets);
+	filePtr->MountDir(engineAssets);
+
+	// This is going to be moved to PrGame system
+	auto gameAssets = PrCore::PathUtils::MakePath(rootEngine, gameAssetPath);
+	filePtr->SetGameAssetsPath(gameAssets);
+	filePtr->MountDir(gameAssets);
+	filePtr->SetWriteDir(gameAssets);
+	//-----------------------
+
+	Events::EventManager::Init();
 	Resources::ResourceSystem::Init();
 
-	// TEMP
+	//-----------------------
+	// Init Resource System
 	{
 		using namespace PrRenderer::Resources;
 		auto textureDatabase = std::make_unique<ResourceDatabase>();
-		auto ptr = textureDatabase.get();
 		textureDatabase->RegisterLoader(".png", std::make_unique<Texture2DLoader>());
 		textureDatabase->RegisterLoader(".jpg", std::make_unique<Texture2DLoader>());
 		textureDatabase->RegisterLoader(".tga", std::make_unique<Texture2DLoader>());
@@ -74,24 +99,21 @@ PrCore::Entry::AppContext::AppContext()
 		cubemapDatabase->RegisterLoader(".hdr", std::make_unique<HdrCubemapLoader>());
 		ResourceSystem::GetInstance().RegisterDatabase<Cubemap>(std::move(cubemapDatabase));
 	}
-	//
+	//-----------------------
 
-	Filesystem::ConfigFile contexConfig(GraphicConfig.data());
-	Windowing::WindowContext context;
-	if (contexConfig.IsValid())
+	File::ConfigFile contexConfig;
+	if (contexConfig.OpenFromFile(GraphicConfig))
 	{
+		Windowing::WindowContext context;
 		context.debugMode = contexConfig.GetSetting<bool>("debugMode");
 		context.forwardCompatibility = contexConfig.GetSetting<bool>("forwardCompatibility");
 		context.multiSampling = contexConfig.GetSetting("multiSampling");
 		context.versionMinor = contexConfig.GetSetting("versionMinor");
 		context.versionMajor = contexConfig.GetSetting("versionMajor");
-	}
+		Windowing::GLWindow::InitDevice(context);
 
-	Windowing::GLWindow::InitDevice(context);
-	
-	Windowing::WindowSettings windowSettings;
-	if (contexConfig.IsValid())
-	{
+
+		Windowing::WindowSettings windowSettings;
 		windowSettings.title = contexConfig.GetSetting<std::string>("title");
 		windowSettings.height = contexConfig.GetSetting("height");
 		windowSettings.width = contexConfig.GetSetting("width");
@@ -100,17 +122,16 @@ PrCore::Entry::AppContext::AppContext()
 		windowSettings.decorated = contexConfig.GetSetting<bool>("decorated");
 		windowSettings.vSync = contexConfig.GetSetting<bool>("vSync");
 		windowSettings.iconPath = contexConfig.GetSetting<std::string>("iconPath");
+		m_window = new Windowing::GLWindow(windowSettings);
 	}
-
-	m_window = new Windowing::GLWindow(windowSettings);
 
 	m_rendererContext = new PrRenderer::OpenGL::GLContext();
 	m_rendererContext->Init();
 
-	PrRenderer::Core::RendererSettings rendererSettings;
-	Filesystem::ConfigFile rendererConfig(RendererConfig.data());
-	if(rendererConfig.IsValid())
+	File::ConfigFile rendererConfig;
+	if (rendererConfig.OpenFromFile(RendererConfig))
 	{
+		PrRenderer::Core::RendererSettings rendererSettings;
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, dirLightMaxShadows);
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, dirLightShadowsMapSize);
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, dirLightCombineMapSize);
@@ -167,12 +188,11 @@ PrCore::Entry::AppContext::AppContext()
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, enableInstancing);
 
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, toneMappingExposure);
+
+		PrRenderer::Core::renderSystem = std::make_unique<PrRenderer::Core::DeferRenderFrontend>(rendererSettings);
 	}
 
-	PrRenderer::Core::renderSystem = std::make_unique<PrRenderer::Core::DeferRenderFrontend>(rendererSettings);
-
 	Input::InputManager::Init();
-
 	ECS::SceneManager::Init();
 }
 
@@ -188,6 +208,6 @@ PrCore::Entry::AppContext::~AppContext()
 	Windowing::GLWindow::TerminateDevice();
 	Resources::ResourceSystem::Terminate();
 	Events::EventManager::Terminate();
-	Filesystem::FileSystem::Terminate();
+	File::FileSystem::Terminate();
 	Utils::Clock::Terminate();
 }

@@ -19,7 +19,7 @@ PrCore::Resources::IResourceDataPtr HdrCubemapLoader::LoadResource(const std::st
 	//Load HDR texture and shader
 	auto textureResource = ResourceSystem::GetInstance().Load<Texture>(p_path);
 	auto texture = textureResource.GetData();
-	auto shader = ResourceSystem::GetInstance().Load<Shader>("Cubemap/HDRToCubemap.shader").GetData();
+	auto shader = ResourceSystem::GetInstance().Load<Shader>("shader/cubemap/hdr_to_cubemap.shader").GetData();
 
 	//Create Framebuffer 
 	Buffers::FramebufferSettings fbSettings;

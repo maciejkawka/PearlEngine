@@ -4,7 +4,7 @@
 namespace PrCore::PathUtils
 {
 	void             Sanitize(char* p_path);
-	void             Sanitize(const std::string& p_path);
+	std::string      Sanitize(std::string_view p_path);
 
 	bool             IsAbsolute(const char* p_path);
 	bool             IsRelative(const char* p_path);
@@ -34,4 +34,7 @@ namespace PrCore::PathUtils
 
 	std::string                   GetSubFolder(std::string_view p_path, size_t generation = 0);
 	std::string_view              GetSubFolderInPlace(std::string_view p_path, size_t generation = 0);
+
+	std::string                   RemoveSubFolder(std::string_view p_path, size_t generation = 1);
+	std::string_view              RemoveSubFolderInPlace(std::string_view p_path, size_t generation = 1);
 }

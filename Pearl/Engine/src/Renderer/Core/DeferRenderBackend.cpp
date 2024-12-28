@@ -17,16 +17,16 @@ namespace PrRenderer::Core
 		IRenderBackend(p_settings)
 	{
 		//Prepare shaders
-		m_shadowMappingShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Shadows/ShadowMapping.shader");
-		m_ToneMappingShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Deferred/RenderFront.shader");
-		m_pbrLightShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Deferred/lightPass.shader");
-		m_pointshadowMappingShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Shadows/PointShadowMapping.shader");
-		m_SSAOShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Deferred/SSAO.shader");
-		m_SSAOBlurShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Deferred/SSAO_Blur.shader");
-		m_FXAAShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Deferred/FXAA.shader");
-		m_fogShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Deferred/Fog.shader");
-		m_downsample = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Deferred/downsample.shader");
-		m_upsample = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("Deferred/upsample.shader");
+		m_shadowMappingShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/shadows/generic_shadow_mapping.shader");
+		m_ToneMappingShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/deffered/front_pass.shader");
+		m_pbrLightShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/deffered/light_pass.shader");
+		m_pointshadowMappingShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/shadows/point_shadow_mapping.shader");
+		m_SSAOShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/deffered/ssao.shader");
+		m_SSAOBlurShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/deffered/ssao_blur.shader");
+		m_FXAAShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/deffered/fxaa.shader");
+		m_fogShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/deffered/logarithmic _fog.shader");
+		m_downsample = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/deffered/downsample.shader");
+		m_upsample = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/deffered/upsample.shader");
 
 		m_renderContext.quadMesh = Resources::Mesh::CreatePrimitive(Resources::Quad);
 		m_renderContext.settings = m_settings;
@@ -1249,7 +1249,7 @@ namespace PrRenderer::Core
 
 		auto framebuffer = Buffers::Framebufffer::Create(settings);
 
-		auto shader = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("IrradianceMap.shader");
+		auto shader = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/cubemap/irradiance_map.shader");
 		auto cube = Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
 		auto cubemap = m_frame->cubemapObject->material->GetTexture("skybox");
 
@@ -1288,7 +1288,7 @@ namespace PrRenderer::Core
 		cube->Unbind();
 		framebuffer->Unbind();
 
-		PrCore::Resources::ResourceSystem::GetInstance().Remove<Resources::Shader>("IrradianceMap.shader");
+		PrCore::Resources::ResourceSystem::GetInstance().Remove<Resources::Shader>("shader/cubemap/irradiance_map.shader");
 	}
 
 	void DeferRenderBackend::GeneratePrefilterMap()
@@ -1309,7 +1309,7 @@ namespace PrRenderer::Core
 
 		auto framebuffer = Buffers::Framebufffer::Create(settings);
 
-		auto shader = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("prefilteredCube.shader");
+		auto shader = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/cubemap/prefiltered_cube.shader");
 		auto cube = Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
 		auto cubemap = m_frame->cubemapObject->material->GetTexture("skybox");
 
@@ -1370,7 +1370,7 @@ namespace PrRenderer::Core
 
 		auto framebuffer = Buffers::Framebufffer::Create(settings);
 
-		auto shader = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("LUTMap.shader");
+		auto shader = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/cubemap/lut_map.shader");
 		auto quad = Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Quad);
 
 		shader->Bind();
@@ -1386,7 +1386,7 @@ namespace PrRenderer::Core
 		quad->Unbind();
 		framebuffer->Unbind();
 
-		PrCore::Resources::ResourceSystem::GetInstance().Remove<Resources::Shader>("LUTMap.shader");
+		PrCore::Resources::ResourceSystem::GetInstance().Remove<Resources::Shader>("shader/cubemap/lut_map.shader");
 	}
 
 	PrCore::Math::vec4 DeferRenderBackend::CalculateLightTexture(size_t p_lightID, size_t p_lightMapSize, size_t p_comboMapSize)

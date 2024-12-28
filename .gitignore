@@ -9,6 +9,7 @@ Bin-int/
 
 #Resources
 Resources/*
+game_assets/*
 !Resources/Shader
 !Resources/Material
 !Resources/Scene

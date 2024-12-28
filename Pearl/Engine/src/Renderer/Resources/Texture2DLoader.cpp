@@ -4,7 +4,7 @@
 #include "Renderer/Resources/Texture2D.h"
 #include "Renderer/OpenGL/GLUtils.h"
 
-#include "Core/Filesystem/FileSystem.h"
+#include "Core/File/FileSystem.h"
 #include "Core/Utils/PathUtils.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -26,17 +26,23 @@ PrCore::Resources::IResourceDataPtr Texture2DLoader::LoadResource(const std::str
 	TextureFormat format = TextureFormat::None;
 
 	// Change that in future
-	std::string dir = PrCore::Filesystem::FileSystem::GetInstance().GetResourcesPath();
-	std::string resourcePath = PrCore::PathUtils::MakePath(dir, TEXTURE_DIR);
-	resourcePath = PrCore::PathUtils::MakePath(resourcePath, p_path);
+	auto file = PrCore::File::FileSystem::GetInstance().OpenFileWrapper(p_path);
+	if (file == nullptr)
+		return nullptr;
 
-	unsigned char* data = stbi_load(resourcePath.c_str(), &width, &heigth, &channelsNumber, 0);
+	size_t fileSize = file->GetSize();
+	unsigned char* buffer = new unsigned char[fileSize];
+	file->Read(buffer, fileSize);
+
+	unsigned char* data = stbi_load_from_memory(buffer, fileSize, &width, &heigth, &channelsNumber, 0);
+	
+	delete[] buffer;
 
 	if (!data)
 		return nullptr;
 
 	//HDR texture
-	if (PrCore::PathUtils::GetExtensionInPlace(resourcePath) == "hdr")
+	if (PrCore::PathUtils::GetExtensionInPlace(p_path) == "hdr")
 	{
 		switch (channelsNumber)
 		{

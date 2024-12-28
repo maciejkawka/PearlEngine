@@ -3,7 +3,7 @@
 #include "Renderer/Resources/MaterialLoader.h"
 #include "Renderer/Resources/Material.h"
 
-#include "Core/Filesystem/FileSystem.h"
+#include "Core/File/FileSystem.h"
 #include "Core/Utils/PathUtils.h"
 
 using namespace PrRenderer::Resources;
@@ -11,13 +11,12 @@ using namespace PrCore::Utils;
 
 PrCore::Resources::IResourceDataPtr MaterialLoader::LoadResource(const std::string& p_path)
 {
-	std::string dir = PrCore::PathUtils::MakePath(MATERIAL_DIR, p_path);
-	PrCore::Filesystem::FileStreamPtr file = PrCore::Filesystem::FileSystem::GetInstance().OpenFileStream(dir.c_str());
+	auto file = PrCore::File::FileSystem::GetInstance().OpenFileWrapper(p_path);
 	if (file == nullptr)
 		return nullptr;
 
 	char* data = new char[file->GetSize()];
-	file->Read(data);
+	file->Read(data, file->GetSize());
 
 	std::vector<uint8_t> dataVector;
 

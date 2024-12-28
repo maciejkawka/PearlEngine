@@ -20,9 +20,12 @@ namespace PrCore::PathUtils
 		}
 	}
 
-	void Sanitize(const std::string& p_path)
+	std::string Sanitize(std::string_view p_path)
 	{
-		Sanitize(p_path.c_str());
+		std::string retPath{ p_path };
+		Sanitize(retPath.data());
+
+		return retPath;
 	}
 
 	bool IsAbsolute(const char* p_path)
@@ -174,7 +177,7 @@ namespace PrCore::PathUtils
 
 		size_t beginPtr = 0;
 		size_t endPtr = p_path.find_first_of("/:");
-		while(endPtr != std::string_view::npos)
+		while (endPtr != std::string_view::npos)
 		{
 			std::string subName{ p_path.substr(beginPtr, endPtr - beginPtr) };
 			retVec.push_back(std::move(subName));
@@ -185,6 +188,7 @@ namespace PrCore::PathUtils
 
 		std::string subName(p_path.substr(beginPtr));
 		retVec.push_back(std::move(subName));
+
 		return retVec;
 	}
 
@@ -203,6 +207,7 @@ namespace PrCore::PathUtils
 		}
 
 		retVec.push_back(p_path.substr(beginPtr));
+
 		return retVec;
 	}
 
@@ -223,5 +228,39 @@ namespace PrCore::PathUtils
 		PR_ASSERT(generation < subFolders.size() - 1, "Generation Index is bigger than subfolders count.");
 
 		return subFolders[subFolders.size() - generation - 1];
+	}
+
+	std::string RemoveSubFolder(std::string_view p_path, size_t generation)
+	{
+		auto folder = RemoveFileInPlace(p_path);
+
+		if (folder.back() == '/' || folder.back() == '\\')
+			folder.remove_suffix(1);
+
+		while (generation > 0)
+		{
+			size_t index = folder.find_last_of("/\\");
+			folder.remove_suffix(folder.size() - index);
+			generation--;
+		}
+		
+		return std::string{ p_path };
+	}
+
+	std::string_view RemoveSubFolderInPlace(std::string_view p_path, size_t generation)
+	{
+		auto folder = RemoveFileInPlace(p_path);
+
+		if (folder.back() == '/' || folder.back() == '\\')
+			folder.remove_suffix(1);
+
+		while (generation > 0)
+		{
+			size_t index = folder.find_last_of("/\\");
+			folder.remove_suffix(folder.size() - index);
+			generation--;
+		}
+
+		return folder;
 	}
 }

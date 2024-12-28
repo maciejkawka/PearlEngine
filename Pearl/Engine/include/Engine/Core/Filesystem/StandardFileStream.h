@@ -2,7 +2,7 @@
 #include"DataStream.h"
 #include<fstream>
 
-namespace PrCore::Filesystem {
+namespace PrCore::File {
 
 	class StandardFileStream : public DataStream {
 	public:

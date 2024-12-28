@@ -7,7 +7,7 @@
 #include"Core/Events/WindowEvents.h"
 #include"Core/Events/InputEvents.h"
 
-#include"Core/Filesystem/FileSystem.h"
+#include"Core/File/FileSystem.h"
 #include"stb/stb_image.h"
 
 using namespace PrCore::Windowing;
@@ -99,7 +99,7 @@ GLWindow::GLWindow(const WindowSettings& p_settings) :
 	glfwMakeContextCurrent(m_window);
 
 	if (!m_settings.iconPath.empty())
-		SetIcon(Filesystem::FileSystem::GetInstance().GetResourcesPath() + m_settings.iconPath);
+		SetIcon(std::string{ File::FileSystem::GetInstance().GetEngineAssetsPath() } + m_settings.iconPath);
 
 	s_mainWindow = this;
 }

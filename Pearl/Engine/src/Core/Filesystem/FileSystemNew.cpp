@@ -68,7 +68,7 @@ std::string_view PrCore::File::FileSystemNew::GetWriteDir()
 const std::vector<std::string_view> FileSystemNew::GetMountPaths()
 {
 	std::vector<std::string_view> retVec;
-	for (auto it = PHYSFS_getSearchPath(); it != NULL; ++it)
+	for (auto it = PHYSFS_getSearchPath(); *it != NULL; ++it)
 	{
 		if (*it != nullptr)
 			retVec.push_back(*it);

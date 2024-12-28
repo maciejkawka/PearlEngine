@@ -6,8 +6,6 @@
 #include"Renderer/Resources/Texture2D.h"
 #include"Renderer/Resources/Cubemap.h"
 
-#include"Core/Filesystem/FileSystem.h"
-
 //Const Pearl engine shader uniforms 
 #define TEXOFFSET_UNIFORM "_offset"
 #define TEXSCALE_UNIFORM "_scale"

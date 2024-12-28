@@ -5,7 +5,7 @@
 #include "Renderer/Resources/Texture2D.h"
 #include "Renderer/OpenGL/GLUtils.h"
 
-#include "Core/Filesystem/FileSystem.h"
+#include "Core/File/FileSystem.h"
 #include "Core/Utils/PathUtils.h"
 #include "Core/Utils/JSONParser.h"
 
@@ -18,14 +18,12 @@ IResourceDataPtr BasicCubemapLoader::LoadResource(const std::string& p_path)
 	// Open cubemap asset file that contains 6 textures
 	std::vector<std::string> facesTexPaths;
 
-	// Change that in the future
-	std::string resourcePath = PrCore::PathUtils::MakePath(TEXTURE_DIR, p_path);
-	PrCore::Filesystem::FileStreamPtr file = PrCore::Filesystem::FileSystem::GetInstance().OpenFileStream(resourcePath.c_str());
+	auto file = PrCore::File::FileSystem::GetInstance().OpenFileWrapper(p_path);
 	if (file == nullptr)
 		return nullptr;
 
 	char* data = new char[file->GetSize()];
-	file->Read(data);
+	file->Read(data, file->GetSize());
 
 	std::vector<uint8_t> dataVector;
 	for (auto i = 0; i < file->GetSize(); i++)
@@ -101,18 +99,23 @@ unsigned char* BasicCubemapLoader::LoadTexture(const std::string& p_path, int& p
 	// Load textures
 	int channelsNumber = 0;
 
-	std::string dir = PrCore::Filesystem::FileSystem::GetInstance().GetResourcesPath();
-	std::string resourcePath = PrCore::PathUtils::MakePath(dir, TEXTURE_DIR);
-	resourcePath = PrCore::PathUtils::MakePath(resourcePath, p_path);
+	auto file = PrCore::File::FileSystem::GetInstance().OpenFileWrapper(p_path);
+	if (file == nullptr)
+		return nullptr;
+
+	size_t fileSize = file->GetSize();
+	unsigned char* data = new unsigned char[fileSize];
+	file->Read(data, fileSize);
 
 	stbi_set_flip_vertically_on_load(false);
-	unsigned char* texData = stbi_load(resourcePath.c_str(), &p_width, &p_height, &channelsNumber, 0);
+	unsigned char* texData = stbi_load_from_memory(data, fileSize, &p_width, &p_height, &channelsNumber, 0);
 
+	delete [] data;
 	if (!texData)
 		return nullptr;
 
 	//HDR texture
-	if (PrCore::PathUtils::GetExtensionInPlace(resourcePath) == "hdr")
+	if (PrCore::PathUtils::GetExtensionInPlace(p_path) == "hdr")
 	{
 		switch (channelsNumber)
 		{

@@ -3,7 +3,7 @@
 #include "Renderer/Resources/ShaderLoader.h"
 #include "Renderer/Resources/Shader.h"
 
-#include"Core/Filesystem/FileSystem.h"
+#include"Core/File/FileSystem.h"
 #include"Core/Utils/StringUtils.h"
 #include"Core/Utils/PathUtils.h"
 
@@ -12,14 +12,13 @@ using namespace PrRenderer::Resources;
 PrCore::Resources::IResourceDataPtr ShaderLoader::LoadResource(const std::string& p_path)
 {
 	//Load from file
-	std::string resourcePath = PrCore::PathUtils::MakePath(SHADER_DIR, p_path);
-	PrCore::Filesystem::FileStreamPtr file = PrCore::Filesystem::FileSystem::GetInstance().OpenFileStream(resourcePath.c_str());
+	auto file = PrCore::File::FileSystem::GetInstance().OpenFileWrapper(p_path);
 	if (file == nullptr)
 		return nullptr;
 
 	std::string shader;
 	shader.resize(file->GetSize());
-	file->Read(&shader[0]);
+	file->Read(&shader[0], file->GetSize());
 
 	std::string vertexShaderKeyword = "#vertex";
 	std::string fragmentShaderKeyword = "#fragment";
