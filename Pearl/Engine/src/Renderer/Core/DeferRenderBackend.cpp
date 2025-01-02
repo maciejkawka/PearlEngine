@@ -1287,8 +1287,6 @@ namespace PrRenderer::Core
 		shader->Unbind();
 		cube->Unbind();
 		framebuffer->Unbind();
-
-		PrCore::Resources::ResourceSystem::GetInstance().Remove<Resources::Shader>("shader/cubemap/irradiance_map.shader");
 	}
 
 	void DeferRenderBackend::GeneratePrefilterMap()
@@ -1352,8 +1350,6 @@ namespace PrRenderer::Core
 		shader->Unbind();
 		cube->Unbind();
 		framebuffer->Unbind();
-
-		PrCore::Resources::ResourceSystem::GetInstance().Remove<Resources::Shader>(shader->GetName());
 	}
 
 	void DeferRenderBackend::GenerateLUTMap()
@@ -1385,8 +1381,6 @@ namespace PrRenderer::Core
 		shader->Unbind();
 		quad->Unbind();
 		framebuffer->Unbind();
-
-		PrCore::Resources::ResourceSystem::GetInstance().Remove<Resources::Shader>("shader/cubemap/lut_map.shader");
 	}
 
 	PrCore::Math::vec4 DeferRenderBackend::CalculateLightTexture(size_t p_lightID, size_t p_lightMapSize, size_t p_comboMapSize)

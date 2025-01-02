@@ -46,8 +46,8 @@ PrCore::Entry::AppContext::AppContext()
 
 	//-----------------------
 	// Init File System
-	std::string_view engineAssetsPath = "engine_assets";
-	std::string_view gameAssetPath = "game_assets";
+	std::string_view engineAssetsPath = "EngineAssets";
+	std::string_view gameAssetPath = "GameAssets";
 
 	File::FileSystem::Init();
 	auto filePtr = File::FileSystem::GetInstancePtr();
