@@ -55,6 +55,9 @@
     <Filter Include="Core\File">
       <UniqueIdentifier>{bc90fd0b-a3a3-425a-92ba-faaa2886d93f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Threading">
+      <UniqueIdentifier>{17c9d241-22f4-469f-bc6e-b7ef3e07ffd1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Engine\Core\Entry\AppContext.h">
@@ -381,6 +384,12 @@
     <ClInclude Include="include\Engine\Core\File\FileWrapper.h">
       <Filter>Core\File</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\Threading\IThread.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Threading\ThreadSystem.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -574,6 +583,9 @@
     </ClCompile>
     <ClCompile Include="src\Core\File\FileWrapper.cpp">
       <Filter>Core\File</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Threading\ThreadSystem.cpp">
+      <Filter>Core\Threading</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

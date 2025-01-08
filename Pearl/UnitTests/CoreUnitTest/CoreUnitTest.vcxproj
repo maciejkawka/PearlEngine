@@ -162,6 +162,7 @@
     <ClCompile Include="src\FileSystemTests.cpp" />
     <ClCompile Include="src\PathUtilsTests.cpp" />
     <ClCompile Include="src\ResourceSystemTests.cpp" />
+    <ClCompile Include="src\ThreadSystemTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CommonUnitTest\CommonUnitTest.vcxproj">

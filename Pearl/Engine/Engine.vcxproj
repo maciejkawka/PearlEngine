@@ -56,6 +56,8 @@
     <ClInclude Include="include\Engine\Core\Resources\IResourceDataLoader.h" />
     <ClInclude Include="include\Engine\Core\Resources\ResourceDatabase.h" />
     <ClInclude Include="include\Engine\Core\Resources\ResourceSystem.h" />
+    <ClInclude Include="include\Engine\Core\Threading\IThread.h" />
+    <ClInclude Include="include\Engine\Core\Threading\ThreadSystem.h" />
     <ClInclude Include="include\Engine\Core\Utils\Assert.h" />
     <ClInclude Include="include\Engine\Core\Utils\ISerializable.h" />
     <ClInclude Include="include\Engine\Core\Utils\JSONParser.h" />
@@ -141,6 +143,7 @@
     <ClCompile Include="src\Core\File\StandardFileStream.cpp" />
     <ClCompile Include="src\Core\Input\InputManager.cpp" />
     <ClCompile Include="src\Core\Resources\ResourceSystem.cpp" />
+    <ClCompile Include="src\Core\Threading\ThreadSystem.cpp" />
     <ClCompile Include="src\Core\Utils\Clock.cpp" />
     <ClCompile Include="src\Core\Utils\JSONParser.cpp" />
     <ClCompile Include="src\Core\Utils\Logger.cpp" />
