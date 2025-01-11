@@ -8,6 +8,8 @@
 #include "Core/File/ConfigFile.h"
 #include "Core/File/FileSystem.h"
 #include "Core/ECS/SceneManager.h"
+#include "Core/Threading/ThreadSystem.h"
+#include "Core/Threading/JobSystem.h"
 
 #include"Renderer/Core/DeferRenderFrontend.h"
 #include"Renderer/Core/RenderSystem.h"
@@ -42,7 +44,14 @@ PrCore::Entry::AppContext::AppContext()
 	Utils::Clock::Init();
 	PRLOG_INFO("Building AppContext");
 
+
+
 	//Init Engine Subsystems
+
+	//-----------------------
+	// Init threading
+	Threading::ThreadSystem::Init();
+	Threading::JobSystem::Init(10);
 
 	//-----------------------
 	// Init File System
@@ -66,7 +75,6 @@ PrCore::Entry::AppContext::AppContext()
 	filePtr->SetGameAssetsPath(gameAssets);
 	filePtr->MountDir(gameAssets);
 	filePtr->SetWriteDir(gameAssets);
-	//-----------------------
 
 	Events::EventManager::Init();
 	Resources::ResourceSystem::Init();
@@ -209,5 +217,7 @@ PrCore::Entry::AppContext::~AppContext()
 	Resources::ResourceSystem::Terminate();
 	Events::EventManager::Terminate();
 	File::FileSystem::Terminate();
+	Threading::JobSystem::Terminate();
+	Threading::ThreadSystem::Terminate();
 	Utils::Clock::Terminate();
 }

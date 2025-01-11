@@ -8,6 +8,7 @@ namespace PrCore::Threading {
 	class JobWorker : public IThread {
 	public:
 		JobWorker(std::string_view p_name);
+		~JobWorker();
 
 		int ThreadLoop() override;
 
@@ -45,7 +46,7 @@ namespace PrCore::Threading {
 		std::condition_variable  m_wakeCondition;
 		std::mutex               m_wakeLock;
 
-		std::vector<std::shared_ptr<JobWorker>> m_stealWorkers;
+		std::vector<std::weak_ptr<JobWorker>> m_stealWorkers;
 
 		std::atomic<bool>       m_isBusy;
 		std::atomic<bool>       m_pause;

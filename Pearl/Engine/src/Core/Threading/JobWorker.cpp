@@ -53,7 +53,8 @@ int JobWorker::ThreadLoop()
 			// Iterate workers and steal the job
 			for (auto& worker : m_stealWorkers)
 			{
-				if (worker->StealJob(jobDesc))
+				auto sharedPtr = worker.lock();
+				if (sharedPtr && sharedPtr->StealJob(jobDesc))
 				{
 #if JOB_SYSTEM_DEBUG_LOG
 					PRLOG_INFO("Job stolen from {} <queue size: {}> by {} <queue size: {}> ", worker->m_name, worker->m_jobBuffer.size() + 1, m_name, m_jobBuffer.size());
@@ -134,10 +135,11 @@ void JobWorker::WaitForIdle()
 
 void JobWorker::SetStealWorkers(const std::vector<std::shared_ptr<JobWorker>>& p_workers)
 {
-	m_stealWorkers = p_workers;
-	
-	m_stealWorkers.erase(std::remove_if(m_stealWorkers.begin(), m_stealWorkers.end(),
-		[&](JobWorkerPtr p_worker) { return p_worker->m_id == this->m_id; }), m_stealWorkers.end());
+	for (auto& worker : p_workers)
+	{
+		if(worker->m_id != m_id)
+			m_stealWorkers.push_back(worker);
+	}
 }
 
 void JobWorker::ProcessJob(JobDesc& p_jobDesc)
@@ -156,4 +158,10 @@ bool JobWorker::ShouldTerminate()
 {
 	std::lock_guard lock{ m_jobBufferLock };
 	return m_terminate.load() && m_jobBuffer.empty();
+}
+
+JobWorker::~JobWorker()
+{
+	PR_ASSERT(m_jobBuffer.empty(), "Job buffer must be emtry!");
+	m_stealWorkers.clear();
 }
