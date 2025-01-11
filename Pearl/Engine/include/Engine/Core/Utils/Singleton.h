@@ -33,6 +33,7 @@ namespace PrCore::Utils {
 			PR_ASSERT(s_instance != nullptr, "Object " + std::string(typeid(T).name()) + "is already initiated");
 			PRLOG_INFO("Terminate {0}", typeid(T).name());
 			delete s_instance;
+			s_instance = nullptr;
 		}
 
 		inline static T& GetInstance()

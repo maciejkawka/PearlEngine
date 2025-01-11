@@ -390,6 +390,15 @@
     <ClInclude Include="include\Engine\Core\Threading\ThreadSystem.h">
       <Filter>Core\Threading</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\Threading\JobDefines.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Threading\JobSystem.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Threading\JobWorker.h">
+      <Filter>Core\Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -587,6 +596,12 @@
     <ClCompile Include="src\Core\Threading\ThreadSystem.cpp">
       <Filter>Core\Threading</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Threading\JobSystem.cpp">
+      <Filter>Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Threading\JobWorker.cpp">
+      <Filter>Core\Threading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\Engine\Core\ECS\ComponentPool.inl">
@@ -603,6 +618,9 @@
     </None>
     <None Include="include\Engine\Core\Resources\ResourceSystem.inl">
       <Filter>Core\Resources</Filter>
+    </None>
+    <None Include="include\Engine\Core\Threading\JobSystem.inl">
+      <Filter>Core\Threading</Filter>
     </None>
   </ItemGroup>
 </Project>
