@@ -2,8 +2,6 @@
 
 #include "Core/Threading/JobWorker.h"
 
-#include <optional>
-
 using namespace PrCore::Threading;
 
 JobWorker::JobWorker(std::string_view p_name) :
@@ -20,18 +18,19 @@ int JobWorker::ThreadLoop()
 		// Wait if thread is paused
 		if (ShouldPause())
 		{
-			std::unique_lock lock{ m_wakeLock };
-			m_wakeCondition.wait(lock, [&]() {return !this->ShouldPause() || m_terminate.load(); });
+			std::unique_lock lock{ m_workerLock };
+			m_isBusy.store(false);
+			m_wakeCondition.wait(lock, [&]() {return !m_pause.load() || m_terminate.load(); });
+			m_isBusy.store(true);
 		}
 
-		bool jobProcessed = false;
-
 		// Try to get job from the buffer
+		bool jobProcessed = false;
 		if (!jobProcessed)
 		{
 			std::optional<JobDesc> jobDesc;
 			{
-				std::lock_guard lock{ m_jobBufferLock };
+				std::lock_guard lock{ m_workerLock };
 				if (m_jobBuffer.size() > 0)
 				{
 					jobDesc = m_jobBuffer.front();
@@ -49,32 +48,39 @@ int JobWorker::ThreadLoop()
 		// Steal job from other workers
 		if (!jobProcessed)
 		{
-			JobDesc jobDesc;
 			// Iterate workers and steal the job
 			for (auto& worker : m_stealWorkers)
 			{
 				auto sharedPtr = worker.lock();
-				if (sharedPtr && sharedPtr->StealJob(jobDesc))
+				if (sharedPtr)
 				{
+					auto jobDesc = sharedPtr->StealJob();
+					if (jobDesc)
+					{
 #if JOB_SYSTEM_DEBUG_LOG
-					PRLOG_INFO("Job stolen from {} <queue size: {}> by {} <queue size: {}> ", worker->m_name, worker->m_jobBuffer.size() + 1, m_name, m_jobBuffer.size());
+						PRLOG_INFO("Job stolen from {} <queue size: {}> by {} <queue size: {}> ", worker->m_name, worker->m_jobBuffer.size() + 1, m_name, m_jobBuffer.size());
 #endif
-					ProcessJob(jobDesc);
-					jobProcessed = true;
-					break;
+						ProcessJob(*jobDesc);
+						jobProcessed = true;
+						break;
+					}
 				}
 			}
 		}
 
-		// Go to sleep
-		if (!jobProcessed)
+		// No job was processed and jobBuffer is empty
+		std::unique_lock lock{ m_workerLock };
+		if (!jobProcessed && m_jobBuffer.empty())
 		{
-			// Notify that no more work to do and go sleep
 			m_isBusy.store(false);
+
+			// Notify that no more work to do and go sleep
 			m_idleCondition.notify_all();
-	
-			std::unique_lock lock{ m_wakeLock };;
-			m_wakeCondition.wait(lock, [&]() { return !m_jobBuffer.empty() || m_terminate.load() || ShouldPause(); });
+		
+			m_wakeCondition.wait(lock, [&]() {
+				return !m_jobBuffer.empty() || m_terminate.load() || m_pause.load();
+				});
+
 			m_isBusy.store(true);
 		}
 	}
@@ -85,41 +91,40 @@ int JobWorker::ThreadLoop()
 void JobWorker::SetPaused(bool isPaused)
 {
 	m_pause.store(isPaused);
-	Notify();
+	m_wakeCondition.notify_one();
 }
 
 void JobWorker::Terminate()
 {
 	m_terminate.store(true);
-	Notify();
+	m_wakeCondition.notify_one();
 }
 
 void JobWorker::AddJobRequest(JobDesc&& p_jobDesc)
 {
 	PR_ASSERT(GetCurrentThreadId() != m_id, "Recursive job request! Not supported!");
 
-	std::lock_guard lock{ m_jobBufferLock };
-	m_jobBuffer.push_back(std::move(p_jobDesc));
+	{
+		std::lock_guard lock{ m_workerLock };
+		m_jobBuffer.push_back(std::move(p_jobDesc));
+	}
+
+	m_wakeCondition.notify_one();
 }
 
-bool JobWorker::StealJob(JobDesc& p_jobDesc)
+std::optional<JobDesc> JobWorker::StealJob()
 {
 	// Steal only if worker is busy
 	if (!IsBusy())
-		return false;
+		return std::nullopt;
 
-	std::lock_guard lock{ m_jobBufferLock };
-	if(m_jobBuffer.size() == 0)
-		return false;
+	std::lock_guard lock{ m_workerLock };
+	if (m_jobBuffer.empty())
+		return std::nullopt;
 
-	p_jobDesc = m_jobBuffer.back();
+	auto jobDesc = std::move(m_jobBuffer.back());
 	m_jobBuffer.pop_back();
-	return true;
-}
-
-void JobWorker::Notify()
-{
-	m_wakeCondition.notify_one();
+	return jobDesc;
 }
 
 bool JobWorker::IsBusy()
@@ -137,26 +142,30 @@ void JobWorker::SetStealWorkers(const std::vector<std::shared_ptr<JobWorker>>& p
 {
 	for (auto& worker : p_workers)
 	{
-		if(worker->m_id != m_id)
+		if (worker->m_id != m_id)
 			m_stealWorkers.push_back(worker);
 	}
 }
 
-void JobWorker::ProcessJob(JobDesc& p_jobDesc)
+void JobWorker::ProcessJob(const JobDesc& p_jobDesc)
 {
 #if JOB_SYSTEM_DEBUG_LOG
 	PRLOG_INFO("JobWorker \"{}\" starting job: \"{}\"", m_name, p_jobDesc.name);
 #endif
 
-	p_jobDesc.state->m_isDone.store(false);
-	p_jobDesc.functionPtr();
-	p_jobDesc.state->m_isDone.store(true);
-	p_jobDesc.state->m_finishedCondition.notify_all();
+	auto jobState = p_jobDesc.state;
+	{
+		std::lock_guard lock{ jobState->m_finishedLock };
+		p_jobDesc.functionPtr();
+		jobState->m_isDone.store(true);
+	}
+
+	jobState->m_finishedCondition.notify_all();
 }
 
 bool JobWorker::ShouldTerminate()
 {
-	std::lock_guard lock{ m_jobBufferLock };
+	std::lock_guard lock{ m_workerLock };
 	return m_terminate.load() && m_jobBuffer.empty();
 }
 

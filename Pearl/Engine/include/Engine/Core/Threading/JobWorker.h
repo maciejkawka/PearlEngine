@@ -3,6 +3,8 @@
 #include "IThread.h"
 #include "JobDefines.h"
 
+#include <optional>
+
 namespace PrCore::Threading {
 
 	class JobWorker : public IThread {
@@ -12,10 +14,9 @@ namespace PrCore::Threading {
 
 		int ThreadLoop() override;
 
-		void AddJobRequest(JobDesc&& p_jobDesc);
-		bool StealJob(JobDesc& p_jobDesc);
+		void                    AddJobRequest(JobDesc&& p_jobDesc);
+		std::optional<JobDesc>  StealJob();
 
-		void Notify();
 		bool IsBusy();
 		void WaitForIdle();
 
@@ -31,20 +32,18 @@ namespace PrCore::Threading {
 		bool IsPaused() override { return m_pause; }
 		bool IsTerminated() override { return m_terminate; }
 
-	private:
-		void ProcessJob(JobDesc& p_jobDesc);
+		void ProcessJob(const JobDesc& p_jobDesc);
 
 		std::string       m_name;
 		size_t            m_id;
 
 		std::deque<JobDesc> m_jobBuffer;
-		std::mutex          m_jobBufferLock;
 
 		std::condition_variable  m_idleCondition;
 		std::mutex               m_idleLock;
 
 		std::condition_variable  m_wakeCondition;
-		std::mutex               m_wakeLock;
+		std::mutex               m_workerLock;
 
 		std::vector<std::weak_ptr<JobWorker>> m_stealWorkers;
 

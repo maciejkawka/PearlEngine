@@ -99,6 +99,7 @@ TEST_F(JobSystemTest, PauseWaitAllJobs)
 
 	EXPECT_EQ(value, 0);
 
+	jobPtr->WaitAll();
 	jobPtr->PauseWorkers(false);
 	jobPtr->WaitAll();
 	EXPECT_FALSE(jobPtr->GetWorkersPaused());

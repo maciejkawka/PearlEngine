@@ -18,13 +18,12 @@ namespace PrCore::Threading {
 		size_t activeWorker = 0;
 		size_t nextActiveWorker = 0;
 		do {
-			activeWorker = m_activeWorker.load();
+			activeWorker = m_nextWorker.load();
 			nextActiveWorker = (activeWorker + 1) % m_workers.size();
 
-		} while (!m_activeWorker.compare_exchange_weak(activeWorker, nextActiveWorker));
+		} while (!m_nextWorker.compare_exchange_weak(activeWorker, nextActiveWorker));
 
 		m_workers[activeWorker]->AddJobRequest(std::move(jobDesc));
-		m_workers[activeWorker]->Notify();
 
 		return jobState;
 	}

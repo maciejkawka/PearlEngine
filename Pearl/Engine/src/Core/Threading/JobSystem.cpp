@@ -24,7 +24,7 @@ JobSystem::JobSystem(size_t p_workerNumber)
 	for (auto& worker : m_workers)
 		worker->SetStealWorkers(m_workers);
 	
-	m_activeWorker.store(0);
+	m_nextWorker.store(0);
 	m_nextJobId.store(0);
 	m_paused.store(false);
 }
@@ -70,11 +70,12 @@ void JobSystem::WaitAll()
 
 void JobState::Wait()
 {
-	if (!m_isDone.load())
-	{
-		std::unique_lock lock{ m_finishedLock };
-		m_finishedCondition.wait(lock);
-	}
+	if (m_isDone.load())
+		return;
+
+	std::unique_lock lock{ m_finishedLock };
+	m_finishedCondition.wait(lock, [this]() {return m_isDone.load(); });
+
 }
 
 bool JobState::IsDone()
