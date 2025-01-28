@@ -43,15 +43,13 @@ void RenderStressTest::OnEnable()
 
 	for (auto [entity, light] : m_entityViewer.EntitesWithComponents<LightComponent>())
 	{
-		if (light->mainDirectLight)
+		if (light->m_light->GetType() == PrRenderer::Resources::LightType::Directional)
 		{
 			m_mainLightPtr = light->m_light;
+			m_lightColor = m_mainLightPtr->GetColor();
 			m_mainLightPtr->SetColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 		}
 	}
-
-	if (m_mainLightPtr == nullptr)
-		m_mainLightPtr = std::make_shared<PrRenderer::Resources::Light>();
 }
 
 void RenderStressTest::OnDisable()
@@ -81,13 +79,13 @@ void RenderStressTest::OnUpdate(float p_dt)
 
 		if (cubemap == 0)
 		{
-			renderSystem->SetCubemap(Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("skymapHDRMaterial.mat").GetData());
-			m_mainLightPtr->SetColor({ 0.8f, 0.8f, 0.8f, 1.0f });
+			renderSystem->SetCubemap(Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("stress_test/hrd_skymap.mat").GetData());
+			m_mainLightPtr->SetColor(m_lightColor);
 		}
 		else if (cubemap == 1)
 		{
-			renderSystem->SetCubemap(Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("cubemapMaterial.mat").GetData());
-			m_mainLightPtr->SetColor({ 0.8f, 0.8f, 0.8f, 1.0f });
+			renderSystem->SetCubemap(Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("stress_test/cubemap_default.mat").GetData());
+			m_mainLightPtr->SetColor(m_lightColor);
 		}
 		else if (cubemap == 2)
 		{
