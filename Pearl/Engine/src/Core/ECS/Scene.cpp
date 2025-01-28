@@ -108,19 +108,19 @@ void Scene::LateUpdate(float p_dt) const
 
 void Scene::CleanDestroyedEntities() const
 {
-	for (auto [entity] : m_entityManager->GetAllHierrarchicalEntities())
-	{
-		if (entity.HasComponent<ToDestoryTag>())
-			continue;
+	EntityViewer viewer(m_entityManager);
 
-		auto parentComponent = entity.GetComponent<ParentComponent>();
-		auto parent = parentComponent->parent;
+	viewer.MT_HierarchicalEntitiesWithComponents<ParentComponent>([](ECS::Entity entity, ParentComponent* parentComponent)
+		{
+			if (entity.HasComponent<ToDestoryTag>())
+				return;
 
-		if (parent.HasComponent<ToDestoryTag>())
-			entity.AddComponent<ToDestoryTag>();
-	}
+			auto parent = parentComponent->parent;
+			if (parent.IsValid() && parent.HasComponent<ToDestoryTag>())
+				entity.AddComponent<ToDestoryTag>();
+		});
 
-	for(auto [entity, _]: m_entityManager->GetEntitiesWithComponents<ToDestoryTag*>())
+	for (auto [entity, _] : viewer.EntitesWithComponents<ToDestoryTag>())
 		m_entityManager->DestoryEntity(entity.GetID());
 }
 

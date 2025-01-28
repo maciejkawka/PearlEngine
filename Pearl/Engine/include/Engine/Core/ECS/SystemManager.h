@@ -41,7 +41,7 @@ namespace PrCore::ECS {
 		void SetActiveSystem(bool p_isActive);
 
 		template<class System>
-		bool IsActiveSystem() const;
+		bool IsActiveSystem();
 
 		void OnSerialize(Utils::JSON::json& p_serialized) override;
 

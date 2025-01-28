@@ -27,6 +27,43 @@ namespace PrCore::Threading {
 	using JobStatePtr = std::shared_ptr<JobState>;
 	using JobPtr = std::function<void()>;
 
+	class BatchJobState {
+	public:
+		BatchJobState()
+		{
+			m_stateVector.reserve(64);
+		}
+
+		void Wait()
+		{
+			for (auto& state : m_stateVector)
+				state->Wait();
+		}
+
+		bool IsDone()
+		{
+			bool done = false;
+			for (auto& state : m_stateVector)
+				done &= state->IsDone();
+
+			return done;
+		}
+
+		void Append(JobStatePtr&& p_statePtr)
+		{
+			m_stateVector.push_back(std::move(p_statePtr));
+		}
+
+		BatchJobState& operator+=(JobStatePtr&& p_statePtr)
+		{
+			m_stateVector.push_back(std::move(p_statePtr));
+			return *this;
+		}
+
+	private:
+		std::vector<JobStatePtr> m_stateVector;
+	};
+
 	struct JobDesc
 	{
 		JobPtr      functionPtr;

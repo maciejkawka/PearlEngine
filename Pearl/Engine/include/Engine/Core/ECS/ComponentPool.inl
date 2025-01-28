@@ -1,96 +1,105 @@
 #pragma once
 #include "Core/Utils/Assert.h"
-#include "ComponentPool.h"
 
 namespace PrCore::ECS {
 
 	template<class T>
-	ComponentPool<T>::ComponentPool():
-		m_componentsNumber(0)
-	{}
+	ComponentPool<T>::ComponentPool()
+	{
+		std::fill(m_components.begin(), m_components.end(), nullptr);
+	}
 
 	template<class T>
 	ComponentPool<T>::~ComponentPool()
 	{
-		for(int i=0;i<m_componentsNumber;i++)
+		for (auto& component : m_components)
 		{
-			auto component = m_components[i];
 			if (component != nullptr)
+			{
 				delete component;
+				component = nullptr;
+			}
 		}
 	}
 
 	template<class T>
 	T* ComponentPool<T>::AllocateData(ID p_ID)
 	{
-		PR_ASSERT(m_entityToIndexMap.find(p_ID) == m_entityToIndexMap.end(), "Entity already has component " + std::string(typeid(T).name()));
+		static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::ECS::BaseComponent");
+
 		PR_ASSERT(p_ID.GetIndex() <= MAX_ENTITIES, "Wrong ID");
+		PR_ASSERT(p_ID.IsValid(), "Wrong ID");
 
-		if (!std::is_base_of<BaseComponent, T>::value)
-			PR_ASSERT(false, "Component must expand PrCore::ECS::BaseComponent");
+		auto entityIndex = p_ID.GetIndex() - 1;
+		if (m_components[entityIndex])
+		{
+			PR_ASSERT(false, "Entity already has component " + std::string(typeid(T).name()));
+			return nullptr;
+		}
 
-		auto nextComponentIndex = m_componentsNumber;
-		m_entityToIndexMap[p_ID] = nextComponentIndex;
-		m_indexToEntityMap[nextComponentIndex] = p_ID;
-		m_components[nextComponentIndex] = new T();
-		m_componentsNumber++;
-
-		return m_components[nextComponentIndex];
+		m_components[entityIndex] = new T();
+		return m_components[entityIndex];
 	}
 
 	template<class T>
 	T* ComponentPool<T>::GetData(ID p_ID)
 	{
+		static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::ECS::BaseComponent");
+
 		PR_ASSERT(p_ID.GetIndex() <= MAX_ENTITIES, "Wrong ID");
+		PR_ASSERT(p_ID.IsValid(), "Wrong ID");
 
-		auto it = m_entityToIndexMap.find(p_ID);
-
-		//If no component return null
-		PR_ASSERT(it != m_entityToIndexMap.end(), "Entity does not have component " + std::string(typeid(T).name()));
-		if(it == m_entityToIndexMap.end())
-			return nullptr;
-
-		return m_components[it->second];
+		auto entityIndex = p_ID.GetIndex() - 1;
+		PR_ASSERT(m_components[entityIndex], "Entity does not have component " + std::string(typeid(T).name()));
+		return m_components[entityIndex];
 	}
 
 	template<class T>
 	void ComponentPool<T>::RemoveData(ID p_ID)
 	{
-		PR_ASSERT(m_entityToIndexMap.find(p_ID) != m_entityToIndexMap.end(), "Entity does not have component " + std::string(typeid(T).name()));
+		static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::ECS::BaseComponent");
+
 		PR_ASSERT(p_ID.GetIndex() <= MAX_ENTITIES, "Wrong ID");
+		PR_ASSERT(p_ID.IsValid(), "Wrong ID");
 
-		auto removedEntityIndex = m_entityToIndexMap[p_ID];
-		auto lastComponentIndex = m_componentsNumber - 1;
+		auto entityIndex = p_ID.GetIndex() - 1;
+		PR_ASSERT(m_components[entityIndex], "Entity does not have component " + std::string(typeid(T).name()));
 
-		delete m_components[removedEntityIndex];
-		m_components[removedEntityIndex] = m_components[lastComponentIndex];
-		m_components[lastComponentIndex] = nullptr;
-
-		auto lastEntity = m_indexToEntityMap[lastComponentIndex];
-		m_entityToIndexMap[lastEntity] = removedEntityIndex;
-		m_indexToEntityMap[removedEntityIndex] = lastEntity;
-
-		m_entityToIndexMap.erase(p_ID);
-		m_indexToEntityMap.erase(lastComponentIndex);
-
-		m_componentsNumber--;
+		delete m_components[entityIndex];
+		m_components[entityIndex] = nullptr;
 	}
 
 	template<class T>
 	bool ComponentPool<T>::DataExist(ID p_ID)
 	{
-		return m_entityToIndexMap.find(p_ID) != m_entityToIndexMap.end();
+		static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::ECS::BaseComponent");
+
+		PR_ASSERT(p_ID.GetIndex() <= MAX_ENTITIES, "Wrong ID");
+		PR_ASSERT(p_ID.IsValid(), "Wrong ID");
+
+		auto entityIndex = p_ID.GetIndex() - 1;
+		return m_components[entityIndex] != nullptr;
 	}
 
 	template<class T>
 	void ComponentPool<T>::EntityDestroyed(ID p_ID)
 	{
+		static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::ECS::BaseComponent");
+
+		PR_ASSERT(p_ID.GetIndex() <= MAX_ENTITIES, "Wrong ID");
+		PR_ASSERT(p_ID.IsValid(), "Wrong ID");
+
 		RemoveData(p_ID);
 	}
 
 	template<class T>
 	 BaseComponent* ComponentPool<T>::GetRawData(ID p_ID)
 	 {
+		 static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::ECS::BaseComponent");
+
+		 PR_ASSERT(p_ID.GetIndex() <= MAX_ENTITIES, "Wrong ID");
+		 PR_ASSERT(p_ID.IsValid(), "Wrong ID");
+
 		 T* component = GetData(p_ID);
 		 return reinterpret_cast<BaseComponent*>(component);
 	 }

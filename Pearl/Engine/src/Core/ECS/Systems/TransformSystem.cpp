@@ -13,13 +13,15 @@ void HierarchyTransform::OnCreate()
 
 void HierarchyTransform::OnUpdate(float p_dt)
 {
-	for(auto [entity, transform]: m_entityViewer.HierarchicalEntitiesWithComponents<TransformComponent>())
-	{
-		auto parentComponent = entity.GetComponent<ParentComponent>();
-		auto parent = parentComponent->parent;
-		auto parentTransform = parent.GetComponent<TransformComponent>();
+	m_entityViewer.MT_HierarchicalEntitiesWithComponents<ParentComponent, TransformComponent>([](const Entity entity, ParentComponent* parentComponent, TransformComponent* transform)
+		{
+			auto parent = parentComponent->parent;
+			if (!parent.IsValid())
+				return;
 
-		transform->SetWorldMatrix(parentTransform->GetWorldMatrix() * transform->GetLocalMatrix());
-		transform->DecomposeWorldMatrix();
-	}
+			auto parentTransform = parent.GetComponent<TransformComponent>();
+
+			transform->SetWorldMatrix(parentTransform->GetWorldMatrix() * transform->GetLocalMatrix());
+			transform->DecomposeWorldMatrix();
+		});
 }

@@ -25,7 +25,7 @@ namespace PrCore::ECS {
 		void SetActiveSystem(bool p_isActive);
 
 		template<class System>
-		bool IsActiveSystem() const;
+		bool IsActiveSystem();
 
 		Entity GetEntityByName(const std::string& p_name);
 		Entity GetEntityByID(Utils::UUID p_UUID);

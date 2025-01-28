@@ -39,8 +39,6 @@ namespace PrCore::ECS {
 		void Init(EntityManager* p_entityManager)
 		{
 			m_entityViewer = EntityViewer(p_entityManager);
-			m_updateGroup = (uint8_t)UpdateGroup::Update;
-			m_isActive = true;
 		}
 
 		friend class SystemManager;

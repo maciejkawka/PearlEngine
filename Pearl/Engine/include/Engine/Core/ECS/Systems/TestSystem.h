@@ -41,6 +41,7 @@ namespace PrCore::ECS
 		int m_selectedLight = 0;
 		int m_maxLight = 0;
 		PrRenderer::Resources::LightPtr m_mainLightPtr;
+		PrRenderer::Core::Color m_lightColor;
 
 		inline virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
 		inline virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}

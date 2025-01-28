@@ -22,5 +22,8 @@
     <ClCompile Include="src\JobSystemTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
+    <ClCompile Include="src\ECSTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

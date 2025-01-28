@@ -32,7 +32,7 @@ void SceneManager::DeleteScene(const Scene* p_scene)
 	PR_ASSERT(sceneIterator != m_scenes.end(), "Scene " + std::to_string(p_scene->GetSceneUUID()) + "does not exist");
 
 	m_scenes.erase(sceneIterator);
-	delete *sceneIterator;
+	delete p_scene;
 	p_scene = nullptr;
 }
 

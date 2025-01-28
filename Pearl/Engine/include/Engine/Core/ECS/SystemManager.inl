@@ -1,5 +1,4 @@
 #pragma once
-#include "SystemManager.h"
 #include <type_traits>
 
 namespace PrCore::ECS {
@@ -67,11 +66,11 @@ namespace PrCore::ECS {
 	}
 
 	template<class System>
-	bool SystemManager::IsActiveSystem() const
+	bool SystemManager::IsActiveSystem()
 	{
 		static_assert(std::is_base_of<BaseSystem, System>::value, "System must expand PrCore::ECS::BaseSystem");
 
-		auto systemID = GetSystemID<System>();
+		size_t systemID = GetSystemID<System>();
 		return m_systems[systemID]->IsActive();
 	}
 

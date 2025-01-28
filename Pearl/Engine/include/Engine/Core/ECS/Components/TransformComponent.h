@@ -90,6 +90,17 @@ namespace PrCore::ECS {
 		Entity parent;
 		bool isDirty = true;
 
+		Entity GetParent()
+		{
+			return parent;
+		}
+
+		void SetParent(Entity p_parent)
+		{
+			parent = p_parent;
+			isDirty = true;
+		}
+
 		virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
 		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
 	};

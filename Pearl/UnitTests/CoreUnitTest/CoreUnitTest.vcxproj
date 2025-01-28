@@ -159,6 +159,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ECSTests.cpp" />
     <ClCompile Include="src\FileSystemTests.cpp" />
     <ClCompile Include="src\JobSystemTests.cpp" />
     <ClCompile Include="src\PathUtilsTests.cpp" />

@@ -1,6 +1,4 @@
 #pragma once
-#include "EntityManager.h"
-
 #include "Core/Events/ECSEvents.h"
 #include "Core/Events/EventManager.h"
 
@@ -80,7 +78,7 @@ namespace PrCore::ECS {
 	template<class T>
 	void EntityManager::RegisterComponent()
 	{
-		PR_ASSERT(m_typeComponentCounter < MAX_COMPONENTS, "Cannot register more components");
+		PR_ASSERT(s_typeComponentCounter < MAX_COMPONENTS, "Cannot register more components");
 
 		auto componentID = GetTypeID<T>();
 		m_ComponentPools[componentID] = std::make_shared<ComponentPool<T>>();;
@@ -116,7 +114,7 @@ namespace PrCore::ECS {
 	template<class T>
 	size_t EntityManager::GetTypeID()
 	{
-		static size_t s_componentID = m_typeComponentCounter++;
+		static size_t s_componentID = s_typeComponentCounter++;
 		return s_componentID;
 	}
 

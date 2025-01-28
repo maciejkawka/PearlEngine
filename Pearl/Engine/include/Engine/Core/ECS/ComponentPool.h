@@ -19,7 +19,6 @@ namespace PrCore::ECS {
 	class ComponentPool: public IComponentPool {
 	public:
 		ComponentPool();
-
 		~ComponentPool();
 
 		T* AllocateData(ID p_ID);
@@ -32,24 +31,12 @@ namespace PrCore::ECS {
 
 		void EntityDestroyed(ID p_ID) override;
 
-		BaseComponent* GetRawData(ID p_ID) override; //Return BaseComponent
+		BaseComponent* GetRawData(ID p_ID) override;
 
 	private:
 		//Vector holds all one type components created
-		//Component vector is packed
-		//Vector capacity would be set as quarter of max entities at the beginig
 		std::array<T*, MAX_ENTITIES> m_components;
-
-		//Map holds Entites to index references
-		std::map<ID, size_t> m_entityToIndexMap;
-
-		//Map holds index to Entity references
-		std::map<size_t, ID> m_indexToEntityMap;
-
-		//Number of all components
-		size_t m_componentsNumber;
 	};
-
 }
 
 #include"Core/ECS/ComponentPool.inl"
