@@ -30,6 +30,8 @@
 #include "Renderer/Resources/MeshOBJLoader.h"
 #include "Renderer/Resources/ShaderLoader.h"
 #include "Renderer/Resources/Texture2DLoader.h"
+
+#include "Physics/Core/PhysicsSystem.h"
 //
 
 const std::string_view GraphicConfig{ "config/graphic.cfg" };
@@ -200,6 +202,9 @@ PrCore::Entry::AppContext::AppContext()
 		PrRenderer::Core::renderSystem = std::make_unique<PrRenderer::Core::DeferRenderFrontend>(rendererSettings);
 	}
 
+	PrPhysics::PhysicsSettings physSettings;
+	PrPhysics::PhysicsSystem::Init(physSettings);
+
 	Input::InputManager::Init();
 	ECS::SceneManager::Init();
 }
@@ -210,6 +215,7 @@ PrCore::Entry::AppContext::~AppContext()
 
 	ECS::SceneManager::Terminate();
 	Input::InputManager::Terminate();
+	PrPhysics::PhysicsSystem::Terminate();
 	PrRenderer::Core::renderSystem.reset();
 	delete m_rendererContext;
 	delete m_window;

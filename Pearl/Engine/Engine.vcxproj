@@ -76,6 +76,19 @@
     <ClInclude Include="include\Engine\Core\Windowing\Window.h" />
     <ClInclude Include="include\Engine\Core\Windowing\WindowContext.h" />
     <ClInclude Include="include\Engine\Core\Windowing\WindowSettings.h" />
+    <ClInclude Include="include\Engine\Physics\Actor\IActor.h" />
+    <ClInclude Include="include\Engine\Physics\Actor\IRigidBody.h" />
+    <ClInclude Include="include\Engine\Physics\Core\Material.h" />
+    <ClInclude Include="include\Engine\Physics\Core\IFactory.h" />
+    <ClInclude Include="include\Engine\Physics\Impl\PhysFactory.h" />
+    <ClInclude Include="include\Engine\Physics\Impl\PhysRigidBody.h" />
+    <ClInclude Include="include\Engine\Physics\Impl\PhysShape.h" />
+    <ClInclude Include="include\Engine\Physics\Impl\ConvertUtils.h" />
+    <ClInclude Include="include\Engine\Physics\Utils\INativePtrHandler.h" />
+    <ClInclude Include="include\Engine\Physics\Shape\IGeometry.h" />
+    <ClInclude Include="include\Engine\Physics\Utils\PhysicsMath.h" />
+    <ClInclude Include="include\Engine\Physics\Core\PhysicsSystem.h" />
+    <ClInclude Include="include\Engine\Physics\Shape\IShape.h" />
     <ClInclude Include="include\Engine\Renderer\Buffers\BufferLayout.h" />
     <ClInclude Include="include\Engine\Renderer\Buffers\Framebuffer.h" />
     <ClInclude Include="include\Engine\Renderer\Buffers\IndexBuffer.h" />
@@ -162,6 +175,10 @@
     <ClCompile Include="src\Core\Utils\StringUtils.cpp" />
     <ClCompile Include="src\Core\Utils\UUID.cpp" />
     <ClCompile Include="src\Core\Windowing\GLWindow.cpp" />
+    <ClCompile Include="src\Physics\Core\PhysicsSystem.cpp" />
+    <ClCompile Include="src\Physics\Impl\PhysFactory.cpp" />
+    <ClCompile Include="src\Physics\Impl\PhysRigidBody.cpp" />
+    <ClCompile Include="src\Physics\Impl\PhysShape.cpp" />
     <ClCompile Include="src\Renderer\Buffers\Framebuffer.cpp" />
     <ClCompile Include="src\Renderer\Buffers\IndexBuffer.cpp" />
     <ClCompile Include="src\Renderer\Buffers\VertexArray.cpp" />
@@ -265,7 +282,7 @@
       <PreprocessorDefinitions>PR_ASSERTENABLE;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/stb/include;../../Dependencies/glad/include;../../Dependencies/glm;../../Dependencies/tinyObj/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/stb/include;../../Dependencies/glad/include;../../Dependencies/glm;../../Dependencies/tinyObj/include;../../Dependencies/PhysX/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>
@@ -280,8 +297,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfw3.lib;physfs-static.lib;Shlwapi.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../../Dependencies/glfw/lib/Debug;../../Dependencies/physfs/lib/Debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;physfs-static.lib;Shlwapi.lib;PhysXExtensions_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXVehicle_static_64.lib;PhysXVehicle2_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCooking_64.lib;SceneQuery_static_64.lib;PhysX_64.lib;PhysXCommon_64.lib;PhysXFoundation_64.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../Dependencies/glfw/lib/Debug;../../Dependencies/physfs/lib/Debug;../../Dependencies/PhysX/lib/profile</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -293,7 +310,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/stb/include;../../Dependencies/glad/include;../../Dependencies/glm;../../Dependencies/tinyObj/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/stb/include;../../Dependencies/glad/include;../../Dependencies/glm;../../Dependencies/tinyObj/include;../../Dependencies/PhysX/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>
@@ -309,8 +326,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfw3.lib;physfs-static.lib;Shlwapi.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../../Dependencies/glfw/lib/Release;../../Dependencies/physfs/lib/Release</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;physfs-static.lib;Shlwapi.lib;PhysXExtensions_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXVehicle_static_64.lib;PhysXVehicle2_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCooking_64.lib;SceneQuery_static_64.lib;PhysX_64.lib;PhysXCommon_64.lib;PhysXFoundation_64.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../Dependencies/glfw/lib/Release;../../Dependencies/physfs/lib/Release;../../Dependencies/PhysX/lib/release</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

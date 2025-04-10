@@ -58,6 +58,24 @@
     <Filter Include="Core\Threading">
       <UniqueIdentifier>{17c9d241-22f4-469f-bc6e-b7ef3e07ffd1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{070237af-01b2-46e4-aa1c-f4b2ab3bb57a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics\Core">
+      <UniqueIdentifier>{37b8b7bf-904b-4be6-8f4a-074e341aebd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics\Actor">
+      <UniqueIdentifier>{b8e2d890-0a58-4027-9106-b35347a4996a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics\Impl">
+      <UniqueIdentifier>{440a0750-4e26-42fd-a10c-8e08f28ecd35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics\Utils">
+      <UniqueIdentifier>{027032c0-246d-485d-b5c4-79dc998259ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics\Shape">
+      <UniqueIdentifier>{ab1a99cc-69ca-4d6f-8c16-4d0b8b4742d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Engine\Core\Entry\AppContext.h">
@@ -399,6 +417,45 @@
     <ClInclude Include="include\Engine\Core\Threading\JobWorker.h">
       <Filter>Core\Threading</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Core\PhysicsSystem.h">
+      <Filter>Physics\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Actor\IActor.h">
+      <Filter>Physics\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Actor\IRigidBody.h">
+      <Filter>Physics\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Impl\ConvertUtils.h">
+      <Filter>Physics\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Core\IFactory.h">
+      <Filter>Physics\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Impl\PhysFactory.h">
+      <Filter>Physics\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Utils\INativePtrHandler.h">
+      <Filter>Physics\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Utils\PhysicsMath.h">
+      <Filter>Physics\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Impl\PhysRigidBody.h">
+      <Filter>Physics\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Shape\IGeometry.h">
+      <Filter>Physics\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Shape\IShape.h">
+      <Filter>Physics\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Core\Material.h">
+      <Filter>Physics\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Impl\PhysShape.h">
+      <Filter>Physics\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -601,6 +658,18 @@
     </ClCompile>
     <ClCompile Include="src\Core\Threading\JobWorker.cpp">
       <Filter>Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\Core\PhysicsSystem.cpp">
+      <Filter>Physics\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\Impl\PhysFactory.cpp">
+      <Filter>Physics\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\Impl\PhysRigidBody.cpp">
+      <Filter>Physics\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\Impl\PhysShape.cpp">
+      <Filter>Physics\Impl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

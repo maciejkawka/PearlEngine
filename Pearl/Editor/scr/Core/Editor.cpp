@@ -1,15 +1,16 @@
-#include"Editor/Core/Editor.h"
+#include "Editor/Core/Editor.h"
 
 #include "Core/ECS/Scene.h"
-#include"Editor/Core/EditorContext.h"
-#include"Engine/Core/Utils/Logger.h"
-#include"Engine/Core/Events/EventManager.h"
-#include"Engine/Core/ECS/SceneManager.h"
+#include "Editor/Core/EditorContext.h"
+#include "Engine/Core/Utils/Logger.h"
+#include "Engine/Core/Events/EventManager.h"
+#include "Engine/Core/ECS/SceneManager.h"
 
-#include"Renderer/Core/RenderSystem.h"
+#include "Renderer/Core/RenderSystem.h"
 
-#include"Renderer/Resources/Shader.h"
-#include"Renderer/Resources/Material.h"
+#include "Renderer/Resources/Shader.h"
+#include "Renderer/Resources/Material.h"
+#include "Physics/Core/PhysicsSystem.h"
 
 using namespace PrEditor::Core;
 using namespace PrCore::Events;
@@ -90,6 +91,9 @@ void Editor::OnFrame(float p_deltaTime)
 
 		scene->OnDisable();
 	}
+
+	PrPhysics::PhysicsSystem::GetInstance().Simulate(p_deltaTime);
+	PrPhysics::PhysicsSystem::GetInstance().FetchResults();
 
 	auto testInfo = PrRenderer::Core::renderSystem->GetPreviousFrameInfo();
 	
