@@ -79,9 +79,14 @@ void Editor::OnFrame(float p_deltaTime)
 		scene->Update(p_deltaTime);
 
 		//Physics Tick
-		scene->PhysicsUpdate(p_deltaTime);
-		scene->FixUpdate(p_deltaTime);
-		//
+		m_physicsStepAccumulator += p_deltaTime;
+		int i = 0;
+		while(m_physicsStepAccumulator >= m_physicsFixStep)
+		{
+			scene->PhysicsUpdate(m_physicsFixStep);
+			scene->FixUpdate(m_physicsFixStep);
+			m_physicsStepAccumulator -= m_physicsFixStep;
+		}
 
 		scene->LateUpdate(p_deltaTime);
 

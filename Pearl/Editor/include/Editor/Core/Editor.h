@@ -21,6 +21,9 @@ namespace PrEditor::Core {
 	private:
 		Components::BasicCamera* m_basicCamera;
 		Components::TestFeatures* m_testFeatures;
+
+		const float m_physicsFixStep = 1.0f / 30.0f;
+		float       m_physicsStepAccumulator = 0.0f;
 	};
 
 }
