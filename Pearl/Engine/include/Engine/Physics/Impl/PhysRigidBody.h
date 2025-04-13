@@ -9,9 +9,10 @@ namespace PrPhysics {
 	class PhysRigidBodyStatic : public IRigidStatic {
 	public:
 		PhysRigidBodyStatic(physx::PxRigidStatic* p_rigidStatic);
+		~PhysRigidBodyStatic();
 
 		void* GetNativePtr() override;
-		void* ReleaseNativePtr() override;
+		void  ReleaseNativePtr() override;
 
 		uint32_t GetInternalActorIndex() const override;
 		uint32_t GetShapesNumber() const override;
@@ -39,6 +40,7 @@ namespace PrPhysics {
 	class PhysRigidBodyDynamic : public IRigidBodyDynamic {
 	public:
 		PhysRigidBodyDynamic(physx::PxRigidDynamic* p_rigidDynamic);
+		~PhysRigidBodyDynamic();
 
 		void             SetCMassLocalPose(const Transform& p_transform) override;
 		const Transform& GetCMassLocalPose() const override;
@@ -122,7 +124,7 @@ namespace PrPhysics {
 		void                      SetRigidDynamicLockFlags(RigidBodyDynamicLockFlags p_lockFlags) override;
 
 		void* GetNativePtr() override;
-		void* ReleaseNativePtr() override;
+		void  ReleaseNativePtr() override;
 
 	private:
 		physx::PxRigidDynamic* m_impl;

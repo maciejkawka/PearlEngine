@@ -1,6 +1,7 @@
 #pragma once
-#include"Core/ECS/BaseSystem.h"
-#include"Core/ECS/Components.h"
+
+#include "Core/ECS/BaseSystem.h"
+#include "Core/ECS/Components.h"
 
 namespace PrCore::ECS {
 

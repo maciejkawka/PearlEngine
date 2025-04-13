@@ -12,6 +12,11 @@ PhysShape::PhysShape(physx::PxShape* p_shape) :
 {
 }
 
+PhysShape::~PhysShape()
+{
+	m_impl->release();
+}
+
 void PhysShape::SetGeometry(const IGeometry& p_geometry)
 {
 	m_impl->setGeometry(ToPxGeometry(&p_geometry).any());
@@ -19,7 +24,7 @@ void PhysShape::SetGeometry(const IGeometry& p_geometry)
 
 const PrPhysics::IGeometry& PhysShape::GetGeometry() const
 {
-	return  PrPhysics::IGeometry{};
+	return PrPhysics::IGeometry{};
 }
 
 void PhysShape::SetLocalPose(const Transform& p_transform)
@@ -67,10 +72,7 @@ void* PhysShape::GetNativePtr()
 	return static_cast<void*>(m_impl);
 }
 
-void* PhysShape::ReleaseNativePtr()
+void PhysShape::ReleaseNativePtr()
 {
 	m_impl->release();
-	m_impl = nullptr;
-
-	return nullptr;
 }

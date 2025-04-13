@@ -18,6 +18,8 @@ namespace PrPhysics {
 		ForceStaticKineNotifications   = 1<<9,
 		EnableGyroscopicForces         = 1<<10
 	};
+	DEFINE_ENUM_FLAG_OPERATORS(RigidBodyFlag);
+
 
 	enum class RigidBodyDynamicLockFlags
 	{
@@ -28,6 +30,7 @@ namespace PrPhysics {
 		LockAngularY = (1 << 4),
 		LockAngularZ = (1 << 5)
 	};
+	DEFINE_ENUM_FLAG_OPERATORS(RigidBodyDynamicLockFlags);
 
 	enum class ForceMode {
 		Force,

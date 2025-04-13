@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Core/ECS/BaseComponent.h"
 
 #include "Core/Utils/UUID.h"

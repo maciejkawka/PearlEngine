@@ -27,6 +27,12 @@ namespace PrPhysics {
 			type = GeometryType::Sphere;
 		}
 
+		SphereGeometry(float p_radius)
+		{
+			radius = p_radius;
+			type = GeometryType::Sphere;
+		}
+
 		float radius = 1.0f;
 	};
 

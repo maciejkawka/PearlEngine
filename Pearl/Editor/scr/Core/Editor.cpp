@@ -28,8 +28,8 @@ Editor::Editor()
 Editor::~Editor()
 {
 	delete m_basicCamera;
-	delete m_appContext;
 	delete m_testFeatures;
+	delete m_appContext;
 }
 
 void Editor::PreFrame()
@@ -78,7 +78,8 @@ void Editor::OnFrame(float p_deltaTime)
 
 		scene->Update(p_deltaTime);
 
-		//Phisics Tick
+		//Physics Tick
+		scene->PhysicsUpdate(p_deltaTime);
 		scene->FixUpdate(p_deltaTime);
 		//
 
@@ -91,9 +92,6 @@ void Editor::OnFrame(float p_deltaTime)
 
 		scene->OnDisable();
 	}
-
-	PrPhysics::PhysicsSystem::GetInstance().Simulate(p_deltaTime);
-	PrPhysics::PhysicsSystem::GetInstance().FetchResults();
 
 	auto testInfo = PrRenderer::Core::renderSystem->GetPreviousFrameInfo();
 	

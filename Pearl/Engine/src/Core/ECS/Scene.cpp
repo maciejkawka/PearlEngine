@@ -1,10 +1,11 @@
 #include"Core/Common/pearl_pch.h"
 
 #include "Core/ECS/Scene.h"
-#include"Core/ECS/SystemManager.h"
-#include"Core/ECS/Components.h"
-#include"Core/ECS/Systems/MeshRendererSystem.h"
-#include"Core/ECS/Systems/TransformSystem.h"
+#include "Core/ECS/SystemManager.h"
+#include "Core/ECS/Components.h"
+#include "Core/ECS/Systems/MeshRendererSystem.h"
+#include "Core/ECS/Systems/TransformSystem.h"
+#include "Core/ECS/Systems/PhysicsUpdateSystem.h"
 
 using namespace PrCore::ECS;
 
@@ -137,6 +138,11 @@ void Scene::OnDisable() const
 void Scene::RenderUpdate(float p_dt) const
 {
 	m_systemManager->UpdateSystem<MeshRendererSystem>(p_dt);
+}
+
+void Scene::PhysicsUpdate(float p_dt) const
+{
+	m_systemManager->UpdateSystem<PhysicsUpdateSystem>(p_dt);
 }
 
 size_t Scene::GetEntitiesCount() const

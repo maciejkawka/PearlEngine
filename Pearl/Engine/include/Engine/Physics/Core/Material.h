@@ -14,10 +14,9 @@ namespace PrPhysics {
 	struct Material 
 	{
 		float dynamicFriction = 0.0f;
-		float staticFriction = 0.0f;
-		float restitution = 0.0f;
-		float dumping = 0.0f;
-
-		MaterialFlag flag = MaterialFlag::ImprovedPathFriction;
+		float staticFriction  = 0.0f;
+		float restitution     = 0.0f;
+		float dumping         = 0.0f;
+		MaterialFlag flag     = MaterialFlag::ImprovedPathFriction;
 	};
 }

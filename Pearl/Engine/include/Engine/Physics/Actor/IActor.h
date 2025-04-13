@@ -17,6 +17,7 @@ namespace PrPhysics {
 		SleepNotifies = 1 << 2,
 		Simulation = 1 << 3
 	};
+	DEFINE_ENUM_FLAG_OPERATORS(ActorFlag);
 
 	class IActor: public INativePtrHandle {
 	public:

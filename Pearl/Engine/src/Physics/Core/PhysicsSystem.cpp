@@ -143,3 +143,8 @@ PrPhysics::IShapePtr PhysicsSystem::CreateShape(const IGeometry& p_geometery, co
 {
 	return m_physicsFactory->CreateShape(p_geometery, p_mat, isExclusive, p_flags);
 }
+
+PrPhysics::PhysicsStatistics PhysicsSystem::GetStatistics() const
+{
+	return PhysicsStatistics{};
+}

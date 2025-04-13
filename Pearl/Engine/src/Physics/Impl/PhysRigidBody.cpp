@@ -12,11 +12,14 @@ PhysRigidBodyStatic::PhysRigidBodyStatic(physx::PxRigidStatic* p_rigidStatic) :
 {
 }
 
-void* PhysRigidBodyStatic::ReleaseNativePtr()
+PhysRigidBodyStatic::~PhysRigidBodyStatic()
 {
 	m_impl->release();
-	m_impl = nullptr;
-	return nullptr;
+}
+
+void PhysRigidBodyStatic::ReleaseNativePtr()
+{
+	m_impl->release();
 }
 
 void* PhysRigidBodyStatic::GetNativePtr()
@@ -92,6 +95,11 @@ PrPhysics::ActorFlag PhysRigidBodyStatic::GetActorFlag()
 PhysRigidBodyDynamic::PhysRigidBodyDynamic(physx::PxRigidDynamic* p_rigidDynamic) :
 	m_impl(p_rigidDynamic)
 {
+}
+
+PhysRigidBodyDynamic::~PhysRigidBodyDynamic()
+{
+	m_impl->release();
 }
 
 void PhysRigidBodyDynamic::SetCMassLocalPose(const Transform& p_transform)
@@ -345,9 +353,7 @@ void* PhysRigidBodyDynamic::GetNativePtr()
 	return static_cast<void*>(m_impl);
 }
 
-void* PhysRigidBodyDynamic::ReleaseNativePtr()
+void PhysRigidBodyDynamic::ReleaseNativePtr()
 {
 	m_impl->release();
-	m_impl = nullptr;
-	return nullptr;
 }

@@ -2,6 +2,7 @@
 
 #include"Core/ECS/Systems/TestSystem.h"
 #include "Renderer/Core/RenderSystem.h"
+#include "Physics/Core/Physics.h"
 
 using namespace PrCore::ECS;
 using namespace PrRenderer::Core;
@@ -19,8 +20,8 @@ void RenderStressTest::OnEnable()
 
 	renderSystem->SetDebugColor(PrRenderer::Core::Color::Red);
 	m_camera = renderSystem->GetCamera();
-	m_camera->SetPosition({ 40, 3, 20 });
-	m_camera->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 90, 0))));
+	m_camera->SetPosition({ 15, 9, 3 });
+	m_camera->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 45, 0))));
 	auto settings = renderSystem->GetSettingsPtr();
 	settings->enableFog = false;
 
@@ -50,6 +51,11 @@ void RenderStressTest::OnEnable()
 			m_mainLightPtr->SetColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 		}
 	}
+
+	renderSystem->SetCubemap(Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("stress_test/hrd_skymap.mat").GetData());
+	m_mainLightPtr->SetColor(m_lightColor);
+
+	PrPhysics::PhysicsSystem::GetInstancePtr()->SetGravity(PrCore::Math::vec3{ 0.0f });
 }
 
 void RenderStressTest::OnDisable()
@@ -58,6 +64,15 @@ void RenderStressTest::OnDisable()
 
 void RenderStressTest::OnUpdate(float p_dt)
 {
+	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::N))
+	{
+		PrPhysics::PhysicsSystem::GetInstancePtr()->SetGravity(PrCore::Math::vec3{ 0.0f });
+	}
+	else if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::M))
+	{
+		PrPhysics::PhysicsSystem::GetInstancePtr()->SetGravity(PrCore::Math::vec3{ 0.0f, -9.81f, 0.0f });
+	}
+
 	//Update Camera Transform
 	m_cameraTransform->SetPosition(m_camera->GetPosition());
 	m_cameraTransform->SetRotation(m_camera->GetRotation());
@@ -70,7 +85,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 		m_selectedLight = (++m_selectedLight) % m_maxLight;
 
 	// Setup cubemap
-	static int cubemap = 2;
+	static int cubemap = 0;
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::G))
 	{
 		cubemap++;

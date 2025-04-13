@@ -42,13 +42,13 @@ namespace PrPhysics {
 		float GetFrictionOffsetThreshold() const;
 
 		// Simulation
-		PhysicsStatistics GetStatistics() const { return PhysicsStatistics{}; }
+		PhysicsStatistics GetStatistics() const;
 
 		void Simulate(float p_dt);
 		void FetchResults();
 
 		// Factory
-		IFactory* GetFactory() const;
+		IFactory*            GetFactory() const;
 
 		IRigidStaticPtr      CreateRigidStatic(const Transform& p_transform);
 		IRigidBodyDynamicPtr CreateRigidDynamic(const Transform& p_transform);

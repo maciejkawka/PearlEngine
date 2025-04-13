@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Core/ECS/BaseSystem.h"
 
 namespace PrCore::ECS {

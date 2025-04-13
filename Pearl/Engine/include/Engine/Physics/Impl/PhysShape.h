@@ -10,6 +10,7 @@ namespace PrPhysics {
 	class PhysShape : public IShape {
 	public:
 		PhysShape(physx::PxShape* p_shape);
+		~PhysShape();
 
 		void             SetGeometry(const IGeometry& p_geometry) override;
 		const IGeometry& GetGeometry() const override;
@@ -27,7 +28,7 @@ namespace PrPhysics {
 		const char* GetName() const override;
 
 		void*  GetNativePtr() override;
-		void*  ReleaseNativePtr() override;
+		void   ReleaseNativePtr() override;
 
 	private:
 		physx::PxShape* m_impl;
