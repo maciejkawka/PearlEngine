@@ -30,7 +30,8 @@ namespace PrPhysics {
 		Bounds3 GetWorldBounds(float p_inflation = 1.01f) const override;
 
 		ActorType GetType() override;
-		void      SetActorFlag(ActorFlag p_flag) override;
+		void      SetActorFlags(ActorFlag p_flag) override;
+		void      SetActorFlag(ActorFlag p_flag, bool p_value) override;
 		ActorFlag GetActorFlag() override;
 
 		PrCore::ECS::Entity GetEntity() override;
@@ -80,8 +81,9 @@ namespace PrPhysics {
 		void  ClearForce(ForceMode p_mode = ForceMode::Force) override;
 		void  ClearTorque(ForceMode p_mode = ForceMode::Force) override;
 
-		void          SetFlags(RigidBodyFlag p_flag) override;
-		RigidBodyFlag GetFlags() const override;
+		void          SetRigidBodyFlags(RigidBodyFlag p_flag) override;
+		void          SetRigidBodyFlag(RigidBodyFlag p_flag, bool p_value) override;
+		RigidBodyFlag GetRigidbodyFlags() const override;
 
 		void  SetMinCCDAdvanceCoefficient(float advanceCoefficient) override {}
 		float GetMinCCDAdvanceCoefficient() const override { return 0; }
@@ -111,7 +113,8 @@ namespace PrPhysics {
 		Bounds3   GetWorldBounds(float p_inflation = 1.01f) const override;
 
 		ActorType GetType() override;
-		void      SetActorFlag(ActorFlag p_flag) override;
+		void      SetActorFlags(ActorFlag p_flag) override;
+		void      SetActorFlag(ActorFlag p_flag, bool p_value) override;
 		ActorFlag GetActorFlag() override;
 
 		void SetKinematicTarget(const Transform& p_destination) override;

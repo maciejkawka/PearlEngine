@@ -27,6 +27,7 @@ namespace PrPhysics {
 		virtual float             GetContactOffset() const = 0;
 
 		virtual void              SetFlags(ShapeFlags p_flag) = 0;
+		virtual void              SetFlag(ShapeFlags p_flag, bool p_value) = 0;
 		virtual ShapeFlags        GetFlags() const = 0;
 
 		virtual void              SetName(const char* p_name) = 0;

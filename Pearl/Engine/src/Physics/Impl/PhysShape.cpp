@@ -76,3 +76,8 @@ void PhysShape::ReleaseNativePtr()
 {
 	m_impl->release();
 }
+
+void PhysShape::SetFlag(ShapeFlags p_flag, bool p_value)
+{
+	m_impl->setFlag(CastFlag<PxShapeFlag::Enum>(p_flag), p_value);
+}

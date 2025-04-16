@@ -86,9 +86,14 @@ PrPhysics::Bounds3 PhysRigidBodyStatic::GetWorldBounds(float p_inflation /*= 1.0
 	return ToBounds3(m_impl->getWorldBounds(p_inflation));
 }
 
-void PhysRigidBodyStatic::SetActorFlag(ActorFlag p_flag)
+void PhysRigidBodyStatic::SetActorFlags(ActorFlag p_flag)
 {
 	m_impl->setActorFlags(CastFlag<PxActorFlags>(p_flag));
+}
+
+void PhysRigidBodyStatic::SetActorFlag(ActorFlag p_flag, bool p_value)
+{
+	m_impl->setActorFlag(CastFlag<PxActorFlag::Enum>(p_flag), p_value);
 }
 
 PrPhysics::ActorFlag PhysRigidBodyStatic::GetActorFlag()
@@ -245,12 +250,17 @@ void PhysRigidBodyDynamic::ClearForce(ForceMode p_mode /*= ForceMode::Force*/)
 	m_impl->clearForce(CastFlag<physx::PxForceMode::Enum>(p_mode));
 }
 
-void PhysRigidBodyDynamic::SetFlags(RigidBodyFlag p_flag)
+void PhysRigidBodyDynamic::SetRigidBodyFlags(RigidBodyFlag p_flag)
 {
 	m_impl->setRigidBodyFlags(CastFlag<PxRigidBodyFlag::Enum>(p_flag));
 }
 
-PrPhysics::RigidBodyFlag PhysRigidBodyDynamic::GetFlags() const
+void PhysRigidBodyDynamic::SetRigidBodyFlag(RigidBodyFlag p_flag, bool p_value)
+{
+	m_impl->setRigidBodyFlag(CastFlag<PxRigidBodyFlag::Enum>(p_flag), p_value);
+}
+
+PrPhysics::RigidBodyFlag PhysRigidBodyDynamic::GetRigidbodyFlags() const
 {
 	return CastFlag<RigidBodyFlag>(m_impl->getRigidBodyFlags());
 }
@@ -310,9 +320,14 @@ PrPhysics::ActorType PhysRigidBodyDynamic::GetType()
 	return CastFlag<ActorType>(m_impl->getType());
 }
 
-void PhysRigidBodyDynamic::SetActorFlag(ActorFlag p_flag)
+void PhysRigidBodyDynamic::SetActorFlags(ActorFlag p_flag)
 {
 	m_impl->setActorFlags(CastFlag<PxActorFlag::Enum>(p_flag));
+}
+
+void PhysRigidBodyDynamic::SetActorFlag(ActorFlag p_flag, bool p_value)
+{
+	m_impl->setActorFlag(CastFlag<PxActorFlag::Enum>(p_flag), p_value);
 }
 
 PrPhysics::ActorFlag PhysRigidBodyDynamic::GetActorFlag()

@@ -22,6 +22,7 @@ namespace PrPhysics {
 		float GetContactOffset() const override;
 
 		void       SetFlags(ShapeFlags p_flag) override;
+		void       SetFlag(ShapeFlags p_flag, bool p_value) override;
 		ShapeFlags GetFlags() const override;
 
 		void        SetName(const char* p_name) override;

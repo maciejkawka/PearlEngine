@@ -90,8 +90,9 @@ namespace PrPhysics {
 		virtual void                      ClearForce(ForceMode p_mode = ForceMode::Force) = 0;
 		virtual void                      ClearTorque(ForceMode p_mode = ForceMode::Force) = 0;
 
-		virtual void                      SetFlags(RigidBodyFlag p_flag) = 0;
-		virtual RigidBodyFlag             GetFlags() const = 0;
+		virtual void                      SetRigidBodyFlags(RigidBodyFlag p_flag) = 0;
+		virtual void                      SetRigidBodyFlag(RigidBodyFlag p_flag, bool p_value) = 0;
+		virtual RigidBodyFlag             GetRigidbodyFlags() const = 0;
 
 		virtual void                      SetMinCCDAdvanceCoefficient(float advanceCoefficient) = 0;
 		virtual float                     GetMinCCDAdvanceCoefficient() const = 0;
