@@ -33,6 +33,9 @@ namespace PrPhysics {
 		void      SetActorFlag(ActorFlag p_flag) override;
 		ActorFlag GetActorFlag() override;
 
+		PrCore::ECS::Entity GetEntity() override;
+		void                SetEntity(PrCore::ECS::Entity p_entity) override;
+
 	private:
 		physx::PxRigidStatic* m_impl;
 	};
@@ -125,6 +128,9 @@ namespace PrPhysics {
 
 		void* GetNativePtr() override;
 		void  ReleaseNativePtr() override;
+
+		PrCore::ECS::Entity GetEntity() override;
+		void                SetEntity(PrCore::ECS::Entity p_entity) override;
 
 	private:
 		physx::PxRigidDynamic* m_impl;

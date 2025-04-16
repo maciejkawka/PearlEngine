@@ -24,7 +24,7 @@ namespace PrCore::Events {
 	typedef std::shared_ptr<Event> EventPtr;
 
 #define DEFINE_EVENT_GUID(guid) \
-	virtual inline EventType GetType() const { return s_type; } \
-	inline const static EventType s_type = guid
+	virtual inline PrCore::Events::EventType GetType() const { return s_type; } \
+	inline const static PrCore::Events::EventType s_type = guid
 
 }

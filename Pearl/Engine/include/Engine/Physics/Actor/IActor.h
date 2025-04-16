@@ -3,6 +3,8 @@
 #include "Physics/Utils/PhysicsMath.h"
 #include "Physics/Utils/INativePtrHandler.h"
 
+#include "Core/ECS/EntityManager.h"
+
 namespace PrPhysics {
 
 	enum class ActorType {
@@ -30,6 +32,9 @@ namespace PrPhysics {
 
 		virtual	void         SetActorFlag(ActorFlag p_flag) = 0;
 		virtual ActorFlag    GetActorFlag() = 0;
+
+		virtual PrCore::ECS::Entity GetEntity() = 0;
+		virtual void                SetEntity(PrCore::ECS::Entity p_entity) = 0;
 	};
 	using IActorPtr = std::shared_ptr<IActor>;
 }

@@ -8,6 +8,7 @@
 
 #include "PhysX/PxPhysicsAPI.h"
 #include "Physics/Impl/PhysFactory.h"
+#include "Physics/Impl/PhysCollisionDispatcher.h"
 
 using namespace PrPhysics;
 using namespace physx;
@@ -21,8 +22,9 @@ static PxFoundation*          s_foundation = nullptr;
 static PxPhysics*             s_physics = nullptr;
 static PxPvd*                 s_pvd = nullptr;
 
-static PxDefaultCpuDispatcher* s_dispatcher = nullptr;
-static PxScene*                s_scene = nullptr;
+static PxDefaultCpuDispatcher*          s_dispatcher = nullptr;
+static PxScene*                         s_scene = nullptr;
+static PxSimulationEventCallback*       s_simulationCallback = nullptr;
 
 PhysicsSystem::PhysicsSystem(const PhysicsSettings& p_settings)
 {
@@ -38,11 +40,15 @@ PhysicsSystem::PhysicsSystem(const PhysicsSettings& p_settings)
 	if (!s_physics)
 		PRLOG_ERROR("Physics failed to initalize! PxCreatePhysics failed!");
 
+	s_dispatcher = PxDefaultCpuDispatcherCreate(2);
+	s_simulationCallback = new CollisionDispatcher();
+
 	PxSceneDesc sceneDesc(s_physics->getTolerancesScale());
 	sceneDesc.gravity = ToPxVec3(p_settings.gravity);
-	s_dispatcher = PxDefaultCpuDispatcherCreate(2);
 	sceneDesc.cpuDispatcher = s_dispatcher;
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	sceneDesc.simulationEventCallback = s_simulationCallback;
+	sceneDesc.filterShader = ContactReportFilterShader;
 	s_scene = s_physics->createScene(sceneDesc);
 
 	PxPvdSceneClient* pvdClient = s_scene->getScenePvdClient();
@@ -60,6 +66,7 @@ PhysicsSystem::~PhysicsSystem()
 {
 	m_physicsFactory.reset();
 
+	delete s_simulationCallback;
 	PX_RELEASE(s_scene)
 	PX_RELEASE(s_dispatcher)
 	PX_RELEASE(s_physics);

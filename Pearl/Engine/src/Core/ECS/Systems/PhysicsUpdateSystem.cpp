@@ -27,7 +27,7 @@ void PhysicsUpdateSystem::OnUpdate(float p_dt)
 	}
 
 	m_entityViewer.MT_EntitesWithComponents<TransformComponent, RigidBodyDynamicComponent>([](Entity entity, auto transform, auto rigidDynamic) {
-		
+
 		auto position = transform->GetPosition();
 		auto rotation = transform->GetRotation();
 
@@ -60,7 +60,7 @@ void PhysicsUpdateSystem::OnCreate()
 
 	Events::EventListener staticAddedListener;
 	staticAddedListener.connect<&PhysicsUpdateSystem::OnComponentStaticCreated>(this);
-	Events::EventManager::GetInstance().AddListener(staticAddedListener, Events::ComponentRemovedEvent<RigidBodyStaticComponent>::s_type);
+	Events::EventManager::GetInstance().AddListener(staticAddedListener, Events::ComponentAddedEvent<RigidBodyStaticComponent>::s_type);
 
 	Events::EventListener staticRemovedListener;
 	staticRemovedListener.connect<&PhysicsUpdateSystem::OnComponentStaticRemoved>(this);
@@ -73,6 +73,7 @@ void PhysicsUpdateSystem::OnComponentDynamicCreated(PrCore::Events::EventPtr p_e
 	auto component = componentEvent->m_component;
 
 	component->rigidBody = m_physics->CreateRigidDynamic(PrPhysics::Transform{});
+	component->rigidBody->SetEntity(componentEvent->m_entity);
 	m_createdActors.push_back(component->rigidBody);
 }
 
@@ -88,6 +89,7 @@ void PhysicsUpdateSystem::OnComponentStaticCreated(PrCore::Events::EventPtr p_ev
 	auto component = componentEvent->m_component;
 
 	component->rigidBody = m_physics->CreateRigidStatic(PrPhysics::Transform{});
+	component->rigidBody->SetEntity(componentEvent->m_entity);
 	m_createdActors.push_back(component->rigidBody);
 }
 

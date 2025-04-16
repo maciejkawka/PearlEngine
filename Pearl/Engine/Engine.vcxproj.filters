@@ -76,6 +76,9 @@
     <Filter Include="Physics\Shape">
       <UniqueIdentifier>{ab1a99cc-69ca-4d6f-8c16-4d0b8b4742d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Physics\Events">
+      <UniqueIdentifier>{d4843644-d8ad-4a95-89ee-12b00238c4db}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Engine\Core\Entry\AppContext.h">
@@ -462,8 +465,14 @@
     <ClInclude Include="include\Engine\Core\ECS\Systems\PhysicsUpdateSystem.h">
       <Filter>Core\ECS\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="Physics.h">
+    <ClInclude Include="include\Engine\Physics\Core\Physics.h">
       <Filter>Physics\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Events\Events.h">
+      <Filter>Physics\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Impl\PhysCollisionDispatcher.h">
+      <Filter>Physics\Impl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

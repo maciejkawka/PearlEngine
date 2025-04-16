@@ -10,15 +10,19 @@ using namespace physx;
 PhysRigidBodyStatic::PhysRigidBodyStatic(physx::PxRigidStatic* p_rigidStatic) :
 	m_impl(p_rigidStatic)
 {
+	PR_ASSERT(!m_impl->userData, "PxActor::userData is not null. Something is wrong");
+	m_impl->userData = new PrCore::ECS::Entity();
 }
 
 PhysRigidBodyStatic::~PhysRigidBodyStatic()
 {
+	delete m_impl->userData;
 	m_impl->release();
 }
 
 void PhysRigidBodyStatic::ReleaseNativePtr()
 {
+	delete m_impl->userData;
 	m_impl->release();
 }
 
@@ -92,13 +96,26 @@ PrPhysics::ActorFlag PhysRigidBodyStatic::GetActorFlag()
 	return CastFlag<ActorFlag>(m_impl->getActorFlags());
 }
 
+PrCore::ECS::Entity PhysRigidBodyStatic::GetEntity()
+{
+	return *static_cast<PrCore::ECS::Entity*>(m_impl->userData);
+}
+
+void PhysRigidBodyStatic::SetEntity(PrCore::ECS::Entity p_entity)
+{
+	*static_cast<PrCore::ECS::Entity*>(m_impl->userData) = p_entity;
+}
+
 PhysRigidBodyDynamic::PhysRigidBodyDynamic(physx::PxRigidDynamic* p_rigidDynamic) :
 	m_impl(p_rigidDynamic)
 {
+	PR_ASSERT(!m_impl->userData, "PxActor::userData is not null. Something is wrong");
+	m_impl->userData = new PrCore::ECS::Entity();
 }
 
 PhysRigidBodyDynamic::~PhysRigidBodyDynamic()
 {
+	delete m_impl->userData;
 	m_impl->release();
 }
 
@@ -355,5 +372,16 @@ void* PhysRigidBodyDynamic::GetNativePtr()
 
 void PhysRigidBodyDynamic::ReleaseNativePtr()
 {
+	delete m_impl->userData;
 	m_impl->release();
+}
+
+PrCore::ECS::Entity PhysRigidBodyDynamic::GetEntity()
+{
+	return *static_cast<PrCore::ECS::Entity*>(m_impl->userData);
+}
+
+void PhysRigidBodyDynamic::SetEntity(PrCore::ECS::Entity p_entity)
+{
+	*static_cast<PrCore::ECS::Entity*>(m_impl->userData) = p_entity;
 }

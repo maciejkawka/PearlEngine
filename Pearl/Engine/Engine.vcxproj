@@ -82,6 +82,9 @@
     <ClInclude Include="include\Engine\Physics\Actor\IRigidBody.h" />
     <ClInclude Include="include\Engine\Physics\Core\Material.h" />
     <ClInclude Include="include\Engine\Physics\Core\IFactory.h" />
+    <ClInclude Include="include\Engine\Physics\Core\Physics.h" />
+    <ClInclude Include="include\Engine\Physics\Events\Events.h" />
+    <ClInclude Include="include\Engine\Physics\Impl\PhysCollisionDispatcher.h" />
     <ClInclude Include="include\Engine\Physics\Impl\PhysFactory.h" />
     <ClInclude Include="include\Engine\Physics\Impl\PhysRigidBody.h" />
     <ClInclude Include="include\Engine\Physics\Impl\PhysShape.h" />
@@ -139,7 +142,6 @@
     <ClInclude Include="include\Engine\Renderer\Resources\Texture.h" />
     <ClInclude Include="include\Engine\Renderer\Resources\Uniform.h" />
     <ClInclude Include="include\Engine\Renderer\Core\RenderCommand.h" />
-    <ClInclude Include="Physics.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\ECS\Systems\PhysicsUpdateSystem.cpp" />
