@@ -4992,16 +4992,18 @@ MeshPtr Mesh::CreateLine()
 	std::vector<PrCore::Math::vec3> vertices =
 	{
 		{0.0f, 0.0f, 0.0f},
-		{1.0f, 1.0f, 1.0f}
+		{0.0f, 0.0, 1.0f},
+		{0.0f, 0.0, 2.0f}
 	};
 
 	std::vector<unsigned int> indices =
 	{
-		0, 1
+		0, 1, 2
 	};
 
 	std::vector<PrCore::Math::vec3> normals =
 	{
+		{0.f, 0.f, 1.f},
 		{0.f, 0.f, 1.f},
 		{0.f, 0.f, 1.f}
 	};
@@ -5009,6 +5011,7 @@ MeshPtr Mesh::CreateLine()
 	std::vector<PrCore::Math::vec2> texCoords =
 	{
 		{0.f, 0.f},
+		{0.5f, 0.5f},
 		{1.f, 1.f}
 	};
 
@@ -5019,8 +5022,8 @@ MeshPtr Mesh::CreateLine()
 	line->m_normals = normals;
 	line->m_UVs[0] = texCoords;
 
-	line->m_indicesCount = 2;
-	line->m_verticesCount = 2;
+	line->m_indicesCount = 3;
+	line->m_verticesCount = 3;
 
 	line->ValidateBuffers();
 	line->UpdateBuffers();

@@ -6,6 +6,12 @@
 
 namespace PrPhysics {
 
+	static PrCore::ECS::Entity ConvertToEntity(physx::PxActor* p_physxActor)
+	{
+		PR_ASSERT(p_physxActor->userData, "PxActor::userData is null. Something is wrong");
+		return *static_cast<PrCore::ECS::Entity*>(p_physxActor->userData);
+	}
+
 	class PhysRigidBodyStatic : public IRigidStatic {
 	public:
 		PhysRigidBodyStatic(physx::PxRigidStatic* p_rigidStatic);

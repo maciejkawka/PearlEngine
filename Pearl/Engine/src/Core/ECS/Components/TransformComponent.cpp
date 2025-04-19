@@ -161,7 +161,7 @@ PrCore::Math::vec3 TransformComponent::GetRightVector() const
 
 PrCore::Math::vec3 TransformComponent::GetForwardVector() const
 {
-	return m_rotation * Math::vec3(0.0f, 0.0f, 1.0f);
+	return m_rotation * Math::vec3(0.0f, 0.0f, -1.0f);
 }
 
 void TransformComponent::DecomposeWorldMatrix()

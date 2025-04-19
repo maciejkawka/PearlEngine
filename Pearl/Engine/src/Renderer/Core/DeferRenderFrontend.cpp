@@ -312,13 +312,19 @@ void DeferRenderFrontend::DrawDebugSphere(const Math::vec3& p_center, float p_ra
 
 void DeferRenderFrontend::DrawDebugLine(const Math::vec3& p_start, const Math::vec3& p_end)
 {
-	Math::mat4 transformMat = Math::translate(Math::mat4(1.0f), p_start)
-		* Math::scale(Math::mat4(1.0f), PrCore::Math::vec3(p_end));
+	glm::vec3 dir = p_end - p_start;
+	float length = glm::length(dir);
+	glm::vec3 direction = glm::normalize(dir);
+	glm::quat rotation = glm::rotation(glm::vec3(0, 0, 1), direction);
+
+	glm::mat4 transform = glm::translate(glm::mat4(1.0f), p_start)
+		* glm::toMat4(rotation)
+		* glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, length));
 
 	auto renderObj = std::make_shared<RenderObject>();
 	renderObj->type = RenderObjectType::Mesh;
 	renderObj->material = m_debugMaterial;
-	renderObj->worldMat = transformMat;
+	renderObj->worldMat = transform;
 	renderObj->id = 0;
 	renderObj->wiredframe = true;
 	renderObj->vertexArrayPtr = Resources::Mesh::CreatePrimitive(Resources::Line)->GetVertexArray();

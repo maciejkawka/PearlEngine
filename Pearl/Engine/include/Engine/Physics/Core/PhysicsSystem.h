@@ -23,6 +23,15 @@ namespace PrPhysics {
 		size_t activeKinematicBodies;
 	};
 
+	struct RaycastHit
+	{
+		PrCore::ECS::Entity entity;
+
+		float                distance;
+		PrCore::Math::vec3   position;
+		PrCore::Math::vec3   normal;
+	};
+
 	class PhysicsSystem : public PrCore::Utils::Singleton<PhysicsSystem> {
 	public:
 		PhysicsSystem(const PhysicsSettings& p_settings);
@@ -54,7 +63,8 @@ namespace PrPhysics {
 		IRigidBodyDynamicPtr CreateRigidDynamic(const Transform& p_transform);
 		IShapePtr            CreateShape(const IGeometry& p_geometery, const Material& p_mat, bool isExclusive = false, ShapeFlags p_flags = ShapeFlags::Visualization | ShapeFlags::SceneQuery | ShapeFlags::Simulation);
 
-		// Queries
+		// Scene Queries
+		bool                 Raycast(const PrCore::Math::vec3& p_origin, const PrCore::Math::vec3& p_dir, float p_maxDistance, RaycastHit& p_rayInfo, bool ignoreTriggerObjects = true);
 
 	private:
 		std::unique_ptr<IFactory> m_physicsFactory;

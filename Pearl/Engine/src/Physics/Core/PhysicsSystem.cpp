@@ -26,6 +26,22 @@ static PxDefaultCpuDispatcher*          s_dispatcher = nullptr;
 static PxScene*                         s_scene = nullptr;
 static PxSimulationEventCallback*       s_simulationCallback = nullptr;
 
+class IgnoreTriggerRaycastCallback : public PxQueryFilterCallback {
+public:
+	PxQueryHitType::Enum preFilter(const PxFilterData& filterData, const PxShape* shape, const PxRigidActor* actor, PxHitFlags& queryFlags) override
+	{
+		if (shape->getFlags() & PxShapeFlag::eTRIGGER_SHAPE)
+			return PxQueryHitType::eNONE;
+
+		return PxQueryHitType::eBLOCK;
+	}
+
+	PxQueryHitType::Enum postFilter(const PxFilterData& filterData, const PxQueryHit& hit, const PxShape* shape, const PxRigidActor* actor) override
+	{
+		return PxQueryHitType::eBLOCK;
+	}
+};
+
 PhysicsSystem::PhysicsSystem(const PhysicsSettings& p_settings)
 {
 	s_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, s_defaultAllocatorCallback, s_defaultErrorCallback);
@@ -154,4 +170,31 @@ PrPhysics::IShapePtr PhysicsSystem::CreateShape(const IGeometry& p_geometery, co
 PrPhysics::PhysicsStatistics PhysicsSystem::GetStatistics() const
 {
 	return PhysicsStatistics{};
+}
+
+bool PhysicsSystem::Raycast(const PrCore::Math::vec3& p_origin, const PrCore::Math::vec3& p_dir, float p_maxDistance, RaycastHit& p_rayInfo, bool ignoreTriggerObjects)
+{
+	IgnoreTriggerRaycastCallback customRayFilterCallback; 
+	PxQueryFilterData customRayFilterData;
+	
+	if(ignoreTriggerObjects)
+		customRayFilterData.flags |= PxQueryFlag::ePREFILTER;
+
+	PxRaycastBuffer hitBuffer;
+	bool hasHit = s_scene->raycast(ToPxVec3(p_origin), ToPxVec3(p_dir), p_maxDistance, hitBuffer, PxHitFlag::ePOSITION | PxHitFlag::eNORMAL, customRayFilterData, &customRayFilterCallback);
+
+	if (hasHit && hitBuffer.hasBlock)
+	{
+		const PxRaycastHit& raycastHit = hitBuffer.block;
+
+		p_rayInfo.position = ToVec3(raycastHit.position);
+		p_rayInfo.normal = ToVec3(raycastHit.normal);;
+		p_rayInfo.distance = raycastHit.distance;
+
+		p_rayInfo.entity = ConvertToEntity(raycastHit.actor);
+
+		return true;
+	}
+
+	return false;
 }
