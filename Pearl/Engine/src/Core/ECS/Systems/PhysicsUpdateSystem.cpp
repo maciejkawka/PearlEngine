@@ -4,6 +4,7 @@
 
 #include "Core/ECS/Components/PhysicsComponents.h"
 #include "Core/ECS/Components/TransformComponent.h"
+#include "Core/ECS/Components/CoreComponents.h"
 #include "Core/Input/InputManager.h"
 
 using namespace PrCore::ECS;
@@ -25,6 +26,18 @@ void PhysicsUpdateSystem::OnUpdate(float p_dt)
 			m_physics->AddActor(actor);
 		m_createdActors.clear();
 	}
+
+	m_entityViewer.MT_EntitesWithComponents<TransformComponent, RigidBodyStaticComponent>([](Entity entity, auto transform, auto rigidStatic) {
+
+		if (transform->IsDirty())
+		{
+			auto position = transform->GetPosition();
+			auto rotation = transform->GetRotation();
+
+			PrPhysics::Transform physTransform{ rotation, position };
+			rigidStatic->rigidBody->SetGlobalPose(physTransform);
+		}
+	});
 
 	m_entityViewer.MT_EntitesWithComponents<TransformComponent, RigidBodyDynamicComponent>([](Entity entity, auto transform, auto rigidDynamic) {
 
@@ -88,7 +101,14 @@ void PhysicsUpdateSystem::OnComponentStaticCreated(PrCore::Events::EventPtr p_ev
 	auto componentEvent = std::static_pointer_cast<Events::ComponentAddedEvent<RigidBodyStaticComponent>>(p_eventType);
 	auto component = componentEvent->m_component;
 
-	component->rigidBody = m_physics->CreateRigidStatic(PrPhysics::Transform{});
+	PrPhysics::Transform physTransform{};
+	if (auto transformComponent = componentEvent->m_entity.GetComponent<PrCore::ECS::TransformComponent>())
+	{
+		physTransform.position = transformComponent->GetPosition();
+		physTransform.rotation = transformComponent->GetRotation();
+	}
+
+	component->rigidBody = m_physics->CreateRigidStatic(physTransform);
 	component->rigidBody->SetEntity(componentEvent->m_entity);
 	m_createdActors.push_back(component->rigidBody);
 }

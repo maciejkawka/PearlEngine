@@ -72,6 +72,9 @@ namespace PrPhysics {
 		PrCore::Math::vec3 GetLinearVelocity() const override;
 		PrCore::Math::vec3 GetAngularVelocity() const override;
 
+		void SetLinearVelocity(const PrCore::Math::vec3& p_velocity) override;
+		void SetAngularVelocity(const PrCore::Math::vec3& p_velocity) override;
+
 		void  SetMaxLinearVelocity(float p_maxLinVel) override;
 		float GetMaxLinearVelocity() const override;
 

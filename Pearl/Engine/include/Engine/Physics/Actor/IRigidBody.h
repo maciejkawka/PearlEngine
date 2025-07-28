@@ -76,6 +76,9 @@ namespace PrPhysics {
 		virtual PrCore::Math::vec3        GetLinearVelocity() const = 0;
 		virtual PrCore::Math::vec3        GetAngularVelocity() const = 0;
 
+		virtual void                      SetLinearVelocity(const PrCore::Math::vec3& p_velocity) = 0;
+		virtual void                      SetAngularVelocity(const PrCore::Math::vec3& p_velocity) = 0;
+
 		virtual void                      SetMaxLinearVelocity(float maxLinVel) = 0;
 		virtual float                     GetMaxLinearVelocity() const = 0;
 		virtual void                      SetMaxAngularVelocity(float maxLinVel) = 0;

@@ -2,6 +2,7 @@
 #include "Core/ECS/BaseSystem.h"
 #include "Core/ECS/Components.h"
 #include "Core/Input/InputManager.h"
+#include "Physics/Actor/IActor.h"
 
 namespace PrCore::ECS
 {
@@ -29,7 +30,6 @@ namespace PrCore::ECS
 
 		virtual ~RenderStressTest() override
 		{
-			delete m_cameraTransform;
 		}
 
 		void OnEnable() override;
@@ -43,7 +43,15 @@ namespace PrCore::ECS
 		PrRenderer::Resources::LightPtr m_mainLightPtr;
 		PrRenderer::Core::Color m_lightColor;
 
+
 		inline virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
 		inline virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
+
+		void OnCollisionEnter(PrCore::Events::EventPtr p_event);
+		void OnCollisionExit(PrCore::Events::EventPtr p_event);
+		void OnCollisionStay(PrCore::Events::EventPtr p_event);
+
+		void OnTriggerEnter(PrCore::Events::EventPtr p_event);
+		void OnTriggerExit(PrCore::Events::EventPtr p_event);
 	};
 }

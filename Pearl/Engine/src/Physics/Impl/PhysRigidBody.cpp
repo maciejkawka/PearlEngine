@@ -195,6 +195,16 @@ PrCore::Math::vec3 PhysRigidBodyDynamic::GetAngularVelocity() const
 	return ToVec3(m_impl->getAngularVelocity());
 }
 
+void PhysRigidBodyDynamic::SetLinearVelocity(const PrCore::Math::vec3& p_velocity)
+{
+	m_impl->setLinearVelocity(ToPxVec3(p_velocity));
+}
+
+void PhysRigidBodyDynamic::SetAngularVelocity(const PrCore::Math::vec3& p_velocity)
+{
+	m_impl->setAngularVelocity(ToPxVec3(p_velocity));
+}
+
 void PhysRigidBodyDynamic::SetMaxLinearVelocity(float p_maxLinVel)
 {
 	m_impl->setMaxLinearVelocity(p_maxLinVel);
