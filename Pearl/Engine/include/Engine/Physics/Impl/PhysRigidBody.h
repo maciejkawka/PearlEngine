@@ -27,8 +27,9 @@ namespace PrPhysics {
 		Transform GetGlobalPose() const override;
 		void      SetGlobalPose(const Transform& p_pose, bool p_autowake = true) override;
 	
-		bool AttachShape(IShapePtr p_shape) override;
-		void DetachShape(IShapePtr p_shape, bool p_wakeOnLostTouch = true) override;
+		bool      AttachShape(IShapePtr p_shape) override;
+		IShapePtr GetShape() override;
+		void      DetachShape(IShapePtr p_shape, bool p_wakeOnLostTouch = true) override;
 
 		void        SetName(const char* p_name) override;
 		const char* GetName() override;
@@ -45,6 +46,9 @@ namespace PrPhysics {
 
 	private:
 		physx::PxRigidStatic* m_impl;
+
+		// Proxy Objects
+		IShapePtr             m_shape;
 	};
 
 	class PhysRigidBodyDynamic : public IRigidBodyDynamic {
@@ -113,8 +117,9 @@ namespace PrPhysics {
 		Transform GetGlobalPose() const override;
 		void      SetGlobalPose(const Transform& p_pose, bool p_autowake = true) override;
 
-		bool AttachShape(IShapePtr p_shape) override;
-		void DetachShape(IShapePtr p_shape, bool p_wakeOnLostTouch = true) override;
+		bool      AttachShape(IShapePtr p_shape) override;
+		IShapePtr GetShape() override;
+		void      DetachShape(IShapePtr p_shape, bool p_wakeOnLostTouch = true) override;
 
 		void        SetName(const char* p_name) override;
 		const char* GetName() override;
@@ -146,6 +151,9 @@ namespace PrPhysics {
 
 	private:
 		physx::PxRigidDynamic* m_impl;
+
+		// Proxy Objects
+		IShapePtr m_shape;
 	};
 
 

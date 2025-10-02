@@ -85,10 +85,13 @@
     <ClInclude Include="include\Engine\Physics\Core\Physics.h" />
     <ClInclude Include="include\Engine\Physics\Events\Events.h" />
     <ClInclude Include="include\Engine\Physics\Impl\PhysCollisionDispatcher.h" />
+    <ClInclude Include="include\Engine\Physics\Impl\PhysConvexMesh.h" />
     <ClInclude Include="include\Engine\Physics\Impl\PhysFactory.h" />
     <ClInclude Include="include\Engine\Physics\Impl\PhysRigidBody.h" />
     <ClInclude Include="include\Engine\Physics\Impl\PhysShape.h" />
     <ClInclude Include="include\Engine\Physics\Impl\ConvertUtils.h" />
+    <ClInclude Include="include\Engine\Physics\Resources\ConvexMeshLoader.h" />
+    <ClInclude Include="include\Engine\Physics\Shape\IConvexMesh.h" />
     <ClInclude Include="include\Engine\Physics\Utils\INativePtrHandler.h" />
     <ClInclude Include="include\Engine\Physics\Shape\IGeometry.h" />
     <ClInclude Include="include\Engine\Physics\Utils\PhysicsMath.h" />
@@ -182,9 +185,11 @@
     <ClCompile Include="src\Core\Utils\UUID.cpp" />
     <ClCompile Include="src\Core\Windowing\GLWindow.cpp" />
     <ClCompile Include="src\Physics\Core\PhysicsSystem.cpp" />
+    <ClCompile Include="src\Physics\Impl\PhysConvexMesh.cpp" />
     <ClCompile Include="src\Physics\Impl\PhysFactory.cpp" />
     <ClCompile Include="src\Physics\Impl\PhysRigidBody.cpp" />
     <ClCompile Include="src\Physics\Impl\PhysShape.cpp" />
+    <ClCompile Include="src\Physics\Resources\ConvexMeshLoader.cpp" />
     <ClCompile Include="src\Renderer\Buffers\Framebuffer.cpp" />
     <ClCompile Include="src\Renderer\Buffers\IndexBuffer.cpp" />
     <ClCompile Include="src\Renderer\Buffers\VertexArray.cpp" />

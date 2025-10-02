@@ -75,39 +75,23 @@ namespace PrPhysics {
 		return PrPhysics::Bounds3{ ToVec3(p_bounds.minimum), ToVec3(p_bounds.maximum) };
 	}
 
-	inline physx::PxGeometryHolder ToPxGeometry(const IGeometry* p_geometry)
+	inline physx::PxGeometryHolder ToPxGeometry(const IGeometry& p_geometry)
 	{
 		physx::PxGeometryHolder holder;
+		GeometeryVisitor visitor{
+			[&](const SphereGeometry* p_geometery)  { holder.storeAny(physx::PxSphereGeometry{ p_geometery->radius }); },
+			[&](const PlaneGeometry* p_geometery)   { holder.storeAny(physx::PxPlaneGeometry{}); },
+			[&](const CapsuleGeometry* p_geometery) { holder.storeAny(physx::PxCapsuleGeometry{ p_geometery->radius, p_geometery->halfHeight }); },
+			[&](const BoxGeometery* p_geometery)    { holder.storeAny(physx::PxBoxGeometry{ ToPxVec3(p_geometery->halfExtents) }); },
+			[&](const ConvexGeometry* p_geometery)
+			{
+				physx::PxMeshScale scale;
+				scale.scale = ToPxVec3(p_geometery->scale);
+				holder.storeAny(physx::PxConvexMeshGeometry{ static_cast<physx::PxConvexMesh*>(p_geometery->convexMeshPtr->GetNativePtr()), scale });
+			}
+		};
 
-		switch (p_geometry->GetType())
-		{
-		case GeometryType::Sphere:
-		{
-			const SphereGeometry* geometry = static_cast<const SphereGeometry*>(p_geometry);
-			holder.storeAny(physx::PxSphereGeometry{ geometry->radius });
-			break;
-		}
-		case GeometryType::Plane:
-		{
-			holder.storeAny(physx::PxPlaneGeometry{});
-			break;
-		}
-		case GeometryType::Capsule:
-		{
-			const CapsuleGeometry* geometry = static_cast<const CapsuleGeometry*>(p_geometry);
-			holder.storeAny(physx::PxCapsuleGeometry{ geometry->radius, geometry->halfHeight });
-			break;
-		}
-		case GeometryType::Box:
-		{
-			const BoxGeometery* geometry = static_cast<const BoxGeometery*>(p_geometry);
-			holder.storeAny(physx::PxBoxGeometry{ ToPxVec3(geometry->halfExtents) });
-			break;
-		}
-		default:
-			PR_ASSERT(false, "Invalid Geometry Type!");
-		}
-
+		p_geometry.Accept(visitor);
 		return holder;
 	}
 

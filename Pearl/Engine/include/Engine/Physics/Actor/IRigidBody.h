@@ -50,6 +50,7 @@ namespace PrPhysics {
 		virtual void                SetGlobalPose(const Transform& p_pose, bool p_autowake = true) = 0;
 
 		virtual bool                AttachShape(IShapePtr p_shape) = 0;
+		virtual IShapePtr           GetShape() = 0;
 		virtual void                DetachShape(IShapePtr p_shape, bool p_wakeOnLostTouch = true) = 0;
 	};
 	using IRigidActorPtr = std::shared_ptr<IRigidActor>;

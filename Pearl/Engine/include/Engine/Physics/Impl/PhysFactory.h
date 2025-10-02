@@ -13,9 +13,9 @@ namespace PrPhysics {
 		IRigidStaticPtr      CreateRigidStatic(const Transform& p_transform) override;
 		IRigidBodyDynamicPtr CreateRigidDynamic(const Transform& p_transform) override;
 		IShapePtr            CreateShape(const IGeometry& p_geometery, const Material& p_mat, bool isExclusive = false, ShapeFlags p_flags = ShapeFlags::Visualization | ShapeFlags::SceneQuery | ShapeFlags::Simulation) override;
-
+		IConvexMeshPtr       CreateConvexMesh(PrRenderer::Resources::MeshHandle p_mesh) override;
+		IConvexMeshPtr       CreateConvexMesh(uint8_t* p_data, size_t p_size) override;
 	private:
 		physx::PxPhysics* m_physics;
 	};
-
 }

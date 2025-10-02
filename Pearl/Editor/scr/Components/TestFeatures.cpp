@@ -55,18 +55,15 @@ TestFeatures::TestFeatures()
 	using namespace PrRenderer::Resources;
 
 	// Load Stress Test
-	auto scene10 = PrCore::ECS::SceneManager::GetInstance().CreateScene("scene/render_stress_test.pearl");
+	auto scene10 = PrCore::ECS::SceneManager::GetInstance().LoadScene("scene/physics_test.pearl");
 	scene10->RegisterSystem<PrCore::ECS::HierarchyTransform>();
-	scene10->RegisterSystem<PrCore::ECS::MeshRendererSystem>();
-	scene10->RegisterSystem<PrCore::ECS::RenderStressTest>();
 	scene10->RegisterSystem<PrCore::ECS::PhysicsUpdateSystem>();
 
-	auto modeHandl = PrCore::Resources::ResourceSystem::GetInstance().Load<Assets::ModelResource>("Model/ocean.glb");
-	modeHandl->AddEntitesToScene(scene10);
+	//auto modeHandl = PrCore::Resources::ResourceSystem::GetInstance().Load<Assets::ModelResource>("Model/ocean.glb");
+	//modeHandl->AddEntitesToScene(scene10);
 
-	auto root = scene10->GetEntityByName("ocean").GetComponent<PrCore::ECS::TransformComponent>();
-	root->SetPosition(PrCore::Math::vec3{ 0,5.0f,0.0f });
-	
+	//auto root = scene10->GetEntityByName("ocean").GetComponent<PrCore::ECS::TransformComponent>();
+	//root->SetPosition(PrCore::Math::vec3{ 0,5.0f,0.0f });
 
 	//Add physics
 	auto physicsPtr = PrPhysics::PhysicsSystem::GetInstancePtr();
@@ -76,21 +73,40 @@ TestFeatures::TestFeatures()
 	material.dynamicFriction = 0.1f;
 	material.restitution = .1f;
 
-	//Ocean
+	//GroundCollider
 	{
-		auto shape = physicsPtr->CreateShape(PrPhysics::PlaneGeometry{}, material);
-		PrPhysics::Transform transform;
-		transform.position = { 0, 5.0f, 0.0f };
-		transform.rotation = glm::angleAxis(glm::radians(90.0f), glm::vec3(0, 0, 1));
-		auto rigidBody = physicsPtr->CreateRigidStatic(transform);
-		rigidBody->AttachShape(shape);
-		physicsPtr->AddActor(rigidBody);
+		auto groundCollider = scene10->CreateEntity("Quad");
+		auto transformComponent = groundCollider.AddComponent<PrCore::ECS::TransformComponent>();
+		transformComponent->SetPosition({ 0, 0.0f, 0.0f });
+		transformComponent->SetRotation(glm::angleAxis(glm::radians(90.0f), glm::vec3(0, 0, 1)));
 
-		auto rigidbodyComponent = scene10->GetEntityByName("ocean").AddComponent<PrCore::ECS::RigidBodyStaticComponent>();
-		rigidbodyComponent->rigidBody = rigidBody;
+		auto rigidBody = groundCollider.AddComponent<PrCore::ECS::RigidBodyStaticComponent>()->rigidBody;
+		auto shape = physicsPtr->CreateShape(PrPhysics::PlaneGeometry{}, material);
+		rigidBody->AttachShape(shape);
 	}
 
-	
+	//Ocean Trigger
+	{
+		auto triggerEntity = scene10->CreateEntity("TriggerPoint");
+		auto rigidbodyComponent = triggerEntity.AddComponent<PrCore::ECS::RigidBodyDynamicComponent>();
+		auto transformComponent = triggerEntity.AddComponent<PrCore::ECS::TransformComponent>();
+		transformComponent->SetPosition({ 3.0f, 3.0f, 3.0f });
+		transformComponent->SetLocalScale({ 30.0f, 2.0f, 30.0f });
+		//transformComponent->SetRotation(PrCore::Math::angleAxis(glm::radians(90.0f), glm::vec3(0, 0, 1)));
+
+		auto logoMesh = triggerEntity.AddComponent<PrCore::ECS::MeshRendererComponent>();
+		logoMesh->mainMaterial = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("stress_test/capsuleTransparent.mat");
+		logoMesh->mainMaterial->SetRenderType(PrRenderer::Resources::RenderType::Transparent);
+		logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
+
+		auto shape = physicsPtr->CreateShape(PrPhysics::BoxGeometery{ 15.0f, 1.0f, 15.0f }, material);
+		shape->SetFlag(PrPhysics::ShapeFlags::Simulation, false);
+		shape->SetFlag(PrPhysics::ShapeFlags::Trigger, true);
+
+		rigidbodyComponent->rigidBody->AttachShape(shape);
+		rigidbodyComponent->rigidBody->SetRigidBodyFlag(PrPhysics::RigidBodyFlag::Kinematic, true);
+	}
+
 	for (int i = 0; i < 10; i += 2)
 	{
 		for (int j = 0; j < 10; j += 2)
@@ -131,6 +147,8 @@ TestFeatures::TestFeatures()
 			logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Sphere);
 		}
 	}
+
+	//PrCore::ECS::SceneManager::GetInstance().SaveSceneByName(scene10->GetSceneName(), "scene/test_deseriallize.pearl");
 
 	// Physics Test
 	//auto physicsPtr = PrPhysics::PhysicsSystem::GetInstancePtr();

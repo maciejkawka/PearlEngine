@@ -167,6 +167,16 @@ PrPhysics::IShapePtr PhysicsSystem::CreateShape(const IGeometry& p_geometery, co
 	return m_physicsFactory->CreateShape(p_geometery, p_mat, isExclusive, p_flags);
 }
 
+PrPhysics::IConvexMeshPtr PhysicsSystem::CreateConvexMesh(PrRenderer::Resources::MeshHandle p_mesh)
+{
+	return m_physicsFactory->CreateConvexMesh(p_mesh);
+}
+
+PrPhysics::IConvexMeshPtr PhysicsSystem::CreateConvexMesh(uint8_t* p_data, size_t p_size)
+{
+	return m_physicsFactory->CreateConvexMesh(p_data, p_size);
+}
+
 PrPhysics::PhysicsStatistics PhysicsSystem::GetStatistics() const
 {
 	return PhysicsStatistics{};

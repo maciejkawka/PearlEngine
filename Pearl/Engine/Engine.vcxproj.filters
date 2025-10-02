@@ -79,6 +79,9 @@
     <Filter Include="Physics\Events">
       <UniqueIdentifier>{d4843644-d8ad-4a95-89ee-12b00238c4db}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Physics\Resources">
+      <UniqueIdentifier>{713ebf68-4782-43b3-bef2-62586659d630}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Engine\Core\Entry\AppContext.h">
@@ -474,6 +477,15 @@
     <ClInclude Include="include\Engine\Physics\Impl\PhysCollisionDispatcher.h">
       <Filter>Physics\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Impl\PhysConvexMesh.h">
+      <Filter>Physics\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Shape\IConvexMesh.h">
+      <Filter>Physics\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Resources\ConvexMeshLoader.h">
+      <Filter>Physics\Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -691,6 +703,12 @@
     </ClCompile>
     <ClCompile Include="src\Core\ECS\Systems\PhysicsUpdateSystem.cpp">
       <Filter>Core\ECS\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\Impl\PhysConvexMesh.cpp">
+      <Filter>Physics\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\Resources\ConvexMeshLoader.cpp">
+      <Filter>Physics\Resources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

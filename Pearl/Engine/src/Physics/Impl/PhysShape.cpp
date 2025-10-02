@@ -7,9 +7,19 @@ using namespace PrPhysics;
 using namespace physx;
 
 
-PhysShape::PhysShape(physx::PxShape* p_shape) :
+PhysShape::PhysShape(physx::PxShape* p_shape, const IGeometry& p_geometry) :
 	m_impl(p_shape)
 {
+	m_visitor = GeometeryVisitor
+	{
+		[&](const SphereGeometry* p_geometery) {m_geometery = std::make_unique<SphereGeometry>(p_geometery->radius); },
+		[&](const PlaneGeometry* p_geometery) {m_geometery = std::make_unique<PlaneGeometry>(); },
+		[&](const CapsuleGeometry* p_geometery) {m_geometery = std::make_unique<CapsuleGeometry>(p_geometery->radius, p_geometery->halfHeight); },
+		[&](const BoxGeometery* p_geometery) {m_geometery = std::make_unique<BoxGeometery>(p_geometery->halfExtents); },
+		[&](const ConvexGeometry* p_geometery) {m_geometery = std::make_unique<ConvexGeometry>(p_geometery->convexMeshPtr, p_geometery->scale); }
+	};
+	
+	p_geometry.Accept(m_visitor);
 }
 
 PhysShape::~PhysShape()
@@ -19,12 +29,13 @@ PhysShape::~PhysShape()
 
 void PhysShape::SetGeometry(const IGeometry& p_geometry)
 {
-	m_impl->setGeometry(ToPxGeometry(&p_geometry).any());
+	p_geometry.Accept(m_visitor);
+	m_impl->setGeometry(ToPxGeometry(p_geometry).any());
 }
 
-const PrPhysics::IGeometry& PhysShape::GetGeometry() const
+const PrPhysics::IGeometry* PhysShape::GetGeometry() const
 {
-	return PrPhysics::IGeometry{};
+	return m_geometery.get();
 }
 
 void PhysShape::SetLocalPose(const Transform& p_transform)
@@ -80,4 +91,18 @@ void PhysShape::ReleaseNativePtr()
 void PhysShape::SetFlag(ShapeFlags p_flag, bool p_value)
 {
 	m_impl->setFlag(CastFlag<PxShapeFlag::Enum>(p_flag), p_value);
+}
+
+void PhysShape::AssignGeometery(const IGeometry* p_geometry)
+{
+	GeometeryVisitor visitor
+	{
+		[&](const SphereGeometry* p_geometery) {m_geometery = std::make_unique<SphereGeometry>(p_geometery->radius); },
+		[&](const PlaneGeometry* p_geometery) {m_geometery = std::make_unique<PlaneGeometry>(); },
+		[&](const CapsuleGeometry* p_geometery) {m_geometery = std::make_unique<CapsuleGeometry>(p_geometery->radius, p_geometery->halfHeight); },
+		[&](const BoxGeometery* p_geometery) {m_geometery = std::make_unique<BoxGeometery>(p_geometery->halfExtents); },
+		[&](const ConvexGeometry* p_geometery) {m_geometery = std::make_unique<ConvexGeometry>(p_geometery->convexMeshPtr, p_geometery->scale); }
+	};
+
+	p_geometry->Accept(visitor);
 }

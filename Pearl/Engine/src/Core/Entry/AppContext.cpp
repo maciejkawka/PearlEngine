@@ -32,6 +32,8 @@
 #include "Renderer/Resources/Texture2DLoader.h"
 
 #include "Physics/Core/PhysicsSystem.h"
+#include "Physics/Shape/IConvexMesh.h"
+#include "Physics/Resources/ConvexMeshLoader.h"
 //
 
 const std::string_view GraphicConfig{ "config/graphic.cfg" };
@@ -202,8 +204,14 @@ PrCore::Entry::AppContext::AppContext()
 		PrRenderer::Core::renderSystem = std::make_unique<PrRenderer::Core::DeferRenderFrontend>(rendererSettings);
 	}
 
-	PrPhysics::PhysicsSettings physSettings;
-	PrPhysics::PhysicsSystem::Init(physSettings);
+	{
+		PrPhysics::PhysicsSettings physSettings;
+		PrPhysics::PhysicsSystem::Init(physSettings);
+
+		auto convexMeshDatabase = std::make_unique<PrRenderer::Resources::ResourceDatabase>();
+		convexMeshDatabase->RegisterLoader(".phys", std::make_unique<PrPhysics::ConvexMeshLoader>());
+		PrRenderer::Resources::ResourceSystem::GetInstance().RegisterDatabase<PrPhysics::IConvexMesh>(std::move(convexMeshDatabase));
+	}
 
 	Input::InputManager::Init();
 	ECS::SceneManager::Init();
@@ -215,7 +223,13 @@ PrCore::Entry::AppContext::~AppContext()
 
 	ECS::SceneManager::Terminate();
 	Input::InputManager::Terminate();
-	PrPhysics::PhysicsSystem::Terminate();
+
+	{
+		PrCore::Resources::ResourceSystem::GetInstance().UnloadAll<PrPhysics::IConvexMesh>();
+		PrCore::Resources::ResourceSystem::GetInstance().UnregisterLoader<PrPhysics::IConvexMesh>(".phys");
+		PrPhysics::PhysicsSystem::Terminate();
+	}
+
 	PrRenderer::Core::renderSystem.reset();
 	delete m_rendererContext;
 	delete m_window;

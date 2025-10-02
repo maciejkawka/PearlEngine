@@ -9,11 +9,11 @@ namespace PrPhysics {
 
 	class PhysShape : public IShape {
 	public:
-		PhysShape(physx::PxShape* p_shape);
+		PhysShape(physx::PxShape* p_shape, const IGeometry& p_geometry);
 		~PhysShape();
 
 		void             SetGeometry(const IGeometry& p_geometry) override;
-		const IGeometry& GetGeometry() const override;
+		const IGeometry* GetGeometry() const override;
 
 		void             SetLocalPose(const Transform& p_transform) override;
 		const Transform& GetLocalPose() const override;
@@ -32,7 +32,13 @@ namespace PrPhysics {
 		void   ReleaseNativePtr() override;
 
 	private:
-		physx::PxShape* m_impl;
+		void AssignGeometery(const IGeometry* p_geometry);
+
+		physx::PxShape*            m_impl;
+
+		// Proxy Objects
+		GeometeryVisitor           m_visitor;
+		std::unique_ptr<IGeometry> m_geometery;
 	};
 
 }

@@ -58,11 +58,18 @@ void PhysRigidBodyStatic::SetGlobalPose(const Transform& p_pose, bool p_autowake
 
 bool PhysRigidBodyStatic::AttachShape(IShapePtr p_shape)
 {
+	m_shape = p_shape;
 	return m_impl->attachShape(*static_cast<PxShape*>(p_shape->GetNativePtr()));
+}
+
+IShapePtr PhysRigidBodyStatic::GetShape()
+{
+	return m_shape;
 }
 
 void PhysRigidBodyStatic::DetachShape(IShapePtr p_shape, bool p_wakeOnLostTouch /*= true*/)
 {
+	m_shape.reset();
 	m_impl->detachShape(*static_cast<PxShape*>(p_shape->GetNativePtr()), p_wakeOnLostTouch);
 }
 
@@ -312,11 +319,18 @@ const char* PhysRigidBodyDynamic::GetName()
 
 bool PhysRigidBodyDynamic::AttachShape(IShapePtr p_shape)
 {
+	m_shape = p_shape;
 	return m_impl->attachShape(*static_cast<PxShape*>(p_shape->GetNativePtr()));
+}
+
+IShapePtr PhysRigidBodyDynamic::GetShape()
+{
+	return m_shape;
 }
 
 void PhysRigidBodyDynamic::DetachShape(IShapePtr p_shape, bool p_wakeOnLostTouch /*= true*/)
 {
+	m_shape.reset();
 	m_impl->detachShape(*static_cast<PxShape*>(p_shape->GetNativePtr()), p_wakeOnLostTouch);
 }
 
