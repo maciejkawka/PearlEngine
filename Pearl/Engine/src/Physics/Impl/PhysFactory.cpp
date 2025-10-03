@@ -33,7 +33,7 @@ PrPhysics::IShapePtr PhysFactory::CreateShape(const IGeometry& p_geometery, cons
 	material->setDamping(p_mat.dumping);
 
 	PxShape* pxShape = m_physics->createShape(ToPxGeometry(p_geometery).any(), *material, p_isExclusive, CastFlag<PxShapeFlag::Enum>(p_flags));
-	return std::make_shared<PhysShape>(pxShape, p_geometery);
+	return std::make_shared<PhysShape>(pxShape, p_geometery, p_mat);
 }
 
 PrPhysics::IConvexMeshPtr PhysFactory::CreateConvexMesh(uint8_t* p_data, size_t p_size)

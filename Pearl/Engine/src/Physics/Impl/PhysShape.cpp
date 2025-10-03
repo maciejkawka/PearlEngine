@@ -7,8 +7,9 @@ using namespace PrPhysics;
 using namespace physx;
 
 
-PhysShape::PhysShape(physx::PxShape* p_shape, const IGeometry& p_geometry) :
-	m_impl(p_shape)
+PhysShape::PhysShape(physx::PxShape* p_shape, const IGeometry& p_geometry, const Material& p_mat) :
+	m_impl(p_shape),
+	m_material(p_mat)
 {
 	m_visitor = GeometeryVisitor
 	{
@@ -16,9 +17,9 @@ PhysShape::PhysShape(physx::PxShape* p_shape, const IGeometry& p_geometry) :
 		[&](const PlaneGeometry* p_geometery) {m_geometery = std::make_unique<PlaneGeometry>(); },
 		[&](const CapsuleGeometry* p_geometery) {m_geometery = std::make_unique<CapsuleGeometry>(p_geometery->radius, p_geometery->halfHeight); },
 		[&](const BoxGeometery* p_geometery) {m_geometery = std::make_unique<BoxGeometery>(p_geometery->halfExtents); },
-		[&](const ConvexGeometry* p_geometery) {m_geometery = std::make_unique<ConvexGeometry>(p_geometery->convexMeshPtr, p_geometery->scale); }
+		[&](const ConvexGeometry* p_geometery) {m_geometery = std::make_unique<ConvexGeometry>(p_geometery->convexMeshHandle, p_geometery->scale); }
 	};
-	
+
 	p_geometry.Accept(m_visitor);
 }
 
@@ -101,8 +102,13 @@ void PhysShape::AssignGeometery(const IGeometry* p_geometry)
 		[&](const PlaneGeometry* p_geometery) {m_geometery = std::make_unique<PlaneGeometry>(); },
 		[&](const CapsuleGeometry* p_geometery) {m_geometery = std::make_unique<CapsuleGeometry>(p_geometery->radius, p_geometery->halfHeight); },
 		[&](const BoxGeometery* p_geometery) {m_geometery = std::make_unique<BoxGeometery>(p_geometery->halfExtents); },
-		[&](const ConvexGeometry* p_geometery) {m_geometery = std::make_unique<ConvexGeometry>(p_geometery->convexMeshPtr, p_geometery->scale); }
+		[&](const ConvexGeometry* p_geometery) {m_geometery = std::make_unique<ConvexGeometry>(p_geometery->convexMeshHandle, p_geometery->scale); }
 	};
 
 	p_geometry->Accept(visitor);
+}
+
+const PrPhysics::Material& PhysShape::GetMaterial()
+{
+	return m_material;
 }

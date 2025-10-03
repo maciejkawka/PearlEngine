@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Physics/Shape/IShape.h"
-#include "Physics/Shape/IGeometry.h"
 
 #include "PhysX/PxPhysicsAPI.h"
 
@@ -9,7 +8,7 @@ namespace PrPhysics {
 
 	class PhysShape : public IShape {
 	public:
-		PhysShape(physx::PxShape* p_shape, const IGeometry& p_geometry);
+		PhysShape(physx::PxShape* p_shape, const IGeometry& p_geometry, const Material& p_mat);
 		~PhysShape();
 
 		void             SetGeometry(const IGeometry& p_geometry) override;
@@ -31,6 +30,8 @@ namespace PrPhysics {
 		void*  GetNativePtr() override;
 		void   ReleaseNativePtr() override;
 
+		const Material& GetMaterial() override;
+
 	private:
 		void AssignGeometery(const IGeometry* p_geometry);
 
@@ -39,6 +40,7 @@ namespace PrPhysics {
 		// Proxy Objects
 		GeometeryVisitor           m_visitor;
 		std::unique_ptr<IGeometry> m_geometery;
+		Material                   m_material;
 	};
 
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Physics/Shape/IGeometry.h"
+#include "Physics/Core/Material.h"
 #include "Physics/Utils/PhysicsMath.h"
 #include "Physics/Utils/INativePtrHandler.h"
 
@@ -32,6 +33,8 @@ namespace PrPhysics {
 
 		virtual void              SetName(const char* p_name) = 0;
 		virtual const char*       GetName() const = 0;
+
+		virtual const Material&   GetMaterial() = 0;
 	};
 	using IShapePtr = std::shared_ptr<IShape>;
 }

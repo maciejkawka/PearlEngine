@@ -195,7 +195,7 @@ namespace PrCore::Resources {
 		size_t              GetSize() const { return m_resourceDesc->size; }
 
 		// Gets IResourceData from the descriptor. If descriptor is nullptr the function returns nullptr
-		std::shared_ptr<T>  GetData() 
+		std::shared_ptr<T>  GetData() const
 		{
 			if (m_resourceDesc == nullptr)
 				return nullptr;

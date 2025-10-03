@@ -161,13 +161,12 @@ namespace PrPhysics {
 		{
 			type = GeometryType::Convex;
 			scale = PrCore::Math::vec3{ 1.0f };
-			convexMeshPtr = nullptr;
 		}
 
-		ConvexGeometry(IConvexMeshPtr p_convexMeshPtr, const PrCore::Math::vec3& p_scale = PrCore::Math::vec3(1.0f))
+		ConvexGeometry(IConvexMeshHandle p_convexMeshHandle, const PrCore::Math::vec3& p_scale = PrCore::Math::vec3(1.0f))
 		{
 			type = GeometryType::Convex;
-			convexMeshPtr = p_convexMeshPtr;
+			convexMeshHandle = p_convexMeshHandle;
 			scale = p_scale;
 		}
 
@@ -177,6 +176,6 @@ namespace PrPhysics {
 		}
 
 		PrCore::Math::vec3 scale;
-		IConvexMeshPtr     convexMeshPtr;
+		IConvexMeshHandle  convexMeshHandle;
 	};
 }

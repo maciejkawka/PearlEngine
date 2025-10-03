@@ -11,20 +11,25 @@ namespace PrCore::ECS {
 		BaseComponent* component = nullptr;
 
 		//Core
-		if		(p_typeName == typeid(NameComponent).name())			component = p_entity.AddComponent<NameComponent>();
-		else if (p_typeName == typeid(UUIDComponent).name())			component = p_entity.AddComponent<UUIDComponent>();
-		else if (p_typeName == typeid(ToDestoryTag).name())				component = p_entity.AddComponent<ToDestoryTag>();
-		else if (p_typeName == typeid(TagComponent).name())				component = p_entity.AddComponent<TagComponent>();
+		if (p_typeName == typeid(NameComponent).name())                 component = p_entity.AddComponent<NameComponent>();
+		else if (p_typeName == typeid(UUIDComponent).name())            component = p_entity.AddComponent<UUIDComponent>();
+		else if (p_typeName == typeid(ToDestoryTag).name())             component = p_entity.AddComponent<ToDestoryTag>();
+		else if (p_typeName == typeid(TagComponent).name())             component = p_entity.AddComponent<TagComponent>();
 
 		//Transform
-		else if (p_typeName == typeid(TransformComponent).name())		component = p_entity.AddComponent<TransformComponent>();
-		else if (p_typeName == typeid(ParentComponent).name())			component = p_entity.AddComponent<ParentComponent>();
+		else if (p_typeName == typeid(TransformComponent).name())       component = p_entity.AddComponent<TransformComponent>();
+		else if (p_typeName == typeid(ParentComponent).name())          component = p_entity.AddComponent<ParentComponent>();
 
 		//Renderer
-		else if (p_typeName == typeid(MeshRendererComponent).name())	component = p_entity.AddComponent<MeshRendererComponent>();
-		else if (p_typeName == typeid(LightComponent).name())			component = p_entity.AddComponent<LightComponent>();
-		else if (p_typeName == typeid(CameraComponent).name())			component = p_entity.AddComponent<CameraComponent>();
-		else															PR_ASSERT(true, "Component type invalid" + p_typeName);
+		else if (p_typeName == typeid(MeshRendererComponent).name())    component = p_entity.AddComponent<MeshRendererComponent>();
+		else if (p_typeName == typeid(LightComponent).name())           component = p_entity.AddComponent<LightComponent>();
+		else if (p_typeName == typeid(CameraComponent).name())          component = p_entity.AddComponent<CameraComponent>();
+
+		//Physics
+		else if (p_typeName == typeid(RigidBodyDynamicComponent).name()) component = p_entity.AddComponent<RigidBodyDynamicComponent>();
+		else if (p_typeName == typeid(RigidBodyStaticComponent).name())  component = p_entity.AddComponent<RigidBodyStaticComponent>();
+
+		else                                                             PR_ASSERT(true, "Component type invalid" + p_typeName);
 
 		return component;
 	}

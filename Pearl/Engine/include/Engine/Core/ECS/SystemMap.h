@@ -8,10 +8,11 @@ namespace PrCore::ECS {
 	{
 		BaseSystem* system = nullptr;
 
-		if (p_typeName == typeid(MeshRendererSystem).name())				p_systemManager->RegisterSystem<MeshRendererSystem>();
-		else if (p_typeName == typeid(HierarchyTransform).name())			p_systemManager->RegisterSystem<HierarchyTransform>();
-		else if (p_typeName == typeid(TestSystem).name())					p_systemManager->RegisterSystem<TestSystem>();
-		else if (p_typeName == typeid(RenderStressTest).name())				p_systemManager->RegisterSystem<RenderStressTest>();
-		else																PR_ASSERT(true, "System type is invalid" + p_typeName);
+		if (p_typeName == typeid(MeshRendererSystem).name())                p_systemManager->RegisterSystem<MeshRendererSystem>();
+		else if (p_typeName == typeid(HierarchyTransform).name())           p_systemManager->RegisterSystem<HierarchyTransform>();
+		else if (p_typeName == typeid(TestSystem).name())                   p_systemManager->RegisterSystem<TestSystem>();
+		else if (p_typeName == typeid(RenderStressTest).name())             p_systemManager->RegisterSystem<RenderStressTest>();
+		else if (p_typeName == typeid(PhysicsUpdateSystem).name())          p_systemManager->RegisterSystem<PhysicsUpdateSystem>();
+		else                                                                PR_ASSERT(true, "System type is invalid" + p_typeName);
 	}
 }

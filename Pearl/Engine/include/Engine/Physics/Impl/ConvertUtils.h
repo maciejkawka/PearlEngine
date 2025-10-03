@@ -87,7 +87,7 @@ namespace PrPhysics {
 			{
 				physx::PxMeshScale scale;
 				scale.scale = ToPxVec3(p_geometery->scale);
-				holder.storeAny(physx::PxConvexMeshGeometry{ static_cast<physx::PxConvexMesh*>(p_geometery->convexMeshPtr->GetNativePtr()), scale });
+				holder.storeAny(physx::PxConvexMeshGeometry{ static_cast<physx::PxConvexMesh*>(p_geometery->convexMeshHandle.GetData()->GetNativePtr()), scale });
 			}
 		};
 

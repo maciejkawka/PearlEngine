@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Physics/Shape/IConvexMesh.h"
-#include "Renderer/Resources/Mesh.h"
 
 #include "PhysX/PxPhysicsAPI.h"
 
