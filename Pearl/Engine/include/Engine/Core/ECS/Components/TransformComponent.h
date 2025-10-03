@@ -1,8 +1,12 @@
 #pragma once
-#include "Core/ECS/BaseComponent.h"
-#include "Core/Math/Math.h"
-#include "Core/ECS/EntityManager.h"
 
+#include "Core/ECS/BaseComponent.h"
+#include "Core/ECS/EntityManager.h"
+#include "Core/ECS/SceneManager.h"
+#include "Core/ECS/Scene.h"
+#include "Core/ECS/Components/CoreComponents.h"
+
+#include "Core/Math/Math.h"
 
 namespace PrCore::ECS {
 
@@ -49,23 +53,23 @@ namespace PrCore::ECS {
 
 		virtual void OnSerialize(Utils::JSON::json& p_serialized) override
 		{
-			p_serialized["Position"] = Utils::JSONParser::ParseVec3(m_position);
-			p_serialized["Rotation"] = Utils::JSONParser::ParseQuat(m_rotation);
-			p_serialized["Scale"] = Utils::JSONParser::ParseVec3(m_scale);
+			p_serialized["position"] = Utils::JSONParser::ParseVec3(m_position);
+			p_serialized["rotation"] = Utils::JSONParser::ParseQuat(m_rotation);
+			p_serialized["scale"] = Utils::JSONParser::ParseVec3(m_scale);
 
-			p_serialized["LocalPosition"] = Utils::JSONParser::ParseVec3(m_localPosition);
-			p_serialized["LocalRotation"] = Utils::JSONParser::ParseQuat(m_localRotation);
-			p_serialized["LocalScale"] = Utils::JSONParser::ParseVec3(m_localScale);
+			p_serialized["localPosition"] = Utils::JSONParser::ParseVec3(m_localPosition);
+			p_serialized["localRotation"] = Utils::JSONParser::ParseQuat(m_localRotation);
+			p_serialized["localScale"] = Utils::JSONParser::ParseVec3(m_localScale);
 		}
 		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override
 		{
-			m_position = Utils::JSONParser::ToVec3(p_deserialized["Position"]);
-			m_rotation = Utils::JSONParser::ToQuat(p_deserialized["Rotation"]);
-			m_scale = Utils::JSONParser::ToVec3(p_deserialized["Scale"]);
+			m_position = Utils::JSONParser::ToVec3(p_deserialized["position"]);
+			m_rotation = Utils::JSONParser::ToQuat(p_deserialized["rotation"]);
+			m_scale = Utils::JSONParser::ToVec3(p_deserialized["scale"]);
 
-			m_localPosition = Utils::JSONParser::ToVec3(p_deserialized["LocalPosition"]);
-			m_localRotation = Utils::JSONParser::ToQuat(p_deserialized["LocalRotation"]);
-			m_localScale = Utils::JSONParser::ToVec3(p_deserialized["LocalScale"]);
+			m_localPosition = Utils::JSONParser::ToVec3(p_deserialized["localPosition"]);
+			m_localRotation = Utils::JSONParser::ToQuat(p_deserialized["localRotation"]);
+			m_localScale = Utils::JSONParser::ToVec3(p_deserialized["localScale"]);
 
 			GenerateWorldMatrix();
 			GenerateLocalMatrix();
@@ -101,7 +105,18 @@ namespace PrCore::ECS {
 			isDirty = true;
 		}
 
-		virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
-		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
+		virtual void OnSerialize(Utils::JSON::json& p_serialized) override 
+		{
+			p_serialized["parentUuid"] = parent.GetComponent<UUIDComponent>()->UUID;
+		}
+
+		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override
+		{
+			if (p_deserialized.contains("parentUuid"))
+			{
+				parent = SceneManager::GetInstance().GetActiveScene()->GetEntityByID(p_deserialized["parentUuid"]);
+				isDirty = true;
+			}
+		}
 	};
 }

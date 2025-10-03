@@ -12,12 +12,12 @@ namespace PrCore::ECS {
 
 		void OnSerialize(Utils::JSON::json& p_serialized) override
 		{
-			p_serialized["UUID"] = UUID;
+			p_serialized["uuid"] = UUID;
 		}
 
 		void OnDeserialize(const Utils::JSON::json& p_deserialized) override
 		{
-			UUID = p_deserialized["UUID"];
+			UUID = p_deserialized["uuid"];
 		}
 	};
 

@@ -56,12 +56,10 @@ Scene* SceneManager::LoadScene(const std::string& p_path)
 
 	auto sceneJSON = Utils::JSON::json::parse(dataVector);
 
-	auto scene = CreateScene("");
-	scene->OnDeserialize(sceneJSON);
+	m_activeScene = CreateScene("");
+	m_activeScene->OnDeserialize(sceneJSON);
 
-	m_activeScene = scene;
-
-	return scene;
+	return m_activeScene;
 }
 
 void SceneManager::SaveSceneByName(const std::string& p_name, const std::string& p_path)

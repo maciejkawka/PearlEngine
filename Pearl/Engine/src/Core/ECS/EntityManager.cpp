@@ -185,8 +185,6 @@ void EntityManager::OnSerialize(Utils::JSON::json& p_serialized)
 		auto ID = entity.GetID();
 		auto entitySignature = m_entitiesSignature[i - 1];
 
-		entityJSON["ID"] = ID.GetID();
-
 		//Serialize Components on Entity
 		Utils::JSON::json componentsJSON;
 		for (int j = 0; j < entitySignature.size(); j++)

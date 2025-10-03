@@ -53,7 +53,10 @@ TestFeatures::TestFeatures()
 {
 	using namespace PrCore::Resources;
 	using namespace PrRenderer::Resources;
-
+	
+	auto scene101 = PrCore::ECS::SceneManager::GetInstance().LoadScene("scene/render_stress_test.pearl");
+	return;
+	
 	// Load Stress Test
 	auto scene10 = PrCore::ECS::SceneManager::GetInstance().LoadScene("scene/physics_test.pearl");
 	scene10->RegisterSystem<PrCore::ECS::HierarchyTransform>();
@@ -142,6 +145,36 @@ TestFeatures::TestFeatures()
 			auto logoTransform = entity.AddComponent<PrCore::ECS::TransformComponent>();
 			auto logoMesh = entity.AddComponent<PrCore::ECS::MeshRendererComponent>();
 			logoTransform->SetPosition(PrCore::Math::vec3({ -10, 25.0f + i * 3, j * 2 }));
+			logoTransform->SetLocalScale(PrCore::Math::vec3(1.0f));
+			logoMesh->mainMaterial = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("stress_test/emissionCapsule.mat");
+			logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Sphere);
+		}
+	}
+
+	{
+		auto entity = scene10->CreateEntity("ParentBox");
+		auto physcomponent = entity.AddComponent<PrCore::ECS::RigidBodyDynamicComponent>();
+
+		auto rigidBody = physcomponent->rigidBody;
+		auto shape = physicsPtr->CreateShape(PrPhysics::SphereGeometry{ 0.5f }, material);
+		rigidBody->AttachShape(shape);
+
+		auto logoTransform = entity.AddComponent<PrCore::ECS::TransformComponent>();
+		auto logoMesh = entity.AddComponent<PrCore::ECS::MeshRendererComponent>();
+		logoTransform->SetPosition(PrCore::Math::vec3({ -50, 50, 10 }));
+		logoTransform->SetLocalScale(PrCore::Math::vec3(1.0f));
+		logoMesh->mainMaterial = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("stress_test/emissionCapsule.mat");
+		logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Sphere);
+
+		for (int j = 0; j < 10; j += 2)
+		{
+			auto entityChild = scene10->CreateEntity("Child");
+			auto parentComponent = entityChild.AddComponent<PrCore::ECS::ParentComponent>();
+			parentComponent->SetParent(entity);
+
+			auto logoTransform = entityChild.AddComponent<PrCore::ECS::TransformComponent>();
+			auto logoMesh = entityChild.AddComponent<PrCore::ECS::MeshRendererComponent>();
+			logoTransform->SetLocalPosition(PrCore::Math::vec3({ -5, -5 + j * 3, 0 }));
 			logoTransform->SetLocalScale(PrCore::Math::vec3(1.0f));
 			logoMesh->mainMaterial = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("stress_test/emissionCapsule.mat");
 			logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Sphere);

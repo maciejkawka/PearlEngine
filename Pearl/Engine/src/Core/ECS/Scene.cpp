@@ -161,7 +161,7 @@ void Scene::OnSerialize(Utils::JSON::json& p_serialized)
 	//Scene Serialize
 	p_serialized["name"] = m_name;
 	p_serialized["path"] = m_path;
-	p_serialized["UUID"] = m_UUID;
+	p_serialized["uuid"] = m_UUID;
 	p_serialized["entitiesCount"] = m_entityManager->GetEntityCount();
 
 	Utils::JSON::json entitesJSON;
@@ -183,7 +183,7 @@ void Scene::OnDeserialize(const Utils::JSON::json& p_deserialized)
 	//Scene Deserialize
 	m_name = p_deserialized["name"];
 	m_path = p_deserialized["path"];
-	m_UUID = p_deserialized["UUID"];
+	m_UUID = p_deserialized["uuid"];
 
 	auto systemsJSON = p_deserialized["systems"];
 	m_systemManager->OnDeserialize(systemsJSON);

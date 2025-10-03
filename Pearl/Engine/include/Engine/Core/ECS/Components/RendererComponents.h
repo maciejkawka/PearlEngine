@@ -31,18 +31,18 @@ namespace PrCore::ECS {
 			if (shadowMesh != nullptr)
 			{
 				if (shadowMesh.GetOrigin() == PrCore::Resources::ResourceOrigin::Memory)
-					p_serialized["ShadowMesh"] = shadowMesh->GetName();
+					p_serialized["shadowMesh"] = shadowMesh->GetName();
 				else
-					p_serialized["ShadowMesh"] = shadowMesh.GetPath();
+					p_serialized["shadowMesh"] = shadowMesh.GetPath();
 			}
 
 			if(mesh.GetOrigin() == PrCore::Resources::ResourceOrigin::Memory)
 			{
-				p_serialized["Mesh"] = mesh->GetName();
+				p_serialized["mesh"] = mesh->GetName();
 			}
 			else
 			{
-				p_serialized["Mesh"] = mesh.GetPath();
+				p_serialized["mesh"] = mesh.GetPath();
 			}
 
 			Utils::JSON::json jsonMaterials;
@@ -51,8 +51,7 @@ namespace PrCore::ECS {
 				if (mat.GetOrigin() == PrCore::Resources::ResourceOrigin::File)
 				{
 					Utils::JSON::json jsonMatElement;
-					jsonMatElement["Path"] = mat.GetPath();
-
+					jsonMatElement["path"] = mat.GetPath();
 					jsonMaterials.push_back(jsonMatElement);
 				}
 				else
@@ -61,12 +60,12 @@ namespace PrCore::ECS {
 				}
 			}
 
-			p_serialized["MaterialList"] = jsonMaterials;
+			p_serialized["materialList"] = jsonMaterials;
 		}
 
 		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override
 		{
-			std::string meshName = p_deserialized["Mesh"];
+			std::string meshName = p_deserialized["mesh"];
 			if (meshName.find("Primitive_Cube") != std::string::npos)
 				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
 			else if (meshName.find("Primitive_Sphere") != std::string::npos)
@@ -80,12 +79,12 @@ namespace PrCore::ECS {
 			else if (meshName.find("Primitive_Quad") != std::string::npos)
 				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Quad);
 			else
-				mesh = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>(static_cast<std::string>(p_deserialized["Mesh"]));
+				mesh = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>(static_cast<std::string>(p_deserialized["mesh"]));
 
-			auto shadowMeshIt = p_deserialized.find("ShadowMesh");
+			auto shadowMeshIt = p_deserialized.find("shadowMesh");
 			if (shadowMeshIt != p_deserialized.end())
 			{
-				std::string meshName = p_deserialized["ShadowMesh"];
+				std::string meshName = p_deserialized["shadowMesh"];
 				if (meshName.find("Primitive_Cube") != std::string::npos)
 					shadowMesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
 				else if (meshName.find("Primitive_Sphere") != std::string::npos)
@@ -99,14 +98,14 @@ namespace PrCore::ECS {
 				else if (meshName.find("Primitive_Quad") != std::string::npos)
 					shadowMesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Quad);
 				else
-					shadowMesh = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>(static_cast<std::string>(p_deserialized["ShadowMesh"]));
+					shadowMesh = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>(static_cast<std::string>(p_deserialized["shadowMesh"]));
 			}
 
-			auto materialJson = p_deserialized["MaterialList"];
+			auto materialJson = p_deserialized["materialList"];
 			materials.resize(materialJson.size());
 			for (int i = 0; i < materialJson.size(); ++i)
 			{
-				auto mat = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>(static_cast<std::string>(materialJson.at(i)["Path"]));
+				auto mat = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>(static_cast<std::string>(materialJson.at(i)["path"]));
 				materials[i] = mat;
 			}
 		}
@@ -121,32 +120,32 @@ namespace PrCore::ECS {
 
 		virtual void OnSerialize(Utils::JSON::json& p_serialized) override
 		{
-			p_serialized["Color"] = Utils::JSONParser::ParseColor(m_light->GetColor());
-			p_serialized["LinearAttenuation"] = m_light->GetLinearAttenuation();
-			p_serialized["QuadraticAttenuation"] = m_light->GetQuadraticAttenuation();
-			p_serialized["ConstantAttenuation"] = m_light->GetConstantAttenuation();
-			p_serialized["Range"] = m_light->GetRange();
+			p_serialized["color"] = Utils::JSONParser::ParseColor(m_light->GetColor());
+			p_serialized["linearAttenuation"] = m_light->GetLinearAttenuation();
+			p_serialized["quadraticAttenuation"] = m_light->GetQuadraticAttenuation();
+			p_serialized["constantAttenuation"] = m_light->GetConstantAttenuation();
+			p_serialized["range"] = m_light->GetRange();
 
-			p_serialized["Type"] = m_light->GetType();
-			p_serialized["InnerCone"] = m_light->GetInnerCone();
-			p_serialized["OutterCone"] = m_light->GetOutterCone();
+			p_serialized["type"] = m_light->GetType();
+			p_serialized["innerCone"] = m_light->GetInnerCone();
+			p_serialized["outterCone"] = m_light->GetOutterCone();
 
-			p_serialized["ShadowCaster"] = m_shadowCast;
-			p_serialized["MainLight"] = mainDirectLight;
+			p_serialized["shadowCaster"] = m_shadowCast;
+			p_serialized["mainLight"] = mainDirectLight;
 		}
 
 		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override
 		{
-			m_light->SetColor(Utils::JSONParser::ToColor(p_deserialized["Color"]));
-			m_light->SetAttenuation(p_deserialized["QuadraticAttenuation"], p_deserialized["LinearAttenuation"], p_deserialized["ConstantAttenuation"]);
-			m_light->SetRange(p_deserialized["Range"]);
+			m_light->SetColor(Utils::JSONParser::ToColor(p_deserialized["color"]));
+			m_light->SetAttenuation(p_deserialized["quadraticAttenuation"], p_deserialized["linearAttenuation"], p_deserialized["constantAttenuation"]);
+			m_light->SetRange(p_deserialized["range"]);
 
-			m_light->SetType(p_deserialized["Type"]);
-			m_light->SetInnerCone(p_deserialized["InnerCone"]);
-			m_light->SetOutterCone(p_deserialized["OutterCone"]);
+			m_light->SetType(p_deserialized["type"]);
+			m_light->SetInnerCone(p_deserialized["innerCone"]);
+			m_light->SetOutterCone(p_deserialized["outterCone"]);
 
-			m_shadowCast = p_deserialized["ShadowCaster"];
-			mainDirectLight = p_deserialized["MainLight"];
+			m_shadowCast = p_deserialized["shadowCaster"];
+			mainDirectLight = p_deserialized["mainLight"];
 		}
 	};
 
@@ -175,24 +174,24 @@ namespace PrCore::ECS {
 
 		virtual void OnSerialize(Utils::JSON::json& p_serialized) override
 		{
-			p_serialized["Type"] = (int)m_camera.GetType();
-			p_serialized["ClearColor"] = Utils::JSONParser::ParseColor(m_camera.GetClearColor());
-			p_serialized["Far"] = m_camera.GetFar();
-			p_serialized["Near"] = m_camera.GetNear();
-			p_serialized["FOV"] = m_camera.GetFOV();
-			p_serialized["Ratio"] = m_camera.GetRatio();
-			p_serialized["Size"] = m_camera.GetSize();
+			p_serialized["type"] = (int)m_camera.GetType();
+			p_serialized["clearColor"] = Utils::JSONParser::ParseColor(m_camera.GetClearColor());
+			p_serialized["far"] = m_camera.GetFar();
+			p_serialized["near"] = m_camera.GetNear();
+			p_serialized["fov"] = m_camera.GetFOV();
+			p_serialized["ratio"] = m_camera.GetRatio();
+			p_serialized["size"] = m_camera.GetSize();
 		}
 
 		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override
 		{
-			m_camera.SetType(p_deserialized["Type"]);
-			m_camera.SetClearColor(Utils::JSONParser::ToColor(p_deserialized["ClearColor"]));
-			m_camera.SetFar(p_deserialized["Far"]);
-			m_camera.SetNear(p_deserialized["Near"]);
-			m_camera.SetFOV(p_deserialized["FOV"]);
-			m_camera.SetRatio(p_deserialized["Ratio"]);
-			m_camera.SetSize(p_deserialized["Size"]);
+			m_camera.SetType(p_deserialized["type"]);
+			m_camera.SetClearColor(Utils::JSONParser::ToColor(p_deserialized["clearColor"]));
+			m_camera.SetFar(p_deserialized["far"]);
+			m_camera.SetNear(p_deserialized["near"]);
+			m_camera.SetFOV(p_deserialized["fov"]);
+			m_camera.SetRatio(p_deserialized["ratio"]);
+			m_camera.SetSize(p_deserialized["size"]);
 		}
 
 	private:

@@ -71,7 +71,8 @@ void RenderStressTest::OnEnable()
 	//Randomize Lights
 	for (auto [entity, light, mesh]: m_entityViewer.EntitesWithComponents<LightComponent, MeshRendererComponent>())
 	{
-		mesh->mainMaterial = std::make_shared<PrRenderer::Resources::Material>(*mesh->mainMaterial.GetData());
+		entity.GetComponent<NameComponent>()->name;
+		//mesh->mainMaterial = std::make_shared<PrRenderer::Resources::Material>(*mesh->mainMaterial.GetData());
 		PrRenderer::Core::Color color = randColor();
 		light->m_light->SetColor(color);
 		mesh->mainMaterial->SetProperty("albedoValue", static_cast<PrCore::Math::vec4>(color));
@@ -94,6 +95,8 @@ void RenderStressTest::OnEnable()
 	m_mainLightPtr->SetColor(m_lightColor);
 
 	PrPhysics::PhysicsSystem::GetInstancePtr()->SetGravity(PrCore::Math::vec3{ 0.0f });
+
+	return;
 
 	for (auto [entity, transform, light] : m_entityViewer.EntitesWithComponents<TransformComponent, LightComponent>())
 	{
@@ -148,9 +151,11 @@ void RenderStressTest::OnEnable()
 		//auto resourceHandle = PrCore::Resources::ResourceSystem::GetInstance().Register<PrPhysics::IConvexMesh>(convexMesh);
 		//PrCore::Resources::ResourceSystem::GetInstance().SaveToFile<PrPhysics::IConvexMesh>(resourceHandle.GetID(), "ThisIsTest.phys");
 
-		auto shape = PrPhysics::PhysicsSystem::GetInstancePtr()->CreateShape(PrPhysics::ConvexGeometry{ convexMesh.GetData(), transform->GetLocalScale() }, material);
+		auto shape = PrPhysics::PhysicsSystem::GetInstancePtr()->CreateShape(PrPhysics::ConvexGeometry{ convexMesh, transform->GetLocalScale() }, material);
 		rigidbody->AttachShape(shape);
 	}
+
+	PrCore::ECS::SceneManager::GetInstance().SaveSceneByName(PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetSceneName(), "scene/test_deseriallize.pearl");
 }
 
 void RenderStressTest::OnDisable()
@@ -279,8 +284,11 @@ void RenderStressTest::OnUpdate(float p_dt)
 
 			if (loko != position)
 			{
-				entity.GetComponent<RigidBodyDynamicComponent>()->rigidBody->SetLinearVelocity(PrCore::Math::vec3{ 0.0f });
-				entity.GetComponent<RigidBodyDynamicComponent>()->rigidBody->SetAngularVelocity(PrCore::Math::vec3{ 0.0f });
+				if (entity.HasComponent<RigidBodyDynamicComponent>())
+				{
+					entity.GetComponent<RigidBodyDynamicComponent>()->rigidBody->SetLinearVelocity(PrCore::Math::vec3{ 0.0f });
+					entity.GetComponent<RigidBodyDynamicComponent>()->rigidBody->SetAngularVelocity(PrCore::Math::vec3{ 0.0f });
+				}
 			}
 
 			light->m_light->SetColor(color);

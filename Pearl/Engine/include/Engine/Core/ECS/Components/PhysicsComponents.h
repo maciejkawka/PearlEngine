@@ -16,7 +16,6 @@ namespace PrCore::ECS {
 		void OnSerialize(Utils::JSON::json& p_serialized) override
 		{
 			// Basic
-			p_serialized["name"] = rigidBody->GetName() ? rigidBody->GetName() : "";
 			p_serialized["type"] = rigidBody->GetType();
 			p_serialized["flags"] = rigidBody->GetRigidbodyFlags();
 			p_serialized["actorFlags"] = rigidBody->GetActorFlag();
@@ -25,7 +24,6 @@ namespace PrCore::ECS {
 			// Shape
 			Utils::JSON::json jsonShape;
 			auto shape = rigidBody->GetShape();
-			jsonShape["name"] = shape->GetName() ? shape->GetName() : "";
 			jsonShape["flags"] = shape->GetFlags();
 
 			// Geometry
@@ -71,8 +69,6 @@ namespace PrCore::ECS {
 		void OnDeserialize(const Utils::JSON::json& p_deserialized) override
 		{
 			// Basic
-			std::string name = p_deserialized["name"];
-			rigidBody->SetName(name.c_str());
 			rigidBody->SetActorFlags(p_deserialized["actorFlags"]);
 			rigidBody->SetRigidBodyFlags(p_deserialized["flags"]);
 			rigidBody->SetMass(p_deserialized["mass"]);
@@ -144,7 +140,6 @@ namespace PrCore::ECS {
 			};
 
 			auto shape = PrPhysics::PhysicsSystem::GetInstancePtr()->CreateShape(*geometery, material);
-			shape->SetName(static_cast<std::string>(jsonShape["name"]).c_str());
 			shape->SetFlags(jsonShape["flags"]);
 			rigidBody->AttachShape(shape);
 		}
@@ -157,14 +152,12 @@ namespace PrCore::ECS {
 		void OnSerialize(Utils::JSON::json& p_serialized) override
 		{
 			// Basic
-			p_serialized["name"] = rigidBody->GetName() ? rigidBody->GetName() : "";
 			p_serialized["type"] = rigidBody->GetType();
 			p_serialized["actorFlags"] = rigidBody->GetActorFlag();
 
 			// Shape
 			Utils::JSON::json jsonShape;
 			auto shape = rigidBody->GetShape();
-			jsonShape["name"] = shape->GetName() ? shape->GetName() : "";
 			jsonShape["flags"] = shape->GetFlags();
 
 			// Geometry
@@ -210,8 +203,6 @@ namespace PrCore::ECS {
 		void OnDeserialize(const Utils::JSON::json& p_deserialized) override
 		{
 			// Basic
-			std::string name = p_deserialized["name"];
-			rigidBody->SetName(name.c_str());
 			rigidBody->SetActorFlags(p_deserialized["actorFlags"]);
 
 			// Shape
@@ -281,7 +272,6 @@ namespace PrCore::ECS {
 			};
 
 			auto shape = PrPhysics::PhysicsSystem::GetInstancePtr()->CreateShape(*geometery, material);
-			shape->SetName(static_cast<std::string>(jsonShape["name"]).c_str());
 			shape->SetFlags(jsonShape["flags"]);
 			rigidBody->AttachShape(shape);
 		}
