@@ -5,6 +5,7 @@
 #include "Physics/Shape/IGeometry.h"
 #include "Physics/Shape/IShape.h"
 #include "Physics/Shape/IConvexMesh.h"
+#include "Physics/Shape/ITriangleMesh.h"
 #include "Physics/Utils/PhysicsMath.h"
 
 #include "Renderer/Resources/Mesh.h"
@@ -21,8 +22,10 @@ namespace PrPhysics {
 
 		virtual IShapePtr            CreateShape(const IGeometry& p_geometery, const Material& p_mat, bool isExclusive = false, ShapeFlags p_flags = ShapeFlags::Visualization | ShapeFlags::SceneQuery | ShapeFlags::Simulation) = 0;
 
-		virtual IConvexMeshPtr       CreateConvexMesh(PrRenderer::Resources::MeshHandle p_mesh) = 0;
+		virtual IConvexMeshPtr       CreateConvexMesh(PrRenderer::Resources::MeshPtr p_mesh) = 0;
 		virtual IConvexMeshPtr       CreateConvexMesh(uint8_t* p_data, size_t p_size) = 0;
 
+		virtual ITriangleMeshPtr     CreateTriangleMesh(PrRenderer::Resources::MeshPtr p_mesh) = 0;
+		virtual ITriangleMeshPtr     CreateTriangleMesh(uint8_t* p_data, size_t p_size) = 0;
 	};
 }

@@ -17,7 +17,8 @@ PhysShape::PhysShape(physx::PxShape* p_shape, const IGeometry& p_geometry, const
 		[&](const PlaneGeometry* p_geometery) {m_geometery = std::make_unique<PlaneGeometry>(); },
 		[&](const CapsuleGeometry* p_geometery) {m_geometery = std::make_unique<CapsuleGeometry>(p_geometery->radius, p_geometery->halfHeight); },
 		[&](const BoxGeometery* p_geometery) {m_geometery = std::make_unique<BoxGeometery>(p_geometery->halfExtents); },
-		[&](const ConvexGeometry* p_geometery) {m_geometery = std::make_unique<ConvexGeometry>(p_geometery->convexMeshHandle, p_geometery->scale); }
+		[&](const ConvexGeometry* p_geometery) {m_geometery = std::make_unique<ConvexGeometry>(p_geometery->convexMeshHandle, p_geometery->scale); },
+		[&](const TriangleGeometery* p_geometery) {m_geometery = std::make_unique<TriangleGeometery>(p_geometery->triangleMeshHandle, p_geometery->scale); }
 	};
 
 	p_geometry.Accept(m_visitor);

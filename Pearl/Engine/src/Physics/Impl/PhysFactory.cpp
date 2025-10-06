@@ -5,6 +5,7 @@
 #include "Physics/Impl/PhysRigidBody.h"
 #include "Physics/Impl/PhysShape.h"
 #include "Physics/Impl/PhysConvexMesh.h"
+#include "Physics/Impl/PhysTriangleMesh.h"
 
 using namespace PrPhysics;
 using namespace physx;
@@ -44,7 +45,7 @@ PrPhysics::IConvexMeshPtr PhysFactory::CreateConvexMesh(uint8_t* p_data, size_t 
 	return std::make_shared<PhysConvexMesh>(convexMesh);
 }
 
-PrPhysics::IConvexMeshPtr PhysFactory::CreateConvexMesh(PrRenderer::Resources::MeshHandle p_mesh)
+PrPhysics::IConvexMeshPtr PhysFactory::CreateConvexMesh(PrRenderer::Resources::MeshPtr p_mesh)
 {
 	auto verts = p_mesh->GetVertices();
 	std::vector<PxVec3> vertices;
@@ -64,12 +65,53 @@ PrPhysics::IConvexMeshPtr PhysFactory::CreateConvexMesh(PrRenderer::Resources::M
 	PxDefaultMemoryOutputStream outputStream;
 	if (!PxCookConvexMesh(params, convexDesc, outputStream))
 	{
-		PRLOG_ERROR("Cannot bake the mesh to IConvexMesh!");
+		PRLOG_ERROR("Cannot bake the IConvexMesh!");
 		return nullptr;
 	}
 
 	PxDefaultMemoryInputData input(outputStream.getData(), outputStream.getSize());
 	PxConvexMesh* convexMesh = m_physics->createConvexMesh(input);
 
-	return std::make_shared<PhysConvexMesh>(convexMesh, p_mesh.GetData());
+	return std::make_shared<PhysConvexMesh>(convexMesh);
+}
+
+PrPhysics::ITriangleMeshPtr PhysFactory::CreateTriangleMesh(PrRenderer::Resources::MeshPtr p_mesh)
+{
+	auto verts = p_mesh->GetVertices();
+	std::vector<PxVec3> vertices;
+	for (auto& vert : verts)
+	{
+		vertices.push_back(ToPxVec3(vert));
+	}
+
+	PxTriangleMeshDesc triangleDesc;
+	triangleDesc.points.count = static_cast<PxU32>(p_mesh->GetVerticesCount());
+	triangleDesc.points.stride = sizeof(PxVec3);
+	triangleDesc.points.data = vertices.data();
+
+	triangleDesc.triangles.count = static_cast<PxU32>(p_mesh->GetIndicesCount() / 3);
+	triangleDesc.triangles.stride = 3 * sizeof(PxU32);
+	triangleDesc.triangles.data = p_mesh->GetIndices().data();
+
+	PxTolerancesScale scale;
+	PxCookingParams params(scale);
+	PxDefaultMemoryOutputStream outputStream;
+	if (!PxCookTriangleMesh(params, triangleDesc, outputStream))
+	{
+		PRLOG_ERROR("Cannot bake the ITriangleMesh!");
+		return nullptr;
+	}
+
+	PxDefaultMemoryInputData input(outputStream.getData(), outputStream.getSize());
+	PxTriangleMesh* triangleMesh = m_physics->createTriangleMesh(input);
+
+	return std::make_shared<PhysTriangleMesh>(triangleMesh);
+}
+
+PrPhysics::ITriangleMeshPtr PhysFactory::CreateTriangleMesh(uint8_t* p_data, size_t p_size)
+{
+	PxDefaultMemoryInputData input(p_data, p_size);
+	PxTriangleMesh* convexMesh = m_physics->createTriangleMesh(input);
+
+	return std::make_shared<PhysTriangleMesh>(convexMesh);
 }

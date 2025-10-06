@@ -1,13 +1,13 @@
 #include "Core/Common/pearl_pch.h"
 
+#include "Physics/Core/PhysicsSystem.h"
 #include "Physics/Resources/ConvexMeshLoader.h"
 #include "Physics/Impl/PhysConvexMesh.h"
-#include "Physics/Core/PhysicsSystem.h"
+#include "Physics/Impl/ConvertUtils.h"
 
 #include "Core/File/FileSystem.h"
 
 #include "PhysX/PxPhysicsAPI.h"
-#include "Physics/Impl/ConvertUtils.h"
 
 using namespace PrPhysics;
 using namespace physx;
@@ -39,41 +39,27 @@ bool ConvexMeshLoader::SaveResourceOnDisc(PrCore::Resources::IResourceDataPtr p_
 {
 	IConvexMeshPtr convexMeshPtr = std::static_pointer_cast<IConvexMesh>(p_resourceData);
 
-	auto meshPtr = convexMeshPtr->GetMesh();
-	if (meshPtr)
+	PxConvexMeshDesc convexDesc;
+	convexDesc.points.count = static_cast<PxU32>(convexMeshPtr->GetVerticesCount());
+	convexDesc.points.stride = sizeof(PxVec3);
+	convexDesc.points.data = convexMeshPtr->GetVertices();
+	convexDesc.flags = PxConvexFlag::eCOMPUTE_CONVEX | PxConvexFlag::eQUANTIZE_INPUT;
+
+	PxTolerancesScale scale;
+	PxCookingParams params(scale);
+	PxDefaultMemoryOutputStream outputStream;
+	if (!PxCookConvexMesh(params, convexDesc, outputStream))
 	{
-		PxConvexMeshDesc convexDesc;
-		convexDesc.points.count = static_cast<PxU32>(meshPtr->GetVerticesCount());
-		convexDesc.points.stride = sizeof(PxVec3);
-
-		const auto& verts = meshPtr->GetVertices();
-		std::vector<PxVec3> vertices;
-		for (auto& vert : verts)
-		{
-			vertices.push_back(ToPxVec3(vert));
-		}
-
-		convexDesc.points.data = vertices.data();
-		convexDesc.flags = PxConvexFlag::eCOMPUTE_CONVEX | PxConvexFlag::eQUANTIZE_INPUT;
-
-		PxTolerancesScale scale;
-		PxCookingParams params(scale);
-		PxDefaultMemoryOutputStream outputStream;
-		if (!PxCookConvexMesh(params, convexDesc, outputStream))
-		{
-			PRLOG_ERROR("Cannot bake the convex mesh!");
-			return false;
-		}
-
-		auto file = PrCore::File::FileSystem::GetInstancePtr()->FileOpen(p_path, PrCore::File::OpenMode::Write);
-		if (!file)
-			return false;
-
-		PrCore::File::FileSystem::GetInstancePtr()->FileWrite(file, outputStream.getData(), outputStream.getSize());
-		PrCore::File::FileSystem::GetInstancePtr()->FileClose(file);
-
-		return true;
+		PRLOG_ERROR("Cannot bake the convex mesh!");
+		return false;
 	}
 
-	return false;
+	auto file = PrCore::File::FileSystem::GetInstancePtr()->FileOpen(p_path, PrCore::File::OpenMode::Write);
+	if (!file)
+		return false;
+
+	PrCore::File::FileSystem::GetInstancePtr()->FileWrite(file, outputStream.getData(), outputStream.getSize());
+	PrCore::File::FileSystem::GetInstancePtr()->FileClose(file);
+
+	return true;
 }

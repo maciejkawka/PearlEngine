@@ -33,7 +33,9 @@
 
 #include "Physics/Core/PhysicsSystem.h"
 #include "Physics/Shape/IConvexMesh.h"
+#include "Physics/Shape/ITriangleMesh.h"
 #include "Physics/Resources/ConvexMeshLoader.h"
+#include "Physics/Resources/TriangleMeshLoader.h"
 //
 
 const std::string_view GraphicConfig{ "config/graphic.cfg" };
@@ -209,8 +211,12 @@ PrCore::Entry::AppContext::AppContext()
 		PrPhysics::PhysicsSystem::Init(physSettings);
 
 		auto convexMeshDatabase = std::make_unique<PrRenderer::Resources::ResourceDatabase>();
-		convexMeshDatabase->RegisterLoader(".phys", std::make_unique<PrPhysics::ConvexMeshLoader>());
+		convexMeshDatabase->RegisterLoader(".physc", std::make_unique<PrPhysics::ConvexMeshLoader>());
 		PrRenderer::Resources::ResourceSystem::GetInstance().RegisterDatabase<PrPhysics::IConvexMesh>(std::move(convexMeshDatabase));
+
+		auto triangleMeshDatabase = std::make_unique<PrRenderer::Resources::ResourceDatabase>();
+		triangleMeshDatabase->RegisterLoader(".physt", std::make_unique<PrPhysics::TriangleMeshLoader>());
+		PrRenderer::Resources::ResourceSystem::GetInstance().RegisterDatabase<PrPhysics::ITriangleMesh>(std::move(triangleMeshDatabase));
 	}
 
 	Input::InputManager::Init();
@@ -226,7 +232,9 @@ PrCore::Entry::AppContext::~AppContext()
 
 	{
 		PrCore::Resources::ResourceSystem::GetInstance().UnloadAll<PrPhysics::IConvexMesh>();
-		PrCore::Resources::ResourceSystem::GetInstance().UnregisterLoader<PrPhysics::IConvexMesh>(".phys");
+		PrCore::Resources::ResourceSystem::GetInstance().UnregisterLoader<PrPhysics::IConvexMesh>(".physc");
+		PrCore::Resources::ResourceSystem::GetInstance().UnloadAll<PrPhysics::ITriangleMesh>();
+		PrCore::Resources::ResourceSystem::GetInstance().UnregisterLoader<PrPhysics::ITriangleMesh>(".physt");
 		PrPhysics::PhysicsSystem::Terminate();
 	}
 

@@ -88,6 +88,16 @@ namespace PrPhysics {
 				physx::PxMeshScale scale;
 				scale.scale = ToPxVec3(p_geometery->scale);
 				holder.storeAny(physx::PxConvexMeshGeometry{ static_cast<physx::PxConvexMesh*>(p_geometery->convexMeshHandle.GetData()->GetNativePtr()), scale });
+			},
+			[&](const TriangleGeometery* p_geometery)
+			{
+				physx::PxMeshScale scale;
+				scale.scale = ToPxVec3(p_geometery->scale);
+
+				physx::PxTriangleMeshGeometry geo;
+				geo.scale = scale;
+				geo.triangleMesh = static_cast<physx::PxTriangleMesh*>(p_geometery->triangleMeshHandle.GetData()->GetNativePtr());
+				holder.storeAny(geo);
 			}
 		};
 

@@ -41,12 +41,15 @@ namespace PrCore::ECS {
 					if (p_geometery->convexMeshHandle.GetOrigin() == Resources::ResourceOrigin::File)
 					{
 						jsonGeo["scale"] = Utils::JSONParser::ParseVec3(p_geometery->scale);
-						jsonGeo["convexMeshPath"] = p_geometery->convexMeshHandle.GetPath();
+						jsonGeo["path"] = p_geometery->convexMeshHandle.GetPath();
 					}
 					else
 					{
 						PRLOG_WARN("Cannot seriallize covex mesh. It was created in memory. This is not supported yet. RigidBody - name: {0}", rigidBody->GetName());
 					}
+				},
+				[&](const PrPhysics::TriangleGeometery* p_geometery) {
+					PRLOG_WARN("Cannot seriallize triangle mesh in dynamic rigidbody name: {0}", rigidBody->GetName());
 				}
 			};
 			geometery->Accept(visitor);
@@ -118,10 +121,10 @@ namespace PrCore::ECS {
 			break;
 			case PrPhysics::GeometryType::Convex:
 			{
-				if (geom.contains("convexMeshPath"))
+				if (geom.contains("path"))
 				{
 					auto convex = std::make_unique<PrPhysics::ConvexGeometry>();
-					convex->convexMeshHandle = PrCore::Resources::ResourceSystem::GetInstance().Load<PrPhysics::IConvexMesh>(static_cast<std::string>(geom["convexMeshPath"]));
+					convex->convexMeshHandle = PrCore::Resources::ResourceSystem::GetInstance().Load<PrPhysics::IConvexMesh>(static_cast<std::string>(geom["path"]));
 					convex->scale = PrCore::Utils::JSONParser::ToVec3(geom["scale"]);
 					geometery = std::move(convex);
 				}
@@ -132,6 +135,11 @@ namespace PrCore::ECS {
 					sphere->radius = 1.0f;
 					geometery = std::move(sphere);
 				}
+			}
+			break;
+			case PrPhysics::GeometryType::Triangle:
+			{
+				PRLOG_WARN("Cannot deserialize traignle mesh in dynamic rigidbody!");
 			}
 			break;
 			default:
@@ -175,11 +183,22 @@ namespace PrCore::ECS {
 					if (p_geometery->convexMeshHandle.GetOrigin() == Resources::ResourceOrigin::File)
 					{
 						jsonGeo["scale"] = Utils::JSONParser::ParseVec3(p_geometery->scale);
-						jsonGeo["convexMeshPath"] = p_geometery->convexMeshHandle.GetPath();
+						jsonGeo["path"] = p_geometery->convexMeshHandle.GetPath();
 					}
 					else
 					{
 						PRLOG_WARN("Cannot seriallize covex mesh. It was created in memory. This is not supported yet. RigidBody - name: {0}", rigidBody->GetName());
+					}
+				},
+				[&](const PrPhysics::TriangleGeometery* p_geometery) {
+					if (p_geometery->triangleMeshHandle.GetOrigin() == Resources::ResourceOrigin::File)
+					{
+						jsonGeo["scale"] = Utils::JSONParser::ParseVec3(p_geometery->scale);
+						jsonGeo["path"] = p_geometery->triangleMeshHandle.GetPath();
+					}
+					else
+					{
+						PRLOG_WARN("Cannot seriallize triangle mesh. It was created in memory. This is not supported yet. RigidBody - name: {0}", rigidBody->GetName());
 					}
 				}
 			};
@@ -250,16 +269,34 @@ namespace PrCore::ECS {
 			break;
 			case PrPhysics::GeometryType::Convex:
 			{
-				if (geom.contains("convexMeshPath"))
+				if (geom.contains("path"))
 				{
 					auto convex = std::make_unique<PrPhysics::ConvexGeometry>();
-					convex->convexMeshHandle = PrCore::Resources::ResourceSystem::GetInstance().Load<PrPhysics::IConvexMesh>(static_cast<std::string>(geom["convexMeshPath"]));
+					convex->convexMeshHandle = PrCore::Resources::ResourceSystem::GetInstance().Load<PrPhysics::IConvexMesh>(static_cast<std::string>(geom["path"]));
 					convex->scale = PrCore::Utils::JSONParser::ToVec3(geom["scale"]);
 					geometery = std::move(convex);
 				}
 				else
 				{
 					PRLOG_WARN("Could not deserialize convex geometery. Defaulting to sphere radius of 1.");
+					auto sphere = std::make_unique<PrPhysics::SphereGeometry>();
+					sphere->radius = 1.0f;
+					geometery = std::move(sphere);
+				}
+			}
+			break;
+			case PrPhysics::GeometryType::Triangle:
+			{
+				if (geom.contains("path"))
+				{
+					auto triangle = std::make_unique<PrPhysics::TriangleGeometery>();
+					triangle->triangleMeshHandle = PrCore::Resources::ResourceSystem::GetInstance().Load<PrPhysics::ITriangleMesh>(static_cast<std::string>(geom["path"]));
+					triangle->scale = PrCore::Utils::JSONParser::ToVec3(geom["scale"]);
+					geometery = std::move(triangle);
+				}
+				else
+				{
+					PRLOG_WARN("Could not deserialize triangle geometery. Defaulting to sphere radius of 1.");
 					auto sphere = std::make_unique<PrPhysics::SphereGeometry>();
 					sphere->radius = 1.0f;
 					geometery = std::move(sphere);

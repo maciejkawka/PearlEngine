@@ -486,6 +486,15 @@
     <ClInclude Include="include\Engine\Physics\Resources\ConvexMeshLoader.h">
       <Filter>Physics\Resources</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Shape\ITriangleMesh.h">
+      <Filter>Physics\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Impl\PhysTriangleMesh.h">
+      <Filter>Physics\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Physics\Resources\TriangleMeshLoader.h">
+      <Filter>Physics\Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -708,6 +717,12 @@
       <Filter>Physics\Impl</Filter>
     </ClCompile>
     <ClCompile Include="src\Physics\Resources\ConvexMeshLoader.cpp">
+      <Filter>Physics\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\Impl\PhysTriangleMesh.cpp">
+      <Filter>Physics\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\Resources\TriangleMeshLoader.cpp">
       <Filter>Physics\Resources</Filter>
     </ClCompile>
   </ItemGroup>

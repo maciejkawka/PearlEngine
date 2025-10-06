@@ -11,16 +11,8 @@ PhysConvexMesh::PhysConvexMesh(physx::PxConvexMesh* p_convexMesh) :
 {
 }
 
-PhysConvexMesh::PhysConvexMesh(physx::PxConvexMesh* p_convexMesh, PrRenderer::Resources::MeshPtr p_meshPtr):
-	m_impl(p_convexMesh),
-	m_meshPtr(p_meshPtr)
-{
-
-}
-
 PhysConvexMesh::~PhysConvexMesh()
 {
-	m_impl->release();
 }
 
 size_t PhysConvexMesh::GetVerticesCount() const
@@ -33,9 +25,9 @@ size_t PhysConvexMesh::GetPolygonsCount() const
 	return m_impl->getNbPolygons();
 }
 
-const uint8_t* PhysConvexMesh::GetVertices() const
+const void* PhysConvexMesh::GetVertices() const
 {
-	return nullptr;
+	return m_impl->getVertices();
 }
 
 size_t PhysConvexMesh::GetByteSize() const
@@ -51,9 +43,4 @@ void* PhysConvexMesh::GetNativePtr()
 void PhysConvexMesh::ReleaseNativePtr()
 {
 	m_impl->release();
-}
-
-PrRenderer::Resources::MeshPtr PhysConvexMesh::GetMesh() const
-{
-	return m_meshPtr;
 }

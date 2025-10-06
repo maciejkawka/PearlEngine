@@ -18,6 +18,8 @@ namespace PrPhysics {
 
 	class IShape: public INativePtrHandle {
 	public:
+		virtual ~IShape() = default;
+
 		virtual void              SetGeometry(const IGeometry& p_geometry) = 0;
 		virtual const IGeometry*  GetGeometry() const = 0;
 

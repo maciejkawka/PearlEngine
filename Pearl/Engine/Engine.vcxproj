@@ -90,8 +90,11 @@
     <ClInclude Include="include\Engine\Physics\Impl\PhysRigidBody.h" />
     <ClInclude Include="include\Engine\Physics\Impl\PhysShape.h" />
     <ClInclude Include="include\Engine\Physics\Impl\ConvertUtils.h" />
+    <ClInclude Include="include\Engine\Physics\Impl\PhysTriangleMesh.h" />
     <ClInclude Include="include\Engine\Physics\Resources\ConvexMeshLoader.h" />
+    <ClInclude Include="include\Engine\Physics\Resources\TriangleMeshLoader.h" />
     <ClInclude Include="include\Engine\Physics\Shape\IConvexMesh.h" />
+    <ClInclude Include="include\Engine\Physics\Shape\ITriangleMesh.h" />
     <ClInclude Include="include\Engine\Physics\Utils\INativePtrHandler.h" />
     <ClInclude Include="include\Engine\Physics\Shape\IGeometry.h" />
     <ClInclude Include="include\Engine\Physics\Utils\PhysicsMath.h" />
@@ -189,7 +192,9 @@
     <ClCompile Include="src\Physics\Impl\PhysFactory.cpp" />
     <ClCompile Include="src\Physics\Impl\PhysRigidBody.cpp" />
     <ClCompile Include="src\Physics\Impl\PhysShape.cpp" />
+    <ClCompile Include="src\Physics\Impl\PhysTriangleMesh.cpp" />
     <ClCompile Include="src\Physics\Resources\ConvexMeshLoader.cpp" />
+    <ClCompile Include="src\Physics\Resources\TriangleMeshLoader.cpp" />
     <ClCompile Include="src\Renderer\Buffers\Framebuffer.cpp" />
     <ClCompile Include="src\Renderer\Buffers\IndexBuffer.cpp" />
     <ClCompile Include="src\Renderer\Buffers\VertexArray.cpp" />

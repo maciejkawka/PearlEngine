@@ -72,7 +72,7 @@ void RenderStressTest::OnEnable()
 	for (auto [entity, light, mesh]: m_entityViewer.EntitesWithComponents<LightComponent, MeshRendererComponent>())
 	{
 		entity.GetComponent<NameComponent>()->name;
-		//mesh->mainMaterial = std::make_shared<PrRenderer::Resources::Material>(*mesh->mainMaterial.GetData());
+		mesh->mainMaterial = std::make_shared<PrRenderer::Resources::Material>(*mesh->mainMaterial.GetData());
 		PrRenderer::Core::Color color = randColor();
 		light->m_light->SetColor(color);
 		mesh->mainMaterial->SetProperty("albedoValue", static_cast<PrCore::Math::vec4>(color));
@@ -96,6 +96,7 @@ void RenderStressTest::OnEnable()
 
 	PrPhysics::PhysicsSystem::GetInstancePtr()->SetGravity(PrCore::Math::vec3{ 0.0f });
 
+	//PrCore::ECS::SceneManager::GetInstance().SaveSceneByReference(PrCore::ECS::SceneManager::GetInstance().GetActiveScene(), "scene/deserializeTest.pearl");
 	return;
 
 	for (auto [entity, transform, light] : m_entityViewer.EntitesWithComponents<TransformComponent, LightComponent>())
