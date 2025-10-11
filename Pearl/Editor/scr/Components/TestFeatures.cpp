@@ -53,10 +53,12 @@ TestFeatures::TestFeatures()
 {
 	using namespace PrCore::Resources;
 	using namespace PrRenderer::Resources;
-	
-	auto scene101 = PrCore::ECS::SceneManager::GetInstance().LoadScene("scene/render_stress_test.pearl");
+
+	auto scene101 = PrCore::ECS::SceneManager::GetInstance().LoadScene("scene/physics_test.pearl");
 	return;
 	
+
+
 	// Load Stress Test
 	auto scene10 = PrCore::ECS::SceneManager::GetInstance().LoadScene("scene/physics_test.pearl");
 	scene10->RegisterSystem<PrCore::ECS::HierarchyTransform>();

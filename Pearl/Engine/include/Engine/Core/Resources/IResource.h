@@ -204,7 +204,10 @@ namespace PrCore::Resources {
 		}
 
 		// Checks if the handle holds valid resource descriptor
-		bool               IsValid() { return m_resourceDesc != nullptr; }
+		bool               IsValid() const { return m_resourceDesc && m_resourceDesc->data; }
+
+		// Invalidates the handle reseting the handle
+		void               Invalidate() { m_resourceDesc.reset(); }
 
 		// Proxy functions to access IResourceData directly
 		// Use these functions instead of GetData()

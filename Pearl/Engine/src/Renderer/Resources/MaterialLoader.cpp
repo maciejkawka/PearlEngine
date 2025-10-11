@@ -26,8 +26,8 @@ PrCore::Resources::IResourceDataPtr MaterialLoader::LoadResource(const std::stri
 
 	auto json = JSON::json::parse(dataVector);
 
-	MaterialPtr mat = std::make_shared<Material>(json);
-
+	MaterialPtr mat = std::make_shared<Material>();
+	mat->OnDeserialize(json);
 	return mat;
 }
 
@@ -39,5 +39,16 @@ void MaterialLoader::UnloadResource(PrCore::Resources::IResourceDataPtr p_resour
 
 bool MaterialLoader::SaveResourceOnDisc(PrCore::Resources::IResourceDataPtr p_resourceData, const std::string& p_path)
 {
-	return false;
+	MaterialPtr materialPtr = std::static_pointer_cast<Material>(p_resourceData);
+
+	PrCore::Utils::JSON::json serialize;
+	materialPtr->OnSerialize(serialize);
+
+	auto serializeStr = serialize.dump(4);
+
+	auto file = PrCore::File::FileSystem::GetInstance().FileOpen(p_path, PrCore::File::OpenMode::Write);
+	PrCore::File::FileSystem::GetInstance().FileWrite(file, serializeStr.c_str(), serializeStr.length());
+	PrCore::File::FileSystem::GetInstance().FileClose(file);
+
+	return true;
 }

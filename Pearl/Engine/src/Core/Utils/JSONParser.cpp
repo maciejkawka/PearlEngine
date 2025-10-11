@@ -122,7 +122,7 @@ JSON::json JSONParser::ParseMat4(const PrCore::Math::mat4& p_mat4)
 	mat4["m14"] = p_mat4[2].w;
 
 	mat4["m3"] = p_mat4[3].x;
-	mat4["m4"] = p_mat4[3].y;
+	mat4["m7"] = p_mat4[3].y;
 	mat4["m11"] = p_mat4[3].z;
 	mat4["m15"] = p_mat4[3].w;
 

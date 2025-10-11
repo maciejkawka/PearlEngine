@@ -63,7 +63,7 @@ void RenderStressTest::OnEnable()
 	settings->enableFog = false;
 
 	m_maxLight = 0;
-	for (auto [entity, Light] : m_entityViewer.EntitesWithComponents<LightComponent>())
+	for (auto [entity, Light] : m_entityViewer.EntitesWithComponents<RigidBodyDynamicComponent>())
 	{
 		m_maxLight++;
 	}
@@ -97,6 +97,7 @@ void RenderStressTest::OnEnable()
 	PrPhysics::PhysicsSystem::GetInstancePtr()->SetGravity(PrCore::Math::vec3{ 0.0f });
 
 	//PrCore::ECS::SceneManager::GetInstance().SaveSceneByReference(PrCore::ECS::SceneManager::GetInstance().GetActiveScene(), "scene/deserializeTest.pearl");
+
 	return;
 
 	for (auto [entity, transform, light] : m_entityViewer.EntitesWithComponents<TransformComponent, LightComponent>())
@@ -246,10 +247,11 @@ void RenderStressTest::OnUpdate(float p_dt)
 		}
 	}
 
-	for (auto [entity, transform, light] : m_entityViewer.EntitesWithComponents<TransformComponent, LightComponent>())
+	int i = 0;
+	for (auto [entity, transform, light] : m_entityViewer.EntitesWithComponents<TransformComponent, RigidBodyDynamicComponent>())
 	{
 		//This is selected light
-		if (entity.GetComponent<NameComponent>()->name == "Light" + std::to_string(m_selectedLight))
+		if (i ==m_selectedLight)
 		{
 			//auto box = mesh->mesh->GetBoxVolume();
 
@@ -277,11 +279,11 @@ void RenderStressTest::OnUpdate(float p_dt)
 				position.y -= 20.0f * p_dt;
 
 			// Change color intensity
-			auto color = light->m_light->GetColor();
-			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::KP_8))
-				color += 10.0f * p_dt;
-			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::KP_2))
-				color -= 10.0f * p_dt;
+			//auto color = light->m_light->GetColor();
+			//if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::KP_8))
+			//	color += 10.0f * p_dt;
+			//if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::KP_2))
+			//	color -= 10.0f * p_dt;
 
 			if (loko != position)
 			{
@@ -292,7 +294,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 				}
 			}
 
-			light->m_light->SetColor(color);
+			//light->m_light->SetColor(color);
 
 			//mesh->mainMaterial->SetProperty("albedoValue", static_cast<PrCore::Math::vec4>(PrCore::Math::max(static_cast<PrCore::Math::vec4>(color), 0.0f)));
 
@@ -303,9 +305,10 @@ void RenderStressTest::OnUpdate(float p_dt)
 				//* Math::scale(Math::mat4(1.0f), box.GetSize() * 1.2f);
 
 			renderSystem->DrawDebugCube(transform->GetWorldMatrix(), true);
-			if (light->m_shadowCast)
-				renderSystem->DrawDebugSphere(position + 0.5f, 0.2f, true);
+			//if (light->m_shadowCast)
+				//renderSystem->DrawDebugSphere(position + 0.5f, 0.2f, true);
 		}
+		i++;
 	}
 
 	// Retup renderer settings

@@ -249,10 +249,10 @@ PrRenderer::Resources::MaterialHandle ModelLoaderHelper::GetOrCreateMaterial(con
 	if (AI_SUCCESS == p_material->Get(AI_MATKEY_UVTRANSFORM(aiTextureType_DIFFUSE, 0), uvScale))
 	{
 		PrCore::Math::vec2 scale = { uvScale.mScaling.x, uvScale.mScaling.y };
-		materialData->SetTexScale("albedoMap", scale);
+		materialData->SetTexScale(scale);
 
 		PrCore::Math::vec2 offset = { uvScale.mTranslation.x, uvScale.mTranslation.y };
-		materialData->SetTexOffset("albedoMap", offset);
+		materialData->SetTexOffset(offset);
 	}
 
 	// Normals
