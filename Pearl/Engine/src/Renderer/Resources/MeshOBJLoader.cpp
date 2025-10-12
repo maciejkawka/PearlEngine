@@ -9,6 +9,9 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include"tinyObj/tiny_obj_loader.h"
 
+#include <assimp/Exporter.hpp>
+#include <assimp/scene.h>
+
 using namespace PrRenderer::Resources;
 
 //Hash Function for map
@@ -74,16 +77,28 @@ PrCore::Resources::IResourceDataPtr MeshOBJLoader::LoadResource(const std::strin
 	auto& shapes = reader.GetShapes();
 
 	std::unordered_map<Vertex, unsigned int> vertexMap;
-
 	std::vector<unsigned int> indices;
 	std::vector<PrCore::Math::vec3> vertices;
 	std::vector<PrCore::Math::vec3> normals;
 	std::vector<PrCore::Math::vec4> tangents;
 	std::vector<Core::Color> colors;
+	std::vector<SubMesh> subMeshes;
 	Mesh::UVArray UVs;
+
+	size_t expectedVertSize = attrib.vertices.size() / 3;
+	vertexMap.reserve(expectedVertSize);
+	indices.reserve(expectedVertSize);
+	vertices.reserve(expectedVertSize);
+	normals.reserve(expectedVertSize);
+	tangents.reserve(expectedVertSize);
+	colors.reserve(expectedVertSize);
+	UVs[0].reserve(expectedVertSize);
 
 	for (const auto& shape : shapes)
 	{
+		SubMesh submesh;
+		submesh.firstIndex = indices.size();
+
 		for (const auto& face : shape.mesh.num_face_vertices)
 		{
 			if (face != 3)
@@ -147,18 +162,22 @@ PrCore::Resources::IResourceDataPtr MeshOBJLoader::LoadResource(const std::strin
 
 			indices.push_back(vertexMap[vert]);
 		}
+
+		submesh.indicesCount = indices.size() - submesh.firstIndex;
+		subMeshes.push_back(submesh);
 	}
 
 	MeshPtr mesh = Mesh::Create();
+	mesh->SetSubmeshes(subMeshes);
 	if (!indices.empty())
 		mesh->SetIndices(std::move(indices));
 	if (!vertices.empty())
 		mesh->SetVertices(std::move(vertices));
-	if(!normals.empty())
+	if (!normals.empty())
 		mesh->SetNormals(std::move(normals));
 	if (!colors.empty())
 		mesh->SetColors(std::move(colors));
-	if(!UVs[0].empty())
+	if (!UVs[0].empty())
 		mesh->SetUVs(0, std::move(UVs[0]));
 
 	mesh->UpdateBuffers();
@@ -173,11 +192,155 @@ PrCore::Resources::IResourceDataPtr MeshOBJLoader::LoadResource(const std::strin
 
 void MeshOBJLoader::UnloadResource(PrCore::Resources::IResourceDataPtr p_resourceData)
 {
+	PR_ASSERT(p_resourceData, "Pointer invalid!");
+
 	p_resourceData.reset();
 	p_resourceData = nullptr;
 }
 
 bool MeshOBJLoader::SaveResourceOnDisc(PrCore::Resources::IResourceDataPtr p_resourceData, const std::string& p_path)
 {
-	return false;
+	PR_ASSERT(p_resourceData, "Pointer invalid!");
+
+	auto meshPtr = std::static_pointer_cast<Mesh>(p_resourceData);
+
+	// convert vertices
+	auto vertices = meshPtr->GetVertices();
+	auto vertSize = meshPtr->GetVerticesCount();
+	aiVector3D* aiVerts = new aiVector3D[vertSize];
+	for (size_t i = 0; i < vertSize; i++)
+	{
+		aiVerts[i] = { vertices[i].x, vertices[i].y, vertices[i].z };
+	}
+
+	// convert normals
+	auto normals = meshPtr->GetNormals();
+	aiVector3D* aiNormals = new aiVector3D[vertSize];
+	for (size_t i = 0; i < vertSize; i++)
+	{
+		aiNormals[i] = { normals[i].x, normals[i].y, normals[i].z };
+	}
+
+	// convert UVs
+	auto uvs = meshPtr->GetUVs();
+	aiVector3D* aiUvs = new aiVector3D[vertSize];
+	for (size_t i = 0; i < vertSize; i++)
+	{
+		aiUvs[i] = { uvs[i].x, uvs[i].y, 0.0f };
+	}
+
+	auto indicies = meshPtr->GetIndices();
+
+	// convert default submesh
+	size_t submeshCount = meshPtr->GetSubmeshCount();
+	auto subMeshes = meshPtr->GetSubmeshes();
+	aiMesh** aiMeshes = new aiMesh * [submeshCount];
+	{
+		auto aiDefaultMesh = new aiMesh();
+
+		aiDefaultMesh->mNumVertices = vertSize;
+		aiDefaultMesh->mVertices = aiVerts;
+
+		aiDefaultMesh->mNormals = aiNormals;
+
+		aiDefaultMesh->mNumUVComponents[0] = 2;
+		aiDefaultMesh->mTextureCoords[0] = aiUvs;
+
+		// convert faces
+		aiDefaultMesh->mNumFaces = subMeshes[0].indicesCount / 3;
+		aiFace* aiFaces = new aiFace[aiDefaultMesh->mNumFaces];
+		for (unsigned int j = 0; j < aiDefaultMesh->mNumFaces; j++)
+		{
+			aiFace face;
+			face.mNumIndices = 3;
+			face.mIndices = new unsigned int[3];
+			face.mIndices[0] = indicies[j * 3];
+			face.mIndices[1] = indicies[j * 3 + 1];
+			face.mIndices[2] = indicies[j * 3 + 2];
+			aiFaces[j] = face;
+		}
+
+		aiDefaultMesh->mFaces = aiFaces;
+		aiDefaultMesh->mName = std::string{ "submesh_0" };
+		aiDefaultMesh->mMaterialIndex = 0;
+		aiMeshes[0] = aiDefaultMesh;
+	}
+
+	// convert the rest of submeshes
+	// copy vertices from the default submesh
+	for (int i = 1; i < submeshCount; i++)
+	{
+		auto aiMeshPtr = new aiMesh();
+
+		// Assign copies, assimp take the memory ownership so cannot reuse memory :/
+		aiMeshPtr->mNumVertices = vertSize;
+
+		size_t copySize = vertSize * sizeof(aiVector3D);
+		aiVector3D* aiVertsCopy = new aiVector3D[vertSize];
+		memcpy(aiVertsCopy, aiVerts, copySize);
+		aiMeshPtr->mVertices = aiVertsCopy;
+
+		aiVector3D* aiNormalsCopy = new aiVector3D[vertSize];
+		memcpy(aiNormalsCopy, aiNormals, copySize);
+		aiMeshPtr->mNormals = aiNormalsCopy;
+
+		aiVector3D* aiUvsCopy = new aiVector3D[vertSize];
+		memcpy(aiUvsCopy, aiUvs, copySize);
+		aiMeshPtr->mNumUVComponents[0] = 2;
+		aiMeshPtr->mTextureCoords[0] = aiUvsCopy;
+
+		//convert faces
+		const auto firxtIndex = subMeshes[i].firstIndex;
+		aiMeshPtr->mNumFaces = subMeshes[i].indicesCount / 3;
+		aiFace* aiFaces = new aiFace[aiMeshPtr->mNumFaces];
+		for (unsigned int j = 0; j < aiMeshPtr->mNumFaces; j++)
+		{
+			aiFace face;
+			face.mNumIndices = 3;
+			face.mIndices = new unsigned int[3];
+			face.mIndices[0] = indicies[j * 3 + firxtIndex];
+			face.mIndices[1] = indicies[j * 3 + 1 + firxtIndex];
+			face.mIndices[2] = indicies[j * 3 + 2 + firxtIndex];
+			aiFaces[j] = face;
+		}
+
+		aiMeshPtr->mFaces = aiFaces;
+		aiMeshPtr->mName = std::string{ "submesh_" + PrCore::StringUtils::ToString(i) };
+		aiMeshPtr->mMaterialIndex = i;
+		aiMeshes[i] = aiMeshPtr;
+	}
+
+	// Create a dummy scene to export
+	aiScene aiScene;
+	aiScene.mNumMeshes = submeshCount;
+	aiScene.mMeshes = aiMeshes;
+	aiScene.mNumMaterials = submeshCount;
+	aiScene.mMaterials = new aiMaterial * [submeshCount];
+
+	aiScene.mRootNode = new aiNode();
+	aiScene.mRootNode->mNumMeshes = submeshCount;
+	aiScene.mRootNode->mMeshes = new unsigned int[submeshCount];
+	for (int i = 0; i < submeshCount; i++)
+	{
+		auto* aiMat = new aiMaterial();
+		aiString matName{ "mat_submesh_" + PrCore::StringUtils::ToString(i) };
+		aiMat->AddProperty(&matName, AI_MATKEY_NAME);
+
+		aiScene.mMaterials[i] = aiMat;
+		aiScene.mRootNode->mMeshes[i] = i;
+	}
+
+	Assimp::Exporter exporter;
+	auto blob = exporter.ExportToBlob(&aiScene, "obj");
+	if (blob == nullptr)
+		return false;
+
+	auto file = PrCore::File::FileSystem::GetInstance().FileOpen(p_path, PrCore::File::OpenMode::Write);
+	if (file == nullptr)
+		return false;
+
+	PrCore::File::FileSystem::GetInstance().FileWrite(file, blob->data, blob->size);
+	PrCore::File::FileSystem::GetInstance().FileClose(file);
+
+	return true;
 }

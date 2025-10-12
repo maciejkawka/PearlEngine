@@ -65,20 +65,16 @@ void Mesh::SetTangents(std::vector<PrCore::Math::vec4>&& p_tangents)
 
 void Mesh::SetUVs(unsigned int p_UVSet, std::vector<PrCore::Math::vec2>&& p_UVs)
 {
-	if (p_UVSet > m_maxUVs)
-	{
-		PRLOG_WARN("Renderer: Mesh {0} wrong UVSet", m_name);
-		return;
-	}
-
-	if (p_UVs.size() != m_verticesCount)
-	{
-		PRLOG_WARN("Renderer: Mesh {0} wrong UVs length", m_name);
-		return;
-	}
+	PR_ASSERT(p_UVSet != 1, "UV set not avaliable. Actually Pearl supports only one set atm. :P");
 
 	m_UVs[p_UVSet] = std::move(p_UVs);
 	m_stateChanged = true;
+}
+
+const std::vector<PrCore::Math::vec2>& Mesh::GetUVs(unsigned int p_UVSet /*= 0*/)
+{
+	PR_ASSERT(p_UVSet != 1, "UV set not avaliable. Actually Pearl supports only one set atm. :P");
+	return m_UVs[p_UVSet];
 }
 
 const SubMesh& Mesh::GetSubmesh(size_t p_index)

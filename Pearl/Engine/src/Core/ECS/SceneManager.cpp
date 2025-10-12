@@ -16,10 +16,10 @@ SceneManager::~SceneManager()
 
 Scene* SceneManager::CreateScene(const std::string& p_name)
 {
-	auto scene = new Scene(p_name);
-	m_scenes.push_back(scene);
+	m_activeScene = new Scene(p_name);
+	m_scenes.push_back(m_activeScene);
 
-	return scene; 
+	return m_activeScene;
 }
 
 void SceneManager::DeleteScene(const Scene* p_scene)

@@ -68,7 +68,7 @@ namespace PrRenderer::Resources {
 
 		inline const Core::BoxVolume& GetBoxVolume() { return m_boxVolume; }
 
-		// Submesh is always al least 1 in size, it contains a submesh covering whole vertexArray in that case
+		// Submesh is always at least 1 in size, it contains a submesh covering whole vertexArray in that case
 		size_t                        GetSubmeshCount() { return m_submeshes.size(); }
 		const SubMesh&                GetSubmesh(size_t p_index);
 		const std::vector<SubMesh>&   GetSubmeshes() { return m_submeshes; }
@@ -79,7 +79,8 @@ namespace PrRenderer::Resources {
 		void SetNormals(std::vector<PrCore::Math::vec3>&& p_normals);
 		void SetTangents(std::vector<PrCore::Math::vec4>&& p_tangents);
 
-		void SetUVs(unsigned int p_UVSet, std::vector<PrCore::Math::vec2>&& p_UVs);
+		void                                    SetUVs(unsigned int p_UVSet, std::vector<PrCore::Math::vec2>&& p_UVs);
+		const std::vector<PrCore::Math::vec2>&  GetUVs(unsigned int p_UVSet = 0);
 
 		void SetSubmesh(size_t p_index, const SubMesh& p_submesh);
 		void SetSubmeshSize(size_t p_size) { m_submeshes.resize(p_size); }

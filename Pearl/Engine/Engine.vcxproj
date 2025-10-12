@@ -298,7 +298,7 @@
       <PreprocessorDefinitions>PR_ASSERTENABLE;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/stb/include;../../Dependencies/glad/include;../../Dependencies/glm;../../Dependencies/tinyObj/include;../../Dependencies/PhysX/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/stb/include;../../Dependencies/glad/include;../../Dependencies/glm;../../Dependencies/tinyObj/include;../../Dependencies/PhysX/include;../../Dependencies/Assimp/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>
@@ -313,8 +313,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfw3.lib;physfs-static.lib;Shlwapi.lib;PhysXExtensions_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXVehicle_static_64.lib;PhysXVehicle2_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCooking_64.lib;SceneQuery_static_64.lib;PhysX_64.lib;PhysXCommon_64.lib;PhysXFoundation_64.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../../Dependencies/glfw/lib/Debug;../../Dependencies/physfs/lib/Debug;../../Dependencies/PhysX/lib/profile</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc142-mtd.lib;glfw3.lib;physfs-static.lib;Shlwapi.lib;PhysXExtensions_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXVehicle_static_64.lib;PhysXVehicle2_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCooking_64.lib;SceneQuery_static_64.lib;PhysX_64.lib;PhysXCommon_64.lib;PhysXFoundation_64.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../Dependencies/glfw/lib/Debug;../../Dependencies/physfs/lib/Debug;../../Dependencies/PhysX/lib/profile;../../Dependencies/Assimp/lib/Debug</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -326,7 +326,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/stb/include;../../Dependencies/glad/include;../../Dependencies/glm;../../Dependencies/tinyObj/include;../../Dependencies/PhysX/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include/Engine;../../Dependencies/spdlog/include;../../Dependencies/entt/include;../../Dependencies/glfw/include;../../Dependencies/physfs/include;../../Dependencies/json/include;../../Dependencies/stb/include;../../Dependencies/glad/include;../../Dependencies/glm;../../Dependencies/tinyObj/include;../../Dependencies/PhysX/include;../../Dependencies/Assimp/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/Common/pearl_pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>
@@ -342,8 +342,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfw3.lib;physfs-static.lib;Shlwapi.lib;PhysXExtensions_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXVehicle_static_64.lib;PhysXVehicle2_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCooking_64.lib;SceneQuery_static_64.lib;PhysX_64.lib;PhysXCommon_64.lib;PhysXFoundation_64.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../../Dependencies/glfw/lib/Release;../../Dependencies/physfs/lib/Release;../../Dependencies/PhysX/lib/release</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc142-mt.lib;glfw3.lib;physfs-static.lib;Shlwapi.lib;PhysXExtensions_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXVehicle_static_64.lib;PhysXVehicle2_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCooking_64.lib;SceneQuery_static_64.lib;PhysX_64.lib;PhysXCommon_64.lib;PhysXFoundation_64.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../Dependencies/glfw/lib/Release;../../Dependencies/physfs/lib/Release;../../Dependencies/PhysX/lib/release;../../Dependencies/Assimp/lib/Release</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
