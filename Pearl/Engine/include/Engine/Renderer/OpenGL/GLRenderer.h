@@ -34,5 +34,6 @@ namespace PrRenderer::OpenGL {
 		void SetCullFaceMode(Core::CullFaceMode p_mode) override;
 
 		void BlitFrameBuffers(Buffers::FramebuffferPtr p_readBuffer, Buffers::FramebuffferPtr p_drawBuffer, Buffers::FramebufferMask p_mask) override;
+		void* ReadFrontBuffer(size_t& p_outWidthm, size_t& p_outHeight) override;
 	};
 }

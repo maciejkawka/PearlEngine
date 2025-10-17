@@ -1,7 +1,8 @@
 #include"Core/Common/pearl_pch.h"
 
 #include "Renderer/OpenGL/GLRenderer.h"
-#include"Renderer/OpenGL/GLUtils.h"
+#include "Renderer/OpenGL/GLUtils.h"
+#include "Core/Windowing/Window.h"
 
 #include"glad/glad.h"
 
@@ -153,4 +154,18 @@ void GLRenderer::BlitFrameBuffers(Buffers::FramebuffferPtr p_readBuffer, Buffers
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, p_drawBuffer ? p_drawBuffer->GetID() : 0);
 	glBlitFramebuffer(0, 0, readWidth, readHeigth, 0, 0, drawWidth, drawHeigth, FramebufferMaskToGL(p_mask), GL_NEAREST);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void* GLRenderer::ReadFrontBuffer(size_t& p_outWidth, size_t& p_outHeight)
+{
+	glReadBuffer(GL_FRONT);
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+	p_outWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
+	p_outHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();
+
+	byte* buffer = new byte[p_outWidth * p_outHeight * 3];
+	glReadPixels(0, 0, p_outWidth, p_outHeight, GL_RGB, GL_UNSIGNED_BYTE, buffer);
+
+	return buffer;
 }

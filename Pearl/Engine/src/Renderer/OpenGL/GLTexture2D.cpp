@@ -107,3 +107,41 @@ size_t GLTexture2D::GetByteSize() const
 {
 	return m_size;
 }
+
+void* GLTexture2D::FetchGPUData(int p_level)
+{
+	Bind();
+
+	size_t bufferSize = 1;
+	switch (m_format)
+	{
+	case Resources::TextureFormat::R8:
+		bufferSize = m_width * m_height;
+		break;
+	case Resources::TextureFormat::RG16:
+		bufferSize = m_width * m_height * 2;
+		break;
+	case Resources::TextureFormat::RGB24:
+		bufferSize = m_width * m_height * 3;
+		break;
+	case Resources::TextureFormat::RGBA32:
+		bufferSize = m_width * m_height * 4;
+		break;
+	default:
+		break;
+	}
+
+	void* rawData = nullptr;
+	auto glFormat = TextureFormatToDataTypeGL(m_format);
+	if (glFormat == GL_FLOAT)
+		rawData = new float[bufferSize];
+	else if (glFormat == GL_UNSIGNED_BYTE)
+		rawData = new byte[bufferSize];
+	else
+		return nullptr;
+
+	glGetTexImage(GL_TEXTURE_2D, p_level, TextureFormatToGL(m_format), glFormat, rawData);
+	Unbind();
+
+	return rawData;
+}

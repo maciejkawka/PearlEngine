@@ -46,7 +46,7 @@ namespace PrRenderer::Resources {
 		None
 	};
 
-	class Texture: public PrCore::Resources::IResourceData {
+	class Texture : public PrCore::Resources::IResourceData {
 	public:
 		Texture() :
 			m_ID(0U),
@@ -66,37 +66,35 @@ namespace PrRenderer::Resources {
 		virtual void Bind(unsigned int p_slot = 0) = 0;
 		virtual void Unbind(unsigned int p_slot = 0) = 0;
 
-		virtual void GenerateMipMaps() = 0;
-		virtual void Apply() = 0;
+		virtual void  GenerateMipMaps() = 0;
+		virtual void* FetchGPUData(int p_level = 0) = 0;
+		virtual void  Apply() = 0;
 
 		virtual void ClearWithColor(const Core::Color& p_color) = 0;
 
-		inline virtual void SetMipMap(bool p_mipmap) { m_mipmap = p_mipmap; }
-		inline virtual void SetReadable(bool p_readable) { m_readable = p_readable; }
+		virtual void SetMinFiltering(TextureFiltering p_minfiltering) { m_minFiltering = p_minfiltering; }
+		virtual void SetMagFiltering(TextureFiltering p_magfiltering) { m_magFiltering = p_magfiltering; }
+		virtual void SetWrapModeU(TextureWrapMode p_wrapU) { m_wrapU = p_wrapU; }
+		virtual void SetWrapModeV(TextureWrapMode p_wrapV) { m_wrapV = p_wrapV; }
+		virtual void SetHeight(size_t p_height) { m_height = p_height; }
+		virtual void SetWidth(size_t p_width) { m_width = p_width; }
+		virtual void SetFormat(TextureFormat p_format) { m_format = p_format; }
+		virtual void SetData(void* p_data) { m_rawData = p_data; }
+		virtual void SetMipMap(bool p_mipmap) { m_mipmap = p_mipmap; }
+		virtual void SetReadable(bool p_readable) { m_readable = p_readable; }
 
-		inline virtual void SetMinFiltering(TextureFiltering p_minfiltering) { m_minFiltering = p_minfiltering; }
-		inline virtual void SetMagFiltering(TextureFiltering p_magfiltering) { m_magFiltering = p_magfiltering; }
-		inline virtual void SetWrapModeU(TextureWrapMode p_wrapU) { m_wrapU = p_wrapU; }
-		inline virtual void SetWrapModeV(TextureWrapMode p_wrapV) { m_wrapV = p_wrapV; }
-		inline virtual void SetHeight(size_t p_height) { m_height = p_height; }
-		inline virtual void SetWidth(size_t p_width) { m_width = p_width; }
-		inline virtual void SetFormat(TextureFormat p_format) { m_format = p_format; }
-		inline virtual void SetData(void* p_data) { m_rawData = p_data; }
+		RendererID       GetRendererID() const { return m_ID; }
+		size_t           GetHeight() const { return m_height; }
+		size_t           GetWidth() const { return m_width; }
+		bool             GetReadable() const { return m_readable; }
+		bool             IsMipMap() const { return m_mipmap; }
+		TextureFiltering GetMinFiltering() const { return m_minFiltering; }
+		TextureFiltering GetMagFiltering() const { return m_magFiltering; }
+		TextureWrapMode  GetWrapModeU() const { return m_wrapU; }
+		TextureWrapMode  GetWrapModeV() const { return m_wrapV; }
+		TextureFormat    GetFormat() const { return m_format; }
+		void*            GetData() { return m_rawData; }
 
-		inline RendererID GetRendererID() const { return m_ID; }
-		inline size_t GetHeight() const { return m_height; }
-		inline size_t GetWidth() const { return m_width; }
-		inline bool  SetReadable() const { return m_readable; }
-		inline bool IsMipMap() const { return m_mipmap; }
-		inline TextureFiltering GetMinFiltering() const { return m_minFiltering; }
-		inline TextureFiltering GetMagFiltering() const { return m_magFiltering; }
-		inline TextureWrapMode GetWrapModeU() const { return m_wrapU; }
-		inline TextureWrapMode GetWrapModeV() const { return m_wrapV; }
-		inline TextureFormat GetFormat() const { return m_format; }
-		inline void* GetData(void* p_data) { return m_rawData; }
-
-
-		size_t GetByteSize();
 
 	protected:
 		virtual void CalculateSize() = 0;

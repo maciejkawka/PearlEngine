@@ -1,0 +1,91 @@
+{
+    "cubemaps": null,
+    "name": "stress_test/pan.mat",
+    "renderOrder": 0,
+    "renderType": 0,
+    "shaderPath": "shader/deffered/standard_lit.shader",
+    "textures": [
+        {
+            "name": "albedoMap",
+            "path": "texture/pan/brass_pan_01_diff_4k.png"
+        },
+        {
+            "name": "metallicMap",
+            "path": "texture/pan/brass_pan_01_metal_4k.png"
+        },
+        {
+            "name": "normalMap",
+            "path": "texture/pan/brass_pan_01_nor_gl_4k.png"
+        },
+        {
+            "name": "roughnessMap",
+            "path": "texture/pan/brass_pan_01_rough_4k.png"
+        }
+    ],
+    "uniforms": [
+        {
+            "name": "albedoMap_offset",
+            "type": "float2",
+            "typeId": 4,
+            "value": {
+                "x": 0.0,
+                "y": 0.0
+            }
+        },
+        {
+            "name": "albedoMap_scale",
+            "type": "float2",
+            "typeId": 4,
+            "value": {
+                "x": 1.0,
+                "y": 1.0
+            }
+        },
+        {
+            "name": "albedoValue",
+            "type": "float4",
+            "typeId": 8,
+            "value": {
+                "w": 0.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        },
+        {
+            "name": "emissionColor",
+            "type": "float3",
+            "typeId": 6,
+            "value": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        },
+        {
+            "name": "emissionInt",
+            "type": "float",
+            "typeId": 2,
+            "value": 0.0
+        },
+        {
+            "name": "metallicValue",
+            "type": "float",
+            "typeId": 2,
+            "value": 0.0
+        },
+        {
+            "name": "normalMapping",
+            "type": "bool",
+            "typeId": 14,
+            "value": true
+        },
+        {
+            "name": "roughnessValue",
+            "type": "float",
+            "typeId": 2,
+            "value": 0.0
+        }
+    ],
+    "version": 1
+}

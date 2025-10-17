@@ -115,3 +115,8 @@ void LowRenderer::BlitFrameBuffers(Buffers::FramebuffferPtr p_readBuffer, Buffer
 {
 	m_rendererAPI->BlitFrameBuffers(p_readBuffer, p_drawBuffer, p_mask);
 }
+
+void* LowRenderer::ReadFrontBuffer(size_t& p_outWidthm, size_t& p_outHeight)
+{
+	return m_rendererAPI->ReadFrontBuffer(p_outWidthm, p_outHeight);
+}

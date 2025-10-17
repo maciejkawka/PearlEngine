@@ -57,6 +57,7 @@ namespace PrRenderer::Core {
 
 		//Utils
 		static void BlitFrameBuffers(Buffers::FramebuffferPtr p_readBuffer, Buffers::FramebuffferPtr p_drawBuffer = nullptr, Buffers::FramebufferMask p_mask = Buffers::FramebufferMask::ColorBufferBit);
+		static void* ReadFrontBuffer(size_t& p_outWidthm, size_t& p_outHeight);
 
 		//Commands
 		REGISTER_RENDER_COMMAND(Clear, ClearFlag);

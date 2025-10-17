@@ -87,7 +87,8 @@ namespace PrRenderer::Core {
 		virtual void EnableCullFace(bool p_enable) = 0;
 		virtual void SetCullFaceMode(CullFaceMode p_mode) = 0;
 
-		virtual void BlitFrameBuffers(Buffers::FramebuffferPtr p_readBuffer, Buffers::FramebuffferPtr p_drawBuffer, Buffers::FramebufferMask p_mask) = 0;
+		virtual void  BlitFrameBuffers(Buffers::FramebuffferPtr p_readBuffer, Buffers::FramebuffferPtr p_drawBuffer, Buffers::FramebufferMask p_mask) = 0;
+		virtual void* ReadFrontBuffer(size_t& p_outWidthm, size_t& p_outHeight) = 0;
 
 		inline static GraphicsAPI GetGraphicsAPI() { return m_graphicsAPI; }
 

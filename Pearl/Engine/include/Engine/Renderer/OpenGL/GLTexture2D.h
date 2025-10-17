@@ -18,6 +18,7 @@ namespace PrRenderer::OpenGL {
 		void ClearWithColor(const Core::Color& p_color) override;
 
 		size_t GetByteSize() const override;
+		void*  FetchGPUData(int p_level = 0) override;
 
 	protected:
 		void CalculateSize() override;

@@ -118,3 +118,8 @@ void GLCubemap::GenerateMipMaps()
 	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
+
+void* GLCubemap::FetchGPUData(int p_level)
+{
+	return nullptr;
+}
