@@ -1,16 +1,15 @@
 #include "Editor/Assets/Exporter/SceneExporter.h"
 
 #include "Core/Resources/ResourceSystem.h"
+#include "Core/File/FileSystem.h"
 #include "Core/Utils/PathUtils.h"
 
 #include "Renderer/Resources/Mesh.h"
 #include "Renderer/Resources/MeshOBJLoader.h"
-#include "Renderer/Resources/Texture2DLoader.h"
 #include "Renderer/Resources/Texture.h"
+#include "Renderer/Resources/Texture2DLoader.h"
 #include "Renderer/Resources/Material.h"
-#include "Core/File/FileSystem.h"
 #include "Renderer/Resources/MaterialLoader.h"
-
 
 using namespace PrEditor::Assets;
 using namespace PrCore::Resources;
@@ -22,7 +21,6 @@ void BasicMeshExport(ResourceDescConstPtr p_resDesc, std::string_view p_exportRo
 		auto lambda = [=]()
 		{
 			auto& resourceName = p_resDesc->origin == ResourceOrigin::File ? PrCore::PathUtils::GetFile(p_resDesc->filePath) : p_resDesc->data->GetName();
-
 			std::string path;
 			if (!p_exportRoot.empty())
 			{
@@ -135,16 +133,7 @@ void SceneExporter::SaveMemoryResourcesToFile(std::string_view p_exportRoot)
 		BasicMaterialExport(p_resDesc, p_exportRoot);
 	};
 
-	if (PrCore::File::FileSystem::GetInstance().FileExist(p_exportRoot))
-	{
-		auto files = PrCore::File::FileSystem::GetInstance().EnumerateFiles(p_exportRoot);
-		for (auto& file : files)
-		{
-			auto path = PrCore::PathUtils::MakePath(p_exportRoot, file);
-			PrCore::File::FileSystem::GetInstance().FileDelete(path);
-		}
-	}
-	else
+	if (!PrCore::File::FileSystem::GetInstance().FileExist(p_exportRoot))
 	{
 		PrCore::File::FileSystem::GetInstance().CreateDir(p_exportRoot);
 	}

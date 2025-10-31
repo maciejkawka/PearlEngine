@@ -133,7 +133,7 @@ void Editor::PostFrame()
 		Assets::SceneExporter exporter;
 		exporter.SaveMemoryResourcesToFile("Export/");
 		auto scene = PrCore::ECS::SceneManager::GetInstance().GetActiveScene();
-		PrCore::ECS::SceneManager::GetInstance().SaveSceneByReference(scene, "scene_export.pearl");
+		PrCore::ECS::SceneManager::GetInstance().SaveSceneByReference(scene, "scene/scene_export.pearl");
 	}
 }
 
