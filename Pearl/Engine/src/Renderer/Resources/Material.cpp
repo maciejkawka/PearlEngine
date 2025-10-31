@@ -15,7 +15,7 @@
 using namespace PrRenderer::Resources;
 using namespace PrCore::Utils;
 
-Material::Material(ShaderPtr p_shader)
+Material::Material(ShaderHandle p_shader)
 {
 	m_shader = p_shader;
 	m_uniforms = m_shader->GetAllUniforms();
@@ -31,7 +31,7 @@ Material::Material(ShaderPtr p_shader)
 		if (uniform.type == UniformType::Texture2D)
 			m_textures[uniformName] = TextureHandle{ Texture2D::CreateUnitTex(PrRenderer::Core::Color::Black) };
 		if (uniform.type == UniformType::Cubemap)
-			m_textures[uniformName] = TextureHandle{};
+			m_cubemaps[uniformName] = CubemapHandle{ Cubemap::CreateUnitTex(Core::Color::Black) };
 	}
 
 	if (blackTexture == nullptr)
@@ -201,18 +201,21 @@ void Material::Unbind()
 	}
 }
 
-void Material::SetTexture(const std::string& p_name, TexturePtr p_texture)
+void Material::SetTexture(const std::string& p_name, TextureHandle p_texture)
 {
 	auto itTex = m_textures.find(p_name);
 	if (itTex != m_textures.end())
 	{
-		itTex->second = TextureHandle{ p_texture };
+		itTex->second = p_texture;
 	}
+}
 
+void Material::SetCubemap(const std::string& p_name, CubemapHandle p_cubemap)
+{
 	auto itCubemap = m_cubemaps.find(p_name);
 	if (itCubemap != m_cubemaps.end())
 	{
-		itCubemap->second = CubemapHandle{ std::static_pointer_cast<Cubemap>(p_texture) };
+		itCubemap->second = p_cubemap;
 	}
 }
 
@@ -402,7 +405,7 @@ void Material::OnSerialize(PrCore::Utils::JSON::json& p_serialized)
 	PrCore::Utils::JSON::json textureArray;
 	for (auto& tex : m_textures)
 	{
-		if (tex.second.GetOrigin() == PrCore::Resources::ResourceOrigin::File)
+		if (tex.second != nullptr && tex.second.GetOrigin() == PrCore::Resources::ResourceOrigin::File)
 		{
 			PrCore::Utils::JSON::json texture;
 			texture[SerGuide::Texture::name] = tex.first;
@@ -537,3 +540,4 @@ void Material::OnDeserialize(const PrCore::Utils::JSON::json& p_deserialized)
 		}
 	}
 }
+

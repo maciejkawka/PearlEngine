@@ -15,7 +15,7 @@ namespace PrPhysics {
 		const IGeometry* GetGeometry() const override;
 
 		void             SetLocalPose(const Transform& p_transform) override;
-		const Transform& GetLocalPose() const override;
+		const Transform GetLocalPose() const override;
 
 		void  SetContactOffset(float p_contactOffset) override;
 		float GetContactOffset() const override;

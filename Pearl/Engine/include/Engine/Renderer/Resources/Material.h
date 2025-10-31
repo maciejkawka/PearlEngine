@@ -21,7 +21,7 @@ namespace PrRenderer::Resources {
 	class Material : public PrCore::Resources::IResourceData, public PrCore::Utils::ISerializable {
 	public:
 		Material();
-		Material(ShaderPtr p_shader);
+		Material(ShaderHandle p_shader);
 		Material(const Material& p_material);
 
 		void               SetColor(const Core::Color& p_color);
@@ -45,7 +45,8 @@ namespace PrRenderer::Resources {
 		void Bind();
 		void Unbind();
 
-		void       SetTexture(const std::string& p_name, TexturePtr p_texture);
+		void       SetTexture(const std::string& p_name, TextureHandle p_texture);
+		void       SetCubemap(const std::string& p_name, CubemapHandle p_cubemap);
 		TexturePtr GetTexture(const std::string& p_name);
 
 		void SetTexScale(const PrCore::Math::vec2& p_value);

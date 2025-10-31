@@ -167,16 +167,9 @@ void Texture2DLoader::UnloadResource(IResourceDataPtr p_resourceData)
 
 void TextureWriteCallback(void* context, void* data, int size)
 {
-	auto bufferPair = static_cast<std::pair<void*, int*>*>(context);
-	byte* buffer = static_cast<byte*>(bufferPair->first);
-	int* bufferSize = bufferPair->second;
-
-	byte* bytes = static_cast<byte*>(data);
-	for (int i = 0; i < size; i++)
-	{
-		buffer[*bufferSize] = bytes[i];
-		++*bufferSize;
-	}
+	auto* vec = reinterpret_cast<std::vector<byte>*>(context);
+	auto* bytes = reinterpret_cast<byte*>(data);
+	vec->insert(vec->end(), bytes, bytes + size);
 }
 
 bool Texture2DLoader::SaveResourceOnDisc(IResourceDataPtr p_resourceData, const std::string& p_path)
@@ -202,14 +195,22 @@ bool Texture2DLoader::SaveResourceOnDisc(IResourceDataPtr p_resourceData, const 
 		format = 4;
 	}
 
-	void* rawData = texturePtr->FetchGPUData();
+	std::vector<byte> tempVector;
+	tempVector.reserve(texturePtr->GetWidth() * texturePtr->GetHeight() * format + 64);
+
+	void* rawData;
+	if (texturePtr->GetReadable())
+		rawData = texturePtr->GetData();
+	else
+		rawData = texturePtr->FetchGPUData();
+
 	void* compressedData = nullptr;
 	int buffSize = 0;
 
 	auto ext = PrCore::PathUtils::GetExtension(p_path);
 	if (ext == ".png")
 	{
-		compressedData = stbi_write_png_to_mem(static_cast<const byte*>(rawData), texturePtr->GetWidth() * format, texturePtr->GetHeight(), texturePtr->GetWidth(), 4, &buffSize);
+		compressedData = stbi_write_png_to_mem(static_cast<const byte*>(rawData), texturePtr->GetWidth() * format, texturePtr->GetWidth(), texturePtr->GetHeight(), format, &buffSize);
 		if (compressedData == nullptr)
 		{
 			delete[]rawData;
@@ -218,27 +219,28 @@ bool Texture2DLoader::SaveResourceOnDisc(IResourceDataPtr p_resourceData, const 
 	}
 	else if (ext == ".tga")
 	{
-		compressedData = new byte[texturePtr->GetWidth() * texturePtr->GetHeight() * format + 64];
-		auto bufferPair = std::make_pair(compressedData, &buffSize);
-
-		if (!stbi_write_tga_to_func(TextureWriteCallback, &bufferPair, texturePtr->GetWidth(), texturePtr->GetHeight(), format, rawData))
+		if (!stbi_write_tga_to_func(TextureWriteCallback, &tempVector, texturePtr->GetWidth(), texturePtr->GetHeight(), format, rawData))
 		{
 			delete[]rawData;
-			delete[]compressedData;
 			return false;
 		}
+
+		compressedData = tempVector.data();
+		buffSize = tempVector.size();
 	}
 	else if (ext == ".jpg")
 	{
-		compressedData = new byte[texturePtr->GetWidth() * texturePtr->GetHeight() * format + 64];
-		auto bufferPair = std::make_pair(compressedData, &buffSize);
-
-		if (!stbi_write_jpg_to_func(TextureWriteCallback, &bufferPair, texturePtr->GetWidth(), texturePtr->GetHeight(), format, rawData, 100))
+		if (!stbi_write_jpg_to_func(TextureWriteCallback, &tempVector, texturePtr->GetWidth(), texturePtr->GetHeight(), format, rawData, 100))
 		{
 			delete[]rawData;
-			delete[]compressedData;
+			if (tempVector.size() == 0)
+				delete[]compressedData;
+
 			return false;
 		}
+
+		compressedData = tempVector.data();
+		buffSize = tempVector.size();
 	}
 	else
 	{
@@ -259,7 +261,8 @@ bool Texture2DLoader::SaveResourceOnDisc(IResourceDataPtr p_resourceData, const 
 	PrCore::File::FileSystem::GetInstance().FileClose(file);
 
 	delete[]rawData;
-	delete[]compressedData;
+	if (tempVector.size() == 0)
+		delete[]compressedData;
 
 	return true;
 }

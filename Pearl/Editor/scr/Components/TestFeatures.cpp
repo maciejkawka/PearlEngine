@@ -40,6 +40,7 @@
 #include "Physics/Core/PhysicsSystem.h"
 #include "Physics/Shape/IGeometry.h"
 #include "Physics/Actor/IRigidBody.h"
+#include "Editor/Assets/Exporter/SceneExporter.h"
 
 //
 using namespace PrEditor::Components;
@@ -54,7 +55,24 @@ TestFeatures::TestFeatures()
 	using namespace PrCore::Resources;
 	using namespace PrRenderer::Resources;
 
-	auto scene101 = PrCore::ECS::SceneManager::GetInstance().LoadScene("scene/physics_test.pearl");
+	auto scene101 = PrCore::ECS::SceneManager::GetInstance().LoadScene("scene/test_export.pearl");
+	return;
+
+	//auto scene101 = PrCore::ECS::SceneManager::GetInstance().LoadScene("scene/physics_test.pearl");
+
+	auto modeHandl = PrCore::Resources::ResourceSystem::GetInstance().Load<Assets::ModelResource>("Model/ocean.glb");
+	modeHandl->AddEntitesToScene(scene101);
+
+	auto root = scene101->GetEntityByName("ocean").GetComponent<PrCore::ECS::TransformComponent>();
+	root->SetPosition(PrCore::Math::vec3{ 0,5.0f,0.0f });
+
+	scene101->RegisterSystem<PrCore::ECS::HierarchyTransform>();
+	scene101->RegisterSystem<PrCore::ECS::MeshRendererSystem>();
+	scene101->RegisterSystem<PrCore::ECS::RenderStressTest>();
+
+	Assets::SceneExporter exporter;
+	exporter.PrepareAssets();
+	PrCore::ECS::SceneManager::GetInstance().SaveSceneByReference(scene101, "scene/test_export.pearl");
 	return;
 	
 

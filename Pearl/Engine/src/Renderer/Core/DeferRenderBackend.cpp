@@ -63,7 +63,7 @@ namespace PrRenderer::Core
 		// Clear Back Buffer
 		PushCommand(CreateRC<LowRenderer::EnableDepthRC>(true));
 		PushCommand(CreateRC<LowRenderer::EnableBlendingRC>(false));
-		PushCommand(CreateRC<LowRenderer::EnableCullFaceRC>(true));
+		PushCommand(CreateRC<LowRenderer::EnableCullFaceRC>(false));
 		PushCommand(CreateRC<LowRenderer::ClearRC>(ColorBuffer | DepthBuffer));
 
 		// Calculate PBR Reflection if cubemap changed
@@ -255,7 +255,7 @@ namespace PrRenderer::Core
 			{
 				m_renderContext.gBuffer.buffer->Bind();
 				LowRenderer::Clear(ColorBuffer | DepthBuffer);
-				LowRenderer::EnableCullFace(true);
+				LowRenderer::EnableCullFace(false);
 				LowRenderer::EnableDepth(true);
 			}));
 
@@ -299,7 +299,7 @@ namespace PrRenderer::Core
 			{
 				m_renderContext.otuputBuff->Bind();
 				LowRenderer::EnableDepth(true);
-				LowRenderer::EnableCullFace(true);
+				LowRenderer::EnableCullFace(false);
 				LowRenderer::EnableBlending(true);
 				LowRenderer::SetBlendingAlgorythm(BlendingAlgorithm::SourceAlpha, BlendingAlgorithm::OneMinusSourceAlpha);
 			}));
@@ -810,14 +810,14 @@ namespace PrRenderer::Core
 
 		if (p_renderContext->IRMap && p_renderContext->prefilterMap && p_renderContext->brdfLUT)
 		{
-			material->SetTexture("PBR_irradianceMap", p_renderContext->IRMap);
-			material->SetTexture("PBR_prefilterMap", p_renderContext->prefilterMap);
+			material->SetCubemap("PBR_irradianceMap", p_renderContext->IRMap);
+			material->SetCubemap("PBR_prefilterMap", p_renderContext->prefilterMap);
 			material->SetTexture("PBR_brdfLUT", p_renderContext->brdfLUT);
 		}
 		else
 		{
-			material->SetTexture("PBR_irradianceMap", nullptr);
-			material->SetTexture("PBR_prefilterMap", nullptr);
+			material->SetCubemap("PBR_irradianceMap", nullptr);
+			material->SetCubemap("PBR_prefilterMap", nullptr);
 			material->SetTexture("PBR_brdfLUT", nullptr);
 		}
 

@@ -125,7 +125,7 @@ namespace PrCore::Resources {
 
 	};
 	using ResourceDescPtr = std::shared_ptr<ResourceDesc>;
-	using ResourceDescConstPtr = std::shared_ptr<const ResourceDesc>;
+	using ResourceDescConstPtr = std::shared_ptr<ResourceDesc>;
 
 	// Resource descriptor proxy that automatically deduces the GetData type
 	// It is main resource access object 
@@ -165,6 +165,11 @@ namespace PrCore::Resources {
 		ResourceHandle(std::shared_ptr<T> p_dataPtr)
 		{
 			m_resourceDesc = std::make_shared<ResourceDesc>(p_dataPtr);
+		}
+
+		ResourceHandle(void* p_ptr) :
+			m_resourceDesc(nullptr)
+		{
 		}
 
 		// Assign operators

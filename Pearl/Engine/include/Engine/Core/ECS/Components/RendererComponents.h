@@ -61,6 +61,7 @@ namespace PrCore::ECS {
 			}
 
 			p_serialized["materialList"] = jsonMaterials;
+			p_serialized["shadowCaster"] = shadowCaster;
 		}
 
 		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override
@@ -101,6 +102,7 @@ namespace PrCore::ECS {
 					shadowMesh = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>(static_cast<std::string>(p_deserialized["shadowMesh"]));
 			}
 
+			shadowCaster = p_deserialized["shadowCaster"];
 			auto materialJson = p_deserialized["materialList"];
 			materials.resize(materialJson.size());
 			for (int i = 0; i < materialJson.size(); ++i)

@@ -216,7 +216,7 @@ PrRenderer::Resources::MaterialHandle ModelLoaderHelper::GetOrCreateMaterial(con
 	}
 
 	PR_ASSERT(shaderHndl != nullptr, "Cannot load standard shader!");
-	auto materialData = std::make_shared<Material>(shaderHndl.GetData());
+	auto materialData = std::make_shared<Material>(shaderHndl);
 	materialData->SetName(p_material->GetName().C_Str());
 
 	// Get PBR Material Properties
@@ -231,7 +231,7 @@ PrRenderer::Resources::MaterialHandle ModelLoaderHelper::GetOrCreateMaterial(con
 	auto diffuseTex = GetOrCreateTexture(p_material, aiTextureType_DIFFUSE);
 	if (diffuseTex != nullptr)
 	{
-		materialData->SetTexture("albedoMap", diffuseTex.GetData());
+		materialData->SetTexture("albedoMap", diffuseTex);
 		materialData->SetProperty("albedoValue", PrCore::Math::vec4{ 0.0f });
 	}
 	else 
@@ -260,7 +260,7 @@ PrRenderer::Resources::MaterialHandle ModelLoaderHelper::GetOrCreateMaterial(con
 	if (normalTex != nullptr)
 	{
 		materialData->SetProperty("normalMapping", true);
-		materialData->SetTexture("normalMap", normalTex.GetData());
+		materialData->SetTexture("normalMap", normalTex);
 	}
 	else
 	{
@@ -273,7 +273,7 @@ PrRenderer::Resources::MaterialHandle ModelLoaderHelper::GetOrCreateMaterial(con
 	auto roughnessTex = GetOrCreateTexture(p_material, aiTextureType_DIFFUSE_ROUGHNESS);
 	if (roughnessTex != nullptr)
 	{
-		materialData->SetTexture("roughnessMap", roughnessTex.GetData());
+		materialData->SetTexture("roughnessMap", roughnessTex);
 		materialData->SetProperty("roughnessValue", 0.0f);
 	}
 	else
@@ -291,7 +291,7 @@ PrRenderer::Resources::MaterialHandle ModelLoaderHelper::GetOrCreateMaterial(con
 	auto metallicTex = GetOrCreateTexture(p_material, aiTextureType_METALNESS);
 	if (metallicTex != nullptr)
 	{
-		materialData->SetTexture("metallicMap", metallicTex.GetData());
+		materialData->SetTexture("metallicMap", metallicTex);
 		materialData->SetProperty("metallicValue", 0.0f);
 	}
 	else
@@ -309,7 +309,7 @@ PrRenderer::Resources::MaterialHandle ModelLoaderHelper::GetOrCreateMaterial(con
 	auto aoTex = GetOrCreateTexture(p_material, aiTextureType_AMBIENT_OCCLUSION);
 	if (aoTex != nullptr)
 	{
-		materialData->SetTexture("aoMap", aoTex.GetData());
+		materialData->SetTexture("aoMap", aoTex);
 		materialData->SetProperty("aoValue", 0.0f);
 	}
 	else
@@ -323,7 +323,7 @@ PrRenderer::Resources::MaterialHandle ModelLoaderHelper::GetOrCreateMaterial(con
 	auto emissionTex = GetOrCreateTexture(p_material, aiTextureType_EMISSIVE);
 	if (emissionTex != nullptr)
 	{
-		materialData->SetTexture("emissionMap", emissionTex.GetData());
+		materialData->SetTexture("emissionMap", emissionTex);
 	}
 	else
 	{
@@ -520,6 +520,11 @@ void ModelLoaderHelper::CreateEntityGraphRecursive(const aiNode* p_node, ModelEn
 	if (it != lights.end())
 	{
 		modelEntity->light = CreateLight(*it);
+
+		if (modelEntity->light->GetType() == PrRenderer::Resources::LightType::Directional)
+		{
+			modelEntity->rotation = PrCore::Math::inverse(modelEntity->rotation);
+		}
 	}
 
 	//Create node

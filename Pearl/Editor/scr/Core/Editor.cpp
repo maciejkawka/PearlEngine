@@ -11,6 +11,7 @@
 #include "Renderer/Resources/Shader.h"
 #include "Renderer/Resources/Material.h"
 #include "Physics/Core/PhysicsSystem.h"
+#include "Editor/Assets/Exporter/SceneExporter.h"
 
 using namespace PrEditor::Core;
 using namespace PrCore::Events;
@@ -124,8 +125,16 @@ void Editor::PostFrame()
 
 	m_appContext->m_window->SwapBuffers();
 	PrCore::Input::InputManager::GetInstance().ResetFlags();
-	
+
 	EventManager::GetInstance().Update();
+
+	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F8))
+	{
+		Assets::SceneExporter exporter;
+		exporter.SaveMemoryResourcesToFile("Export/");
+		auto scene = PrCore::ECS::SceneManager::GetInstance().GetActiveScene();
+		PrCore::ECS::SceneManager::GetInstance().SaveSceneByReference(scene, "scene_export.pearl");
+	}
 }
 
 

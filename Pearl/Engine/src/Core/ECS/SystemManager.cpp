@@ -63,16 +63,19 @@ void SystemManager::UpdateGroup(ECS::UpdateGroup p_systemGroup, float p_dt)
 
 void SystemManager::OnSerialize(Utils::JSON::json& p_serialized)
 {
-	for(int i=0;i< m_systemTypeCounter; i++)
+	for (int i = 0; i < m_systemTypeCounter; i++)
 	{
 		Utils::JSON::json system;
 		auto systemPtr = m_systems[i];
-		system["systemType"] = typeid(*systemPtr).name();
-		system["isActive"] = systemPtr->m_isActive;
+		if (systemPtr)
+		{
+			system["systemType"] = typeid(*systemPtr).name();
+			system["isActive"] = systemPtr->m_isActive;
 
-		systemPtr->OnSerialize(system);
+			systemPtr->OnSerialize(system);
 
-		p_serialized.push_back(system);
+			p_serialized.push_back(system);
+		}
 	}
 }
 

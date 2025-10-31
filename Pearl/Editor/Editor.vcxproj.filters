@@ -17,6 +17,9 @@
     <Filter Include="Assets\Model">
       <UniqueIdentifier>{c6c113fa-e8ff-4c1a-9796-eb9d57c2ac4c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets\Exporter">
+      <UniqueIdentifier>{770723b4-b8ed-48dd-888a-31096d8c7d7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scr\Core\Editor.cpp">
@@ -43,6 +46,9 @@
     <ClCompile Include="scr\Assets\Model\ModelResource.cpp">
       <Filter>Assets\Model</Filter>
     </ClCompile>
+    <ClCompile Include="scr\Assets\Exporter\SceneExporter.cpp">
+      <Filter>Assets\Exporter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Editor\Core\Editor.h">
@@ -68,6 +74,9 @@
     </ClInclude>
     <ClInclude Include="include\Editor\Assets\Model\ModelResourceLoader.h">
       <Filter>Assets\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Editor\Assets\Exporter\SceneExporter.h">
+      <Filter>Assets\Exporter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

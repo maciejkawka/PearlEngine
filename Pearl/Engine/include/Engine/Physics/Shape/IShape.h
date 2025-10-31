@@ -24,7 +24,7 @@ namespace PrPhysics {
 		virtual const IGeometry*  GetGeometry() const = 0;
 
 		virtual void              SetLocalPose(const Transform& p_transform) = 0;
-		virtual const Transform&  GetLocalPose() const = 0;
+		virtual const Transform   GetLocalPose() const = 0;
 
 		virtual void              SetContactOffset(float p_contactOffset) = 0;
 		virtual float             GetContactOffset() const = 0;

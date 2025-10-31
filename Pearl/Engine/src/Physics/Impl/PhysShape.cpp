@@ -45,7 +45,7 @@ void PhysShape::SetLocalPose(const Transform& p_transform)
 	m_impl->setLocalPose(ToPxTransform(p_transform));
 }
 
-const PrPhysics::Transform& PhysShape::GetLocalPose() const
+const PrPhysics::Transform PhysShape::GetLocalPose() const
 {
 	return ToTransform(m_impl->getLocalPose());
 }

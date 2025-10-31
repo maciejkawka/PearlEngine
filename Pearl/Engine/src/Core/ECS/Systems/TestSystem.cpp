@@ -9,6 +9,9 @@
 #include "Physics/Core/Physics.h"
 #include "Physics/Shape/IConvexMesh.h"
 #include "Physics/Events/Events.h"
+#include "Core/File/FileSystem.h"
+#include "Renderer/Core/LowRenderer.h"
+#include "Renderer/Resources/Texture2DLoader.h"
 
 using namespace PrCore::ECS;
 using namespace PrRenderer::Core;
@@ -63,19 +66,20 @@ void RenderStressTest::OnEnable()
 	settings->enableFog = false;
 
 	m_maxLight = 0;
-	for (auto [entity, Light] : m_entityViewer.EntitesWithComponents<RigidBodyDynamicComponent>())
+	for (auto [entity, Light] : m_entityViewer.EntitesWithComponents<LightComponent>())
 	{
 		m_maxLight++;
 	}
 
 	//Randomize Lights
-	for (auto [entity, light, mesh]: m_entityViewer.EntitesWithComponents<LightComponent, MeshRendererComponent>())
+	for (auto [entity, light, mesh] : m_entityViewer.EntitesWithComponents<LightComponent, MeshRendererComponent>())
 	{
 		entity.GetComponent<NameComponent>()->name;
 		mesh->mainMaterial = std::make_shared<PrRenderer::Resources::Material>(*mesh->mainMaterial.GetData());
 		PrRenderer::Core::Color color = randColor();
 		light->m_light->SetColor(color);
-		mesh->mainMaterial->SetProperty("albedoValue", static_cast<PrCore::Math::vec4>(color));
+		mesh->mainMaterial->SetColor(color);
+		mesh->shadowCaster = false;
 	}
 
 	for (auto [entity, light] : m_entityViewer.EntitesWithComponents<LightComponent>())
@@ -96,7 +100,36 @@ void RenderStressTest::OnEnable()
 
 	PrPhysics::PhysicsSystem::GetInstancePtr()->SetGravity(PrCore::Math::vec3{ 0.0f });
 
+	auto pan = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("Plane.003");
+
+	if(pan.IsValid())
+	{
+		auto shader = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Shader>("shader/deffered/water.shader");
+
+		auto newMat = std::make_shared<PrRenderer::Resources::Material>(shader);
+		auto mat = pan.GetComponent<MeshRendererComponent>()->mainMaterial;
+		newMat->CopyPropertiesFrom(*mat.GetData());
+
+		newMat->SetProperty<float>("uTime", 0.0f);
+		newMat->SetProperty<float>("uAmplitude", 0.6f);
+		newMat->SetProperty<float>("uFrequency", 2.0f);
+		newMat->SetProperty<float>("uSpeed", 1.5f);
+
+		pan.GetComponent<MeshRendererComponent>()->mainMaterial = newMat;
+		//PrCore::Resources::ResourceSystem::GetInstance().SaveToFile<PrRenderer::Resources::Mesh>(mesh.GetID(), "test.obj");
+		//auto loadedMesh = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>("test.obj");
+		//pan.GetComponent<MeshRendererComponent>()->mesh = loadedMesh;
+
+
+		//auto texture = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Texture>("texture/jacaranda_tree_leaves_diff_4k_New.png");
+		//auto data = texture->FetchGPUData();
+		//PrCore::Resources::ResourceSystem::GetInstance().SaveToFile<PrRenderer::Resources::Texture>(texture.GetID(), "test.jpg");
+		//pan.GetComponent<MeshRendererComponent>()->materials[1]->SetTexture("albedoMap", texture.GetData());
+	}
+
 	//PrCore::ECS::SceneManager::GetInstance().SaveSceneByReference(PrCore::ECS::SceneManager::GetInstance().GetActiveScene(), "scene/deserializeTest.pearl");
+
+
 
 	return;
 
@@ -220,11 +253,17 @@ void RenderStressTest::OnUpdate(float p_dt)
 		{
 			renderSystem->SetCubemap(Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("stress_test/hrd_skymap.mat").GetData());
 			m_mainLightPtr->SetColor(m_lightColor);
+
+			//auto entity = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("jacaranda_tree_leaves");
+			//entity.GetComponent<PrCore::ECS::MeshRendererComponent>()->materials[1]->SetColor({ 0.0f, 0.0f, 0.0f, 0.0f });
 		}
 		else if (cubemap == 1)
 		{
 			renderSystem->SetCubemap(Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("stress_test/cubemap_default.mat").GetData());
 			m_mainLightPtr->SetColor(m_lightColor);
+
+			//auto entity = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("jacaranda_tree_leaves");
+			//entity.GetComponent<PrCore::ECS::MeshRendererComponent>()->materials[1]->SetColor({ 1.0f, 0.6f, 0.0f, 0.0f });
 		}
 		else if (cubemap == 2)
 		{
@@ -248,7 +287,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 	}
 
 	int i = 0;
-	for (auto [entity, transform, light] : m_entityViewer.EntitesWithComponents<TransformComponent, RigidBodyDynamicComponent>())
+	for (auto [entity, transform, light] : m_entityViewer.EntitesWithComponents<TransformComponent, LightComponent>())
 	{
 		//This is selected light
 		if (i ==m_selectedLight)
@@ -285,14 +324,14 @@ void RenderStressTest::OnUpdate(float p_dt)
 			//if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::KP_2))
 			//	color -= 10.0f * p_dt;
 
-			if (loko != position)
-			{
-				if (entity.HasComponent<RigidBodyDynamicComponent>())
-				{
-					entity.GetComponent<RigidBodyDynamicComponent>()->rigidBody->SetLinearVelocity(PrCore::Math::vec3{ 0.0f });
-					entity.GetComponent<RigidBodyDynamicComponent>()->rigidBody->SetAngularVelocity(PrCore::Math::vec3{ 0.0f });
-				}
-			}
+			//if (loko != position)
+			//{
+			//	if (entity.HasComponent<RigidBodyDynamicComponent>())
+			//	{
+			//		entity.GetComponent<RigidBodyDynamicComponent>()->rigidBody->SetLinearVelocity(PrCore::Math::vec3{ 0.0f });
+			//		entity.GetComponent<RigidBodyDynamicComponent>()->rigidBody->SetAngularVelocity(PrCore::Math::vec3{ 0.0f });
+			//	}
+			//}
 
 			//light->m_light->SetColor(color);
 
@@ -309,6 +348,35 @@ void RenderStressTest::OnUpdate(float p_dt)
 				//renderSystem->DrawDebugSphere(position + 0.5f, 0.2f, true);
 		}
 		i++;
+	}
+
+	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::F11))
+	{
+		size_t width, hegiht;
+		auto buffer = PrRenderer::Core::LowRenderer::ReadFrontBuffer(width, hegiht);
+
+		auto tex = PrRenderer::Resources::Texture2D::Create();
+		tex->SetFormat(PrRenderer::Resources::TextureFormat::RGB24);
+		tex->SetHeight(hegiht);
+		tex->SetWidth(width);
+		tex->SetData(buffer);
+		tex->Apply();
+
+		PrRenderer::Resources::Texture2DLoader loader;
+		loader.SaveResourceOnDisc(tex, "screen.jpg");
+
+		delete[] buffer;
+	}
+
+
+	auto pan = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("Plane.003");
+
+	if (pan.IsValid())
+	{
+		static float time = 0;
+		time += p_dt;
+		auto mat = pan.GetComponent<MeshRendererComponent>()->mainMaterial;
+		mat->SetProperty<float>("uTime", time);
 	}
 
 	// Retup renderer settings
@@ -338,8 +406,8 @@ void RenderStressTest::OnCollisionEnter(PrCore::Events::EventPtr p_event)
 
 	if (collisionInfo.entityA.HasComponent<PrCore::ECS::LightComponent>() && nameB == "Quad")
 	{
-		collisionInfo.entityA.GetComponent<PrCore::ECS::LightComponent>()->m_light->SetColor(static_cast<PrCore::Math::vec4>(PrRenderer::Core::Color::Red) * 10.0f);
-		collisionInfo.entityA.GetComponent<PrCore::ECS::MeshRendererComponent>()->mainMaterial->SetProperty("albedoValue", static_cast<PrCore::Math::vec4>(PrRenderer::Core::Color::Red) * 10.0f);
+		collisionInfo.entityA.GetComponent<PrCore::ECS::LightComponent>()->m_light->SetColor(static_cast<PrCore::Math::vec4>(PrRenderer::Core::Color::Red) * 15.0f);
+		collisionInfo.entityA.GetComponent<PrCore::ECS::MeshRendererComponent>()->mainMaterial->SetColor(PrRenderer::Core::Color::Red * 10.0f);
 	}
 
     //PRLOG_INFO("On collision enter, EntityA: {}, EntityB {}", nameA, nameB);
@@ -355,7 +423,7 @@ void RenderStressTest::OnCollisionExit(PrCore::Events::EventPtr p_event)
 	{
 		auto color = PrRenderer::Core::Color(std::rand() % 20, std::rand() % 20, std::rand() % 20, std::rand() % 20);
 		collisionInfo.entityA.GetComponent<PrCore::ECS::LightComponent>()->m_light->SetColor(static_cast<PrCore::Math::vec4>(color));
-		collisionInfo.entityA.GetComponent<PrCore::ECS::MeshRendererComponent>()->mainMaterial->SetProperty("albedoValue", static_cast<PrCore::Math::vec4>(color));
+		collisionInfo.entityA.GetComponent<PrCore::ECS::MeshRendererComponent>()->mainMaterial->SetColor(color);
 	}
 
 	//PRLOG_INFO("On collision exit, EntityA: {}, EntityB {}", nameA, nameB);

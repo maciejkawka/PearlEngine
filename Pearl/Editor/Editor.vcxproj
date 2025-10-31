@@ -100,6 +100,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="scr\Assets\Exporter\SceneExporter.cpp" />
     <ClCompile Include="scr\Assets\Model\ModelEntityGraph.cpp" />
     <ClCompile Include="scr\Assets\Model\ModelResource.cpp" />
     <ClCompile Include="scr\Assets\Model\ModelResourceLoader.cpp" />
@@ -110,6 +111,7 @@
     <ClCompile Include="scr\Core\EditorContext.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Editor\Assets\Exporter\SceneExporter.h" />
     <ClInclude Include="include\Editor\Assets\Model\ModelEntityGraph.h" />
     <ClInclude Include="include\Editor\Assets\Model\ModelResource.h" />
     <ClInclude Include="include\Editor\Assets\Model\ModelResourceLoader.h" />

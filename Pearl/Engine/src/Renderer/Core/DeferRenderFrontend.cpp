@@ -28,8 +28,9 @@ DeferRenderFrontend::DeferRenderFrontend(RendererSettings& p_settings) :
 	m_nextSpotLightPos = 0;
 	m_nextDirLightPos = 0;
 
-	m_debugShader = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/debug_pass.shader").GetData();
-	m_debugMaterial = std::make_shared<Resources::Material>(m_debugShader);
+	auto debugShaderHndl = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/debug_pass.shader");
+	m_debugShader = debugShaderHndl.GetData();
+	m_debugMaterial = std::make_shared<Resources::Material>(debugShaderHndl);
 
 	m_rendererBackend = std::make_shared<DeferRenderBackend>(m_renderSettings);
 }
