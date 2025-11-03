@@ -102,7 +102,9 @@ namespace PrCore::ECS {
 					shadowMesh = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>(static_cast<std::string>(p_deserialized["shadowMesh"]));
 			}
 
-			shadowCaster = p_deserialized["shadowCaster"];
+			if (p_deserialized.contains("shadowCaster"))
+				shadowCaster = p_deserialized["shadowCaster"];
+
 			auto materialJson = p_deserialized["materialList"];
 			materials.resize(materialJson.size());
 			for (int i = 0; i < materialJson.size(); ++i)

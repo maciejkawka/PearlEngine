@@ -45,7 +45,7 @@ void DeferRenderFrontend::SubmitLight(ECS::LightComponent* p_lightComponent, ECS
 
 		auto lightObject = std::make_shared<DirLightObject>();
 		lightObject->id = p_id;
-		lightObject->packedMat = p_lightComponent->m_light->CreatePackedMatrix(p_transformComponent->GetPosition(), -p_transformComponent->GetForwardVector());
+		lightObject->packedMat = p_lightComponent->m_light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
 		lightObject->shadowMapPos = SIZE_MAX; // ShadowMapPos is not important in main light
 		lightObject->castShadow = p_lightComponent->m_shadowCast;
 		m_currentFrame->mainDirectLight = lightObject;
@@ -65,7 +65,7 @@ void DeferRenderFrontend::SubmitLight(ECS::LightComponent* p_lightComponent, ECS
 		}
 
 		lightObject = std::make_shared<DirLightObject>();
-		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), -p_transformComponent->GetForwardVector());
+		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
 		lightObject->id = p_id;
 		m_dirLightNumber++;
 
@@ -87,7 +87,7 @@ void DeferRenderFrontend::SubmitLight(ECS::LightComponent* p_lightComponent, ECS
 		}
 
 		lightObject = std::make_shared<LightObject>();
-		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), -p_transformComponent->GetForwardVector());
+		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
 		lightObject->id = p_id;
 		m_pointLightNumber++;
 
@@ -109,7 +109,7 @@ void DeferRenderFrontend::SubmitLight(ECS::LightComponent* p_lightComponent, ECS
 		}
 
 		lightObject = std::make_shared<SpotLightObject>();
-		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), -p_transformComponent->GetForwardVector());
+		lightObject->packedMat = light->CreatePackedMatrix(p_transformComponent->GetPosition(), p_transformComponent->GetForwardVector());
 		lightObject->id = p_id;
 		m_spotLightNumber++;
 

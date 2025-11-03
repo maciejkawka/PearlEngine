@@ -19,6 +19,15 @@
 using namespace PrEditor::Assets;
 using namespace PrRenderer::Resources;
 
+struct ArrayHash {
+	std::size_t operator()(const std::vector<uint64_t>& nums) const noexcept {
+		std::size_t hash = 0;
+		for (uint64_t i : nums) {
+			hash ^= std::hash<uint64_t>()(i) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+		}
+		return hash;
+	}
+};
 
 PrRenderer::Core::Color ToColor(const aiColor4D& p_vec4)
 {
@@ -69,16 +78,18 @@ LightType ToLightType(aiLightSourceType p_sourceType)
 	case aiLightSource_AREA:
 	case _aiLightSource_Force32Bit:
 	case aiLightSource_UNDEFINED:
+	default:
 		return LightType::Unknown;
+		break;
 	}
 }
 
 ////////////////////////////////////////////////////
 struct ModelLoaderHelper
 {
-	std::unordered_map<uint64_t, PrRenderer::Resources::MaterialHandle> materialMap;
-	std::unordered_map<uint64_t, PrRenderer::Resources::MeshHandle>     meshMap;
-	std::unordered_map<uint64_t, PrRenderer::Resources::TextureHandle>     textureMap;
+	std::unordered_map<std::vector<uint64_t>, PrRenderer::Resources::MeshHandle, ArrayHash> meshMap;
+	std::unordered_map<uint64_t, PrRenderer::Resources::MaterialHandle>                     materialMap;
+	std::unordered_map<uint64_t, PrRenderer::Resources::TextureHandle>                      textureMap;
 
 	std::vector<const aiMesh*>     meshes;
 	std::vector<const aiMaterial*> materials;
@@ -111,11 +122,11 @@ PrRenderer::Resources::TextureHandle  ModelLoaderHelper::GetOrCreateTexture(cons
 		auto textureEmbedded = scene->GetEmbeddedTexture(texPath.C_Str());
 		if (textureEmbedded)
 		{
-			auto texIt = textureMap.find((uint64_t)textureEmbedded);
+			auto texIt = textureMap.find(reinterpret_cast<uint64_t>(textureEmbedded));
 			if (texIt != textureMap.end())
 				return texIt->second;
 
-			// if texture height is 0 texture is 0 the pointer is a compressed texture
+			// if texture height is 0 texture is a pointer to a compressed data
 			if (textureEmbedded->mHeight == 0)
 			{
 				PrRenderer::Resources::Texture2DLoader loader;
@@ -125,9 +136,9 @@ PrRenderer::Resources::TextureHandle  ModelLoaderHelper::GetOrCreateTexture(cons
 
 				texData->SetName(textureEmbedded->mFilename.C_Str());
 				texHandle = PrCore::Resources::ResourceSystem::GetInstance().Register<Texture>(texData);
-				textureMap.insert({ (uint64_t)textureEmbedded, texHandle });
+				textureMap.insert({ reinterpret_cast<uint64_t>(textureEmbedded), texHandle });
 			}
-			// else load textre directly from aiTexel array
+			// else load texture directly from aiTexel array
 			else
 			{
 				auto texData = PrRenderer::Resources::Texture2D::Create();
@@ -138,7 +149,7 @@ PrRenderer::Resources::TextureHandle  ModelLoaderHelper::GetOrCreateTexture(cons
 				texData->SetFormat(PrRenderer::Resources::TextureFormat::RGBA32);
 				texData->SetMipMap(true);
 
-				size_t texSize = textureEmbedded->mHeight * textureEmbedded->mWidth;
+				unsigned int texSize = textureEmbedded->mHeight * textureEmbedded->mWidth;
 				unsigned char* data = new unsigned char[texSize * 4];
 				for (unsigned int i = 0; i < texSize; i++)
 				{
@@ -159,7 +170,7 @@ PrRenderer::Resources::TextureHandle  ModelLoaderHelper::GetOrCreateTexture(cons
 				delete[]data;
 
 				texHandle = PrCore::Resources::ResourceSystem::GetInstance().Register<Texture>(texData);
-				textureMap.insert({ (uint64_t)textureEmbedded, texHandle });
+				textureMap.insert({ reinterpret_cast<uint64_t>(textureEmbedded), texHandle });
 			}
 		}
 		// Load texture from file
@@ -244,7 +255,7 @@ PrRenderer::Resources::MaterialHandle ModelLoaderHelper::GetOrCreateMaterial(con
 		}
 	}
 	
-	// Get texture scale and offset from diffuse texure only, this will apply to all textures in the material
+	// Get texture scale and offset from diffuse texture only, this will apply to all textures in the material
 	aiUVTransform uvScale;
 	if (AI_SUCCESS == p_material->Get(AI_MATKEY_UVTRANSFORM(aiTextureType_DIFFUSE, 0), uvScale))
 	{
@@ -353,15 +364,26 @@ PrRenderer::Resources::MaterialHandle ModelLoaderHelper::GetOrCreateMaterial(con
 
 PrRenderer::Resources::MeshHandle ModelLoaderHelper::GetOrCreateMesh(const aiNode* p_mesh)
 {
-	PR_ASSERT(p_mesh);
+	if (p_mesh == nullptr)
+	{
+		PR_ASSERT(false, "Mesh nullptr!");
+		return PrRenderer::Resources::MeshHandle{};
+	}
 
-	// Check if already created
-	auto it = meshMap.find((uint64_t)p_mesh);
+	std::vector<uint64_t> containedMeshes;
+	containedMeshes.reserve(p_mesh->mNumMeshes);
+	for (int i = 0; i < p_mesh->mNumMeshes; ++i)
+	{
+		containedMeshes.push_back(p_mesh->mMeshes[i]);
+	}
+
+	// Check if already created and return from cache
+	auto it = meshMap.find(containedMeshes);
 	if (it != meshMap.end())
 		return it->second;
 
 	auto meshData = Mesh::Create();
-	meshData->SetName(p_mesh->mName.C_Str());
+	meshData->SetName(meshes[p_mesh->mMeshes[0]]->mName.C_Str());
 
 	std::vector<PrCore::Math::vec3>      verticesVec;
 	std::vector<PrCore::Math::vec3>      normalsVec;
@@ -371,9 +393,9 @@ PrRenderer::Resources::MeshHandle ModelLoaderHelper::GetOrCreateMesh(const aiNod
 
 	unsigned int indicesOffset = 0;
 	unsigned int subMeshIndexOffset = 0;
-	for (int i = 0; i < p_mesh->mNumMeshes; ++i)
+	for (uint64_t meshIndex : containedMeshes)
 	{
-		auto mesh = meshes[p_mesh->mMeshes[i]];
+		auto mesh = meshes[meshIndex];
 		for (int vertId = 0; vertId < mesh->mNumVertices; ++vertId)
 		{
 			if (mesh->HasPositions())
@@ -420,11 +442,11 @@ PrRenderer::Resources::MeshHandle ModelLoaderHelper::GetOrCreateMesh(const aiNod
 	if (!meshData->ValidateBuffers())
 	{
 		PRLOG_ERROR("Renderer: Mesh {0} invalid", meshData->GetName());
-		return PrRenderer::Resources::MeshHandle{};;
+		return PrRenderer::Resources::MeshHandle{};
 	}
 
 	auto meshHandle = PrCore::Resources::ResourceSystem::GetInstance().Register<Mesh>(meshData);
-	meshMap.insert({ (uint64_t)p_mesh, meshHandle });
+	meshMap.insert({ containedMeshes, meshHandle });
 
 	return meshHandle;
 }
@@ -520,11 +542,6 @@ void ModelLoaderHelper::CreateEntityGraphRecursive(const aiNode* p_node, ModelEn
 	if (it != lights.end())
 	{
 		modelEntity->light = CreateLight(*it);
-
-		if (modelEntity->light->GetType() == PrRenderer::Resources::LightType::Directional)
-		{
-			modelEntity->rotation = PrCore::Math::inverse(modelEntity->rotation);
-		}
 	}
 
 	//Create node
@@ -597,14 +614,18 @@ PrCore::Resources::IResourceDataPtr ModelResourceLoader::LoadResource(const std:
 	std::for_each(helper.materialMap.begin(), helper.materialMap.end(), [&materialVec](auto&& pair) {
 		materialVec.push_back(pair.second);
 		});
-	
+
 	std::vector<MeshHandle> meshVec;
 	materialVec.reserve(helper.meshMap.size());
 	std::for_each(helper.meshMap.begin(), helper.meshMap.end(), [&meshVec](auto&& pair) {
 		meshVec.push_back(pair.second);
 		});
-	
+
 	auto modelData = std::make_shared<ModelResource>(std::move(modelEntityGraph), std::move(materialVec), std::move(meshVec));
+
+	PRLOG_INFO("Loaded model file {} \n Meshes Num: {}\n Materials Num: {}\n Textures Num: {}\n Lights Num: {}",
+		p_path, helper.meshMap.size(), helper.materialMap.size(), helper.textureMap.size(), helper.lights.size());
+
 	return modelData;
 }
 

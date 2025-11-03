@@ -20,7 +20,7 @@ namespace PrRenderer::Resources {
 
 		IResourceDataPtr LoadResource(const std::string& p_path) override;
 
-		IResourceDataPtr LoadFromMemoryResource(const void* p_buffer, size_t p_size, int p_flags = 0);
+		IResourceDataPtr LoadFromMemoryResource(const void* p_buffer, size_t p_size, int p_flags = 0) override;
 
 		void UnloadResource(IResourceDataPtr p_resourceData) override;
 
