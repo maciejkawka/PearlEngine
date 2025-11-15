@@ -89,9 +89,10 @@ void RenderStressTest::OnEnable()
 			m_mainLightPtr = light->m_light;
 			m_lightColor = m_mainLightPtr->GetColor();
 			m_mainLightPtr->SetColor({ 0.0f, 0.0f, 0.0f, 1.0f });
+			light->mainDirectLight = true;
 
 			auto elo = entity.GetComponent<PrCore::ECS::TransformComponent>()->GetRotation();
-			entity.GetComponent<PrCore::ECS::TransformComponent>()->SetRotation(PrCore::Math::inverse(elo));
+			//entity.GetComponent<PrCore::ECS::TransformComponent>()->SetRotation(PrCore::Math::inverse(elo));
 		}
 	}
 
@@ -106,15 +107,18 @@ void RenderStressTest::OnEnable()
 	{
 		auto shader = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Shader>("shader/deffered/water.shader");
 
-		auto newMat = std::make_shared<PrRenderer::Resources::Material>(shader);
+		auto newMat = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("water.mat");
 		auto mat = pan.GetComponent<MeshRendererComponent>()->mainMaterial;
-		newMat->CopyPropertiesFrom(*mat.GetData());
+		//newMat->CopyPropertiesFrom(*mat.GetData());
 
 		newMat->SetProperty<float>("uTime", 0.0f);
 		newMat->SetProperty<float>("uAmplitude", 0.6f);
 		newMat->SetProperty<float>("uFrequency", 2.0f);
 		newMat->SetProperty<float>("uSpeed", 1.5f);
+		//newMat->SetTexture("normalMap", PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Texture>("Water_001_NORM.jpg"));
+		//newMat->SetTexture("albedoMap", PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Texture>("Water_001_COLOR.jpg"));
 
+		//auto waterMat = 
 		pan.GetComponent<MeshRendererComponent>()->mainMaterial = newMat;
 		//PrCore::Resources::ResourceSystem::GetInstance().SaveToFile<PrRenderer::Resources::Mesh>(mesh.GetID(), "test.obj");
 		//auto loadedMesh = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>("test.obj");
@@ -241,6 +245,21 @@ void RenderStressTest::OnUpdate(float p_dt)
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(Input::PrKey::L))
 		m_selectedLight = (++m_selectedLight) % m_maxLight;
 
+
+	auto sun = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("Sun");
+	if(sun.IsValid())
+	{
+		auto forwardVector = sun.GetComponent<TransformComponent>()->GetForwardVector();
+		auto rotation = sun.GetComponent<TransformComponent>()->GetRotation();
+		PrRenderer::Core::renderSystem->DrawDebugSphere(PrCore::Math::vec3{ 0,20,0 }, 1.0f, false);
+		PrRenderer::Core::renderSystem->DrawDebugLine(PrCore::Math::vec3{ 0,20,0 }, PrCore::Math::vec3{ 0,20,0 } + forwardVector * 5.0f);
+		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::K))
+		{
+			glm::quat deltaRot = glm::angleAxis(glm::radians(20 * p_dt), glm::vec3(1, 0, 0));
+			sun.GetComponent<TransformComponent>()->SetRotation(deltaRot * rotation);
+		}
+	}
+
 	// Setup cubemap
 	static int cubemap = 0;
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::G))
@@ -350,6 +369,35 @@ void RenderStressTest::OnUpdate(float p_dt)
 		i++;
 	}
 
+	if (PrCore::Input::InputManager::GetInstance().IsButtonPressed(PrCore::Input::PrMouseButton::BUTTON_LEFT))
+	{
+		auto physicsPtr = PrPhysics::PhysicsSystem::GetInstancePtr();
+
+		PrPhysics::Material material;
+		material.staticFriction = 0.0f;
+		material.dynamicFriction = 0.1f;
+		material.restitution = .1f;
+
+		auto entity = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->CreateEntity("PhysicsBox");
+		auto physcomponent = entity.AddComponent<PrCore::ECS::RigidBodyDynamicComponent>();
+
+		auto rigidBody = physcomponent->rigidBody;
+		auto shape = physicsPtr->CreateShape(PrPhysics::SphereGeometry{ 0.5f }, material);
+		rigidBody->AttachShape(shape);
+
+		auto logoTransform = entity.AddComponent<PrCore::ECS::TransformComponent>();
+		auto logoMesh = entity.AddComponent<PrCore::ECS::MeshRendererComponent>();
+		logoTransform->SetPosition(m_camera->GetPosition() + m_cameraTransform->GetForwardVector() * 2.0f);
+		logoTransform->SetLocalScale(PrCore::Math::vec3(1.0f));
+		logoMesh->mainMaterial = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("stress_test/emissionCapsule.mat");
+		logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Sphere);
+
+		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::LEFT_CONTROL))
+		{
+			rigidBody->SetLinearVelocity(m_cameraTransform->GetForwardVector() * 50.0f);
+		}
+	}
+
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::F11))
 	{
 		size_t width, hegiht;
@@ -363,7 +411,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 		tex->Apply();
 
 		PrRenderer::Resources::Texture2DLoader loader;
-		loader.SaveResourceOnDisc(tex, "screen.jpg");
+		loader.SaveResourceOnDisc(tex, "screen.png");
 
 		delete[] buffer;
 	}

@@ -55,24 +55,60 @@ TestFeatures::TestFeatures()
 	using namespace PrCore::Resources;
 	using namespace PrRenderer::Resources;
 
-	auto scene101 = PrCore::ECS::SceneManager::GetInstance().LoadScene("scene/test_export.pearl");
+	auto scene101 = PrCore::ECS::SceneManager::GetInstance().LoadScene("scene/scene_export.pearl");
 	return;
+	//scene101->RegisterSystem<PrCore::ECS::PhysicsUpdateSystem>();
 
-	//auto scene101 = PrCore::ECS::SceneManager::GetInstance().LoadScene("scene/physics_test.pearl");
+	//auto physicsPtr1 = PrPhysics::PhysicsSystem::GetInstancePtr();
 
-	auto modeHandl = PrCore::Resources::ResourceSystem::GetInstance().Load<Assets::ModelResource>("Model/ocean.glb");
+	//PrPhysics::Material material1;
+	//material1.staticFriction = 0.0f;
+	//material1.dynamicFriction = 0.1f;
+	//material1.restitution = .1f;
+
+	//auto groundCollider = scene101->CreateEntity("Quad");
+	//auto transformComponent = groundCollider.AddComponent<PrCore::ECS::TransformComponent>();
+	//transformComponent->SetPosition({ 0, 5.0f, 0.0f });
+	//transformComponent->SetRotation(glm::angleAxis(glm::radians(90.0f), glm::vec3(0, 0, 1)));
+
+	//auto rigidBody = groundCollider.AddComponent<PrCore::ECS::RigidBodyStaticComponent>()->rigidBody;
+	//auto shape = physicsPtr1->CreateShape(PrPhysics::PlaneGeometry{}, material1);
+	//rigidBody->AttachShape(shape);
+
+	//return;
+
+	//auto scene101 = PrCore::ECS::SceneManager::GetInstance().CreateScene("export_test");
+
+	auto modeHandl = PrCore::Resources::ResourceSystem::GetInstance().Load<Assets::ModelResource>("Model/SceneOceanNewTest.glb");
 	modeHandl->AddEntitesToScene(scene101);
 
-	auto root = scene101->GetEntityByName("ocean").GetComponent<PrCore::ECS::TransformComponent>();
+	auto root = scene101->GetEntityByName("sceneoceannewtest").GetComponent<PrCore::ECS::TransformComponent>();
 	root->SetPosition(PrCore::Math::vec3{ 0,5.0f,0.0f });
 
 	scene101->RegisterSystem<PrCore::ECS::HierarchyTransform>();
 	scene101->RegisterSystem<PrCore::ECS::MeshRendererSystem>();
 	scene101->RegisterSystem<PrCore::ECS::RenderStressTest>();
+	scene101->RegisterSystem<PrCore::ECS::PhysicsUpdateSystem>();
 
-	Assets::SceneExporter exporter;
-	exporter.PrepareAssets();
-	PrCore::ECS::SceneManager::GetInstance().SaveSceneByReference(scene101, "scene/test_export.pearl");
+	auto physicsPtr1 = PrPhysics::PhysicsSystem::GetInstancePtr();
+
+	PrPhysics::Material material1;
+	material1.staticFriction = 0.0f;
+	material1.dynamicFriction = 0.1f;
+	material1.restitution = .1f;
+
+	auto groundCollider = scene101->CreateEntity("Quad");
+	auto transformComponent = groundCollider.AddComponent<PrCore::ECS::TransformComponent>();
+	transformComponent->SetPosition({ 0, 5.0f, 0.0f });
+	transformComponent->SetRotation(glm::angleAxis(glm::radians(90.0f), glm::vec3(0, 0, 1)));
+
+	auto rigidBody = groundCollider.AddComponent<PrCore::ECS::RigidBodyStaticComponent>()->rigidBody;
+	auto shape = physicsPtr1->CreateShape(PrPhysics::PlaneGeometry{}, material1);
+	rigidBody->AttachShape(shape);
+
+	//Assets::SceneExporter exporter;
+	//exporter.BasicExporter("Export/");
+	//PrCore::ECS::SceneManager::GetInstance().SaveSceneByReference(scene101, "scene/test_export.pearl");
 	return;
 	
 

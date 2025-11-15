@@ -131,7 +131,7 @@ void Editor::PostFrame()
 	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F8))
 	{
 		Assets::SceneExporter exporter;
-		exporter.SaveMemoryResourcesToFile("Export/");
+		exporter.SaveMemoryResourcesToFile("OceanNew/");
 		auto scene = PrCore::ECS::SceneManager::GetInstance().GetActiveScene();
 		PrCore::ECS::SceneManager::GetInstance().SaveSceneByReference(scene, "scene/scene_export.pearl");
 	}
