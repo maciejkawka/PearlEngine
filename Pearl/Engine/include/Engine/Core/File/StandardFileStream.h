@@ -1,8 +1,10 @@
 #pragma once
-#include"DataStream.h"
-#include<fstream>
 
-namespace PrCore::File {
+#include "DataStream.h"
+
+#include <fstream>
+
+namespace PrCore {
 
 	class StandardFileStream : public DataStream {
 	public:

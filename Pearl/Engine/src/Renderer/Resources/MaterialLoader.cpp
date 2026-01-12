@@ -11,7 +11,7 @@ using namespace PrCore::Utils;
 
 PrCore::Resources::IResourceDataPtr MaterialLoader::LoadResource(const std::string& p_path)
 {
-	auto file = PrCore::File::FileSystem::GetInstance().OpenFileWrapper(p_path);
+	auto file = PrSystems::Get<PrCore::FileSystem>()->OpenFileWrapper(p_path);
 	if (file == nullptr)
 		return nullptr;
 
@@ -46,9 +46,10 @@ bool MaterialLoader::SaveResourceOnDisc(PrCore::Resources::IResourceDataPtr p_re
 
 	auto serializeStr = serialize.dump(4);
 
-	auto file = PrCore::File::FileSystem::GetInstance().FileOpen(p_path, PrCore::File::OpenMode::Write);
-	PrCore::File::FileSystem::GetInstance().FileWrite(file, serializeStr.c_str(), serializeStr.length());
-	PrCore::File::FileSystem::GetInstance().FileClose(file);
+	auto pFileSystem = PrSystems::Get<PrCore::FileSystem>();
+	auto file = pFileSystem->FileOpen(p_path, PrCore::FileOpenMode::Write);
+	pFileSystem->FileWrite(file, serializeStr.c_str(), serializeStr.length());
+	pFileSystem->FileClose(file);
 
 	return true;
 }

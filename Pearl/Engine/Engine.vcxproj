@@ -65,6 +65,7 @@
     <ClInclude Include="include\Engine\Core\Threading\ThreadSystem.h" />
     <ClInclude Include="include\Engine\Core\Utils\Assert.h" />
     <ClInclude Include="include\Engine\Core\Utils\ISerializable.h" />
+    <ClInclude Include="include\Engine\Core\Utils\ISystem.h" />
     <ClInclude Include="include\Engine\Core\Utils\JSONParser.h" />
     <ClInclude Include="include\Engine\Core\Utils\Logger.h" />
     <ClInclude Include="include\Engine\Core\Utils\Clock.h" />
@@ -72,6 +73,7 @@
     <ClInclude Include="include\Engine\Core\Utils\PathUtils.h" />
     <ClInclude Include="include\Engine\Core\Utils\Singleton.h" />
     <ClInclude Include="include\Engine\Core\Utils\StringUtils.h" />
+    <ClInclude Include="include\Engine\Core\Utils\SystemProvider.h" />
     <ClInclude Include="include\Engine\Core\Utils\UUID.h" />
     <ClInclude Include="include\Engine\Core\Windowing\GLWindow.h" />
     <ClInclude Include="include\Engine\Core\Input\PrKey.h" />

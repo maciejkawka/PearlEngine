@@ -1,6 +1,6 @@
 #pragma once
 
-namespace PrCore::File {
+namespace PrCore {
 
 	using FileHandle = void*;
 

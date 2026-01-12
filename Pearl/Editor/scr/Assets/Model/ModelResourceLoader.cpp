@@ -4,6 +4,7 @@
 #include "Core/File/FileSystem.h"
 #include "Core/Resources/ResourceSystem.h"
 #include "Core/Utils/PathUtils.h"
+#include "Core/Utils/SystemProvider.h"
 
 #include "Renderer/Resources/Mesh.h"
 #include "Renderer/Resources/Material.h"
@@ -581,7 +582,7 @@ LightPtr ModelLoaderHelper::CreateLight(const aiLight* p_light)
 
 PrCore::Resources::IResourceDataPtr ModelResourceLoader::LoadResource(const std::string& p_path)
 {
-	auto file = PrCore::File::FileSystem::GetInstance().OpenFileWrapper(p_path);
+	auto file = PrSystems::Get<PrCore::FileSystem>()->OpenFileWrapper(p_path);
 	if (file == nullptr)
 		return nullptr;
 

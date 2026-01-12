@@ -2,7 +2,7 @@
 
 #include"Core/File/StandardFileStream.h"
 
-using namespace PrCore::File;
+using namespace PrCore;
 
 StandardFileStream::StandardFileStream(std::fstream* p_fstream) :
 	DataStream(),

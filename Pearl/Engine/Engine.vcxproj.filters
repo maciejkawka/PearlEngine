@@ -495,6 +495,12 @@
     <ClInclude Include="include\Engine\Physics\Resources\TriangleMeshLoader.h">
       <Filter>Physics\Resources</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\Utils\SystemProvider.h">
+      <Filter>Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\Utils\ISystem.h">
+      <Filter>Core\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">

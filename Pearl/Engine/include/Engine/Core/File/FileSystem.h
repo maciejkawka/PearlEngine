@@ -2,25 +2,28 @@
 
 #include "FileWrapper.h"
 
-#include "Core/Utils/Singleton.h"
+#include "Core/Utils/ISystem.h"
+
 #include <string>
 
-namespace PrCore::File {
+namespace PrCore {
 
-	enum OpenMode : uint8_t
+	enum FileOpenMode : uint8_t
 	{
-		Append     = 1,
-		Read       = 2,
-		Write      = 4,
-		Invalid    = 0,
+		Append = 1,
+		Read = 2,
+		Write = 4
 	};
 
 	// IMPORTANT!! FileSystem expects string_view paths to be NULL-terminated
-	class FileSystem : public Utils::Singleton<FileSystem> {
+	class FileSystem : public Utils::ISystem {
 	public:
+		FileSystem();
+		virtual ~FileSystem();
+
 		// Mounts the directory to the seach paths, last opened has the highest priority
 		void MountDir(std::string_view p_path, std::string_view p_mountPoint = "/");
-		
+
 		// Unmounts the directory from the seach path
 		void UnmountDir(std::string_view p_path);
 
@@ -31,7 +34,7 @@ namespace PrCore::File {
 		// Writing directory is a directory where file system can write files
 		void                   SetWriteDir(std::string_view p_path);
 		std::string_view       GetWriteDir();
-		
+
 		const std::vector<std::string_view> GetMountPaths();
 
 		void     CreateDir(std::string_view p_path);
@@ -63,7 +66,7 @@ namespace PrCore::File {
 		PrFilePtr    OpenFileWrapper(std::string_view p_path);
 
 		// Opens write/read file returns handle, use below functions to read/write file
-		FileHandle   FileOpen(std::string_view p_path, OpenMode p_openMode = OpenMode::Read);
+		FileHandle   FileOpen(std::string_view p_path, FileOpenMode p_fileOpenMode = FileOpenMode::Read);
 		void         FileClose(FileHandle p_handle);
 
 		size_t       FileRead(FileHandle p_handle, void* p_buffer, size_t p_length);
@@ -78,15 +81,10 @@ namespace PrCore::File {
 		bool         FileFlush(FileHandle p_handle);
 
 	private:
-		FileSystem();
-		~FileSystem();
-
 		void PrintError();
 
 		std::string  m_engineRoot;
 		std::string  m_engineAssets;
 		std::string  m_gameAssets;
-		
-		friend Utils::Singleton<FileSystem>;
 	};
 }

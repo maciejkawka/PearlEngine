@@ -99,7 +99,7 @@ GLWindow::GLWindow(const WindowSettings& p_settings) :
 	glfwMakeContextCurrent(m_window);
 
 	if (!m_settings.iconPath.empty())
-		SetIcon(std::string{ File::FileSystem::GetInstance().GetEngineAssetsPath() } + m_settings.iconPath);
+		SetIcon(std::string{ PrSystems::Get<FileSystem>()->GetEngineAssetsPath() } + m_settings.iconPath);
 
 	s_mainWindow = this;
 }

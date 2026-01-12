@@ -12,7 +12,7 @@ using namespace PrRenderer::Resources;
 PrCore::Resources::IResourceDataPtr ShaderLoader::LoadResource(const std::string& p_path)
 {
 	//Load from file
-	auto file = PrCore::File::FileSystem::GetInstance().OpenFileWrapper(p_path);
+	auto file = PrSystems::Get<PrCore::FileSystem>()->OpenFileWrapper(p_path);
 	if (file == nullptr)
 		return nullptr;
 

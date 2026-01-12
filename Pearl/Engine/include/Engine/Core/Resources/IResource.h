@@ -209,7 +209,7 @@ namespace PrCore::Resources {
 		}
 
 		// Checks if the handle holds valid resource descriptor
-		bool               IsValid() const { return m_resourceDesc && m_resourceDesc->data; }
+		bool               IsValid() const { return m_resourceDesc != nullptr; }
 
 		// Invalidates the handle reseting the handle
 		void               Invalidate() { m_resourceDesc.reset(); }

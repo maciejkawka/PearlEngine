@@ -30,7 +30,7 @@ PrCore::Resources::IResourceDataPtr Texture2DLoader::LoadResource(const std::str
 	TextureFormat format = TextureFormat::None;
 
 	// Change that in future
-	auto file = PrCore::File::FileSystem::GetInstance().OpenFileWrapper(p_path);
+	auto file = PrSystems::Get<PrCore::FileSystem>()->OpenFileWrapper(p_path);
 	if (file == nullptr)
 		return nullptr;
 
@@ -249,7 +249,8 @@ bool Texture2DLoader::SaveResourceOnDisc(IResourceDataPtr p_resourceData, const 
 		return false;
 	}
 
-	auto file = PrCore::File::FileSystem::GetInstance().FileOpen(p_path, PrCore::File::OpenMode::Write);
+	auto pFileSystem = PrSystems::Get<PrCore::FileSystem>();
+	auto file = pFileSystem->FileOpen(p_path, PrCore::FileOpenMode::Write);
 	if (file == nullptr)
 	{
 		delete[]rawData;
@@ -257,8 +258,8 @@ bool Texture2DLoader::SaveResourceOnDisc(IResourceDataPtr p_resourceData, const 
 		return false;
 	}
 
-	PrCore::File::FileSystem::GetInstance().FileWrite(file, compressedData, buffSize);
-	PrCore::File::FileSystem::GetInstance().FileClose(file);
+	pFileSystem->FileWrite(file, compressedData, buffSize);
+	pFileSystem->FileClose(file);
 
 	delete[]rawData;
 	if (tempVector.size() == 0)

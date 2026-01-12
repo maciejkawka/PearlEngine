@@ -1,7 +1,8 @@
 #pragma once
-#include"Core/File/DataStream.h"
 
-namespace PrCore::File {
+#include "Core/File/DataStream.h"
+
+namespace PrCore {
 
 	class MemoryStream : public DataStream {
 	public:

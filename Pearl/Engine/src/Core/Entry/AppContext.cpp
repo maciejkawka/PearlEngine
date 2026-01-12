@@ -36,6 +36,8 @@
 #include "Physics/Shape/ITriangleMesh.h"
 #include "Physics/Resources/ConvexMeshLoader.h"
 #include "Physics/Resources/TriangleMeshLoader.h"
+
+#include "Core/Utils/SystemProvider.h"
 //
 
 const std::string_view GraphicConfig{ "config/graphic.cfg" };
@@ -61,26 +63,26 @@ PrCore::Entry::AppContext::AppContext()
 
 	//-----------------------
 	// Init File System
+	PRLOG_INFO("Initalizing FileSystem");
+
+	auto* pFileSystem = PrSystems::Register<FileSystem>();
 	std::string_view engineAssetsPath = "EngineAssets";
 	std::string_view gameAssetPath = "GameAssets";
 
-	File::FileSystem::Init();
-	auto filePtr = File::FileSystem::GetInstancePtr();
-
-	auto binView = filePtr->GetExecutablePath();
+	auto binView = pFileSystem->GetExecutablePath();
 	auto sanitized = PrCore::PathUtils::Sanitize(binView.data());
 
 	auto rootEngine = PrCore::PathUtils::RemoveSubFolderInPlace(sanitized, 2);
 	auto engineAssets = PrCore::PathUtils::MakePath(rootEngine, engineAssetsPath);
-	filePtr->SetEngineRoot(rootEngine);
-	filePtr->SetEngineAssetsPath(engineAssets);
-	filePtr->MountDir(engineAssets);
+	pFileSystem->SetEngineRoot(rootEngine);
+	pFileSystem->SetEngineAssetsPath(engineAssets);
+	pFileSystem->MountDir(engineAssets);
 
 	// This is going to be moved to PrGame system
 	auto gameAssets = PrCore::PathUtils::MakePath(rootEngine, gameAssetPath);
-	filePtr->SetGameAssetsPath(gameAssets);
-	filePtr->MountDir(gameAssets);
-	filePtr->SetWriteDir(gameAssets);
+	pFileSystem->SetGameAssetsPath(gameAssets);
+	pFileSystem->MountDir(gameAssets);
+	pFileSystem->SetWriteDir(gameAssets);
 
 	Events::EventManager::Init();
 	Resources::ResourceSystem::Init();
@@ -115,7 +117,7 @@ PrCore::Entry::AppContext::AppContext()
 	}
 	//-----------------------
 
-	File::ConfigFile contexConfig;
+	ConfigFile contexConfig;
 	if (contexConfig.OpenFromFile(GraphicConfig))
 	{
 		Windowing::WindowContext context;
@@ -142,7 +144,7 @@ PrCore::Entry::AppContext::AppContext()
 	m_rendererContext = new PrRenderer::OpenGL::GLContext();
 	m_rendererContext->Init();
 
-	File::ConfigFile rendererConfig;
+	ConfigFile rendererConfig;
 	if (rendererConfig.OpenFromFile(RendererConfig))
 	{
 		PrRenderer::Core::RendererSettings rendererSettings;
@@ -244,7 +246,7 @@ PrCore::Entry::AppContext::~AppContext()
 	Windowing::GLWindow::TerminateDevice();
 	Resources::ResourceSystem::Terminate();
 	Events::EventManager::Terminate();
-	File::FileSystem::Terminate();
+	PrSystems::Unregister<FileSystem>();
 	Threading::JobSystem::Terminate();
 	Threading::ThreadSystem::Terminate();
 	Utils::Clock::Terminate();

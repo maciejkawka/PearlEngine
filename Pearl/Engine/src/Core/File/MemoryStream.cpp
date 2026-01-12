@@ -2,7 +2,7 @@
 
 #include"Core/File/MemoryStream.h"
 
-using namespace PrCore::File;
+using namespace PrCore;
 
 MemoryStream::MemoryStream(void* p_data, size_t p_size) :
 	DataStream(),

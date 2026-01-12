@@ -1,7 +1,8 @@
 #pragma once
-#include<string>
 
-namespace PrCore::File {
+#include <string>
+
+namespace PrCore {
 
 	enum class DataAccess {
 		Write,
@@ -58,9 +59,9 @@ namespace PrCore::File {
 		virtual size_t Tell() = 0;
 
 	protected:
-		size_t m_size;
+		size_t      m_size;
 		std::string m_name;
-		DataAccess m_dataAccess;
-		bool m_autoDelete;
+		DataAccess  m_dataAccess;
+		bool        m_autoDelete;
 	};
 }

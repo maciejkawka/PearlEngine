@@ -14,14 +14,15 @@ using namespace physx;
 
 PrCore::Resources::IResourceDataPtr ConvexMeshLoader::LoadResource(const std::string& p_path)
 {
-	auto file = PrCore::File::FileSystem::GetInstancePtr()->FileOpen(p_path);
+	auto pFileSystem = PrSystems::Get<PrCore::FileSystem>();
+	auto file = pFileSystem->FileOpen(p_path);
 	if (!file)
 		return nullptr;
 
-	auto size = PrCore::File::FileSystem::GetInstancePtr()->FileSize(file);
+	auto size = pFileSystem->FileSize(file);
 	uint8_t* buff = new uint8_t[size];
-	PrCore::File::FileSystem::GetInstancePtr()->FileRead(file, buff, size);
-	PrCore::File::FileSystem::GetInstancePtr()->FileClose(file);
+	pFileSystem->FileRead(file, buff, size);
+	pFileSystem->FileClose(file);
 
 	auto convexMeshPtr = PhysicsSystem::GetInstancePtr()->CreateConvexMesh(buff, size);
 	delete[] buff;
@@ -54,12 +55,13 @@ bool ConvexMeshLoader::SaveResourceOnDisc(PrCore::Resources::IResourceDataPtr p_
 		return false;
 	}
 
-	auto file = PrCore::File::FileSystem::GetInstancePtr()->FileOpen(p_path, PrCore::File::OpenMode::Write);
+	auto pFileSystem = PrSystems::Get<PrCore::FileSystem>();
+	auto file = pFileSystem->FileOpen(p_path, PrCore::FileOpenMode::Write);
 	if (!file)
 		return false;
 
-	PrCore::File::FileSystem::GetInstancePtr()->FileWrite(file, outputStream.getData(), outputStream.getSize());
-	PrCore::File::FileSystem::GetInstancePtr()->FileClose(file);
+	pFileSystem->FileWrite(file, outputStream.getData(), outputStream.getSize());
+	pFileSystem->FileClose(file);
 
 	return true;
 }

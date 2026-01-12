@@ -1,12 +1,9 @@
 #pragma once
-#include<string>
+#include <string>
 
 #include "Core/Utils/JSONParser.h"
-#include"JSON/json.hpp"
 
-using json = nlohmann::json;
-
-namespace PrCore::File {
+namespace PrCore {
 
 	class ConfigFile {
 	public:
@@ -55,8 +52,8 @@ namespace PrCore::File {
 		}
 
 	private:
-		json        m_jsonFile;
-		std::string m_filePath;
+		Utils::JSON::json  m_jsonFile;
+		std::string        m_filePath;
 	};
 
 	template<>

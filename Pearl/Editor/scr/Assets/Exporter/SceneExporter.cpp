@@ -3,6 +3,7 @@
 #include "Core/Resources/ResourceSystem.h"
 #include "Core/File/FileSystem.h"
 #include "Core/Utils/PathUtils.h"
+#include "Core/Utils/SystemProvider.h"
 
 #include "Renderer/Resources/Mesh.h"
 #include "Renderer/Resources/MeshOBJLoader.h"
@@ -28,7 +29,7 @@ void BasicMeshExport(ResourceDescConstPtr p_resDesc, std::string_view p_exportRo
 			}
 			path += ".obj";
 
-			if (PrCore::File::FileSystem::GetInstance().FileExist(path))
+			if (PrSystems::Get<PrCore::FileSystem>()->FileExist(path))
 				return;
 
 			PrRenderer::Resources::MeshOBJLoader loader;
@@ -67,7 +68,7 @@ void BasicTextureExport(ResourceDescConstPtr p_resDesc, std::string_view p_expor
 			}
 			path += ".tga";
 
-			if (PrCore::File::FileSystem::GetInstance().FileExist(path))
+			if (PrSystems::Get<PrCore::FileSystem>()->FileExist(path))
 				return;
 
 			PrRenderer::Resources::Texture2DLoader loader;
@@ -99,7 +100,7 @@ void BasicMaterialExport(ResourceDescConstPtr p_resDesc, std::string_view p_expo
 		}
 		path += ".mat";
 
-		if (PrCore::File::FileSystem::GetInstance().FileExist(path))
+		if (PrSystems::Get<PrCore::FileSystem>()->FileExist(path))
 			return;
 
 		PrRenderer::Resources::MaterialLoader loader;
@@ -133,9 +134,9 @@ void SceneExporter::SaveMemoryResourcesToFile(std::string_view p_exportRoot)
 		BasicMaterialExport(p_resDesc, p_exportRoot);
 	};
 
-	if (!PrCore::File::FileSystem::GetInstance().FileExist(p_exportRoot))
+	if (!PrSystems::Get<PrCore::FileSystem>()->FileExist(p_exportRoot))
 	{
-		PrCore::File::FileSystem::GetInstance().CreateDir(p_exportRoot);
+		PrSystems::Get<PrCore::FileSystem>()->CreateDir(p_exportRoot);
 	}
 
 	PrCore::Resources::ResourceSystem::GetInstance().ForEachResource<PrRenderer::Resources::Mesh>(meshExporter);

@@ -56,7 +56,7 @@ namespace std {
 
 PrCore::Resources::IResourceDataPtr MeshOBJLoader::LoadResource(const std::string& p_path)
 {
-	auto file = PrCore::File::FileSystem::GetInstance().OpenFileWrapper(p_path);
+	auto file = PrSystems::Get<PrCore::FileSystem>()->OpenFileWrapper(p_path);
 	if (file == nullptr)
 		return nullptr;
 
@@ -335,12 +335,13 @@ bool MeshOBJLoader::SaveResourceOnDisc(PrCore::Resources::IResourceDataPtr p_res
 	if (blob == nullptr)
 		return false;
 
-	auto file = PrCore::File::FileSystem::GetInstance().FileOpen(p_path, PrCore::File::OpenMode::Write);
+	auto pFileSystem = PrSystems::Get<PrCore::FileSystem>();
+	auto file = pFileSystem->FileOpen(p_path, PrCore::FileOpenMode::Write);
 	if (file == nullptr)
 		return false;
 
-	PrCore::File::FileSystem::GetInstance().FileWrite(file, blob->data, blob->size);
-	PrCore::File::FileSystem::GetInstance().FileClose(file);
+	pFileSystem->FileWrite(file, blob->data, blob->size);
+	pFileSystem->FileClose(file);
 
 	return true;
 }

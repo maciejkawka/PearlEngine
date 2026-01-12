@@ -18,7 +18,7 @@ IResourceDataPtr BasicCubemapLoader::LoadResource(const std::string& p_path)
 	// Open cubemap asset file that contains 6 textures
 	std::vector<std::string> facesTexPaths;
 
-	auto file = PrCore::File::FileSystem::GetInstance().OpenFileWrapper(p_path);
+	auto file = PrSystems::Get<PrCore::FileSystem>()->OpenFileWrapper(p_path);
 	if (file == nullptr)
 		return nullptr;
 
@@ -99,7 +99,7 @@ unsigned char* BasicCubemapLoader::LoadTexture(const std::string& p_path, int& p
 	// Load textures
 	int channelsNumber = 0;
 
-	auto file = PrCore::File::FileSystem::GetInstance().OpenFileWrapper(p_path);
+	auto file = PrSystems::Get<PrCore::FileSystem>()->OpenFileWrapper(p_path);
 	if (file == nullptr)
 		return nullptr;
 

@@ -4,7 +4,7 @@
 
 #include "physfs/physfs.h"
 
-using namespace PrCore::File;
+using namespace PrCore;
 
 // Defined in the FileSystem.cpp
 extern PHYSFS_File* ToPhys(FileHandle p_handle);
@@ -14,7 +14,7 @@ PrFile::~PrFile()
 	PHYSFS_close(ToPhys(m_handle));
 }
 
-size_t PrCore::File::PrFile::Read(void* p_buffer, size_t p_length)
+size_t PrCore::PrFile::Read(void* p_buffer, size_t p_length)
 {
 	PR_ASSERT(p_buffer, "Buffer is invalid");
 
@@ -25,7 +25,7 @@ size_t PrCore::File::PrFile::Read(void* p_buffer, size_t p_length)
 	return readBytes;
 }
 
-int PrCore::File::PrFile::Seek(size_t p_pos)
+int PrCore::PrFile::Seek(size_t p_pos)
 {
 	int error = PHYSFS_seek(ToPhys(m_handle), p_pos);
 	if (!error)
@@ -34,7 +34,7 @@ int PrCore::File::PrFile::Seek(size_t p_pos)
 	return error;
 }
 
-int PrCore::File::PrFile::Tell()
+int PrCore::PrFile::Tell()
 {
 	int pos = PHYSFS_tell(ToPhys(m_handle));
 	if (pos == -1)
@@ -43,12 +43,12 @@ int PrCore::File::PrFile::Tell()
 	return pos;
 }
 
-bool PrCore::File::PrFile::IsEof()
+bool PrCore::PrFile::IsEof()
 {
 	return PHYSFS_eof(ToPhys(m_handle));
 }
 
-int PrCore::File::PrFile::GetSize()
+int PrCore::PrFile::GetSize()
 {
 	int size = PHYSFS_fileLength(ToPhys(m_handle));
 	if (size == -1)
@@ -57,7 +57,7 @@ int PrCore::File::PrFile::GetSize()
 	return size;
 }
 
-FileStats PrCore::File::PrFile::GetStat()
+FileStats PrCore::PrFile::GetStat()
 {
 	PHYSFS_Stat physStat;
 	if (!PHYSFS_stat(m_path.c_str(), &physStat))
@@ -79,7 +79,7 @@ FileStats PrCore::File::PrFile::GetStat()
 	}
 }
 
-void PrCore::File::PrFile::PrintError()
+void PrCore::PrFile::PrintError()
 {
 	PHYSFS_ErrorCode errorCode = PHYSFS_getLastErrorCode();
 	if (errorCode != PHYSFS_ErrorCode::PHYSFS_ERR_OK)

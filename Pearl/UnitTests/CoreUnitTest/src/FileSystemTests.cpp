@@ -3,8 +3,9 @@
 #include "Core/File/FileSystem.h"
 #include "Core/Utils/StringUtils.h"
 #include "Core/Utils/PathUtils.h"
+#include "Core/Utils/SystemProvider.h"
 
-using namespace PrCore::File;
+using namespace PrCore;
 
 const char* g_unitTestPath = "UnitTests";
 const char* g_subUnitTestPath = "UnitTests/SubFolder";
@@ -15,10 +16,10 @@ public:
 	{
 		//This will be replaced with mocked versions in the future when I implement system localizer 
 		PrCore::Utils::Logger::Init();
-		PrCore::File::FileSystem::Init();
+		PrSystems::Register<FileSystem>();
 
 		// Create UnitTests files
-		auto fileSystem = PrCore::File::FileSystem::GetInstancePtr();
+		auto fileSystem = PrSystems::Get<FileSystem>();
 		auto exePath = fileSystem->GetExecutablePath();
 		fileSystem->SetWriteDir(exePath);
 		fileSystem->MountDir(exePath);
@@ -29,7 +30,7 @@ public:
 		{
 			{
 				auto path = PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(i));
-				FileHandle handle = fileSystem->FileOpen(path, OpenMode::Write);
+				FileHandle handle = fileSystem->FileOpen(path, FileOpenMode::Write);
 				const char* text = "Test Text";
 				fileSystem->FileWrite(handle, text, strlen(text));
 				fileSystem->FileClose(handle);
@@ -39,7 +40,7 @@ public:
 
 			{
 				auto path = PrCore::PathUtils::MakePath(g_subUnitTestPath, PrCore::StringUtils::ToString(i * 10));
-				FileHandle handle = fileSystem->FileOpen(path, OpenMode::Write);
+				FileHandle handle = fileSystem->FileOpen(path, FileOpenMode::Write);
 				const char* text = "Test Text";
 				fileSystem->FileWrite(handle, text, strlen(text));
 				fileSystem->FileClose(handle);
@@ -52,7 +53,7 @@ public:
 	static void TearDownTestSuite()
 	{
 		// Delete UnitTests files
-		auto fileSystem = PrCore::File::FileSystem::GetInstancePtr();
+		auto fileSystem = PrSystems::Get<FileSystem>();
 		for (int i = 0; i < 10; i++)
 		{
 			{
@@ -73,16 +74,16 @@ public:
 		fileSystem->DeleteDir(g_unitTestPath);
 
 		//This will be replaced with mocked versions in the future when I implement system localizer 
-		PrCore::File::FileSystem::Terminate();
+		PrSystems::Unregister<FileSystem>();
 		PrCore::Utils::Logger::Terminate();
 	}
 };
 
 TEST_F(FileSystemTest, FileRead)
 {
-	auto fileSystem = FileSystem::GetInstancePtr();
+	auto fileSystem = PrSystems::Get<FileSystem>();
 
-	auto handle = fileSystem->FileOpen(PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(0)), OpenMode::Read);
+	auto handle = fileSystem->FileOpen(PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(0)), FileOpenMode::Read);
 	EXPECT_TRUE(handle);
 
 	int size = fileSystem->FileSize(handle);
@@ -122,7 +123,7 @@ TEST_F(FileSystemTest, FileRead)
 
 TEST_F(FileSystemTest, FileWrapper)
 {
-	auto fileSystem = FileSystem::GetInstancePtr();
+	auto fileSystem = PrSystems::Get<FileSystem>();
 
 	auto file = fileSystem->OpenFileWrapper(PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(0)));
 	EXPECT_TRUE(file);
@@ -165,7 +166,7 @@ TEST_F(FileSystemTest, FileWrapper)
 
 TEST_F(FileSystemTest, SystemFeatures)
 {
-	auto fileSystem = FileSystem::GetInstancePtr();
+	auto fileSystem = PrSystems::Get<FileSystem>();
 
 	// Check file
 	auto filePath = PrCore::PathUtils::MakePath(g_unitTestPath, PrCore::StringUtils::ToString(5));
@@ -222,7 +223,7 @@ TEST_F(FileSystemTest, SystemFeatures)
 
 TEST_F(FileSystemTest, BufferedWrite)
 {
-	auto fileSystem = FileSystem::GetInstancePtr();
+	auto fileSystem = PrSystems::Get<FileSystem>();
 
 	auto filePath = PrCore::PathUtils::MakePath(g_unitTestPath, "BufferedWrite.txt");
 	auto writeHandle = fileSystem->FileOpen(filePath, Write);
@@ -264,7 +265,7 @@ TEST_F(FileSystemTest, BufferedWrite)
 }
 TEST_F(FileSystemTest, MountPriority)
 {
-	auto fileSystem = FileSystem::GetInstancePtr();
+	auto fileSystem = PrSystems::Get<FileSystem>();
 	auto exePath = fileSystem->GetExecutablePath();
 	fileSystem->UnmountDir(exePath);
 
