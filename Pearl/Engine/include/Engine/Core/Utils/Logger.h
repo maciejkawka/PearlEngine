@@ -1,31 +1,20 @@
 #pragma once
-#include"spdlog/spdlog.h"
 
-#define PRLOG_DEBUG(...) PrCore::Utils::Logger::GetMainLogger()->debug(__VA_ARGS__)
-#define PRLOG_INFO(...) PrCore::Utils::Logger::GetMainLogger()->info(__VA_ARGS__)
-#define PRLOG_WARN(...) PrCore::Utils::Logger::GetMainLogger()->warn(__VA_ARGS__)
-#define PRLOG_ERROR(...) PrCore::Utils::Logger::GetMainLogger()->error(__VA_ARGS__)
-
-#define PRLOG_DEBUGF(...) PrCore::Utils::Logger::GetFileLogger()->debug(__VA_ARGS__)
-#define PRLOG_INFOF(...) PrCore::Utils::Logger::GetFileLogger()->info(__VA_ARGS__)
-#define PRLOG_WARNF(...) PrCore::Utils::Logger::GetFileLogger()->warn(__VA_ARGS__)
-#define PRLOG_ERRORF(...) PrCore::Utils::Logger::GetFileLogger()->error(__VA_ARGS__)
+#include "Core/Utils/ILogger.h"
 
 namespace PrCore::Utils {
 
-	class Logger {
+	class Logger final : public ILogger {
 	public:
-		Logger() = delete;
-		~Logger() = delete;
+		Logger();
+		virtual ~Logger();
 
-		static void Init();
-		static void Terminate();
-
-		inline static std::shared_ptr<spdlog::logger> GetMainLogger() { return s_mainLogger; }
-		inline static std::shared_ptr<spdlog::logger> GetFileLogger() { return s_fileLogger; }
+		void Log(std::string_view msg) override;
+		void Warning(std::string_view msg) override;
+		void Error(std::string_view msg) override;
 
 	private:
-		static std::shared_ptr<spdlog::logger> s_mainLogger;
-		static std::shared_ptr<spdlog::logger> s_fileLogger;
+		std::shared_ptr<spdlog::logger> m_mainLogger;
+		std::shared_ptr<spdlog::logger> m_fileLogger;
 	};
 }

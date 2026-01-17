@@ -8,6 +8,11 @@
 
 namespace PrCore
 {
+	namespace Utils
+	{
+		class ILogger;
+	}
+
 	class FileSystem;
 }
 
@@ -17,7 +22,8 @@ namespace PrCore
 // If system is not going to be replaced or mocked in unit tests just use the concrete implementation in here
 // There is no need to provide the interface if it is not necessery
 using EngineSystems = std::tuple<
-	PrCore::FileSystem
+	PrCore::FileSystem,
+	PrCore::Utils::ILogger
 >;
 
 // PrSystems is in global namespace for an easy usage. 
@@ -35,7 +41,7 @@ private:
 
 	template <class T, class U, class... Types>
 	struct SystemId<T, std::tuple<U, Types...>> {
-		static_assert(std::is_void_v<U>, "System does not exist!");
+		static_assert(SystemId<T, std::tuple<Types...>>::value < std::tuple_size_v<EngineSystems>, "System does not exist!");
 		static const std::size_t value = 1 + SystemId<T, std::tuple<Types...>>::value;
 	};
 
@@ -71,9 +77,8 @@ public:
 
 		if (pSystem)
 		{
-			Interface* instance = static_cast<Interface*>(pSystem);
 			m_systems[SystemId<Interface, EngineSystems>::value] = nullptr;
-			delete instance;
+			delete pSystem;
 		}
 	}
 

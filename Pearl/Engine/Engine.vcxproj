@@ -64,6 +64,7 @@
     <ClInclude Include="include\Engine\Core\Threading\JobWorker.h" />
     <ClInclude Include="include\Engine\Core\Threading\ThreadSystem.h" />
     <ClInclude Include="include\Engine\Core\Utils\Assert.h" />
+    <ClInclude Include="include\Engine\Core\Utils\ILogger.h" />
     <ClInclude Include="include\Engine\Core\Utils\ISerializable.h" />
     <ClInclude Include="include\Engine\Core\Utils\ISystem.h" />
     <ClInclude Include="include\Engine\Core\Utils\JSONParser.h" />
@@ -176,6 +177,7 @@
     <ClCompile Include="src\Core\Threading\JobSystem.cpp" />
     <ClCompile Include="src\Core\Threading\JobWorker.cpp" />
     <ClCompile Include="src\Core\Threading\ThreadSystem.cpp" />
+    <ClCompile Include="src\Core\Utils\Assert.cpp" />
     <ClCompile Include="src\Core\Utils\Clock.cpp" />
     <ClCompile Include="src\Core\Utils\JSONParser.cpp" />
     <ClCompile Include="src\Core\Utils\Logger.cpp" />

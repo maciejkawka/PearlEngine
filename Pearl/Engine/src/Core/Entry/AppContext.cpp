@@ -48,7 +48,7 @@ PrCore::Entry::AppContext::AppContext()
 	m_window = nullptr;
 	m_rendererContext = nullptr;
 
-	Utils::Logger::Init();
+	PrSystems::Register<PrCore::Utils::ILogger, PrCore::Utils::Logger>();
 	Utils::Clock::Init();
 	PRLOG_INFO("Building AppContext");
 
@@ -250,4 +250,5 @@ PrCore::Entry::AppContext::~AppContext()
 	Threading::JobSystem::Terminate();
 	Threading::ThreadSystem::Terminate();
 	Utils::Clock::Terminate();
+	PrSystems::Unregister<PrCore::Utils::ILogger>();
 }

@@ -1,4 +1,5 @@
-#include <CommonUnitTest/Common/common.h>
+#include "CommonUnitTest/Common/common.h"
+#include "CommonUnitTest/Mocking/Core/Logger.h"
 
 #include "Core/File/FileSystem.h"
 #include "Core/Utils/StringUtils.h"
@@ -15,7 +16,7 @@ public:
 	static void SetUpTestSuite()
 	{
 		//This will be replaced with mocked versions in the future when I implement system localizer 
-		PrCore::Utils::Logger::Init();
+		PrSystems::Register<PrCore::Utils::ILogger, Mock::MockLogger>();
 		PrSystems::Register<FileSystem>();
 
 		// Create UnitTests files
@@ -75,7 +76,7 @@ public:
 
 		//This will be replaced with mocked versions in the future when I implement system localizer 
 		PrSystems::Unregister<FileSystem>();
-		PrCore::Utils::Logger::Terminate();
+		PrSystems::Unregister<PrCore::Utils::ILogger>();
 	}
 };
 

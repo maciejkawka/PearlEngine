@@ -6,36 +6,51 @@
 
 using namespace PrCore::Utils;
 
-std::shared_ptr<spdlog::logger> Logger::s_mainLogger = nullptr;
-std::shared_ptr<spdlog::logger> Logger::s_fileLogger = nullptr;
-
-void Logger::Init()
+Logger::Logger()
 {
 	//Main logger
 	auto consoleSink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
 	consoleSink->set_pattern("<%T> %v%$");
 
-	s_mainLogger = std::make_shared<spdlog::logger>("Pearl", consoleSink);
-	s_mainLogger->flush_on(spdlog::level::debug);
-	s_mainLogger->set_level(spdlog::level::debug);
-	spdlog::register_logger(s_mainLogger);
+	m_mainLogger = std::make_shared<spdlog::logger>("Pearl", consoleSink);
+	m_mainLogger->flush_on(spdlog::level::debug);
+	m_mainLogger->set_level(spdlog::level::debug);
+	spdlog::register_logger(m_mainLogger);
 
 	//File logger
 	auto fileName = "Logging/PearlLog.log";
 	auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(fileName, true);
 	fileSink->set_pattern("<%T> %v%$");
-	s_fileLogger = std::make_shared<spdlog::logger>("Pearl_File", fileSink);
-	s_fileLogger->flush_on(spdlog::level::debug);
-	s_fileLogger->set_level(spdlog::level::debug);
-	spdlog::register_logger(s_fileLogger);
+	m_fileLogger = std::make_shared<spdlog::logger>("Pearl_File", fileSink);
+	m_fileLogger->flush_on(spdlog::level::debug);
+	m_fileLogger->set_level(spdlog::level::debug);
+	spdlog::register_logger(m_fileLogger);
 
-	PRLOG_INFO("Init Logger");
+	Log("Init Logger");
 }
 
-void Logger::Terminate()
+Logger::~Logger()
 {
-	s_mainLogger.reset();
-	s_fileLogger.reset();
+	m_mainLogger.reset();
+	m_fileLogger.reset();
 
 	spdlog::shutdown();
+}
+
+void Logger::Log(std::string_view msg)
+{
+	m_mainLogger->info(msg);
+	m_fileLogger->info(msg);
+}
+
+void Logger::Warning(std::string_view msg)
+{
+	m_mainLogger->warn(msg);
+	m_fileLogger->warn(msg);
+}
+
+void Logger::Error(std::string_view msg)
+{
+	m_mainLogger->error(msg);
+	m_fileLogger->error(msg);
 }

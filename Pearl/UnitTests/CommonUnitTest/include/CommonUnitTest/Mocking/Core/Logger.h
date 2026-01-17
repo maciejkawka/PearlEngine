@@ -1,11 +1,15 @@
 #pragma once
 
-#define PRLOG_DEBUG(...)
-#define PRLOG_INFO(...)
-#define PRLOG_WARN(...)
-#define PRLOG_ERROR(...)
+#include "CommonUnitTest/Common/common.h"
+#include "Core/Utils/ILogger.h"
 
-#define PRLOG_DEBUGF(...)
-#define PRLOG_INFOF(...)
-#define PRLOG_WARNF(...)
-#define PRLOG_ERRORF(...)
+#include <string>
+
+namespace Mock {
+
+	class MockLogger : public PrCore::Utils::ILogger {
+		void Log(std::string_view msg) override {}
+		void Warning(std::string_view msg) override {}
+		void Error(std::string_view msg) override { GTEST_FATAL_FAILURE_(std::string{ msg }.data()); }
+	};
+}

@@ -1,8 +1,8 @@
-#include <CommonUnitTest/Common/common.h>
+#include "CommonUnitTest/Common/common.h"
+#include "CommonUnitTest/Mocking/Core/Logger.h"
 
 #include "Core/Threading/ThreadSystem.h"
 #include "Core/Threading/JobSystem.h"
-#include "Core/Utils/Logger.h"
 #include "Core/Utils/StringUtils.h"
 
 #include <future>
@@ -14,7 +14,7 @@ public:
 	static void SetUpTestSuite()
 	{
 		//This will be replaced with mocked versions in the future when I implement system localizer 
-		PrCore::Utils::Logger::Init();
+		PrSystems::Register<PrCore::Utils::ILogger, Mock::MockLogger>();
 		PrCore::Threading::ThreadSystem::Init();
 		PrCore::Threading::JobSystem::Init(8);
 
@@ -27,7 +27,7 @@ public:
 		//This will be replaced with mocked versions in the future when I implement system localizer 
 		PrCore::Threading::JobSystem::Terminate();
 		PrCore::Threading::ThreadSystem::Terminate();
-		PrCore::Utils::Logger::Terminate();
+		PrSystems::Unregister<PrCore::Utils::ILogger>();
 	}
 };
 

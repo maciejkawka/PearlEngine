@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Utils/Assert.h"
+#include "Core/Utils/ILogger.h"
 
 namespace PrCore::Utils {
 

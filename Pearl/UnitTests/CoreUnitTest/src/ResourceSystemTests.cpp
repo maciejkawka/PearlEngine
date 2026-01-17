@@ -1,12 +1,12 @@
-#include <CommonUnitTest/Common/common.h>
+#include "CommonUnitTest/Common/common.h"
+#include "CommonUnitTest/Mocking/Core/Logger.h"
 
 #include "Core/Resources/IResourceDataLoader.h"
 #include "Core/Resources/IResource.h"
 #include "Core/Resources/ResourceDatabase.h"
 #include "Core/Resources/ResourceSystem.h"
 
-#include"Core/Utils/UUID.h"
-#include "Core/Utils/Logger.h"
+#include "Core/Utils/UUID.h"
 #include "Core/Events/EventManager.h"
 
 using namespace PrCore::Resources;
@@ -99,7 +99,7 @@ public:
 	static void SetUpTestSuite()
 	{
 		//This will be replaced with mocked versions in the future when I implement system localizer 
-		PrCore::Utils::Logger::Init();
+		PrSystems::Register<PrCore::Utils::ILogger, Mock::MockLogger>();
 		PrCore::Events::EventManager::Init();
 	}
 
@@ -107,7 +107,7 @@ public:
 	{
 		//This will be replaced with mocked versions in the future when I implement system localizer 
 		PrCore::Events::EventManager::Terminate();
-		PrCore::Utils::Logger::Terminate();
+		PrSystems::Unregister<PrCore::Utils::ILogger>();
 	}
 };
 
