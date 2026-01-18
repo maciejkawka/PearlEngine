@@ -1,14 +1,15 @@
 #pragma once
-#include"Core/Utils/Singleton.h"
 
-#include<chrono>
+#include "Core/Utils/SystemProvider.h"
+
+#include <chrono>
 
 namespace PrCore::Utils {
 
-	class Clock : public Singleton<Clock> {
+	class Clock : public Utils::ISystem {
 	public:
 		Clock();
-		~Clock() = default;
+		virtual ~Clock() = default;
 
 		float GetDeltaTime() const;
 

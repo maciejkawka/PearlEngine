@@ -10,6 +10,7 @@ namespace PrCore
 {
 	namespace Utils
 	{
+		class Clock;
 		class ILogger;
 	}
 
@@ -23,6 +24,7 @@ namespace PrCore
 // There is no need to provide the interface if it is not necessery
 using EngineSystems = std::tuple<
 	PrCore::FileSystem,
+	PrCore::Utils::Clock,
 	PrCore::Utils::ILogger
 >;
 

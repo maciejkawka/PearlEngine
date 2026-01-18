@@ -1,10 +1,10 @@
-#include"Core/Common/pearl_pch.h"
+#include "Core/Common/pearl_pch.h"
 
 #include "Core/Entry/Application.h"
-#include"Core/Entry/AppContext.h"
-#include"Core/Events/WindowEvents.h"
-#include"Core/Events/EventManager.h"
-#include"Core/Utils/Clock.h"
+#include "Core/Entry/AppContext.h"
+#include "Core/Events/WindowEvents.h"
+#include "Core/Events/EventManager.h"
+#include "Core/Utils/Clock.h"
 
 using namespace PrCore::Entry;
 
@@ -21,11 +21,10 @@ void Application::Run()
 	{
 		PreFrame();
 		if (!m_minimalized)
-			OnFrame(Utils::Clock::GetInstance().GetUnscaledDeltaTime());
+			OnFrame(PrSystems::Get<Utils::Clock>()->GetUnscaledDeltaTime());
 		PostFrame();
 
-		//PRLOG_INFO("{0}", gameClock.GetRealTime());
-		Utils::Clock::GetInstance().Tick();
+		PrSystems::Get<Utils::Clock>()->Tick();
 	}
 }
 

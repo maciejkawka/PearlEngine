@@ -1,11 +1,13 @@
 #pragma once
-#include"Core/Events/Event.h"
-#include"Core/Utils/NonCopyable.h"
+
+#include "Core/Events/Event.h"
+#include "Core/Utils/NonCopyable.h"
+
 namespace PrCore::Entry {
 
 	class AppContext;
 
-	class Application: public Utils::NonCopyable {
+	class Application : public Utils::NonCopyable {
 	public:
 		Application();
 
@@ -20,7 +22,7 @@ namespace PrCore::Entry {
 		virtual void OnFrame(float p_deltaTime) = 0;
 
 		virtual void PostFrame() = 0;
-	
+
 	private:
 		void OnWindowClose(Events::EventPtr p_event);
 
@@ -28,7 +30,7 @@ namespace PrCore::Entry {
 
 	protected:
 		AppContext* m_appContext;
-		bool m_shouldClose;
-		bool m_minimalized;
+		bool          m_shouldClose;
+		bool          m_minimalized;
 	};
 }

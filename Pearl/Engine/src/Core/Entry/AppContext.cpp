@@ -49,11 +49,12 @@ PrCore::Entry::AppContext::AppContext()
 	m_rendererContext = nullptr;
 
 	PrSystems::Register<PrCore::Utils::ILogger, PrCore::Utils::Logger>();
-	Utils::Clock::Init();
 	PRLOG_INFO("Building AppContext");
+	
+	PRLOG_INFO("Init Clock");
+	PrSystems::Register<PrCore::Utils::Clock>();
 
-
-
+	
 	//Init Engine Subsystems
 
 	//-----------------------
@@ -249,6 +250,6 @@ PrCore::Entry::AppContext::~AppContext()
 	PrSystems::Unregister<FileSystem>();
 	Threading::JobSystem::Terminate();
 	Threading::ThreadSystem::Terminate();
-	Utils::Clock::Terminate();
+	PrSystems::Unregister<PrCore::Utils::Clock>();
 	PrSystems::Unregister<PrCore::Utils::ILogger>();
 }

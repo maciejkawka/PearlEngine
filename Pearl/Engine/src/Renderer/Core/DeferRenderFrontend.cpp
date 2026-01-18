@@ -4,6 +4,7 @@
 
 #include"Core/ECS/ECS.h"
 #include"Core/Utils/Clock.h"
+#include"Core/Utils/SystemProvider.h"
 
 #include "Renderer/Core/DeferRenderBackend.h"
 #include "Renderer/Core/BoundingVolume.h"
@@ -264,7 +265,7 @@ void DeferRenderFrontend::BuildFrame()
 	//Send objects to the backend renderer
 	m_rendererBackend->SetFrame(m_currentFrame);
 
-	m_currentFrame->frameInfo.frameTimeStamp = Utils::Clock::GetInstance().GetRealTime();
+	m_currentFrame->frameInfo.frameTimeStamp = PrSystems::Get<PrCore::Utils::Clock>()->GetRealTime();
 	m_currentFrame->frameInfo.frameID = m_frameID++;
 }
 

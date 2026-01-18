@@ -53,7 +53,7 @@ namespace PrRenderer::Core
 
 		// Temp variables
 		const auto camera = m_frame->camera;
-		auto clock = PrCore::Utils::Clock::GetInstancePtr();
+		auto clock = PrSystems::Get<PrCore::Utils::Clock>();
 		m_renderContext.frameInfo = &m_frame->frameInfo;
 		m_renderContext.camera = camera;
 		m_renderContext.camera->RecalculateMatrices();
