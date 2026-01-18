@@ -1,6 +1,6 @@
 #pragma once
 
-namespace PrCore::Threading {
+namespace PrCore {
 
 	class ThreadSystem;
 

@@ -1,12 +1,12 @@
 #pragma once
 
 #include "IThread.h"
-#include "Core/Utils/Singleton.h"
+#include "Core/Utils/SystemProvider.h"
 
 #include <shared_mutex>
 #include <string>
 
-namespace PrCore::Threading {
+namespace PrCore {
 
 	// Basic thread info stored in the ThreadSystem
 	struct ThreadInfo
@@ -26,9 +26,10 @@ namespace PrCore::Threading {
 		bool        startPaused = false;
 	};
 
-	class ThreadSystem : public Utils::Singleton<ThreadSystem> {
+	class ThreadSystem : public Utils::ISystem {
 	public:
-		~ThreadSystem();
+		ThreadSystem() = default;
+		virtual ~ThreadSystem();
 
 		bool SpawnThread(IThreadPtr p_thread, const ThreadConfig& p_desc);
 		void JoinThread(IThreadPtr p_thread);

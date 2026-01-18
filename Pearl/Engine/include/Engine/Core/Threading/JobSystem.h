@@ -3,11 +3,13 @@
 #include "JobDefines.h"
 #include "JobWorker.h"
 
-#include "Core/Utils/Singleton.h"
+#include "Core/Utils/SystemProvider.h"
 
-namespace PrCore::Threading {
+namespace PrCore {
 
-	class JobSystem : public Utils::Singleton<JobSystem> {
+	class ThreadSystem;
+
+	class JobSystem : public Utils::ISystem {
 	public:
 		JobSystem(size_t p_workerNumber);
 		~JobSystem();
@@ -31,6 +33,9 @@ namespace PrCore::Threading {
 		std::atomic<bool>         m_paused;
 
 		std::atomic<size_t>       m_nextJobId;
+
+		// Dependency
+		ThreadSystem*             m_threadsystem{ nullptr };
 	};
 }
 

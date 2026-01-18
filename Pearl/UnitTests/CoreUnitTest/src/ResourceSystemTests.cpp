@@ -6,8 +6,8 @@
 #include "Core/Resources/ResourceDatabase.h"
 #include "Core/Resources/ResourceSystem.h"
 
-#include "Core/Utils/UUID.h"
 #include "Core/Events/EventManager.h"
+#include "Core/Utils/UUID.h"
 
 using namespace PrCore::Resources;
 

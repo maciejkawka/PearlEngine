@@ -14,7 +14,9 @@ namespace PrCore
 		class ILogger;
 	}
 
+	class JobSystem;
 	class FileSystem;
+	class ThreadSystem;
 }
 
 // Tuple with all systems used in the engine,
@@ -24,6 +26,8 @@ namespace PrCore
 // There is no need to provide the interface if it is not necessery
 using EngineSystems = std::tuple<
 	PrCore::FileSystem,
+	PrCore::JobSystem,
+	PrCore::ThreadSystem,
 	PrCore::Utils::Clock,
 	PrCore::Utils::ILogger
 >;

@@ -5,7 +5,7 @@
 
 #include <optional>
 
-namespace PrCore::Threading {
+namespace PrCore {
 
 	class JobWorker : public IThread {
 	public:

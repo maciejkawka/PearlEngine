@@ -15,7 +15,6 @@ class FileSystemTest : public ::testing::Test {
 public:
 	static void SetUpTestSuite()
 	{
-		//This will be replaced with mocked versions in the future when I implement system localizer 
 		PrSystems::Register<PrCore::Utils::ILogger, Mock::MockLogger>();
 		PrSystems::Register<FileSystem>();
 
@@ -74,7 +73,6 @@ public:
 		fileSystem->DeleteDir(g_subUnitTestPath);
 		fileSystem->DeleteDir(g_unitTestPath);
 
-		//This will be replaced with mocked versions in the future when I implement system localizer 
 		PrSystems::Unregister<FileSystem>();
 		PrSystems::Unregister<PrCore::Utils::ILogger>();
 	}

@@ -45,7 +45,7 @@ void BasicMeshExport(ResourceDescConstPtr p_resDesc, std::string_view p_exportRo
 			p_resDesc->filePath = path;
 		};
 
-		PrCore::Threading::JobSystem::GetInstance().Schedule("Export Mesh", lambda);
+		PrSystems::Get<PrCore::JobSystem>()->Schedule("Export Mesh", lambda);
 	}
 }
 
@@ -84,7 +84,7 @@ void BasicTextureExport(ResourceDescConstPtr p_resDesc, std::string_view p_expor
 			p_resDesc->filePath = path;
 		};
 
-		PrCore::Threading::JobSystem::GetInstance().Schedule("Export Texture", lambda);
+		PrSystems::Get<PrCore::JobSystem>()->Schedule("Export Texture", lambda);
 	}
 }
 
@@ -141,6 +141,6 @@ void SceneExporter::SaveMemoryResourcesToFile(std::string_view p_exportRoot)
 
 	PrCore::Resources::ResourceSystem::GetInstance().ForEachResource<PrRenderer::Resources::Mesh>(meshExporter);
 	PrCore::Resources::ResourceSystem::GetInstance().ForEachResource<PrRenderer::Resources::Texture>(textureExporter);
-	PrCore::Threading::JobSystem::GetInstance().WaitAll();
+	PrSystems::Get<PrCore::JobSystem>()->WaitAll();
 	PrCore::Resources::ResourceSystem::GetInstance().ForEachResource<PrRenderer::Resources::Material>(materialExporter);
 }

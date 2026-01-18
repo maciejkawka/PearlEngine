@@ -2,7 +2,7 @@
 
 #include "Core/Threading/JobWorker.h"
 
-using namespace PrCore::Threading;
+using namespace PrCore;
 
 JobWorker::JobWorker(std::string_view p_name) :
 	m_id(0),

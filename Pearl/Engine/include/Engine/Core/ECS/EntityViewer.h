@@ -17,10 +17,10 @@ namespace PrCore::ECS {
 	}
 
 	template<typename T, typename Func>
-	Threading::BatchJobState ScheduleBatchJobWork(T itBegin, T itEnd, size_t batchSize, Func funcPtr)
+	BatchJobState ScheduleBatchJobWork(T itBegin, T itEnd, size_t batchSize, Func funcPtr)
 	{
-		auto jobPtr = Threading::JobSystem::GetInstancePtr();
-		Threading::BatchJobState batchState;
+		auto jobPtr = PrSystems::Get<JobSystem>();
+		BatchJobState batchState;
 		while (itBegin != itEnd)
 		{
 			batchState += jobPtr->Schedule("ECS_Batch_Work", &JobBatchWork<T, Func>, itBegin, itEnd, batchSize, funcPtr);
@@ -104,7 +104,7 @@ namespace PrCore::ECS {
 			auto viewIt = entityView.begin();
 
 			// Run only same generation children in parallel
-			Threading::BatchJobState batchJobState;
+			BatchJobState batchJobState;
 			auto vecIt = m_entityManager->m_hierarchicalEntites.begin();
 			auto vecItEnd = m_entityManager->m_hierarchicalEntites.end();
 			while (vecIt != vecItEnd)
@@ -145,7 +145,7 @@ namespace PrCore::ECS {
 			auto viewIt = entityView.begin();
 
 			// Run only same generation children in parallel
-			Threading::BatchJobState batchJobState;
+			BatchJobState batchJobState;
 			auto vecIt = m_entityManager->m_hierarchicalEntites.begin();
 			auto vecItEnd = m_entityManager->m_hierarchicalEntites.end();
 			while (vecIt != vecItEnd)

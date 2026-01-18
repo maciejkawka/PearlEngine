@@ -1,4 +1,4 @@
-namespace PrCore::Threading {
+namespace PrCore {
 
 	template<typename Func, typename... Args>
 	JobStatePtr JobSystem::Schedule(std::string_view p_name, Func&& p_function, Args&&... p_args)

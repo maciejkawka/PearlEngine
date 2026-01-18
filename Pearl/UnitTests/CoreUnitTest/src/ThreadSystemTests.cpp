@@ -6,7 +6,7 @@
 
 #include <future>
 
-using namespace PrCore::Threading;
+using namespace PrCore;
 
 class TestThread : public IThread
 {
@@ -58,23 +58,21 @@ protected:
 class ThreadingSystemTest : public ::testing::Test {
 public:
 	static void SetUpTestSuite()
-	{
-		//This will be replaced with mocked versions in the future when I implement system localizer 
+	{ 
 		PrSystems::Register<PrCore::Utils::ILogger, Mock::MockLogger>();
-		PrCore::Threading::ThreadSystem::Init();
+		PrSystems::Register<ThreadSystem>();
 	}
 
 	static void TearDownTestSuite()
 	{
-		//This will be replaced with mocked versions in the future when I implement system localizer 
-		PrCore::Threading::ThreadSystem::Terminate();
+		PrSystems::Unregister<PrCore::ThreadSystem>();
 		PrSystems::Unregister<PrCore::Utils::ILogger>();
 	}
 };
 
 TEST_F(ThreadingSystemTest, SpawnThread)
 {
-	auto threadingSystem = PrCore::Threading::ThreadSystem::GetInstancePtr();
+	auto threadingSystem = PrSystems::Get<PrCore::ThreadSystem>();
 
 	auto thread = std::make_shared<TestThread>();
 	ThreadConfig config;
@@ -106,7 +104,7 @@ TEST_F(ThreadingSystemTest, SpawnThread)
 
 TEST_F(ThreadingSystemTest, JoinThread)
 {
-	auto threadingSystem = PrCore::Threading::ThreadSystem::GetInstancePtr();
+	auto threadingSystem = PrSystems::Get<PrCore::ThreadSystem>();
 
 	auto thread = std::make_shared<TestThread>();
 	ThreadConfig config;
@@ -158,7 +156,7 @@ TEST_F(ThreadingSystemTest, JoinThread)
 TEST_F(ThreadingSystemTest, ThreadInfo)
 {
 	const char* threadName = "TestThread";
-	auto threadingSystem = PrCore::Threading::ThreadSystem::GetInstancePtr();
+	auto threadingSystem = PrSystems::Get<PrCore::ThreadSystem>();
 
 	auto thread = std::make_shared<TestThread>();
 	ThreadConfig config;
@@ -184,7 +182,7 @@ TEST_F(ThreadingSystemTest, StressTest)
 	const int threadNumber = 20;
 	const auto waitTime = 500ms;
 
-	auto threadingSystem = PrCore::Threading::ThreadSystem::GetInstancePtr();
+	auto threadingSystem = PrSystems::Get<PrCore::ThreadSystem>();
 	// Aggressively spawn and terminate threads, this is to spot issues with thread registry and data racing 
 	for(int i=0;i<10;i++)
 	{

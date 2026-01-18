@@ -48,19 +48,21 @@ PrCore::Entry::AppContext::AppContext()
 	m_window = nullptr;
 	m_rendererContext = nullptr;
 
+	//Init Engine Subsystems
 	PrSystems::Register<PrCore::Utils::ILogger, PrCore::Utils::Logger>();
 	PRLOG_INFO("Building AppContext");
 	
 	PRLOG_INFO("Init Clock");
 	PrSystems::Register<PrCore::Utils::Clock>();
 
-	
-	//Init Engine Subsystems
-
 	//-----------------------
 	// Init threading
-	Threading::ThreadSystem::Init();
-	Threading::JobSystem::Init(10);
+	PRLOG_INFO("Init Thread System");
+	PrSystems::Register<ThreadSystem>();
+
+	const int workerCount = 10;
+	PRLOG_INFO("Init Job System with {} Job Workers", workerCount);
+	PrSystems::Register<JobSystem>(workerCount);
 
 	//-----------------------
 	// Init File System
@@ -248,8 +250,8 @@ PrCore::Entry::AppContext::~AppContext()
 	Resources::ResourceSystem::Terminate();
 	Events::EventManager::Terminate();
 	PrSystems::Unregister<FileSystem>();
-	Threading::JobSystem::Terminate();
-	Threading::ThreadSystem::Terminate();
+	PrSystems::Unregister<JobSystem>();
+	PrSystems::Unregister<ThreadSystem>();
 	PrSystems::Unregister<PrCore::Utils::Clock>();
 	PrSystems::Unregister<PrCore::Utils::ILogger>();
 }

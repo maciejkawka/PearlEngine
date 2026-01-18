@@ -7,7 +7,7 @@
 
 #define JOB_SYSTEM_DEBUG_LOG 0
 
-namespace PrCore::Threading {
+namespace PrCore {
 	class JobWorker;
 
 	class JobState {

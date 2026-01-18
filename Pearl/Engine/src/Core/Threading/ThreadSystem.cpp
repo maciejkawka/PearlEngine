@@ -4,7 +4,7 @@
 
 #include <windows.h>
 
-namespace PrCore::Threading {
+namespace PrCore {
 	DWORD WINAPI ThreadEntry(LPVOID p_thread)
 	{
 		auto threadPtr = *static_cast<IThreadPtr*>(p_thread);
@@ -12,7 +12,7 @@ namespace PrCore::Threading {
 
 		// Remove thread from the registry when terminated
 		{
-			auto threadSystem = ThreadSystem::GetInstancePtr();
+			auto threadSystem = PrSystems::Get<ThreadSystem>();;
 			std::lock_guard lock{ threadSystem->m_activeThreadLock };
 			auto it = threadSystem->m_activeThreads.find(threadPtr);
 			if (it == threadSystem->m_activeThreads.end())
@@ -32,7 +32,7 @@ namespace PrCore::Threading {
 	}
 }
 
-using namespace PrCore::Threading;
+using namespace PrCore;
 
 ThreadSystem::~ThreadSystem()
 {
@@ -73,7 +73,7 @@ bool ThreadSystem::SpawnThread(IThreadPtr p_thread, const ThreadConfig& p_config
 	DWORD threadId = 0;
 	HANDLE threadHandle = ::CreateThread(NULL,
 		p_config.stackSize * 1024,
-		PrCore::Threading::ThreadEntry,
+		PrCore::ThreadEntry,
 		heapSharedPtr,
 		0,
 		&threadId

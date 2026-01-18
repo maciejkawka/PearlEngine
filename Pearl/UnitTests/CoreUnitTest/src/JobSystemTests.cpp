@@ -7,26 +7,24 @@
 
 #include <future>
 
-using namespace PrCore::Threading;
+using namespace PrCore;
 
 class JobSystemTest : public ::testing::Test {
 public:
 	static void SetUpTestSuite()
 	{
-		//This will be replaced with mocked versions in the future when I implement system localizer 
 		PrSystems::Register<PrCore::Utils::ILogger, Mock::MockLogger>();
-		PrCore::Threading::ThreadSystem::Init();
-		PrCore::Threading::JobSystem::Init(8);
+		PrSystems::Register<PrCore::ThreadSystem>();
+		auto pJobSystem = PrSystems::Register<PrCore::JobSystem>(8);
 
-		auto workerNum = PrCore::Threading::JobSystem::GetInstance().GetWorkerNum();
+		auto workerNum = pJobSystem->GetWorkerNum();
 		EXPECT_EQ(workerNum, 8);
 	}
 
 	static void TearDownTestSuite()
 	{
-		//This will be replaced with mocked versions in the future when I implement system localizer 
-		PrCore::Threading::JobSystem::Terminate();
-		PrCore::Threading::ThreadSystem::Terminate();
+		PrSystems::Unregister<JobSystem>();
+		PrSystems::Unregister<ThreadSystem>();
 		PrSystems::Unregister<PrCore::Utils::ILogger>();
 	}
 };
@@ -49,7 +47,7 @@ public:
 
 TEST_F(JobSystemTest, ScheduleJob)
 {
-	auto jobPtr = JobSystem::GetInstancePtr();
+	auto jobPtr = PrSystems::Get<JobSystem>();
 
 	// Free function
 	auto state = jobPtr->Schedule("FreeFunction", &JobFunction, 50);
@@ -84,7 +82,7 @@ TEST_F(JobSystemTest, ScheduleJob)
 
 TEST_F(JobSystemTest, PauseWaitAllJobs)
 {
-	auto jobPtr = JobSystem::GetInstancePtr();
+	auto jobPtr = PrSystems::Get<JobSystem>();
 	jobPtr->PauseWorkers(true);
 
 	std::atomic<int> value = 0;
@@ -108,7 +106,7 @@ TEST_F(JobSystemTest, PauseWaitAllJobs)
 
 TEST_F(JobSystemTest, StressTest)
 {
-	auto jobPtr = JobSystem::GetInstancePtr();
+	auto jobPtr = PrSystems::Get<JobSystem>();
 
 	std::atomic<int> value = 0;
 	auto lambda = [&]() {
@@ -141,7 +139,7 @@ TEST_F(JobSystemTest, StressTest)
 
 TEST_F(JobSystemTest, JobStealing)
 {
-	auto jobPtr = JobSystem::GetInstancePtr();
+	auto jobPtr = PrSystems::Get<JobSystem>();
 
 	std::atomic<int> value = 0;
 
@@ -177,7 +175,7 @@ TEST_F(JobSystemTest, JobStealing)
 
 TEST_F(JobSystemTest, TerminatePaused)
 {
-	auto jobPtr = JobSystem::GetInstancePtr();
+	auto jobPtr = PrSystems::Get<JobSystem>();
 
 	std::atomic<int> value = 0;
 	auto lambda = [&]() {
@@ -187,14 +185,14 @@ TEST_F(JobSystemTest, TerminatePaused)
 	};
 
 	jobPtr->PauseWorkers(true);
-	jobPtr->Schedule("lambda",lambda);
-	jobPtr->Schedule("lambda",lambda);
-	jobPtr->Schedule("lambda",lambda);
-	jobPtr->Schedule("lambda",lambda);
+	jobPtr->Schedule("lambda", lambda);
+	jobPtr->Schedule("lambda", lambda);
+	jobPtr->Schedule("lambda", lambda);
+	jobPtr->Schedule("lambda", lambda);
 
 	EXPECT_EQ(value, 0);
-	PrCore::Threading::JobSystem::Terminate();
+	PrSystems::Unregister<JobSystem>();
 	EXPECT_EQ(value, 4);
 
-	PrCore::Threading::JobSystem::Init(8);
+	PrSystems::Register<JobSystem>(8);
 }

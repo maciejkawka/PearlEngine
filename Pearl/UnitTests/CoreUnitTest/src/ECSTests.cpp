@@ -1,12 +1,12 @@
 #include "CommonUnitTest/Common/common.h"
 #include "CommonUnitTest/Mocking/Core/Logger.h"
 
-#include "Core/Utils/StringUtils.h"
+#include "Core/ECS/ECS.h"
 #include "Core/Threading/ThreadSystem.h"
 #include "Core/Threading/JobSystem.h"
-#include "Core/Utils/SystemProvider.h"
-#include "Core/ECS/ECS.h"
 #include "Core/Utils/JSONParser.h"
+#include "Core/Utils/StringUtils.h"
+#include "Core/Utils/SystemProvider.h"
 
 using namespace PrCore::ECS;
 
@@ -16,12 +16,12 @@ public:
 	{
 		//This will be replaced with mocked versions in the future when I implement system localizer 
 		PrSystems::Register<PrCore::Utils::ILogger, Mock::MockLogger>();
-		PrCore::Threading::ThreadSystem::Init();
-		PrCore::Threading::JobSystem::Init(8);
+		PrSystems::Register<PrCore::ThreadSystem>();
+		auto pJobSystem = PrSystems::Register<PrCore::JobSystem>(8);
 		PrCore::Events::EventManager::Init();
 		PrCore::ECS::SceneManager::Init();
 
-		auto workerNum = PrCore::Threading::JobSystem::GetInstance().GetWorkerNum();
+		auto workerNum = pJobSystem->GetWorkerNum();
 		EXPECT_EQ(workerNum, 8);
 	}
 
@@ -30,8 +30,8 @@ public:
 		//This will be replaced with mocked versions in the future when I implement system localizer 
 		PrCore::ECS::SceneManager::Terminate();
 		PrCore::Events::EventManager::Terminate();
-		PrCore::Threading::JobSystem::Terminate();
-		PrCore::Threading::ThreadSystem::Terminate();
+		PrSystems::Unregister<PrCore::JobSystem>();
+		PrSystems::Unregister<PrCore::ThreadSystem>();
 		PrSystems::Unregister<PrCore::Utils::ILogger>();
 	}
 };
