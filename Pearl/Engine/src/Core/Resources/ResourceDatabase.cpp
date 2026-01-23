@@ -517,35 +517,35 @@ PrCore::Resources::ResourceDescPtr ResourceDatabase::ResourceByPath(const std::s
 
 void ResourceDatabase::FireBudgetExceeded(ResourceID p_id, const std::string& p_path, size_t p_usage, size_t p_budget)
 {
-	Events::EventPtr event =
-		std::make_shared<Events::BudgetExceededv2>(p_id, p_path, p_usage, p_budget);
-	Events::EventManager::GetInstance().QueueEvent(event);
+	EventPtr event =
+		std::make_shared<BudgetExceededv2>(p_id, p_path, p_usage, p_budget);
+	PrSystems::Get<EventManager>()->QueueEvent(event);
 }
 
 void ResourceDatabase::FireCacheMiss(ResourceID p_id, const std::string& p_path)
 {
-	Events::EventPtr event =
-		std::make_shared<Events::CacheMissEventv2>(p_id, p_path);
-	Events::EventManager::GetInstance().QueueEvent(event);
+	EventPtr event =
+		std::make_shared<CacheMissEventv2>(p_id, p_path);
+	PrSystems::Get<EventManager>()->QueueEvent(event);
 }
 
 void ResourceDatabase::FireCorruptedEvent(ResourceID p_id, const std::string& p_path)
 {
-	Events::EventPtr event =
-		std::make_shared<Events::ResourceCorruptedEventv2>(p_id, p_path);
-	Events::EventManager::GetInstance().QueueEvent(event);
+	EventPtr event =
+		std::make_shared<ResourceCorruptedEventv2>(p_id, p_path);
+	PrSystems::Get<EventManager>()->QueueEvent(event);
 }
 
 void ResourceDatabase::FireLoadedEvent(ResourceID p_id, const std::string& p_path)
 {
-	Events::EventPtr event =
-		std::make_shared<Events::ResourceLoadedEventv2>(p_id, p_path);
-	Events::EventManager::GetInstance().QueueEvent(event);
+	EventPtr event =
+		std::make_shared<ResourceLoadedEventv2>(p_id, p_path);
+	PrSystems::Get<EventManager>()->QueueEvent(event);
 }
 
 void ResourceDatabase::FireUnloadedEvent(ResourceID p_id, const std::string& p_path)
 {
-	Events::EventPtr event =
-		std::make_shared<Events::ResourceUnloadedEventv2>(p_id, p_path);
-	Events::EventManager::GetInstance().QueueEvent(event);
+	EventPtr event =
+		std::make_shared<ResourceUnloadedEventv2>(p_id, p_path);
+	PrSystems::Get<EventManager>()->QueueEvent(event);
 }

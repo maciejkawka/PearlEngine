@@ -16,11 +16,11 @@ namespace PrCore::ECS {
 		inline virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
 		inline virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
 
-		void OnComponentDynamicCreated(PrCore::Events::EventPtr p_eventType);
-		void OnComponentDynamicRemoved(PrCore::Events::EventPtr p_eventType);
+		void OnComponentDynamicCreated(PrCore::EventPtr p_eventType);
+		void OnComponentDynamicRemoved(PrCore::EventPtr p_eventType);
 		
-		void OnComponentStaticCreated(PrCore::Events::EventPtr p_eventType);
-		void OnComponentStaticRemoved(PrCore::Events::EventPtr p_eventType);
+		void OnComponentStaticCreated(PrCore::EventPtr p_eventType);
+		void OnComponentStaticRemoved(PrCore::EventPtr p_eventType);
 
 	private:
 		PrPhysics::PhysicsSystem*         m_physics;

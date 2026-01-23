@@ -41,14 +41,14 @@ namespace PrCore::Input {
 		InputManager();
 		~InputManager();
 
-		void OnKeyPressed(Events::EventPtr p_event);
-		void OnKeyReleased(Events::EventPtr p_event);
+		void OnKeyPressed(EventPtr p_event);
+		void OnKeyReleased(EventPtr p_event);
 
-		void OnMouseButtonPressed(Events::EventPtr p_event);
-		void OnMouseButtonReleased(Events::EventPtr p_event);
+		void OnMouseButtonPressed(EventPtr p_event);
+		void OnMouseButtonReleased(EventPtr p_event);
 
-		void OnMouseMoved(Events::EventPtr p_event);
-		void OnMouseScroll(Events::EventPtr p_event);
+		void OnMouseMoved(EventPtr p_event);
+		void OnMouseScroll(EventPtr p_event);
 
 		KeyStateMap s_keyState;
 		KeyHoldMap s_keyHold;

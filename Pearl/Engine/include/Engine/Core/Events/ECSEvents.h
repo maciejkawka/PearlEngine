@@ -1,10 +1,10 @@
 #pragma once
 
-#include"Core/Events/Event.h"
-#include"Core/ECS/EntityManager.h"
-#include"Core/ECS/BaseComponent.h"
+#include "Core/Events/Event.h"
+#include "Core/ECS/EntityManager.h"
+#include "Core/ECS/BaseComponent.h"
 
-namespace PrCore::Events {
+namespace PrCore {
 
 	class EntityCreatedEvent : public Event {
 	public:
@@ -33,7 +33,7 @@ namespace PrCore::Events {
 	public:
 		ComponentAddedEvent(ECS::Entity p_entity, Component* p_component) :
 			m_entity(p_entity),
-		m_component(p_component)
+			m_component(p_component)
 		{}
 
 		ECS::Entity m_entity;
@@ -63,5 +63,4 @@ namespace PrCore::Events {
 
 	template<class Component>
 	const EventType ComponentRemovedEvent<Component>::s_type = typeid(ComponentRemovedEvent<Component>).hash_code() + 0x353e5392;
-
 }

@@ -18,7 +18,7 @@ public:
 		PrSystems::Register<PrCore::Utils::ILogger, Mock::MockLogger>();
 		PrSystems::Register<PrCore::ThreadSystem>();
 		auto pJobSystem = PrSystems::Register<PrCore::JobSystem>(8);
-		PrCore::Events::EventManager::Init();
+		PrSystems::Register<PrCore::EventManager>();
 		PrCore::ECS::SceneManager::Init();
 
 		auto workerNum = pJobSystem->GetWorkerNum();
@@ -29,7 +29,7 @@ public:
 	{
 		//This will be replaced with mocked versions in the future when I implement system localizer 
 		PrCore::ECS::SceneManager::Terminate();
-		PrCore::Events::EventManager::Terminate();
+		PrSystems::Unregister<PrCore::EventManager>();
 		PrSystems::Unregister<PrCore::JobSystem>();
 		PrSystems::Unregister<PrCore::ThreadSystem>();
 		PrSystems::Unregister<PrCore::Utils::ILogger>();

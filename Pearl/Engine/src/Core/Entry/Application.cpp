@@ -30,22 +30,22 @@ void Application::Run()
 
 void Application::SubscribeEvents()
 {
-	Events::EventListener windowCloseListener;
-	windowCloseListener.connect<&Application::OnWindowClose>(this);
-	Events::EventManager::GetInstance().AddListener(windowCloseListener, PrCore::Events::WindowCloseEvent::s_type);
+	EventListener windowCloseListener;
+	windowCloseListener.Connect<&Application::OnWindowClose>(this);
+	PrSystems::Get<EventManager>()->AddListener(windowCloseListener, PrCore::WindowCloseEvent::s_type);
 
-	Events::EventListener windowMinimalizedListener;
-	windowMinimalizedListener.connect<&Application::OnWindowMinimalized>(this);
-	Events::EventManager::GetInstance().AddListener(windowMinimalizedListener, PrCore::Events::WindowMinimalizeEvent::s_type);
+	EventListener windowMinimalizedListener;
+	windowMinimalizedListener.Connect<&Application::OnWindowMinimalized>(this);
+	PrSystems::Get<EventManager>()->AddListener(windowMinimalizedListener, PrCore::WindowMinimalizeEvent::s_type);
 }
 
-void Application::OnWindowClose(Events::EventPtr p_event)
+void Application::OnWindowClose(EventPtr p_event)
 {
 	m_shouldClose = true;
 }
 
-void Application::OnWindowMinimalized(Events::EventPtr p_event)
+void Application::OnWindowMinimalized(EventPtr p_event)
 {
-	auto minimalizeEvent = std::static_pointer_cast<Events::WindowMinimalizeEvent>(p_event);
+	auto minimalizeEvent = std::static_pointer_cast<WindowMinimalizeEvent>(p_event);
 	m_minimalized = minimalizeEvent->m_minimalized;
 }

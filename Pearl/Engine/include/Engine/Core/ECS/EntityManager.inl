@@ -100,15 +100,15 @@ namespace PrCore::ECS {
 	template<class T>
 	void EntityManager::FireComponentAdded(Entity p_entity, T* p_component)
 	{
-		Events::EventPtr event = std::make_shared<Events::ComponentAddedEvent<T>>(p_entity, p_component);
-		Events::EventManager::GetInstance().FireEvent(event);
+		EventPtr event = std::make_shared<ComponentAddedEvent<T>>(p_entity, p_component);
+		PrSystems::Get<EventManager>()->FireEvent(event);
 	}
 
 	template<class T>
 	void EntityManager::FireComponentRemoved(Entity p_entity, T* p_component)
 	{
-		Events::EventPtr event = std::make_shared<Events::ComponentRemovedEvent<T>>(p_entity, p_component);
-		Events::EventManager::GetInstance().FireEvent(event);
+		EventPtr event = std::make_shared<ComponentRemovedEvent<T>>(p_entity, p_component);
+		PrSystems::Get<EventManager>()->FireEvent(event);
 	}
 
 	template<class T>

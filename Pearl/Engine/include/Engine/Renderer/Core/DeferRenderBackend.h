@@ -19,7 +19,7 @@ namespace PrRenderer::Core {
 		void PostRender() override;
 
 	private:
-		void OnWindowResize(PrCore::Events::EventPtr p_event);
+		void OnWindowResize(PrCore::EventPtr p_event);
 
 		struct gBuffer
 		{

@@ -14,7 +14,7 @@
 #include "Editor/Assets/Exporter/SceneExporter.h"
 
 using namespace PrEditor::Core;
-using namespace PrCore::Events;
+using namespace PrCore;
 
 Editor::Editor()
 {
@@ -126,7 +126,7 @@ void Editor::PostFrame()
 	m_appContext->m_window->SwapBuffers();
 	PrCore::Input::InputManager::GetInstance().ResetFlags();
 
-	EventManager::GetInstance().Update();
+	PrSystems::Get<EventManager>()->Update();
 
 	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F8))
 	{

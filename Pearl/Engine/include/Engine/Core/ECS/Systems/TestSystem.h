@@ -47,11 +47,11 @@ namespace PrCore::ECS
 		inline virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}
 		inline virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override {}
 
-		void OnCollisionEnter(PrCore::Events::EventPtr p_event);
-		void OnCollisionExit(PrCore::Events::EventPtr p_event);
-		void OnCollisionStay(PrCore::Events::EventPtr p_event);
+		void OnCollisionEnter(PrCore::EventPtr p_event);
+		void OnCollisionExit(PrCore::EventPtr p_event);
+		void OnCollisionStay(PrCore::EventPtr p_event);
 
-		void OnTriggerEnter(PrCore::Events::EventPtr p_event);
-		void OnTriggerExit(PrCore::Events::EventPtr p_event);
+		void OnTriggerEnter(PrCore::EventPtr p_event);
+		void OnTriggerExit(PrCore::EventPtr p_event);
 	};
 }

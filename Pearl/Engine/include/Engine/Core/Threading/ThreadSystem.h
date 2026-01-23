@@ -5,6 +5,7 @@
 
 #include <shared_mutex>
 #include <string>
+#include <set>
 
 namespace PrCore {
 

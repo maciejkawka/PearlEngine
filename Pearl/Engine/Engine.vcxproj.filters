@@ -504,6 +504,9 @@
     <ClInclude Include="include\Engine\Core\Utils\ILogger.h">
       <Filter>Core\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\Events\Delegate.h">
+      <Filter>Core\Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">

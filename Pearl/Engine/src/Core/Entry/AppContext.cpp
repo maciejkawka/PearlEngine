@@ -60,13 +60,15 @@ PrCore::Entry::AppContext::AppContext()
 	PRLOG_INFO("Init Thread System");
 	PrSystems::Register<ThreadSystem>();
 
+	//-----------------------
+	// Init Job System
 	const int workerCount = 10;
 	PRLOG_INFO("Init Job System with {} Job Workers", workerCount);
 	PrSystems::Register<JobSystem>(workerCount);
 
 	//-----------------------
 	// Init File System
-	PRLOG_INFO("Initalizing FileSystem");
+	PRLOG_INFO("Init File System");
 
 	auto* pFileSystem = PrSystems::Register<FileSystem>();
 	std::string_view engineAssetsPath = "EngineAssets";
@@ -87,7 +89,11 @@ PrCore::Entry::AppContext::AppContext()
 	pFileSystem->MountDir(gameAssets);
 	pFileSystem->SetWriteDir(gameAssets);
 
-	Events::EventManager::Init();
+	//-----------------------
+	// Init Event System
+	PRLOG_INFO("Init Event Manager");
+	PrSystems::Register<EventManager>();
+
 	Resources::ResourceSystem::Init();
 
 	//-----------------------
@@ -118,7 +124,6 @@ PrCore::Entry::AppContext::AppContext()
 		cubemapDatabase->RegisterLoader(".hdr", std::make_unique<HdrCubemapLoader>());
 		ResourceSystem::GetInstance().RegisterDatabase<Cubemap>(std::move(cubemapDatabase));
 	}
-	//-----------------------
 
 	ConfigFile contexConfig;
 	if (contexConfig.OpenFromFile(GraphicConfig))
@@ -248,10 +253,23 @@ PrCore::Entry::AppContext::~AppContext()
 	delete m_window;
 	Windowing::GLWindow::TerminateDevice();
 	Resources::ResourceSystem::Terminate();
-	Events::EventManager::Terminate();
+
+	PRLOG_INFO("Terminating Event Manager");
+	PrSystems::Unregister<EventManager>();
+
+	PRLOG_INFO("Terminating File System");
 	PrSystems::Unregister<FileSystem>();
+
+	PRLOG_INFO("Terminating Job System");
 	PrSystems::Unregister<JobSystem>();
+
+	PRLOG_INFO("Terminating Thread System");
 	PrSystems::Unregister<ThreadSystem>();
+
+	PRLOG_INFO("Terminating Clock");
 	PrSystems::Unregister<PrCore::Utils::Clock>();
+
+	PRLOG_INFO("Terminating Logger");
+	PRLOG_INFO("Say goodbye to PearlEngine. See you soon");
 	PrSystems::Unregister<PrCore::Utils::ILogger>();
 }

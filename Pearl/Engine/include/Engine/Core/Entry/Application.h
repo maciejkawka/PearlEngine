@@ -24,9 +24,9 @@ namespace PrCore::Entry {
 		virtual void PostFrame() = 0;
 
 	private:
-		void OnWindowClose(Events::EventPtr p_event);
+		void OnWindowClose(EventPtr p_event);
 
-		void OnWindowMinimalized(Events::EventPtr p_event);
+		void OnWindowMinimalized(EventPtr p_event);
 
 	protected:
 		AppContext* m_appContext;

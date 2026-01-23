@@ -95,18 +95,18 @@ int EntityManager::BasicHierarchicalView::RecursiveHierarchyCreation(Entity p_en
 EntityManager::EntityManager():
 	m_entitiesNumber(0)
 {
-	Events::EventListener parentComponentModified;
-	parentComponentModified.connect<&EntityManager::OnParentComponentModified>(this);
-	Events::EventManager::GetInstance().AddListener(parentComponentModified, Events::ComponentAddedEvent<ParentComponent>::s_type);
-	Events::EventManager::GetInstance().AddListener(parentComponentModified, Events::ComponentRemovedEvent<ParentComponent>::s_type);
+	EventListener parentComponentModified;
+	parentComponentModified.Connect<&EntityManager::OnParentComponentModified>(this);
+	PrSystems::Get<EventManager>()->AddListener(parentComponentModified, ComponentAddedEvent<ParentComponent>::s_type);
+	PrSystems::Get<EventManager>()->AddListener(parentComponentModified, ComponentRemovedEvent<ParentComponent>::s_type);
 }
 
 EntityManager::~EntityManager()
 {
-	Events::EventListener parentComponentModified;
-	parentComponentModified.connect<&EntityManager::OnParentComponentModified>(this);
-	Events::EventManager::GetInstance().RemoveListener(parentComponentModified, Events::ComponentAddedEvent<ParentComponent>::s_type);
-	Events::EventManager::GetInstance().RemoveListener(parentComponentModified, Events::ComponentRemovedEvent<ParentComponent>::s_type);
+	EventListener parentComponentModified;
+	parentComponentModified.Connect<&EntityManager::OnParentComponentModified>(this);
+	PrSystems::Get<EventManager>()->RemoveListener(parentComponentModified, ComponentAddedEvent<ParentComponent>::s_type);
+	PrSystems::Get<EventManager>()->RemoveListener(parentComponentModified, ComponentRemovedEvent<ParentComponent>::s_type);
 }
 
 Entity EntityManager::CreateEntity()
@@ -226,14 +226,14 @@ void EntityManager::OnDeserialize(const Utils::JSON::json& p_serialized)
 
 void EntityManager::FireEntityCreated(Entity p_entity)
 {
-	Events::EventPtr event = std::make_shared<Events::EntityCreatedEvent>(p_entity);
-	Events::EventManager::GetInstance().FireEvent(event);
+	EventPtr event = std::make_shared<EntityCreatedEvent>(p_entity);
+	PrSystems::Get<EventManager>()->FireEvent(event);
 }
 
 void EntityManager::FireEntityDestoryed(Entity p_entity)
 {
-	Events::EventPtr event = std::make_shared<Events::EntityDestroyedEvent>(p_entity);
-	Events::EventManager::GetInstance().FireEvent(event);
+	EventPtr event = std::make_shared<EntityDestroyedEvent>(p_entity);
+	PrSystems::Get<EventManager>()->FireEvent(event);
 }
 
 Entity EntityManager::ConstructEntityonIndex(uint32_t p_index)
@@ -242,7 +242,7 @@ Entity EntityManager::ConstructEntityonIndex(uint32_t p_index)
 	return Entity(entityID, this);
 }
 
-void EntityManager::OnParentComponentModified(Events::EventPtr p_event)
+void EntityManager::OnParentComponentModified(EventPtr p_event)
 {
 	m_isHierarchicalEntitiesDirty = true;
 }

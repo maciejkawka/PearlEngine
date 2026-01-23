@@ -14,8 +14,9 @@ namespace PrCore
 		class ILogger;
 	}
 
-	class JobSystem;
+	class EventManager;
 	class FileSystem;
+	class JobSystem;
 	class ThreadSystem;
 }
 
@@ -25,6 +26,7 @@ namespace PrCore
 // If system is not going to be replaced or mocked in unit tests just use the concrete implementation in here
 // There is no need to provide the interface if it is not necessery
 using EngineSystems = std::tuple<
+	PrCore::EventManager,
 	PrCore::FileSystem,
 	PrCore::JobSystem,
 	PrCore::ThreadSystem,

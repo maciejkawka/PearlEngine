@@ -3,7 +3,7 @@
 #include"Event.h"
 #include"Core/Resources/IResource.h"
 
-namespace PrCore::Events{
+namespace PrCore{
 
 	class ResourceUnloadedEventv2 : public Event {
 	public:

@@ -1,16 +1,18 @@
-#include"Event.h"
+#pragma once
 
-namespace PrCore::Events {
+#include "Event.h"
 
-	class WindowCloseEvent: public Event {
+namespace PrCore {
+
+	class WindowCloseEvent : public Event {
 	public:
 		virtual inline EventType GetType() const { return s_type; }
 		inline const static EventType s_type = 0x1cd2925a;
 	};
 
-	class WindowResizeEvent: public Event {
+	class WindowResizeEvent : public Event {
 	public:
-		WindowResizeEvent(float p_width, float p_height):
+		WindowResizeEvent(float p_width, float p_height) :
 			m_width(p_width), m_height(p_height)
 		{}
 

@@ -63,26 +63,26 @@ void PhysicsUpdateSystem::OnCreate()
 {
 	m_updateGroup = (uint8_t)UpdateGroup::Custom;
 
-	Events::EventListener dynamicAddedListener;
-	dynamicAddedListener.connect<&PhysicsUpdateSystem::OnComponentDynamicCreated>(this);
-	Events::EventManager::GetInstance().AddListener(dynamicAddedListener, Events::ComponentAddedEvent<RigidBodyDynamicComponent>::s_type);
+	EventListener dynamicAddedListener;
+	dynamicAddedListener.Connect<&PhysicsUpdateSystem::OnComponentDynamicCreated>(this);
+	PrSystems::Get<EventManager>()->AddListener(dynamicAddedListener, ComponentAddedEvent<RigidBodyDynamicComponent>::s_type);
 
-	Events::EventListener dynamicRemovedListener;
-	dynamicRemovedListener.connect<&PhysicsUpdateSystem::OnComponentDynamicRemoved>(this);
-	Events::EventManager::GetInstance().AddListener(dynamicRemovedListener, Events::ComponentRemovedEvent<RigidBodyDynamicComponent>::s_type);
+	EventListener dynamicRemovedListener;
+	dynamicRemovedListener.Connect<&PhysicsUpdateSystem::OnComponentDynamicRemoved>(this);
+	PrSystems::Get<EventManager>()->AddListener(dynamicRemovedListener, ComponentRemovedEvent<RigidBodyDynamicComponent>::s_type);
 
-	Events::EventListener staticAddedListener;
-	staticAddedListener.connect<&PhysicsUpdateSystem::OnComponentStaticCreated>(this);
-	Events::EventManager::GetInstance().AddListener(staticAddedListener, Events::ComponentAddedEvent<RigidBodyStaticComponent>::s_type);
+	EventListener staticAddedListener;
+	staticAddedListener.Connect<&PhysicsUpdateSystem::OnComponentStaticCreated>(this);
+	PrSystems::Get<EventManager>()->AddListener(staticAddedListener, ComponentAddedEvent<RigidBodyStaticComponent>::s_type);
 
-	Events::EventListener staticRemovedListener;
-	staticRemovedListener.connect<&PhysicsUpdateSystem::OnComponentStaticRemoved>(this);
-	Events::EventManager::GetInstance().AddListener(staticRemovedListener, Events::ComponentRemovedEvent<RigidBodyStaticComponent>::s_type);
+	EventListener staticRemovedListener;
+	staticRemovedListener.Connect<&PhysicsUpdateSystem::OnComponentStaticRemoved>(this);
+	PrSystems::Get<EventManager>()->AddListener(staticRemovedListener, ComponentRemovedEvent<RigidBodyStaticComponent>::s_type);
 }
 
-void PhysicsUpdateSystem::OnComponentDynamicCreated(PrCore::Events::EventPtr p_eventType)
+void PhysicsUpdateSystem::OnComponentDynamicCreated(PrCore::EventPtr p_eventType)
 {
-	auto componentEvent = std::static_pointer_cast<Events::ComponentAddedEvent<RigidBodyDynamicComponent>>(p_eventType);
+	auto componentEvent = std::static_pointer_cast<ComponentAddedEvent<RigidBodyDynamicComponent>>(p_eventType);
 	auto component = componentEvent->m_component;
 
 	component->rigidBody = m_physics->CreateRigidDynamic(PrPhysics::Transform{});
@@ -90,15 +90,15 @@ void PhysicsUpdateSystem::OnComponentDynamicCreated(PrCore::Events::EventPtr p_e
 	m_createdActors.push_back(component->rigidBody);
 }
 
-void PhysicsUpdateSystem::OnComponentDynamicRemoved(PrCore::Events::EventPtr p_eventType)
+void PhysicsUpdateSystem::OnComponentDynamicRemoved(PrCore::EventPtr p_eventType)
 {
-	auto rigidBody = std::static_pointer_cast<Events::ComponentAddedEvent<RigidBodyDynamicComponent>>(p_eventType)->m_component->rigidBody;
+	auto rigidBody = std::static_pointer_cast<ComponentAddedEvent<RigidBodyDynamicComponent>>(p_eventType)->m_component->rigidBody;
 	m_removedActors.push_back(rigidBody);
 }
 
-void PhysicsUpdateSystem::OnComponentStaticCreated(PrCore::Events::EventPtr p_eventType)
+void PhysicsUpdateSystem::OnComponentStaticCreated(PrCore::EventPtr p_eventType)
 {
-	auto componentEvent = std::static_pointer_cast<Events::ComponentAddedEvent<RigidBodyStaticComponent>>(p_eventType);
+	auto componentEvent = std::static_pointer_cast<ComponentAddedEvent<RigidBodyStaticComponent>>(p_eventType);
 	auto component = componentEvent->m_component;
 
 	PrPhysics::Transform physTransform{};
@@ -113,8 +113,8 @@ void PhysicsUpdateSystem::OnComponentStaticCreated(PrCore::Events::EventPtr p_ev
 	m_createdActors.push_back(component->rigidBody);
 }
 
-void PhysicsUpdateSystem::OnComponentStaticRemoved(PrCore::Events::EventPtr p_eventType)
+void PhysicsUpdateSystem::OnComponentStaticRemoved(PrCore::EventPtr p_eventType)
 {
-	auto rigidBody = std::static_pointer_cast<Events::ComponentAddedEvent<RigidBodyStaticComponent>>(p_eventType)->m_component->rigidBody;
+	auto rigidBody = std::static_pointer_cast<ComponentAddedEvent<RigidBodyStaticComponent>>(p_eventType)->m_component->rigidBody;
 	m_removedActors.push_back(rigidBody);
 }

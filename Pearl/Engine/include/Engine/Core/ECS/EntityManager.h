@@ -406,7 +406,7 @@ namespace PrCore::ECS {
 		Entity ConstructEntityonIndex(uint32_t p_index);
 
 		//For Hierarchical Vector
-		void OnParentComponentModified(Events::EventPtr p_event);
+		void OnParentComponentModified(EventPtr p_event);
 
 		template<class T>
 		size_t GetTypeID();

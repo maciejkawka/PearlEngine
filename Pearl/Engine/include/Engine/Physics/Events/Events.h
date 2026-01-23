@@ -13,7 +13,7 @@ namespace PrPhysics {
 		PrCore::ECS::Entity entityB;
 	};
 
-	class CollisionEnter : public PrCore::Events::Event {
+	class CollisionEnter : public PrCore::Event {
 	public:
 		CollisionEnter(const CollisionInfo& p_collisionInfo) :
 			m_collisionInfo(p_collisionInfo)
@@ -24,7 +24,7 @@ namespace PrPhysics {
 		DEFINE_EVENT_GUID(0xc8b49d55);
 	};
 
-	class CollisionExit : public PrCore::Events::Event {
+	class CollisionExit : public PrCore::Event {
 	public:
 		CollisionExit(const CollisionInfo& p_collisionInfo) :
 			m_collisionInfo(p_collisionInfo)
@@ -35,7 +35,7 @@ namespace PrPhysics {
 		DEFINE_EVENT_GUID(0xc006569a);
 	};
 
-	class CollisionStay : public PrCore::Events::Event {
+	class CollisionStay : public PrCore::Event {
 	public:
 		CollisionStay(const CollisionInfo& p_collisionInfo) :
 			m_collisionInfo(p_collisionInfo)
@@ -46,7 +46,7 @@ namespace PrPhysics {
 		DEFINE_EVENT_GUID(0x9c2824c7);
 	};
 
-	class TriggerEnter : public PrCore::Events::Event {
+	class TriggerEnter : public PrCore::Event {
 	public:
 		TriggerEnter(const CollisionInfo& p_collisionInfo) :
 			m_collisionInfo(p_collisionInfo)
@@ -57,7 +57,7 @@ namespace PrPhysics {
 		DEFINE_EVENT_GUID(0xba720fc1);
 	};
 
-	class TriggerExit : public PrCore::Events::Event {
+	class TriggerExit : public PrCore::Event {
 	public:
 		TriggerExit(const CollisionInfo& p_collisionInfo) :
 			m_collisionInfo(p_collisionInfo)
@@ -69,7 +69,7 @@ namespace PrPhysics {
 	};
 
 	// Not supported by PhysX, will implement when necessary
-	//class TriggerStay : public PrCore::Events::Event {
+	//class TriggerStay : public PrCore::Event {
 	//public:
 	//	TriggerStay(const CollisionInfo& p_collisionInfo) :
 	//		m_collisionInfo(p_collisionInfo)

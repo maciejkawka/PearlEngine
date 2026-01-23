@@ -41,18 +41,18 @@ namespace PrPhysics {
 
 				if (pair.events & PxPairFlag::Enum::eNOTIFY_TOUCH_FOUND)
 				{
-					PrCore::Events::EventPtr eventPtr = std::make_shared<PrPhysics::CollisionEnter>(collisionInfo);
-					PrCore::Events::EventManager::GetInstancePtr()->FireEvent(eventPtr);
+					PrCore::EventPtr eventPtr = std::make_shared<PrPhysics::CollisionEnter>(collisionInfo);
+					PrSystems::Get<PrCore::EventManager>()->FireEvent(eventPtr);
 				}
 				else if (pair.events & PxPairFlag::Enum::eNOTIFY_TOUCH_PERSISTS)
 				{
-					PrCore::Events::EventPtr eventPtr = std::make_shared<PrPhysics::CollisionStay>(collisionInfo);
-					PrCore::Events::EventManager::GetInstancePtr()->FireEvent(eventPtr);
+					PrCore::EventPtr eventPtr = std::make_shared<PrPhysics::CollisionStay>(collisionInfo);
+					PrSystems::Get<PrCore::EventManager>()->FireEvent(eventPtr);
 				}
 				else if (pair.events & PxPairFlag::Enum::eNOTIFY_TOUCH_LOST)
 				{
-					PrCore::Events::EventPtr eventPtr = std::make_shared<PrPhysics::CollisionExit>(collisionInfo);
-					PrCore::Events::EventManager::GetInstancePtr()->FireEvent(eventPtr);
+					PrCore::EventPtr eventPtr = std::make_shared<PrPhysics::CollisionExit>(collisionInfo);
+					PrSystems::Get<PrCore::EventManager>()->FireEvent(eventPtr);
 				}
 			}
 		}
@@ -71,13 +71,13 @@ namespace PrPhysics {
 
 				if (pair.status & PxPairFlag::Enum::eNOTIFY_TOUCH_FOUND)
 				{
-					PrCore::Events::EventPtr eventPtr = std::make_shared<PrPhysics::TriggerEnter>(collisionInfo);
-					PrCore::Events::EventManager::GetInstancePtr()->FireEvent(eventPtr);
+					PrCore::EventPtr eventPtr = std::make_shared<PrPhysics::TriggerEnter>(collisionInfo);
+					PrSystems::Get<PrCore::EventManager>()->FireEvent(eventPtr);
 				}
 				else if (pair.status & PxPairFlag::Enum::eNOTIFY_TOUCH_LOST)
 				{
-					PrCore::Events::EventPtr eventPtr = std::make_shared<PrPhysics::TriggerExit>(collisionInfo);
-					PrCore::Events::EventManager::GetInstancePtr()->FireEvent(eventPtr);
+					PrCore::EventPtr eventPtr = std::make_shared<PrPhysics::TriggerExit>(collisionInfo);
+					PrSystems::Get<PrCore::EventManager>()->FireEvent(eventPtr);
 				}
 			}
 		}

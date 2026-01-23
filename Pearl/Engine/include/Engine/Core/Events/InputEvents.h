@@ -1,10 +1,12 @@
 #pragma once
-#include"Event.h"
-#include"Core/Input/PrKey.h"
-#include"Core/Input/PrKeyState.h"
-#include"Core/Input/PrMouseButton.h"
 
-namespace PrCore::Events {
+#include "Event.h"
+
+#include "Core/Input/PrKey.h"
+#include "Core/Input/PrKeyState.h"
+#include "Core/Input/PrMouseButton.h"
+
+namespace PrCore {
 
 	class KeyPressedEvent : public Event {
 	public:

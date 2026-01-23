@@ -41,9 +41,9 @@ namespace PrRenderer::Core
 		GeneratePostprocessContext();
 
 		// Set events
-		PrCore::Events::EventListener windowResizedListener;
-		windowResizedListener.connect<&DeferRenderBackend::OnWindowResize>(this);
-		PrCore::Events::EventManager::GetInstance().AddListener(windowResizedListener, PrCore::Events::WindowResizeEvent::s_type);
+		PrCore::EventListener windowResizedListener;
+		windowResizedListener.Connect<&DeferRenderBackend::OnWindowResize>(this);
+		PrSystems::Get<PrCore::EventManager>()->AddListener(windowResizedListener, PrCore::WindowResizeEvent::s_type);
 	}
 
 	void DeferRenderBackend::PreparePipeline()
@@ -357,9 +357,9 @@ namespace PrRenderer::Core
 	{
 	}
 
-	void DeferRenderBackend::OnWindowResize(PrCore::Events::EventPtr p_event)
+	void DeferRenderBackend::OnWindowResize(PrCore::EventPtr p_event)
 	{
-		auto windowResizeEvent = std::static_pointer_cast<PrCore::Events::WindowResizeEvent>(p_event);
+		auto windowResizeEvent = std::static_pointer_cast<PrCore::WindowResizeEvent>(p_event);
 		m_screenWidth = windowResizeEvent->m_width;
 		m_screenHeight = windowResizeEvent->m_height;
 

@@ -98,15 +98,13 @@ class ResourceSystemTest : public ::testing::Test {
 public:
 	static void SetUpTestSuite()
 	{
-		//This will be replaced with mocked versions in the future when I implement system localizer 
 		PrSystems::Register<PrCore::Utils::ILogger, Mock::MockLogger>();
-		PrCore::Events::EventManager::Init();
+		PrSystems::Register<PrCore::EventManager>();
 	}
 
 	static void TearDownTestSuite()
 	{
-		//This will be replaced with mocked versions in the future when I implement system localizer 
-		PrCore::Events::EventManager::Terminate();
+		PrSystems::Unregister<PrCore::EventManager>();
 		PrSystems::Unregister<PrCore::Utils::ILogger>();
 	}
 };

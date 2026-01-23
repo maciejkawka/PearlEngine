@@ -13,56 +13,56 @@ InputManager::InputManager() :
 	s_anyPressed(false),
 	s_anyHold(false)
 {
-	Events::EventListener keyPressedListener;
-	keyPressedListener.connect<&InputManager::OnKeyPressed>(this);
-	Events::EventManager::GetInstance().AddListener(keyPressedListener, Events::KeyPressedEvent::s_type);
+	EventListener keyPressedListener;
+	keyPressedListener.Connect<&InputManager::OnKeyPressed>(this);
+	PrSystems::Get<EventManager>()->AddListener(keyPressedListener, KeyPressedEvent::s_type);
 
-	Events::EventListener keyReleasedListener;
-	keyReleasedListener.connect<&InputManager::OnKeyReleased>(this);
-	Events::EventManager::GetInstance().AddListener(keyReleasedListener, Events::KeyReleasedEvent::s_type);
+	EventListener keyReleasedListener;
+	keyReleasedListener.Connect<&InputManager::OnKeyReleased>(this);
+	PrSystems::Get<EventManager>()->AddListener(keyReleasedListener, KeyReleasedEvent::s_type);
 
-	Events::EventListener buttonPressedListener;
-	buttonPressedListener.connect<&InputManager::OnMouseButtonPressed>(this);
-	Events::EventManager::GetInstance().AddListener(buttonPressedListener, Events::MouseButtonPressedEvent::s_type);
+	EventListener buttonPressedListener;
+	buttonPressedListener.Connect<&InputManager::OnMouseButtonPressed>(this);
+	PrSystems::Get<EventManager>()->AddListener(buttonPressedListener, MouseButtonPressedEvent::s_type);
 
-	Events::EventListener buttonReleasedListener;
-	buttonReleasedListener.connect<&InputManager::OnMouseButtonReleased>(this);
-	Events::EventManager::GetInstance().AddListener(buttonReleasedListener, Events::MouseButtonReleasedEvent::s_type);
+	EventListener buttonReleasedListener;
+	buttonReleasedListener.Connect<&InputManager::OnMouseButtonReleased>(this);
+	PrSystems::Get<EventManager>()->AddListener(buttonReleasedListener, MouseButtonReleasedEvent::s_type);
 
-	Events::EventListener mouseMovedListener;
-	mouseMovedListener.connect<&InputManager::OnMouseMoved>(this);
-	Events::EventManager::GetInstance().AddListener(mouseMovedListener, Events::MouseMovedEvent::s_type);
+	EventListener mouseMovedListener;
+	mouseMovedListener.Connect<&InputManager::OnMouseMoved>(this);
+	PrSystems::Get<EventManager>()->AddListener(mouseMovedListener, MouseMovedEvent::s_type);
 
-	Events::EventListener mouseScrollListener;
-	mouseScrollListener.connect<&InputManager::OnMouseScroll>(this);
-	Events::EventManager::GetInstance().AddListener(mouseScrollListener, Events::MouseScrollEvent::s_type);
+	EventListener mouseScrollListener;
+	mouseScrollListener.Connect<&InputManager::OnMouseScroll>(this);
+	PrSystems::Get<EventManager>()->AddListener(mouseScrollListener, MouseScrollEvent::s_type);
 }
 
 InputManager::~InputManager()
 {
-	Events::EventListener keyPressedListener;
-	keyPressedListener.connect<&InputManager::OnKeyPressed>(this);
-	Events::EventManager::GetInstance().RemoveListener(keyPressedListener, Events::KeyPressedEvent::s_type);
+	EventListener keyPressedListener;
+	keyPressedListener.Connect<&InputManager::OnKeyPressed>(this);
+	PrSystems::Get<EventManager>()->RemoveListener(keyPressedListener, KeyPressedEvent::s_type);
 
-	Events::EventListener keyReleasedListener;
-	keyReleasedListener.connect<&InputManager::OnKeyReleased>(this);
-	Events::EventManager::GetInstance().RemoveListener(keyReleasedListener, Events::KeyReleasedEvent::s_type);
+	EventListener keyReleasedListener;
+	keyReleasedListener.Connect<&InputManager::OnKeyReleased>(this);
+	PrSystems::Get<EventManager>()->RemoveListener(keyReleasedListener, KeyReleasedEvent::s_type);
 
-	Events::EventListener buttonPressedListener;
-	buttonPressedListener.connect<&InputManager::OnMouseButtonPressed>(this);
-	Events::EventManager::GetInstance().RemoveListener(buttonPressedListener, Events::MouseButtonPressedEvent::s_type);
+	EventListener buttonPressedListener;
+	buttonPressedListener.Connect<&InputManager::OnMouseButtonPressed>(this);
+	PrSystems::Get<EventManager>()->RemoveListener(buttonPressedListener, MouseButtonPressedEvent::s_type);
 
-	Events::EventListener buttonReleasedListener;
-	buttonReleasedListener.connect<&InputManager::OnMouseButtonReleased>(this);
-	Events::EventManager::GetInstance().RemoveListener(buttonReleasedListener, Events::MouseButtonReleasedEvent::s_type);
+	EventListener buttonReleasedListener;
+	buttonReleasedListener.Connect<&InputManager::OnMouseButtonReleased>(this);
+	PrSystems::Get<EventManager>()->RemoveListener(buttonReleasedListener, MouseButtonReleasedEvent::s_type);
 
-	Events::EventListener mouseMovedListener;
-	mouseMovedListener.connect<&InputManager::OnMouseMoved>(this);
-	Events::EventManager::GetInstance().RemoveListener(mouseMovedListener, Events::MouseMovedEvent::s_type);
+	EventListener mouseMovedListener;
+	mouseMovedListener.Connect<&InputManager::OnMouseMoved>(this);
+	PrSystems::Get<EventManager>()->RemoveListener(mouseMovedListener, MouseMovedEvent::s_type);
 
-	Events::EventListener mouseScrollListener;
-	mouseScrollListener.connect<&InputManager::OnMouseScroll>(this);
-	Events::EventManager::GetInstance().RemoveListener(mouseScrollListener, Events::MouseScrollEvent::s_type);
+	EventListener mouseScrollListener;
+	mouseScrollListener.Connect<&InputManager::OnMouseScroll>(this);
+	PrSystems::Get<EventManager>()->RemoveListener(mouseScrollListener, MouseScrollEvent::s_type);
 }
 
 bool InputManager::IsKeyPressed(PrKey p_key) const
@@ -157,43 +157,43 @@ void InputManager::ResetFlags()
 	s_buttonState.clear();
 }
 
-void InputManager::OnKeyPressed(Events::EventPtr p_event)
+void InputManager::OnKeyPressed(EventPtr p_event)
 {
-	auto keyPresedEvent = std::static_pointer_cast<Events::KeyPressedEvent>(p_event);
+	auto keyPresedEvent = std::static_pointer_cast<KeyPressedEvent>(p_event);
 	s_keyState[keyPresedEvent->m_key] = PrInputState::PRESS;
 	s_keyHold[keyPresedEvent->m_key] = true;
 }
 
-void InputManager::OnKeyReleased(Events::EventPtr p_event)
+void InputManager::OnKeyReleased(EventPtr p_event)
 {
-	auto keyReleasedEvent = std::static_pointer_cast<Events::KeyReleasedEvent>(p_event);
+	auto keyReleasedEvent = std::static_pointer_cast<KeyReleasedEvent>(p_event);
 	s_keyState[keyReleasedEvent->m_key] = PrInputState::RELEASE;
 	s_keyHold[keyReleasedEvent->m_key] = false;
 }
 
-void InputManager::OnMouseButtonPressed(Events::EventPtr p_event)
+void InputManager::OnMouseButtonPressed(EventPtr p_event)
 {
-	auto buttonPresedEvent = std::static_pointer_cast<Events::MouseButtonPressedEvent>(p_event);
+	auto buttonPresedEvent = std::static_pointer_cast<MouseButtonPressedEvent>(p_event);
 	s_buttonState[buttonPresedEvent->m_button] = PrInputState::PRESS;
 	s_buttonHold[buttonPresedEvent->m_button] = true;
 }
 
-void InputManager::OnMouseButtonReleased(Events::EventPtr p_event)
+void InputManager::OnMouseButtonReleased(EventPtr p_event)
 {
-	auto buttonReleasedEvent = std::static_pointer_cast<Events::MouseButtonReleasedEvent>(p_event);
+	auto buttonReleasedEvent = std::static_pointer_cast<MouseButtonReleasedEvent>(p_event);
 	s_buttonState[buttonReleasedEvent->m_button] = PrInputState::RELEASE;
 	s_buttonHold[buttonReleasedEvent->m_button] = false;
 }
 
-void InputManager::OnMouseMoved(Events::EventPtr p_event)
+void InputManager::OnMouseMoved(EventPtr p_event)
 {
-	auto mouseMovedEvent = std::static_pointer_cast<Events::MouseMovedEvent>(p_event);
+	auto mouseMovedEvent = std::static_pointer_cast<MouseMovedEvent>(p_event);
 	s_mouseXPos = mouseMovedEvent->m_xPos;
 	s_mouseYPos = mouseMovedEvent->m_yPos;
 }
 
-void InputManager::OnMouseScroll(Events::EventPtr p_event)
+void InputManager::OnMouseScroll(EventPtr p_event)
 {
-	auto mouseScrollEvent = std::static_pointer_cast<Events::MouseScrollEvent>(p_event);
+	auto mouseScrollEvent = std::static_pointer_cast<MouseScrollEvent>(p_event);
 	s_mouseScroll = mouseScrollEvent->m_yOffset;
 }

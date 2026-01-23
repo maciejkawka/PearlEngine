@@ -19,27 +19,27 @@ using namespace PrRenderer::Core;
 void RenderStressTest::OnEnable()
 {
 	{
-		Events::EventListener enterListener;
-		enterListener.connect<&RenderStressTest::OnCollisionEnter>(this);
-		Events::EventManager::GetInstance().AddListener(enterListener, PrPhysics::CollisionEnter::s_type);
+		EventListener enterListener;
+		enterListener.Connect<&RenderStressTest::OnCollisionEnter>(this);
+		PrSystems::Get<EventManager>()->AddListener(enterListener, PrPhysics::CollisionEnter::s_type);
 
-		Events::EventListener stayListener;
-		stayListener.connect<&RenderStressTest::OnCollisionStay>(this);
-		Events::EventManager::GetInstance().AddListener(stayListener, PrPhysics::CollisionStay::s_type);
+		EventListener stayListener;
+		stayListener.Connect<&RenderStressTest::OnCollisionStay>(this);
+		PrSystems::Get<EventManager>()->AddListener(stayListener, PrPhysics::CollisionStay::s_type);
 
-		Events::EventListener exitListener;
-		exitListener.connect<&RenderStressTest::OnCollisionExit>(this);
-		Events::EventManager::GetInstance().AddListener(exitListener, PrPhysics::CollisionExit::s_type);
+		EventListener exitListener;
+		exitListener.Connect<&RenderStressTest::OnCollisionExit>(this);
+		PrSystems::Get<EventManager>()->AddListener(exitListener, PrPhysics::CollisionExit::s_type);
 	}
 
 	{
-		Events::EventListener enterListener;
-		enterListener.connect<&RenderStressTest::OnTriggerEnter>(this);
-		Events::EventManager::GetInstance().AddListener(enterListener, PrPhysics::TriggerEnter::s_type);
+		EventListener enterListener;
+		enterListener.Connect<&RenderStressTest::OnTriggerEnter>(this);
+		PrSystems::Get<EventManager>()->AddListener(enterListener, PrPhysics::TriggerEnter::s_type);
 
-		Events::EventListener exitListener;
-		exitListener.connect<&RenderStressTest::OnTriggerExit>(this);
-		Events::EventManager::GetInstance().AddListener(exitListener, PrPhysics::TriggerExit::s_type);
+		EventListener exitListener;
+		exitListener.Connect<&RenderStressTest::OnTriggerExit>(this);
+		PrSystems::Get<EventManager>()->AddListener(exitListener, PrPhysics::TriggerExit::s_type);
 	}
 
 	std::srand(std::time(0));
@@ -446,7 +446,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 		settings->enableBloom = !settings->enableBloom;
 }
 
-void RenderStressTest::OnCollisionEnter(PrCore::Events::EventPtr p_event)
+void RenderStressTest::OnCollisionEnter(PrCore::EventPtr p_event)
 {
 	auto collisionInfo = std::static_pointer_cast<PrPhysics::CollisionEnter>(p_event)->m_collisionInfo;
 	auto nameA = collisionInfo.entityA.GetComponent<PrCore::ECS::NameComponent>()->name;
@@ -461,7 +461,7 @@ void RenderStressTest::OnCollisionEnter(PrCore::Events::EventPtr p_event)
     //PRLOG_INFO("On collision enter, EntityA: {}, EntityB {}", nameA, nameB);
 }
 
-void RenderStressTest::OnCollisionExit(PrCore::Events::EventPtr p_event)
+void RenderStressTest::OnCollisionExit(PrCore::EventPtr p_event)
 {
 	auto collisionInfo = std::static_pointer_cast<PrPhysics::CollisionExit>(p_event)->m_collisionInfo;
 	auto nameA = collisionInfo.entityA.GetComponent<PrCore::ECS::NameComponent>()->name;
@@ -477,14 +477,14 @@ void RenderStressTest::OnCollisionExit(PrCore::Events::EventPtr p_event)
 	//PRLOG_INFO("On collision exit, EntityA: {}, EntityB {}", nameA, nameB);
 }
 
-void RenderStressTest::OnCollisionStay(PrCore::Events::EventPtr p_event)
+void RenderStressTest::OnCollisionStay(PrCore::EventPtr p_event)
 {
 	auto collisionInfo = std::static_pointer_cast<PrPhysics::CollisionStay>(p_event)->m_collisionInfo;
 	auto nameA = collisionInfo.entityA.GetComponent<PrCore::ECS::NameComponent>()->name;
 	auto nameB = collisionInfo.entityB.GetComponent<PrCore::ECS::NameComponent>()->name;
 }
 
-void RenderStressTest::OnTriggerEnter(PrCore::Events::EventPtr p_event)
+void RenderStressTest::OnTriggerEnter(PrCore::EventPtr p_event)
 {
 	auto collisionInfo = std::static_pointer_cast<PrPhysics::TriggerEnter>(p_event)->m_collisionInfo;
 	auto nameA = collisionInfo.entityA.GetComponent<PrCore::ECS::NameComponent>()->name;
@@ -492,7 +492,7 @@ void RenderStressTest::OnTriggerEnter(PrCore::Events::EventPtr p_event)
 	PRLOG_INFO("On trigger enter, EntityA: {}, EntityB {}", nameA, nameB);
 }
 
-void RenderStressTest::OnTriggerExit(PrCore::Events::EventPtr p_event)
+void RenderStressTest::OnTriggerExit(PrCore::EventPtr p_event)
 {
 	auto collisionInfo = std::static_pointer_cast<PrPhysics::TriggerExit>(p_event)->m_collisionInfo;
 	auto nameA = collisionInfo.entityA.GetComponent<PrCore::ECS::NameComponent>()->name;
