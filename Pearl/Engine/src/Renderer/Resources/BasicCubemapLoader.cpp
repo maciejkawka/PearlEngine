@@ -11,7 +11,7 @@
 
 #include"stb/stb_image.h"
 
-using namespace PrRenderer::Resources;
+using namespace PrRenderer;
 
 IResourceDataPtr BasicCubemapLoader::LoadResource(const std::string& p_path)
 {
@@ -94,7 +94,7 @@ IResourceDataPtr BasicCubemapLoader::LoadResource(const std::string& p_path)
 	return cubemap;
 }
 
-unsigned char* BasicCubemapLoader::LoadTexture(const std::string& p_path, int& p_width, int& p_height, Resources::TextureFormat& p_format)
+unsigned char* BasicCubemapLoader::LoadTexture(const std::string& p_path, int& p_width, int& p_height, TextureFormat& p_format)
 {
 	// Load textures
 	int channelsNumber = 0;
@@ -120,10 +120,10 @@ unsigned char* BasicCubemapLoader::LoadTexture(const std::string& p_path, int& p
 		switch (channelsNumber)
 		{
 		case 3:
-			p_format = Resources::TextureFormat::RGB16F;
+			p_format = TextureFormat::RGB16F;
 			break;
 		case 4:
-			p_format = Resources::TextureFormat::RGBA16F;
+			p_format = TextureFormat::RGBA16F;
 			break;
 		default:
 			PRLOG_WARN("Cannot specify texture {0} channel format", p_path);
@@ -136,16 +136,16 @@ unsigned char* BasicCubemapLoader::LoadTexture(const std::string& p_path, int& p
 		switch (channelsNumber)
 		{
 		case 1:
-			p_format = Resources::TextureFormat::R8;
+			p_format = TextureFormat::R8;
 			break;
 		case 2:
-			p_format = Resources::TextureFormat::RG16;
+			p_format = TextureFormat::RG16;
 			break;
 		case 3:
-			p_format = Resources::TextureFormat::RGB24;
+			p_format = TextureFormat::RGB24;
 			break;
 		case 4:
-			p_format = Resources::TextureFormat::RGBA32;
+			p_format = TextureFormat::RGBA32;
 			break;
 		default:
 			PRLOG_WARN("Cannot specify texture {0} channel format", p_path);

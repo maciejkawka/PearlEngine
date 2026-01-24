@@ -14,7 +14,7 @@
 
 #define MAX_UVs 8
 
-namespace PrRenderer::Resources {
+namespace PrRenderer {
 
 	class Mesh;
 	using MeshPtr = std::shared_ptr<Mesh>;
@@ -41,7 +41,7 @@ namespace PrRenderer::Resources {
 		Line
 	};
 
-	class Mesh : public PrCore::Resources::IResourceData {
+	class Mesh : public PrCore::IResourceData {
 	public:
 		using UVArray = std::array<std::vector<PrCore::Math::vec2>, 8>;
 

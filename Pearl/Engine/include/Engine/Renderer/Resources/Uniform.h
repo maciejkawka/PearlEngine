@@ -1,7 +1,7 @@
 #pragma once
 #include<any>
 
-namespace PrRenderer::Resources {
+namespace PrRenderer {
 
 	enum class UniformType {
 		Int,

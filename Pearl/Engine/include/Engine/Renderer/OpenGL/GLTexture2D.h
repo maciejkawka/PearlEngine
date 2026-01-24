@@ -4,10 +4,10 @@
 
 namespace PrRenderer::OpenGL {
 
-	class GLTexture2D : public Resources::Texture2D {
+	class GLTexture2D : public Texture2D {
 	public:
 		GLTexture2D();
-		GLTexture2D(RendererID p_id, size_t p_width, size_t p_height, Resources::TextureFormat p_format);
+		GLTexture2D(RendererID p_id, size_t p_width, size_t p_height, TextureFormat p_format);
 		~GLTexture2D() override;
 
 		void Bind(unsigned int p_slot = 0) override;

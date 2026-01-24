@@ -16,8 +16,8 @@ namespace PrRenderer::OpenGL {
 		void         Resize(size_t width, size_t height) override;
 		virtual void ClearAttachmentColor(unsigned int p_attachemntIndex, const Core::Color& p_color) override;
 
-		virtual Resources::TexturePtr GetTexturePtr(unsigned int p_index = 0) override;
-		virtual Resources::TexturePtr GetDepthTexturePtr() override;
+		virtual TexturePtr GetTexturePtr(unsigned int p_index = 0) override;
+		virtual TexturePtr GetDepthTexturePtr() override;
 
 	private:
 		void UpdateFamebuffer();

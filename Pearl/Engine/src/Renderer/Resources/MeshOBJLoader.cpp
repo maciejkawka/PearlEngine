@@ -12,7 +12,7 @@
 #include <assimp/Exporter.hpp>
 #include <assimp/scene.h>
 
-using namespace PrRenderer::Resources;
+using namespace PrRenderer;
 
 //Hash Function for map
 template <typename T, typename... Rest>
@@ -54,7 +54,7 @@ namespace std {
 	};
 }
 
-PrCore::Resources::IResourceDataPtr MeshOBJLoader::LoadResource(const std::string& p_path)
+PrCore::IResourceDataPtr MeshOBJLoader::LoadResource(const std::string& p_path)
 {
 	auto file = PrSystems::Get<PrCore::FileSystem>()->OpenFileWrapper(p_path);
 	if (file == nullptr)
@@ -190,7 +190,7 @@ PrCore::Resources::IResourceDataPtr MeshOBJLoader::LoadResource(const std::strin
 	return mesh;
 }
 
-void MeshOBJLoader::UnloadResource(PrCore::Resources::IResourceDataPtr p_resourceData)
+void MeshOBJLoader::UnloadResource(PrCore::IResourceDataPtr p_resourceData)
 {
 	PR_ASSERT(p_resourceData, "Pointer invalid!");
 
@@ -198,7 +198,7 @@ void MeshOBJLoader::UnloadResource(PrCore::Resources::IResourceDataPtr p_resourc
 	p_resourceData = nullptr;
 }
 
-bool MeshOBJLoader::SaveResourceOnDisc(PrCore::Resources::IResourceDataPtr p_resourceData, const std::string& p_path)
+bool MeshOBJLoader::SaveResourceOnDisc(PrCore::IResourceDataPtr p_resourceData, const std::string& p_path)
 {
 	PR_ASSERT(p_resourceData, "Pointer invalid!");
 

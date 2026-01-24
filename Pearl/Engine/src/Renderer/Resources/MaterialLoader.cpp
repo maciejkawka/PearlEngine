@@ -6,10 +6,10 @@
 #include "Core/File/FileSystem.h"
 #include "Core/Utils/PathUtils.h"
 
-using namespace PrRenderer::Resources;
+using namespace PrRenderer;
 using namespace PrCore::Utils;
 
-PrCore::Resources::IResourceDataPtr MaterialLoader::LoadResource(const std::string& p_path)
+PrCore::IResourceDataPtr MaterialLoader::LoadResource(const std::string& p_path)
 {
 	auto file = PrSystems::Get<PrCore::FileSystem>()->OpenFileWrapper(p_path);
 	if (file == nullptr)
@@ -31,13 +31,13 @@ PrCore::Resources::IResourceDataPtr MaterialLoader::LoadResource(const std::stri
 	return mat;
 }
 
-void MaterialLoader::UnloadResource(PrCore::Resources::IResourceDataPtr p_resourceData)
+void MaterialLoader::UnloadResource(PrCore::IResourceDataPtr p_resourceData)
 {
 	p_resourceData.reset();
 	p_resourceData = nullptr;
 }
 
-bool MaterialLoader::SaveResourceOnDisc(PrCore::Resources::IResourceDataPtr p_resourceData, const std::string& p_path)
+bool MaterialLoader::SaveResourceOnDisc(PrCore::IResourceDataPtr p_resourceData, const std::string& p_path)
 {
 	MaterialPtr materialPtr = std::static_pointer_cast<Material>(p_resourceData);
 

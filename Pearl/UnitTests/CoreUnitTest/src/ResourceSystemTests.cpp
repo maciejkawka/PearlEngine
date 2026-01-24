@@ -9,7 +9,7 @@
 #include "Core/Events/EventManager.h"
 #include "Core/Utils/UUID.h"
 
-using namespace PrCore::Resources;
+using namespace PrCore;
 
 class TestResource : public IResourceData {
 public:
@@ -458,8 +458,7 @@ TEST_F(ResourceSystemTest, ResourcesFromMemory)
 
 TEST_F(ResourceSystemTest, GeneralResourceSystem)
 {
-	PrCore::Resources::ResourceSystem::Init();
-	auto resourceSystem = PrCore::Resources::ResourceSystem::GetInstancePtr();
+	auto resourceSystem = new PrCore::ResourceSystem();
 
 	auto dataBase = std::make_unique<ResourceDatabase>();
 	auto loader = std::make_unique<TestLoader>();
@@ -562,9 +561,9 @@ TEST_F(ResourceSystemTest, GeneralResourceSystem)
 	EXPECT_TRUE(resMemoryHandle.GetSize() == 0);
 	EXPECT_TRUE(resMemoryHandle.GetState() == ResourceState::Unmanaged);
 	EXPECT_TRUE(resMemoryHandle.IsValid());
-	EXPECT_TRUE(resMemoryHandle == nullptr);	
+	EXPECT_TRUE(resMemoryHandle == nullptr);
 
-	
+
 	// Save to file
 	EXPECT_CALL(*loaderPtr, SaveResourceOnDisc(::testing::_, "save.test")).Times(2).WillRepeatedly(::testing::Return(true));
 
@@ -598,11 +597,11 @@ TEST_F(ResourceSystemTest, GeneralResourceSystem)
 	EXPECT_EQ(copiedResource1->c, resourceToCopy->c);
 
 	resourceSystem->RemoveAll<TestResource>();
-	
+
 	// Check memory budget
 	resourceSystem->SetMemoryBudget<TestResource>(100);
 	EXPECT_EQ(resourceSystem->GetMemoryBudget<TestResource>(), 100);
 	EXPECT_EQ(resourceSystem->GetMemoryUsage<TestResource>(), 0);
 
-	PrCore::Resources::ResourceSystem::Terminate();
+	delete resourceSystem;
 }

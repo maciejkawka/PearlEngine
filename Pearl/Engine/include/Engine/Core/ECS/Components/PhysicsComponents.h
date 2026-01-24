@@ -38,7 +38,7 @@ namespace PrCore::ECS {
 				[&](const PrPhysics::CapsuleGeometry* p_geometery) { jsonGeo["radius"] = p_geometery->radius; jsonGeo["halfHeight"] = p_geometery->halfHeight; },
 				[&](const PrPhysics::BoxGeometery* p_geometery) { jsonGeo["halfExtents"] = Utils::JSONParser::ParseVec3(p_geometery->halfExtents); },
 				[&](const PrPhysics::ConvexGeometry* p_geometery) {
-					if (p_geometery->convexMeshHandle.GetOrigin() == Resources::ResourceOrigin::File)
+					if (p_geometery->convexMeshHandle.GetOrigin() == ResourceOrigin::File)
 					{
 						jsonGeo["scale"] = Utils::JSONParser::ParseVec3(p_geometery->scale);
 						jsonGeo["path"] = p_geometery->convexMeshHandle.GetPath();
@@ -124,7 +124,7 @@ namespace PrCore::ECS {
 				if (geom.contains("path"))
 				{
 					auto convex = std::make_unique<PrPhysics::ConvexGeometry>();
-					convex->convexMeshHandle = PrCore::Resources::ResourceSystem::GetInstance().Load<PrPhysics::IConvexMesh>(static_cast<std::string>(geom["path"]));
+					convex->convexMeshHandle = PrSystems::Get<ResourceSystem>()->Load<PrPhysics::IConvexMesh>(static_cast<std::string>(geom["path"]));
 					convex->scale = PrCore::Utils::JSONParser::ToVec3(geom["scale"]);
 					geometery = std::move(convex);
 				}
@@ -180,7 +180,7 @@ namespace PrCore::ECS {
 				[&](const PrPhysics::CapsuleGeometry* p_geometery) { jsonGeo["radius"] = p_geometery->radius; jsonGeo["halfHeight"] = p_geometery->halfHeight; },
 				[&](const PrPhysics::BoxGeometery* p_geometery) { jsonGeo["halfExtents"] = Utils::JSONParser::ParseVec3(p_geometery->halfExtents); },
 				[&](const PrPhysics::ConvexGeometry* p_geometery) {
-					if (p_geometery->convexMeshHandle.GetOrigin() == Resources::ResourceOrigin::File)
+					if (p_geometery->convexMeshHandle.GetOrigin() == ResourceOrigin::File)
 					{
 						jsonGeo["scale"] = Utils::JSONParser::ParseVec3(p_geometery->scale);
 						jsonGeo["path"] = p_geometery->convexMeshHandle.GetPath();
@@ -191,7 +191,7 @@ namespace PrCore::ECS {
 					}
 				},
 				[&](const PrPhysics::TriangleGeometery* p_geometery) {
-					if (p_geometery->triangleMeshHandle.GetOrigin() == Resources::ResourceOrigin::File)
+					if (p_geometery->triangleMeshHandle.GetOrigin() == ResourceOrigin::File)
 					{
 						jsonGeo["scale"] = Utils::JSONParser::ParseVec3(p_geometery->scale);
 						jsonGeo["path"] = p_geometery->triangleMeshHandle.GetPath();
@@ -272,7 +272,7 @@ namespace PrCore::ECS {
 				if (geom.contains("path"))
 				{
 					auto convex = std::make_unique<PrPhysics::ConvexGeometry>();
-					convex->convexMeshHandle = PrCore::Resources::ResourceSystem::GetInstance().Load<PrPhysics::IConvexMesh>(static_cast<std::string>(geom["path"]));
+					convex->convexMeshHandle = PrSystems::Get<ResourceSystem>()->Load<PrPhysics::IConvexMesh>(static_cast<std::string>(geom["path"]));
 					convex->scale = PrCore::Utils::JSONParser::ToVec3(geom["scale"]);
 					geometery = std::move(convex);
 				}
@@ -290,7 +290,7 @@ namespace PrCore::ECS {
 				if (geom.contains("path"))
 				{
 					auto triangle = std::make_unique<PrPhysics::TriangleGeometery>();
-					triangle->triangleMeshHandle = PrCore::Resources::ResourceSystem::GetInstance().Load<PrPhysics::ITriangleMesh>(static_cast<std::string>(geom["path"]));
+					triangle->triangleMeshHandle = PrSystems::Get<ResourceSystem>()->Load<PrPhysics::ITriangleMesh>(static_cast<std::string>(geom["path"]));
 					triangle->scale = PrCore::Utils::JSONParser::ToVec3(geom["scale"]);
 					geometery = std::move(triangle);
 				}

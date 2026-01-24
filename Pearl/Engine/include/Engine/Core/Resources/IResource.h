@@ -1,10 +1,11 @@
 #pragma once
-#include<string>
-#include<memory>
+
+#include <string>
+#include <memory>
 
 #include "Core/Utils/UUID.h"
 
-namespace PrCore::Resources {
+namespace PrCore {
 
 	using ResourceID = Utils::UUID;
 	constexpr ResourceID InvalidID = 0;
@@ -238,5 +239,5 @@ namespace PrCore::Resources {
 	};
 
 #define REGISTRER_RESOURCE_HANDLE(ResourceName) \
-	using ResourceName ## Handle = PrCore::Resources::ResourceHandle<ResourceName>
+	using ResourceName ## Handle = PrCore::ResourceHandle<ResourceName>
 }

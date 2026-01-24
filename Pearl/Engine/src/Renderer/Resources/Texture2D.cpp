@@ -4,7 +4,7 @@
 #include "Renderer/OpenGL/GLTexture2D.h"
 #include "Renderer/Core/RendererAPI.h"
 
-using namespace PrRenderer::Resources;
+using namespace PrRenderer;
 
 std::shared_ptr<Texture2D> Texture2D::Create()
 {

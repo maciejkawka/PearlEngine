@@ -2,7 +2,7 @@
 
 #include"Renderer/Resources/Mesh.h"
 
-using namespace PrRenderer::Resources;
+using namespace PrRenderer;
 
 MeshPtr Mesh::CreatePrimitive(PrimitiveType p_primitiveType)
 {

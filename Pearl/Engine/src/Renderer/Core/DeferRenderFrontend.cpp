@@ -29,9 +29,9 @@ DeferRenderFrontend::DeferRenderFrontend(RendererSettings& p_settings) :
 	m_nextSpotLightPos = 0;
 	m_nextDirLightPos = 0;
 
-	auto debugShaderHndl = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/debug_pass.shader");
+	auto debugShaderHndl = PrSystems::Get<PrCore::ResourceSystem>()->Load<Shader>("shader/debug_pass.shader");
 	m_debugShader = debugShaderHndl.GetData();
-	m_debugMaterial = std::make_shared<Resources::Material>(debugShaderHndl);
+	m_debugMaterial = std::make_shared<Material>(debugShaderHndl);
 
 	m_rendererBackend = std::make_shared<DeferRenderBackend>(m_renderSettings);
 }
@@ -57,7 +57,7 @@ void DeferRenderFrontend::SubmitLight(ECS::LightComponent* p_lightComponent, ECS
 	LightObjectPtr lightObject = nullptr;
 	switch (light->GetType())
 	{
-	case Resources::LightType::Directional:
+	case LightType::Directional:
 	{
 		if(m_dirLightNumber > MAX_LIGHT_DIRECT_COUNT)
 		{
@@ -79,7 +79,7 @@ void DeferRenderFrontend::SubmitLight(ECS::LightComponent* p_lightComponent, ECS
 		}
 		break;
 	}
-	case Resources::LightType::Point:
+	case LightType::Point:
 	{
 		if (m_pointLightNumber > MAX_LIGHT_POINT_COUNT)
 		{
@@ -101,7 +101,7 @@ void DeferRenderFrontend::SubmitLight(ECS::LightComponent* p_lightComponent, ECS
 		}
 		break;
 	}
-	case Resources::LightType::Spot:
+	case LightType::Spot:
 	{
 		if (m_spotLightNumber > MAX_LIGHT_SPOT_COUNT)
 		{
@@ -161,7 +161,7 @@ void DeferRenderFrontend::SubmitMesh(ECS::Entity& p_entity)
 		object->material = material.GetData();
 		object->vertexArrayPtr = mesh->GetVertexArray();
 		object->vertexArrayShadowPtr = shadowMesh != nullptr ? shadowMesh->GetVertexArray() : nullptr;
-		object->subMesh = mesh->GetSubmeshCount() > 0 ? mesh->GetSubmesh(i): Resources::SubMesh();
+		object->subMesh = mesh->GetSubmeshCount() > 0 ? mesh->GetSubmesh(i): SubMesh();
 		object->boxVolume = mesh->GetBoxVolume();
 		object->type = RenderObjectType::Mesh;
 		object->worldMat = worldMatrix;
@@ -172,7 +172,7 @@ void DeferRenderFrontend::SubmitMesh(ECS::Entity& p_entity)
 		object->sortingHash = hash;
 
 		// Add to shadow casters
-		if (meshComponent->shadowCaster && material->GetRenderType() == Resources::RenderType::Opaque)
+		if (meshComponent->shadowCaster && material->GetRenderType() == RenderType::Opaque)
 			m_currentFrame->shadowCasters.push_back(object);
 
 		// Frustrum culling
@@ -183,14 +183,14 @@ void DeferRenderFrontend::SubmitMesh(ECS::Entity& p_entity)
 		}
 
 		// Add object to the objects lists
-		if (material->GetRenderType() == Resources::RenderType::Opaque)
+		if (material->GetRenderType() == RenderType::Opaque)
 			m_currentFrame->opaqueObjects.push_back(object);
 		else
 			m_currentFrame->transpatrentObjects.push_back(object);
 	}
 }
 
-void DeferRenderFrontend::SetCubemap(Resources::MaterialPtr p_cubemapMat)
+void DeferRenderFrontend::SetCubemap(MaterialPtr p_cubemapMat)
 {
 	if(p_cubemapMat == nullptr)
 	{
@@ -282,7 +282,7 @@ void DeferRenderFrontend::DrawDebugCube(const Math::mat4& p_transformMat, bool p
 	renderObj->material = m_debugMaterial;
 	renderObj->worldMat = p_transformMat;
 	renderObj->id = 0;
-	renderObj->vertexArrayPtr = Resources::Mesh::CreatePrimitive(Resources::Cube)->GetVertexArray();
+	renderObj->vertexArrayPtr = Mesh::CreatePrimitive(Cube)->GetVertexArray();
 	renderObj->wiredframe = p_wireframe;
 
 	m_currentFrame->debugObjects.push_back(renderObj);
@@ -306,7 +306,7 @@ void DeferRenderFrontend::DrawDebugSphere(const Math::vec3& p_center, float p_ra
 	renderObj->material = m_debugMaterial;
 	renderObj->worldMat = transformMat;
 	renderObj->id = 0;
-	renderObj->vertexArrayPtr = Resources::Mesh::CreatePrimitive(Resources::Sphere)->GetVertexArray();
+	renderObj->vertexArrayPtr = Mesh::CreatePrimitive(Sphere)->GetVertexArray();
 	renderObj->wiredframe = p_wireframe;
 
 	m_currentFrame->debugObjects.push_back(renderObj);
@@ -329,7 +329,7 @@ void DeferRenderFrontend::DrawDebugLine(const Math::vec3& p_start, const Math::v
 	renderObj->worldMat = transform;
 	renderObj->id = 0;
 	renderObj->wiredframe = true;
-	renderObj->vertexArrayPtr = Resources::Mesh::CreatePrimitive(Resources::Line)->GetVertexArray();
+	renderObj->vertexArrayPtr = Mesh::CreatePrimitive(Line)->GetVertexArray();
 
 	m_currentFrame->debugObjects.push_back(renderObj);
 }

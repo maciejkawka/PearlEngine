@@ -3,7 +3,7 @@
 #include"Core/Math/Math.h"
 #include"Renderer/Core/Color.h"
 
-namespace PrRenderer::Resources {
+namespace PrRenderer {
 
 	enum class LightType{
 		Directional = 0,

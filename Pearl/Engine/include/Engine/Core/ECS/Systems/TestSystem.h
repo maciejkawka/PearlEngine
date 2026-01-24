@@ -40,7 +40,7 @@ namespace PrCore::ECS
 		PrRenderer::Core::Camera* m_camera;
 		int m_selectedLight = 0;
 		int m_maxLight = 0;
-		PrRenderer::Resources::LightPtr m_mainLightPtr;
+		PrRenderer::LightPtr m_mainLightPtr;
 		PrRenderer::Core::Color m_lightColor;
 
 

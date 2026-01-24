@@ -9,7 +9,7 @@
 #include"Renderer/Buffers/VertexArray.h"
 #include "Renderer/Buffers/VertexBuffer.h"
 
-using namespace PrRenderer::Resources;
+using namespace PrRenderer;
 
 void Mesh::SetVertices(std::vector<PrCore::Math::vec3>&& p_vertices)
 {

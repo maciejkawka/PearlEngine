@@ -1,8 +1,9 @@
 #pragma once
+
 #include "Core/Resources/IResource.h"
 
 
-namespace PrCore::Resources {
+namespace PrCore {
 
 	class IResourceDataLoader {
 	public:

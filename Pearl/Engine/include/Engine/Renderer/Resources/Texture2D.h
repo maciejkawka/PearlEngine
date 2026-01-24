@@ -2,7 +2,7 @@
 
 #include "Renderer/Resources/Texture.h"
 
-namespace PrRenderer::Resources {
+namespace PrRenderer {
 
 	class Texture2D : public Texture {
 	public:

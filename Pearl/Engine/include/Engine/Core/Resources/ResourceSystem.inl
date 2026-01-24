@@ -1,7 +1,7 @@
 #include "Core/Utils/Assert.h"
 #include "Core/Resources/IResource.h"
 
-namespace PrCore::Resources {
+namespace PrCore {
 
 	template<class T>
 	ResourceHandle<T> ResourceSystem::Load(const std::string& p_path, std::shared_ptr<IResourceDataLoader> p_loader /*= nullptr*/)

@@ -13,7 +13,7 @@ namespace PrPhysics {
 	};
 	DEFINE_ENUM_FLAG_OPERATORS(TriangleMeshFlags);
 
-	class ITriangleMesh : public PrCore::Resources::IResourceData, public PrPhysics::INativePtrHandle {
+	class ITriangleMesh : public PrCore::IResourceData, public PrPhysics::INativePtrHandle {
 	public:
 		virtual ~ITriangleMesh() = default;
 

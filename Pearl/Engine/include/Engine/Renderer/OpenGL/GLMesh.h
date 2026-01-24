@@ -4,7 +4,7 @@
 
 namespace PrRenderer::OpenGL {
 
-	class GLMesh : public Resources::Mesh {
+	class GLMesh : public Mesh {
 	public:
 		void Bind() override;
 		void Unbind() override;

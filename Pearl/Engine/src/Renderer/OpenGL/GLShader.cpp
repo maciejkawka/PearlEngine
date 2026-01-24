@@ -302,7 +302,7 @@ void GLShader::ScanUniforms()
 
 		PrCore::StringUtils::ResizeToFitContains(uniformName);
 
-		Resources::UniformType prUniformType = Resources::UniformType::None;
+		UniformType prUniformType = UniformType::None;
 		std::any uniformValue;
 
 		switch (uniformType)
@@ -310,79 +310,79 @@ void GLShader::ScanUniforms()
 		case GL_INT:
 			if (uniformSize == 1)
 			{
-				prUniformType = Resources::UniformType::Int;
+				prUniformType = UniformType::Int;
 				uniformValue = std::make_any<int>(GetUniformInt(uniformName));
 			}
 			else
-				prUniformType = Resources::UniformType::Int_Array;
+				prUniformType = UniformType::Int_Array;
 			break;
 		case GL_BOOL:
-			prUniformType = Resources::UniformType::Bool;
+			prUniformType = UniformType::Bool;
 			uniformValue = std::make_any<bool>(GetUniformInt(uniformName));
 
 			break;
 		case GL_FLOAT:
 			if (uniformSize == 1)
 			{
-				prUniformType = Resources::UniformType::Float;
+				prUniformType = UniformType::Float;
 				uniformValue = std::make_any<float>(GetUniformFloat(uniformName));
 			}
 			else
-				prUniformType = Resources::UniformType::Float_Array;
+				prUniformType = UniformType::Float_Array;
 			break;
 		case GL_FLOAT_VEC2:
 			if (uniformSize == 1)
 			{
-				prUniformType = Resources::UniformType::Float_Vec2;
+				prUniformType = UniformType::Float_Vec2;
 				uniformValue = std::make_any<PrCore::Math::vec2>(GetUniformVec2(uniformName));
 			}
 			else
-				prUniformType = Resources::UniformType::Float_Vec2_Array;
+				prUniformType = UniformType::Float_Vec2_Array;
 			break;
 		case GL_FLOAT_VEC3:
 			if (uniformSize == 1)
 			{
-				prUniformType = Resources::UniformType::Float_Vec3;
+				prUniformType = UniformType::Float_Vec3;
 				uniformValue = std::make_any<PrCore::Math::vec3>(GetUniformVec3(uniformName));
 			}
 			else
-				prUniformType = Resources::UniformType::Float_Vec3_Array;
+				prUniformType = UniformType::Float_Vec3_Array;
 			break;
 		case GL_FLOAT_VEC4:
 			if (uniformSize == 1)
 			{
-				prUniformType = Resources::UniformType::Float_Vec4;
+				prUniformType = UniformType::Float_Vec4;
 				uniformValue = std::make_any<PrCore::Math::vec4>(GetUniformVec4(uniformName));
 			}
 			else
-				prUniformType = Resources::UniformType::Float_Vec4_Array;
+				prUniformType = UniformType::Float_Vec4_Array;
 			break;
 		case GL_FLOAT_MAT4:
 			if (uniformSize == 1)
 			{
-				prUniformType = Resources::UniformType::Float_Mat4;
+				prUniformType = UniformType::Float_Mat4;
 				uniformValue = std::make_any<PrCore::Math::mat4>(GetUniformMat4(uniformName));
 			}
 			else
-				prUniformType = Resources::UniformType::Float_Mat4_Array;
+				prUniformType = UniformType::Float_Mat4_Array;
 			break;
 		case GL_FLOAT_MAT3:
 			if (uniformSize == 1)
 			{
-				prUniformType = Resources::UniformType::Float_Mat3;
+				prUniformType = UniformType::Float_Mat3;
 				uniformValue = std::make_any<PrCore::Math::mat3>(GetUniformMat3(uniformName));
 			}
 			else
-				prUniformType = Resources::UniformType::Float_Mat3_Array;
+				prUniformType = UniformType::Float_Mat3_Array;
 			break;
 		case GL_SAMPLER_2D:
-			prUniformType = Resources::UniformType::Texture2D;
+			prUniformType = UniformType::Texture2D;
 			break;
 		case GL_SAMPLER_3D:
-			prUniformType = Resources::UniformType::Texture3D;
+			prUniformType = UniformType::Texture3D;
 			break;
 		case GL_SAMPLER_CUBE:
-			prUniformType = Resources::UniformType::Cubemap;
+			prUniformType = UniformType::Cubemap;
 			break;
 		default:
 		{
@@ -392,7 +392,7 @@ void GLShader::ScanUniforms()
 		}
 		}
 
-		Resources::Uniform uniform{
+		Uniform uniform{
 			prUniformType,
 			(unsigned int)uniformSize,
 			uniformValue

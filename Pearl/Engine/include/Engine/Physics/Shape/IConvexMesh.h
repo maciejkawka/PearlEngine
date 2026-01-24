@@ -6,7 +6,7 @@
 
 namespace PrPhysics {
 
-	class IConvexMesh : public PrCore::Resources::IResourceData, public PrPhysics::INativePtrHandle {
+	class IConvexMesh : public PrCore::IResourceData, public PrPhysics::INativePtrHandle {
 	public:
 		~IConvexMesh() = default;
 

@@ -9,7 +9,7 @@ namespace PrRenderer::Core {
 	class Color;
 }
 
-namespace PrRenderer::Resources {
+namespace PrRenderer {
 
 	enum class TextureFormat {
 		R8,
@@ -46,7 +46,7 @@ namespace PrRenderer::Resources {
 		None
 	};
 
-	class Texture : public PrCore::Resources::IResourceData {
+	class Texture : public PrCore::IResourceData {
 	public:
 		Texture() :
 			m_ID(0U),

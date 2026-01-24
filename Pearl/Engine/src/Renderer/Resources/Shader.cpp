@@ -6,9 +6,9 @@
 #include "Renderer/Core/RendererAPI.h"
 
 
-using namespace PrRenderer::Resources;
+using namespace PrRenderer;
 
-PrRenderer::Resources::Shader::Shader(const std::string& p_vertexShader, const std::string& p_fragmentShader):
+PrRenderer::Shader::Shader(const std::string& p_vertexShader, const std::string& p_fragmentShader):
 	m_vertexShader(p_vertexShader),
 	m_fragmentShader(p_fragmentShader),
 	m_geometryShader(""),

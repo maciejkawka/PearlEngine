@@ -21,15 +21,15 @@ namespace PrRenderer::Buffers {
 
 		FramebufferTexture() = default;
 		FramebufferTexture(
-			Resources::TextureFormat p_format,
-			Resources::TextureFiltering p_filteringMin = Resources::TextureFiltering::Linear,
-			Resources::TextureFiltering p_filteringMag = Resources::TextureFiltering::Linear,
-			Resources::TextureWrapMode p_wrapModeU = Resources::TextureWrapMode::Clamp,
-			Resources::TextureWrapMode p_wrapModeV = Resources::TextureWrapMode::Clamp,
+			TextureFormat p_format,
+			TextureFiltering p_filteringMin = TextureFiltering::Linear,
+			TextureFiltering p_filteringMag = TextureFiltering::Linear,
+			TextureWrapMode p_wrapModeU = TextureWrapMode::Clamp,
+			TextureWrapMode p_wrapModeV = TextureWrapMode::Clamp,
 			size_t p_with = 0,
 			size_t p_height = 0,
 			bool p_cubeTexture = false,
-			Resources::TextureWrapMode p_wrapModeR = Resources::TextureWrapMode::Clamp) :
+			TextureWrapMode p_wrapModeR = TextureWrapMode::Clamp) :
 			width(p_with),
 			height(p_height),
 			format(p_format),
@@ -43,12 +43,12 @@ namespace PrRenderer::Buffers {
 
 		size_t width = 0;
 		size_t height = 0;
-		Resources::TextureFormat format = Resources::TextureFormat::RGBA32;
-		Resources::TextureFiltering filteringMin = Resources::TextureFiltering::Linear;
-		Resources::TextureFiltering filteringMag = Resources::TextureFiltering::Linear;
-		Resources::TextureWrapMode wrapModeU = Resources::TextureWrapMode::Clamp;
-		Resources::TextureWrapMode wrapModeV = Resources::TextureWrapMode::Clamp;
-		Resources::TextureWrapMode wrapModeR = Resources::TextureWrapMode::Clamp;
+		TextureFormat format = TextureFormat::RGBA32;
+		TextureFiltering filteringMin = TextureFiltering::Linear;
+		TextureFiltering filteringMag = TextureFiltering::Linear;
+		TextureWrapMode wrapModeU = TextureWrapMode::Clamp;
+		TextureWrapMode wrapModeV = TextureWrapMode::Clamp;
+		TextureWrapMode wrapModeR = TextureWrapMode::Clamp;
 		bool cubeTexture = false;
 	};
 
@@ -73,7 +73,7 @@ namespace PrRenderer::Buffers {
 		bool mipMaped = false;
 		int samples = 1;
 		FramebufferTexAttachments colorTextureAttachments;
-		FramebufferTexture depthStencilAttachment = Resources::TextureFormat::None;
+		FramebufferTexture depthStencilAttachment = TextureFormat::None;
 	};
 
 	class Framebufffer {
@@ -87,8 +87,8 @@ namespace PrRenderer::Buffers {
 		virtual void Resize(size_t width, size_t height) = 0;
 		virtual void ClearAttachmentColor(unsigned int p_attachemntIndex, const Core::Color& p_color) = 0;
 		
-		virtual Resources::TexturePtr GetTexturePtr(unsigned int p_index = 0) = 0;
-		virtual Resources::TexturePtr GetDepthTexturePtr() = 0;
+		virtual TexturePtr GetTexturePtr(unsigned int p_index = 0) = 0;
+		virtual TexturePtr GetDepthTexturePtr() = 0;
 
 		inline const FramebufferSettings& GetSettings() const { return m_settings; }
 		inline RendererID                 GetID() const { return m_ID; }
@@ -96,10 +96,10 @@ namespace PrRenderer::Buffers {
 		static FramebuffferPtr Create(const FramebufferSettings& p_settings);
 
 	protected:
-		RendererID                          m_ID;
-		FramebufferSettings                 m_settings;
-		Resources::TexturePtr               m_depthTexture;
-		std::vector<Resources::TexturePtr>  m_colorTextures;
+		RendererID               m_ID;
+		FramebufferSettings      m_settings;
+		TexturePtr               m_depthTexture;
+		std::vector<TexturePtr>  m_colorTextures;
 	};
 
 	typedef std::shared_ptr<Framebufffer> FramebuffferPtr;

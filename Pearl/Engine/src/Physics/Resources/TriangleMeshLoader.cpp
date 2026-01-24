@@ -13,7 +13,7 @@
 using namespace PrPhysics;
 using namespace physx;
 
-PrCore::Resources::IResourceDataPtr TriangleMeshLoader::LoadResource(const std::string& p_path)
+PrCore::IResourceDataPtr TriangleMeshLoader::LoadResource(const std::string& p_path)
 {
 	auto pFileSystem = PrSystems::Get<PrCore::FileSystem>();
 	auto file = pFileSystem->FileOpen(p_path);
@@ -31,13 +31,13 @@ PrCore::Resources::IResourceDataPtr TriangleMeshLoader::LoadResource(const std::
 	return convexMeshPtr;
 }
 
-void TriangleMeshLoader::UnloadResource(PrCore::Resources::IResourceDataPtr p_resourceData)
+void TriangleMeshLoader::UnloadResource(PrCore::IResourceDataPtr p_resourceData)
 {
 	p_resourceData.reset();
 	p_resourceData = nullptr;
 }
 
-bool TriangleMeshLoader::SaveResourceOnDisc(PrCore::Resources::IResourceDataPtr p_resourceData, const std::string& p_path)
+bool TriangleMeshLoader::SaveResourceOnDisc(PrCore::IResourceDataPtr p_resourceData, const std::string& p_path)
 {
 	ITriangleMeshPtr triangleMeshPtr = std::static_pointer_cast<ITriangleMesh>(p_resourceData);
 

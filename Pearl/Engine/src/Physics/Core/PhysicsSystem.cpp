@@ -167,7 +167,7 @@ PrPhysics::IShapePtr PhysicsSystem::CreateShape(const IGeometry& p_geometery, co
 	return m_physicsFactory->CreateShape(p_geometery, p_mat, isExclusive, p_flags);
 }
 
-PrPhysics::IConvexMeshPtr PhysicsSystem::CreateConvexMesh(PrRenderer::Resources::MeshPtr p_mesh)
+PrPhysics::IConvexMeshPtr PhysicsSystem::CreateConvexMesh(PrRenderer::MeshPtr p_mesh)
 {
 	return m_physicsFactory->CreateConvexMesh(p_mesh);
 }
@@ -209,7 +209,7 @@ bool PhysicsSystem::Raycast(const PrCore::Math::vec3& p_origin, const PrCore::Ma
 	return false;
 }
 
-PrPhysics::ITriangleMeshPtr PhysicsSystem::CreateTriangleMesh(PrRenderer::Resources::MeshPtr p_mesh)
+PrPhysics::ITriangleMeshPtr PhysicsSystem::CreateTriangleMesh(PrRenderer::MeshPtr p_mesh)
 {
 	return m_physicsFactory->CreateTriangleMesh(p_mesh);
 }

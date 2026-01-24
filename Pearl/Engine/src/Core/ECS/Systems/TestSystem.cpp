@@ -75,7 +75,7 @@ void RenderStressTest::OnEnable()
 	for (auto [entity, light, mesh] : m_entityViewer.EntitesWithComponents<LightComponent, MeshRendererComponent>())
 	{
 		entity.GetComponent<NameComponent>()->name;
-		mesh->mainMaterial = std::make_shared<PrRenderer::Resources::Material>(*mesh->mainMaterial.GetData());
+		mesh->mainMaterial = std::make_shared<PrRenderer::Material>(*mesh->mainMaterial.GetData());
 		PrRenderer::Core::Color color = randColor();
 		light->m_light->SetColor(color);
 		mesh->mainMaterial->SetColor(color);
@@ -84,7 +84,7 @@ void RenderStressTest::OnEnable()
 
 	for (auto [entity, light] : m_entityViewer.EntitesWithComponents<LightComponent>())
 	{
-		if (light->m_light->GetType() == PrRenderer::Resources::LightType::Directional)
+		if (light->m_light->GetType() == PrRenderer::LightType::Directional)
 		{
 			m_mainLightPtr = light->m_light;
 			m_lightColor = m_mainLightPtr->GetColor();
@@ -96,7 +96,7 @@ void RenderStressTest::OnEnable()
 		}
 	}
 
-	renderSystem->SetCubemap(Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("stress_test/hrd_skymap.mat").GetData());
+	renderSystem->SetCubemap(PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/hrd_skymap.mat").GetData());
 	m_mainLightPtr->SetColor(m_lightColor);
 
 	PrPhysics::PhysicsSystem::GetInstancePtr()->SetGravity(PrCore::Math::vec3{ 0.0f });
@@ -105,9 +105,9 @@ void RenderStressTest::OnEnable()
 
 	if(pan.IsValid())
 	{
-		auto shader = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Shader>("shader/deffered/water.shader");
+		auto shader = PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Shader>("shader/deffered/water.shader");
 
-		auto newMat = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("water.mat");
+		auto newMat = PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("water.mat");
 		auto mat = pan.GetComponent<MeshRendererComponent>()->mainMaterial;
 		//newMat->CopyPropertiesFrom(*mat.GetData());
 
@@ -115,19 +115,19 @@ void RenderStressTest::OnEnable()
 		newMat->SetProperty<float>("uAmplitude", 0.6f);
 		newMat->SetProperty<float>("uFrequency", 2.0f);
 		newMat->SetProperty<float>("uSpeed", 1.5f);
-		//newMat->SetTexture("normalMap", PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Texture>("Water_001_NORM.jpg"));
-		//newMat->SetTexture("albedoMap", PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Texture>("Water_001_COLOR.jpg"));
+		//newMat->SetTexture("normalMap", PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Texture>("Water_001_NORM.jpg"));
+		//newMat->SetTexture("albedoMap", PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Texture>("Water_001_COLOR.jpg"));
 
 		//auto waterMat = 
 		pan.GetComponent<MeshRendererComponent>()->mainMaterial = newMat;
-		//PrCore::Resources::ResourceSystem::GetInstance().SaveToFile<PrRenderer::Resources::Mesh>(mesh.GetID(), "test.obj");
-		//auto loadedMesh = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>("test.obj");
+		//PrSystems::Get<ResourceSystem>()->SaveToFile<PrRenderer::Mesh>(mesh.GetID(), "test.obj");
+		//auto loadedMesh = PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Mesh>("test.obj");
 		//pan.GetComponent<MeshRendererComponent>()->mesh = loadedMesh;
 
 
-		//auto texture = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Texture>("texture/jacaranda_tree_leaves_diff_4k_New.png");
+		//auto texture = PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Texture>("texture/jacaranda_tree_leaves_diff_4k_New.png");
 		//auto data = texture->FetchGPUData();
-		//PrCore::Resources::ResourceSystem::GetInstance().SaveToFile<PrRenderer::Resources::Texture>(texture.GetID(), "test.jpg");
+		//PrSystems::Get<ResourceSystem>()->SaveToFile<PrRenderer::Texture>(texture.GetID(), "test.jpg");
 		//pan.GetComponent<MeshRendererComponent>()->materials[1]->SetTexture("albedoMap", texture.GetData());
 	}
 
@@ -184,11 +184,11 @@ void RenderStressTest::OnEnable()
 		material.dynamicFriction = 0.1f;
 		material.restitution = .1f;
 
-		auto convexMesh = PrCore::Resources::ResourceSystem::GetInstance().Load<PrPhysics::IConvexMesh>("test.phys");
+		auto convexMesh = PrSystems::Get<ResourceSystem>()->Load<PrPhysics::IConvexMesh>("test.phys");
 
 		//auto convexMesh = PrPhysics::PhysicsSystem::GetInstance().CreateConvexMesh(render->mesh);
-		//auto resourceHandle = PrCore::Resources::ResourceSystem::GetInstance().Register<PrPhysics::IConvexMesh>(convexMesh);
-		//PrCore::Resources::ResourceSystem::GetInstance().SaveToFile<PrPhysics::IConvexMesh>(resourceHandle.GetID(), "ThisIsTest.phys");
+		//auto resourceHandle = PrSystems::Get<ResourceSystem>()->Register<PrPhysics::IConvexMesh>(convexMesh);
+		//PrSystems::Get<ResourceSystem>()->SaveToFile<PrPhysics::IConvexMesh>(resourceHandle.GetID(), "ThisIsTest.phys");
 
 		auto shape = PrPhysics::PhysicsSystem::GetInstancePtr()->CreateShape(PrPhysics::ConvexGeometry{ convexMesh, transform->GetLocalScale() }, material);
 		rigidbody->AttachShape(shape);
@@ -270,7 +270,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 
 		if (cubemap == 0)
 		{
-			renderSystem->SetCubemap(Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("stress_test/hrd_skymap.mat").GetData());
+			renderSystem->SetCubemap(PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/hrd_skymap.mat").GetData());
 			m_mainLightPtr->SetColor(m_lightColor);
 
 			//auto entity = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("jacaranda_tree_leaves");
@@ -278,7 +278,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 		}
 		else if (cubemap == 1)
 		{
-			renderSystem->SetCubemap(Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("stress_test/cubemap_default.mat").GetData());
+			renderSystem->SetCubemap(PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/cubemap_default.mat").GetData());
 			m_mainLightPtr->SetColor(m_lightColor);
 
 			//auto entity = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("jacaranda_tree_leaves");
@@ -389,8 +389,8 @@ void RenderStressTest::OnUpdate(float p_dt)
 		auto logoMesh = entity.AddComponent<PrCore::ECS::MeshRendererComponent>();
 		logoTransform->SetPosition(m_camera->GetPosition() + m_cameraTransform->GetForwardVector() * 2.0f);
 		logoTransform->SetLocalScale(PrCore::Math::vec3(1.0f));
-		logoMesh->mainMaterial = PrCore::Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>("stress_test/emissionCapsule.mat");
-		logoMesh->mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Sphere);
+		logoMesh->mainMaterial = PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/emissionCapsule.mat");
+		logoMesh->mesh = PrRenderer::Mesh::CreatePrimitive(PrRenderer::PrimitiveType::Sphere);
 
 		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::LEFT_CONTROL))
 		{
@@ -403,14 +403,14 @@ void RenderStressTest::OnUpdate(float p_dt)
 		size_t width, hegiht;
 		auto buffer = PrRenderer::Core::LowRenderer::ReadFrontBuffer(width, hegiht);
 
-		auto tex = PrRenderer::Resources::Texture2D::Create();
-		tex->SetFormat(PrRenderer::Resources::TextureFormat::RGB24);
+		auto tex = PrRenderer::Texture2D::Create();
+		tex->SetFormat(PrRenderer::TextureFormat::RGB24);
 		tex->SetHeight(hegiht);
 		tex->SetWidth(width);
 		tex->SetData(buffer);
 		tex->Apply();
 
-		PrRenderer::Resources::Texture2DLoader loader;
+		PrRenderer::Texture2DLoader loader;
 		loader.SaveResourceOnDisc(tex, "screen.png");
 
 		delete[] buffer;

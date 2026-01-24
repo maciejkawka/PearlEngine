@@ -69,7 +69,6 @@ PrCore::Entry::AppContext::AppContext()
 	//-----------------------
 	// Init File System
 	PRLOG_INFO("Init File System");
-
 	auto* pFileSystem = PrSystems::Register<FileSystem>();
 	std::string_view engineAssetsPath = "EngineAssets";
 	std::string_view gameAssetPath = "GameAssets";
@@ -94,35 +93,37 @@ PrCore::Entry::AppContext::AppContext()
 	PRLOG_INFO("Init Event Manager");
 	PrSystems::Register<EventManager>();
 
-	Resources::ResourceSystem::Init();
 
 	//-----------------------
 	// Init Resource System
+	PRLOG_INFO("Init Resource Manager");
+	auto pResourceSystem = PrSystems::Register<ResourceSystem>();
+
 	{
-		using namespace PrRenderer::Resources;
+		using namespace PrRenderer;
 		auto textureDatabase = std::make_unique<ResourceDatabase>();
 		textureDatabase->RegisterLoader(".png", std::make_unique<Texture2DLoader>());
 		textureDatabase->RegisterLoader(".jpg", std::make_unique<Texture2DLoader>());
 		textureDatabase->RegisterLoader(".tga", std::make_unique<Texture2DLoader>());
 		textureDatabase->RegisterLoader(".hdr", std::make_unique<Texture2DLoader>());
-		ResourceSystem::GetInstance().RegisterDatabase<Texture>(std::move(textureDatabase));
+		pResourceSystem->RegisterDatabase<Texture>(std::move(textureDatabase));
 
 		auto materialLoader = std::make_unique<ResourceDatabase>();
 		materialLoader->RegisterLoader(".mat", std::make_unique<MaterialLoader>());
-		ResourceSystem::GetInstance().RegisterDatabase<Material>(std::move(materialLoader));
+		pResourceSystem->RegisterDatabase<Material>(std::move(materialLoader));
 
 		auto shaderLoader = std::make_unique<ResourceDatabase>();
 		shaderLoader->RegisterLoader(".shader", std::make_unique<ShaderLoader>());
-		ResourceSystem::GetInstance().RegisterDatabase<Shader>(std::move(shaderLoader));
+		pResourceSystem->RegisterDatabase<Shader>(std::move(shaderLoader));
 
 		auto meshLoader = std::make_unique<ResourceDatabase>();
 		meshLoader->RegisterLoader(".obj", std::make_unique<MeshOBJLoader>());
-		ResourceSystem::GetInstance().RegisterDatabase<Mesh>(std::move(meshLoader));
+		pResourceSystem->RegisterDatabase<Mesh>(std::move(meshLoader));
 
 		auto cubemapDatabase = std::make_unique<ResourceDatabase>();
 		cubemapDatabase->RegisterLoader(".cubemap", std::make_unique<BasicCubemapLoader>());
 		cubemapDatabase->RegisterLoader(".hdr", std::make_unique<HdrCubemapLoader>());
-		ResourceSystem::GetInstance().RegisterDatabase<Cubemap>(std::move(cubemapDatabase));
+		pResourceSystem->RegisterDatabase<Cubemap>(std::move(cubemapDatabase));
 	}
 
 	ConfigFile contexConfig;
@@ -220,13 +221,13 @@ PrCore::Entry::AppContext::AppContext()
 		PrPhysics::PhysicsSettings physSettings;
 		PrPhysics::PhysicsSystem::Init(physSettings);
 
-		auto convexMeshDatabase = std::make_unique<PrRenderer::Resources::ResourceDatabase>();
+		auto convexMeshDatabase = std::make_unique<PrRenderer::ResourceDatabase>();
 		convexMeshDatabase->RegisterLoader(".physc", std::make_unique<PrPhysics::ConvexMeshLoader>());
-		PrRenderer::Resources::ResourceSystem::GetInstance().RegisterDatabase<PrPhysics::IConvexMesh>(std::move(convexMeshDatabase));
+		pResourceSystem->RegisterDatabase<PrPhysics::IConvexMesh>(std::move(convexMeshDatabase));
 
-		auto triangleMeshDatabase = std::make_unique<PrRenderer::Resources::ResourceDatabase>();
+		auto triangleMeshDatabase = std::make_unique<PrRenderer::ResourceDatabase>();
 		triangleMeshDatabase->RegisterLoader(".physt", std::make_unique<PrPhysics::TriangleMeshLoader>());
-		PrRenderer::Resources::ResourceSystem::GetInstance().RegisterDatabase<PrPhysics::ITriangleMesh>(std::move(triangleMeshDatabase));
+		pResourceSystem->RegisterDatabase<PrPhysics::ITriangleMesh>(std::move(triangleMeshDatabase));
 	}
 
 	Input::InputManager::Init();
@@ -241,10 +242,10 @@ PrCore::Entry::AppContext::~AppContext()
 	Input::InputManager::Terminate();
 
 	{
-		PrCore::Resources::ResourceSystem::GetInstance().UnloadAll<PrPhysics::IConvexMesh>();
-		PrCore::Resources::ResourceSystem::GetInstance().UnregisterLoader<PrPhysics::IConvexMesh>(".physc");
-		PrCore::Resources::ResourceSystem::GetInstance().UnloadAll<PrPhysics::ITriangleMesh>();
-		PrCore::Resources::ResourceSystem::GetInstance().UnregisterLoader<PrPhysics::ITriangleMesh>(".physt");
+		PrSystems::Get<ResourceSystem>()->UnloadAll<PrPhysics::IConvexMesh>();
+		PrSystems::Get<ResourceSystem>()->UnregisterLoader<PrPhysics::IConvexMesh>(".physc");
+		PrSystems::Get<ResourceSystem>()->UnloadAll<PrPhysics::ITriangleMesh>();
+		PrSystems::Get<ResourceSystem>()->UnregisterLoader<PrPhysics::ITriangleMesh>(".physt");
 		PrPhysics::PhysicsSystem::Terminate();
 	}
 
@@ -252,7 +253,9 @@ PrCore::Entry::AppContext::~AppContext()
 	delete m_rendererContext;
 	delete m_window;
 	Windowing::GLWindow::TerminateDevice();
-	Resources::ResourceSystem::Terminate();
+
+	PRLOG_INFO("Terminating Resource Manager");
+	PrSystems::Unregister<ResourceSystem>();
 
 	PRLOG_INFO("Terminating Event Manager");
 	PrSystems::Unregister<EventManager>();

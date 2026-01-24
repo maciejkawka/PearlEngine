@@ -2,7 +2,7 @@
 
 #include "Core/Resources/ResourceSystem.h"
 
-using namespace PrCore::Resources;
+using namespace PrCore;
 
 void ResourceSystem::UnregisterDatabasesAll()
 {

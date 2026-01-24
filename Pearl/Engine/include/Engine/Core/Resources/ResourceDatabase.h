@@ -5,7 +5,7 @@
 #include "IResource.h"
 #include "IResourceDatabase.h"
 
-namespace PrCore::Resources {
+namespace PrCore {
 
 	class ResourceDatabase : public IResourceDatabase {
 	public:

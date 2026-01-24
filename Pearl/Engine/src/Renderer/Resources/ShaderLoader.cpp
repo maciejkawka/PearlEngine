@@ -7,9 +7,9 @@
 #include"Core/Utils/StringUtils.h"
 #include"Core/Utils/PathUtils.h"
 
-using namespace PrRenderer::Resources;
+using namespace PrRenderer;
 
-PrCore::Resources::IResourceDataPtr ShaderLoader::LoadResource(const std::string& p_path)
+PrCore::IResourceDataPtr ShaderLoader::LoadResource(const std::string& p_path)
 {
 	//Load from file
 	auto file = PrSystems::Get<PrCore::FileSystem>()->OpenFileWrapper(p_path);
@@ -50,13 +50,13 @@ PrCore::Resources::IResourceDataPtr ShaderLoader::LoadResource(const std::string
 	return shaderPtr;
 }
 
-void ShaderLoader::UnloadResource(PrCore::Resources::IResourceDataPtr p_resourceData)
+void ShaderLoader::UnloadResource(PrCore::IResourceDataPtr p_resourceData)
 {
 	p_resourceData.reset();
 	p_resourceData = nullptr;
 }
 
-bool ShaderLoader::SaveResourceOnDisc(PrCore::Resources::IResourceDataPtr p_resourceData, const std::string& p_path)
+bool ShaderLoader::SaveResourceOnDisc(PrCore::IResourceDataPtr p_resourceData, const std::string& p_path)
 {
 	return false;
 }

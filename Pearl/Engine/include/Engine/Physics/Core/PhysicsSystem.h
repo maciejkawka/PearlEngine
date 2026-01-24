@@ -62,9 +62,9 @@ namespace PrPhysics {
 		IRigidStaticPtr      CreateRigidStatic(const Transform& p_transform);
 		IRigidBodyDynamicPtr CreateRigidDynamic(const Transform& p_transform);
 		IShapePtr            CreateShape(const IGeometry& p_geometery, const Material& p_mat, bool isExclusive = false, ShapeFlags p_flags = ShapeFlags::Visualization | ShapeFlags::SceneQuery | ShapeFlags::Simulation);
-		IConvexMeshPtr       CreateConvexMesh(PrRenderer::Resources::MeshPtr p_mesh);
+		IConvexMeshPtr       CreateConvexMesh(PrRenderer::MeshPtr p_mesh);
 		IConvexMeshPtr       CreateConvexMesh(uint8_t* p_data, size_t p_size);
-		ITriangleMeshPtr     CreateTriangleMesh(PrRenderer::Resources::MeshPtr p_mesh);
+		ITriangleMeshPtr     CreateTriangleMesh(PrRenderer::MeshPtr p_mesh);
 		ITriangleMeshPtr     CreateTriangleMesh(uint8_t* p_data, size_t p_size);
 
 		// Scene Queries

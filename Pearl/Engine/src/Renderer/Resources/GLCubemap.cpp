@@ -12,7 +12,7 @@ GLCubemap::GLCubemap()
 	glGenTextures(1, &m_ID);
 }
 
-GLCubemap::GLCubemap(RendererID p_id, size_t p_width, size_t p_height, Resources::TextureFormat p_format)
+GLCubemap::GLCubemap(RendererID p_id, size_t p_width, size_t p_height, TextureFormat p_format)
 {
 	m_ID = p_id;
 	m_width = p_width;
@@ -49,16 +49,16 @@ void GLCubemap::CalculateSize()
 
 	switch (m_format)
 	{
-	case Resources::TextureFormat::R8:
+	case TextureFormat::R8:
 		m_size += m_width * m_height * 8 * 6;
 		break;
-	case Resources::TextureFormat::RG16:
+	case TextureFormat::RG16:
 		m_size += m_width * m_height * 2 * 8 * 6;
 		break;
-	case Resources::TextureFormat::RGB24:
+	case TextureFormat::RGB24:
 		m_size += m_width * m_height * 3 * 8 * 6;
 		break;
-	case Resources::TextureFormat::RGBA32:
+	case TextureFormat::RGBA32:
 		m_size += m_width * m_height * 4 * 8 * 6;
 		break;
 	default:

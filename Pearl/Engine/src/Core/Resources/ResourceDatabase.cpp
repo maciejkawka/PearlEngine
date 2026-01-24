@@ -10,7 +10,7 @@
 
 #include <algorithm>
 
-using namespace PrCore::Resources;
+using namespace PrCore;
 
 ResourceDatabase::~ResourceDatabase()
 {
@@ -108,7 +108,7 @@ void ResourceDatabase::Unload(ResourceID p_id)
 		UnloadResourcePrivate(resourceDesc);
 }
 
-PrCore::Resources::ResourceDescPtr ResourceDatabase::Get(ResourceID p_id)
+PrCore::ResourceDescPtr ResourceDatabase::Get(ResourceID p_id)
 {
 	PR_ASSERT(p_id != InvalidID, "ResourceID is invalid.");
 
@@ -128,7 +128,7 @@ PrCore::Resources::ResourceDescPtr ResourceDatabase::Get(ResourceID p_id)
 	return resourceDesc;
 }
 
-PrCore::Resources::ResourceDescPtr ResourceDatabase::Get(const std::string& p_path)
+PrCore::ResourceDescPtr ResourceDatabase::Get(const std::string& p_path)
 {
 	PR_ASSERT(!p_path.empty(), "Resource path is empty");
 	auto lowerPath = PrCore::StringUtils::ToLower(p_path);
@@ -149,12 +149,12 @@ PrCore::Resources::ResourceDescPtr ResourceDatabase::Get(const std::string& p_pa
 	return resourceDesc;
 }
 
-PrCore::Resources::ResourceDescPtr ResourceDatabase::Register(IResourceDataPtr p_resourceData)
+PrCore::ResourceDescPtr ResourceDatabase::Register(IResourceDataPtr p_resourceData)
 {
 	return RegisterMemoryResourcePrivate(p_resourceData);
 }
 
-PrCore::Resources::ResourceDescPtr ResourceDatabase::Register(const std::string& p_path)
+PrCore::ResourceDescPtr ResourceDatabase::Register(const std::string& p_path)
 {
 	PR_ASSERT(!p_path.empty(), "Resource path is empty");
 	auto lowerPath = PrCore::StringUtils::ToLower(p_path);
@@ -206,7 +206,7 @@ bool ResourceDatabase::Remove(ResourceID p_id)
 	return true;
 }
 
-PrCore::Resources::ResourceDescPtr ResourceDatabase::RegisterFileResourcePrivate(const std::string& p_path)
+PrCore::ResourceDescPtr ResourceDatabase::RegisterFileResourcePrivate(const std::string& p_path)
 {
 	PR_ASSERT(!p_path.empty(), "Resource path is empty");
 
@@ -224,7 +224,7 @@ PrCore::Resources::ResourceDescPtr ResourceDatabase::RegisterFileResourcePrivate
 	return resourceDesc;
 }
 
-PrCore::Resources::ResourceDescPtr PrCore::Resources::ResourceDatabase::RegisterMemoryResourcePrivate(const IResourceDataPtr& p_resourceData)
+PrCore::ResourceDescPtr PrCore::ResourceDatabase::RegisterMemoryResourcePrivate(const IResourceDataPtr& p_resourceData)
 {
 	PR_ASSERT(p_resourceData, "Resource data is nullptr");
 
@@ -244,7 +244,7 @@ PrCore::Resources::ResourceDescPtr PrCore::Resources::ResourceDatabase::Register
 	return resourceDesc;
 }
 
-bool PrCore::Resources::ResourceDatabase::LoadResourcePrivate(const ResourceDescPtr& p_resourceDesc, std::shared_ptr<IResourceDataLoader> p_loader /*= nullptr*/)
+bool PrCore::ResourceDatabase::LoadResourcePrivate(const ResourceDescPtr& p_resourceDesc, std::shared_ptr<IResourceDataLoader> p_loader /*= nullptr*/)
 {
 	PR_ASSERT(p_resourceDesc, "Resource is nullptr");
 	PR_ASSERT(!p_resourceDesc->filePath.empty(), "Resource path is empty");
@@ -308,7 +308,7 @@ bool PrCore::Resources::ResourceDatabase::LoadResourcePrivate(const ResourceDesc
 	return true;
 }
 
-PrCore::Resources::IResourceDataLoader* PrCore::Resources::ResourceDatabase::GetLoader(const std::string& p_fileExtension)
+PrCore::IResourceDataLoader* PrCore::ResourceDatabase::GetLoader(const std::string& p_fileExtension)
 {
 	PR_ASSERT(!p_fileExtension.empty(), "File extension is empty");
 	auto lowerExt = PrCore::StringUtils::ToLower(p_fileExtension);
@@ -321,7 +321,7 @@ PrCore::Resources::IResourceDataLoader* PrCore::Resources::ResourceDatabase::Get
 	return it->second.get();
 }
 
-PrCore::Resources::ResourceDescPtr ResourceDatabase::SaveToFileAndLoad(ResourceID p_sourceId, const std::string& p_path)
+PrCore::ResourceDescPtr ResourceDatabase::SaveToFileAndLoad(ResourceID p_sourceId, const std::string& p_path)
 {
 	PR_ASSERT(!p_path.empty(), "File path is empty");
 	auto lowerPath = PrCore::StringUtils::ToLower(p_path);
@@ -387,7 +387,7 @@ void ResourceDatabase::RemoveAll()
 		Remove(id);
 }
 
-PrCore::Resources::ResourceDescPtr ResourceDatabase::GetMetadata(const std::string& p_path)
+PrCore::ResourceDescPtr ResourceDatabase::GetMetadata(const std::string& p_path)
 {
 	PR_ASSERT(!p_path.empty(), "Resource path is empty");
 	auto lowerPath = PrCore::StringUtils::ToLower(p_path);
@@ -402,7 +402,7 @@ PrCore::Resources::ResourceDescPtr ResourceDatabase::GetMetadata(const std::stri
 	return resourceDesc;
 }
 
-PrCore::Resources::ResourceDescPtr ResourceDatabase::GetMetadata(ResourceID p_id)
+PrCore::ResourceDescPtr ResourceDatabase::GetMetadata(ResourceID p_id)
 {
 	PR_ASSERT(p_id != InvalidID, "ResourceID is invalid.");
 
@@ -463,7 +463,7 @@ void ResourceDatabase::UnregisterAllLoaders()
 	m_loaders.clear();
 }
 
-void PrCore::Resources::ResourceDatabase::UnloadResourcePrivate(const ResourceDescPtr& p_resourceDesc)
+void PrCore::ResourceDatabase::UnloadResourcePrivate(const ResourceDescPtr& p_resourceDesc)
 {
 	PR_ASSERT(p_resourceDesc, "Resource is nullptr");
 	PR_ASSERT(!p_resourceDesc->filePath.empty(), "Resource path is empty");
@@ -495,7 +495,7 @@ void PrCore::Resources::ResourceDatabase::UnloadResourcePrivate(const ResourceDe
 	FireUnloadedEvent(p_resourceDesc->id, path);
 }
 
-PrCore::Resources::ResourceDescPtr ResourceDatabase::ResourceByID(ResourceID p_id)
+PrCore::ResourceDescPtr ResourceDatabase::ResourceByID(ResourceID p_id)
 {
 	auto find = m_resourcesID.find(p_id);
 
@@ -505,7 +505,7 @@ PrCore::Resources::ResourceDescPtr ResourceDatabase::ResourceByID(ResourceID p_i
 	return nullptr;
 }
 
-PrCore::Resources::ResourceDescPtr ResourceDatabase::ResourceByPath(const std::string& p_path)
+PrCore::ResourceDescPtr ResourceDatabase::ResourceByPath(const std::string& p_path)
 {
 	auto find = m_resourcesPaths.find(p_path);
 

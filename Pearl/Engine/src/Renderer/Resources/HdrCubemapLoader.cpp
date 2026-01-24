@@ -11,15 +11,15 @@
 
 #include <Renderer/Core/LowRenderer.h>
 
-using namespace PrRenderer::Resources;
-using namespace PrCore::Resources;
+using namespace PrRenderer;
+using namespace PrCore;
 
-PrCore::Resources::IResourceDataPtr HdrCubemapLoader::LoadResource(const std::string& p_path)
+PrCore::IResourceDataPtr HdrCubemapLoader::LoadResource(const std::string& p_path)
 {
 	//Load HDR texture and shader
-	auto textureResource = ResourceSystem::GetInstance().Load<Texture>(p_path);
+	auto textureResource = PrSystems::Get<ResourceSystem>()->Load<Texture>(p_path);
 	auto texture = textureResource.GetData();
-	auto shader = ResourceSystem::GetInstance().Load<Shader>("shader/cubemap/hdr_to_cubemap.shader").GetData();
+	auto shader = PrSystems::Get<ResourceSystem>()->Load<Shader>("shader/cubemap/hdr_to_cubemap.shader").GetData();
 
 	//Create Framebuffer 
 	Buffers::FramebufferSettings fbSettings;
@@ -28,9 +28,9 @@ PrCore::Resources::IResourceDataPtr HdrCubemapLoader::LoadResource(const std::st
 ;
 	Buffers::FramebufferTexture fbTex;
 	fbTex.cubeTexture = true;
-	fbTex.format = Resources::TextureFormat::RGB24;
-	fbTex.filteringMag = Resources::TextureFiltering::Nearest;
-	fbTex.filteringMin = Resources::TextureFiltering::Nearest;
+	fbTex.format = TextureFormat::RGB24;
+	fbTex.filteringMag = TextureFiltering::Nearest;
+	fbTex.filteringMin = TextureFiltering::Nearest;
 
 	fbSettings.colorTextureAttachments.textures.push_back(fbTex);
 
@@ -55,7 +55,7 @@ PrCore::Resources::IResourceDataPtr HdrCubemapLoader::LoadResource(const std::st
 
 	framebuffer->Bind();
 
-	auto cube = Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
+	auto cube = Mesh::CreatePrimitive(PrimitiveType::Cube);
 	cube->Bind();
 	for (int i = 0; i < 6; i++)
 	{
@@ -71,16 +71,16 @@ PrCore::Resources::IResourceDataPtr HdrCubemapLoader::LoadResource(const std::st
 	framebuffer->Unbind();
 	cube->Unbind();
 
-	return std::static_pointer_cast<Resources::Cubemap>(framebuffer->GetTexturePtr());
+	return std::static_pointer_cast<Cubemap>(framebuffer->GetTexturePtr());
 }
 
-void HdrCubemapLoader::UnloadResource(PrCore::Resources::IResourceDataPtr p_resourceData)
+void HdrCubemapLoader::UnloadResource(PrCore::IResourceDataPtr p_resourceData)
 {
 	p_resourceData.reset();
 	p_resourceData = nullptr;
 }
 
-bool HdrCubemapLoader::SaveResourceOnDisc(PrCore::Resources::IResourceDataPtr p_resourceData, const std::string& p_path)
+bool HdrCubemapLoader::SaveResourceOnDisc(PrCore::IResourceDataPtr p_resourceData, const std::string& p_path)
 {
 	return false;
 }

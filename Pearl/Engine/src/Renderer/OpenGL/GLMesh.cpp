@@ -119,7 +119,7 @@ void GLMesh::UpdateBuffers()
 	// Submesh should always be at least 1 covering whole VertexArray
 	if (m_submeshes.size() == 0)
 	{
-		Resources::SubMesh submesh;
+		SubMesh submesh;
 		submesh.firstIndex = 0;
 		submesh.indicesCount = m_indicesCount;
 

@@ -84,10 +84,10 @@ namespace PrRenderer::Core {
 	struct RenderObject {
 		RenderObjectType         type;
 		size_t                   id;
-		Resources::MaterialPtr   material;
+		MaterialPtr              material;
 		Buffers::VertexArrayPtr  vertexArrayPtr;
 		Buffers::VertexArrayPtr  vertexArrayShadowPtr;
-		Resources::SubMesh       subMesh;
+		SubMesh                  subMesh;
 		BoxVolume                boxVolume;
 		SortingHash              sortingHash;
 		PrCore::Math::mat4       worldMat;
@@ -156,9 +156,9 @@ namespace PrRenderer::Core {
 			return { packedMat[0][0], packedMat[0][1], packedMat[0][2] };
 		}
 
-		Resources::LightType GetType() const
+		LightType GetType() const
 		{
-			return static_cast<Resources::LightType>(packedMat[0][3]);
+			return static_cast<LightType>(packedMat[0][3]);
 		}
 
 		const PrCore::Math::vec3 GetDirection() const

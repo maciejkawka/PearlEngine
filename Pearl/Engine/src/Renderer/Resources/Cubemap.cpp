@@ -4,7 +4,7 @@
 #include "Renderer/OpenGL/GLCubemap.h"
 #include "Renderer/Core/RendererAPI.h"
 
-using namespace PrRenderer::Resources;
+using namespace PrRenderer;
 
 std::shared_ptr<Cubemap> Cubemap::Create()
 {
@@ -23,7 +23,7 @@ std::shared_ptr<Cubemap> Cubemap::Create()
 	return texture;
 }
 
-std::shared_ptr<PrRenderer::Resources::Cubemap> Cubemap::Create(RendererID p_id, size_t p_width, size_t p_height, Resources::TextureFormat p_format)
+std::shared_ptr<PrRenderer::Cubemap> Cubemap::Create(RendererID p_id, size_t p_width, size_t p_height, TextureFormat p_format)
 {
 	CubemapPtr texture;
 	switch (Core::RendererAPI::GetGraphicsAPI())

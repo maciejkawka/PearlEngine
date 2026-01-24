@@ -7,8 +7,8 @@ namespace PrRenderer::Core {
 
     struct MeshRenderObject {
 
-        Resources::MeshPtr mesh;
-        Resources::MaterialPtr material;
+        MeshPtr     mesh;
+        MaterialPtr material;
 
         PrCore::Math::mat4 worldMat;
         PrCore::Math::vec3 position;
@@ -18,10 +18,10 @@ namespace PrRenderer::Core {
 
     struct InstancedMeshObject {
 
-        Resources::MeshPtr mesh;
-        Resources::MaterialPtr material;
+        MeshPtr     mesh;
+        MaterialPtr material;
 
-        size_t instanceCount;
+        size_t i                        nstanceCount;
         std::vector<PrCore::Math::mat4> wordMatrices;
 
         bool castShadow = false;

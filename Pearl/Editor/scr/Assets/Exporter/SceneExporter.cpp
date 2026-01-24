@@ -13,7 +13,7 @@
 #include "Renderer/Resources/MaterialLoader.h"
 
 using namespace PrEditor::Assets;
-using namespace PrCore::Resources;
+using namespace PrCore;
 
 void BasicMeshExport(ResourceDescConstPtr p_resDesc, std::string_view p_exportRoot)
 {
@@ -32,7 +32,7 @@ void BasicMeshExport(ResourceDescConstPtr p_resDesc, std::string_view p_exportRo
 			if (PrSystems::Get<PrCore::FileSystem>()->FileExist(path))
 				return;
 
-			PrRenderer::Resources::MeshOBJLoader loader;
+			PrRenderer::MeshOBJLoader loader;
 			auto success = loader.SaveResourceOnDisc(p_resDesc->data, path);
 			if (!success)
 			{
@@ -53,7 +53,7 @@ void BasicTextureExport(ResourceDescConstPtr p_resDesc, std::string_view p_expor
 {
 	if (p_resDesc->origin == ResourceOrigin::Memory)
 	{
-		auto texturePtr = std::static_pointer_cast<PrRenderer::Resources::Texture>(p_resDesc->data);
+		auto texturePtr = std::static_pointer_cast<PrRenderer::Texture>(p_resDesc->data);
 		auto data = texturePtr->FetchGPUData();
 		texturePtr->SetData(data);
 		texturePtr->SetReadable(true);
@@ -71,7 +71,7 @@ void BasicTextureExport(ResourceDescConstPtr p_resDesc, std::string_view p_expor
 			if (PrSystems::Get<PrCore::FileSystem>()->FileExist(path))
 				return;
 
-			PrRenderer::Resources::Texture2DLoader loader;
+			PrRenderer::Texture2DLoader loader;
 			auto success = loader.SaveResourceOnDisc(p_resDesc->data, path);
 			if (!success)
 			{
@@ -103,7 +103,7 @@ void BasicMaterialExport(ResourceDescConstPtr p_resDesc, std::string_view p_expo
 		if (PrSystems::Get<PrCore::FileSystem>()->FileExist(path))
 			return;
 
-		PrRenderer::Resources::MaterialLoader loader;
+		PrRenderer::MaterialLoader loader;
 		auto success = loader.SaveResourceOnDisc(p_resDesc->data, path);
 		if (!success)
 		{
@@ -139,8 +139,9 @@ void SceneExporter::SaveMemoryResourcesToFile(std::string_view p_exportRoot)
 		PrSystems::Get<PrCore::FileSystem>()->CreateDir(p_exportRoot);
 	}
 
-	PrCore::Resources::ResourceSystem::GetInstance().ForEachResource<PrRenderer::Resources::Mesh>(meshExporter);
-	PrCore::Resources::ResourceSystem::GetInstance().ForEachResource<PrRenderer::Resources::Texture>(textureExporter);
+	auto pResourceSystem = PrSystems::Get<PrCore::ResourceSystem>();
+	pResourceSystem->ForEachResource<PrRenderer::Mesh>(meshExporter);
+	pResourceSystem->ForEachResource<PrRenderer::Texture>(textureExporter);
 	PrSystems::Get<PrCore::JobSystem>()->WaitAll();
-	PrCore::Resources::ResourceSystem::GetInstance().ForEachResource<PrRenderer::Resources::Material>(materialExporter);
+	pResourceSystem->ForEachResource<PrRenderer::Material>(materialExporter);
 }

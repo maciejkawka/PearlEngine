@@ -18,6 +18,7 @@ namespace PrCore
 	class FileSystem;
 	class JobSystem;
 	class ThreadSystem;
+	class ResourceSystem;
 }
 
 // Tuple with all systems used in the engine,
@@ -30,6 +31,7 @@ using EngineSystems = std::tuple<
 	PrCore::FileSystem,
 	PrCore::JobSystem,
 	PrCore::ThreadSystem,
+	PrCore::ResourceSystem,
 	PrCore::Utils::Clock,
 	PrCore::Utils::ILogger
 >;

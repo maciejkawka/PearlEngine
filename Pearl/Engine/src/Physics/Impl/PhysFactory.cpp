@@ -45,7 +45,7 @@ PrPhysics::IConvexMeshPtr PhysFactory::CreateConvexMesh(uint8_t* p_data, size_t 
 	return std::make_shared<PhysConvexMesh>(convexMesh);
 }
 
-PrPhysics::IConvexMeshPtr PhysFactory::CreateConvexMesh(PrRenderer::Resources::MeshPtr p_mesh)
+PrPhysics::IConvexMeshPtr PhysFactory::CreateConvexMesh(PrRenderer::MeshPtr p_mesh)
 {
 	auto verts = p_mesh->GetVertices();
 	std::vector<PxVec3> vertices;
@@ -75,7 +75,7 @@ PrPhysics::IConvexMeshPtr PhysFactory::CreateConvexMesh(PrRenderer::Resources::M
 	return std::make_shared<PhysConvexMesh>(convexMesh);
 }
 
-PrPhysics::ITriangleMeshPtr PhysFactory::CreateTriangleMesh(PrRenderer::Resources::MeshPtr p_mesh)
+PrPhysics::ITriangleMeshPtr PhysFactory::CreateTriangleMesh(PrRenderer::MeshPtr p_mesh)
 {
 	auto verts = p_mesh->GetVertices();
 	std::vector<PxVec3> vertices;

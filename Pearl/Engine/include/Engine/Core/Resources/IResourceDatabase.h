@@ -3,7 +3,7 @@
 #include "IResource.h"
 #include <functional>
 
-namespace PrCore::Resources {
+namespace PrCore {
 
 	class IResourceDataLoader;
 

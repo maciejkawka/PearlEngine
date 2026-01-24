@@ -11,14 +11,14 @@
 #include<map>
 #include<optional>
 
-namespace PrRenderer::Resources {
+namespace PrRenderer {
 
 	enum class RenderType {
 		Opaque,
 		Transparent
 	};
 
-	class Material : public PrCore::Resources::IResourceData, public PrCore::Utils::ISerializable {
+	class Material : public PrCore::IResourceData, public PrCore::Utils::ISerializable {
 	public:
 		Material();
 		Material(ShaderHandle p_shader);

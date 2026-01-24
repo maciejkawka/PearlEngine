@@ -12,7 +12,7 @@ GLTexture2D::GLTexture2D()
 	glGenTextures(1, &m_ID);
 }
 
-GLTexture2D::GLTexture2D(RendererID p_id, size_t p_width, size_t p_height, Resources::TextureFormat p_format)
+GLTexture2D::GLTexture2D(RendererID p_id, size_t p_width, size_t p_height, TextureFormat p_format)
 {
 	m_ID = p_id;
 	m_width = p_width;
@@ -85,16 +85,16 @@ void GLTexture2D::CalculateSize()
 	{
 		switch (m_format)
 		{
-		case Resources::TextureFormat::R8:
+		case TextureFormat::R8:
 			m_size = m_width * m_height * 8;
 			break;
-		case Resources::TextureFormat::RG16:
+		case TextureFormat::RG16:
 			m_size = m_width * m_height * 2 * 8;
 			break;
-		case Resources::TextureFormat::RGB24:
+		case TextureFormat::RGB24:
 			m_size = m_width * m_height * 3 * 8;
 			break;
-		case Resources::TextureFormat::RGBA32:
+		case TextureFormat::RGBA32:
 			m_size = m_width * m_height * 4 * 8;
 			break;
 		default:
@@ -115,16 +115,16 @@ void* GLTexture2D::FetchGPUData(int p_level)
 	size_t bufferSize = 1;
 	switch (m_format)
 	{
-	case Resources::TextureFormat::R8:
+	case TextureFormat::R8:
 		bufferSize = m_width * m_height;
 		break;
-	case Resources::TextureFormat::RG16:
+	case TextureFormat::RG16:
 		bufferSize = m_width * m_height * 2;
 		break;
-	case Resources::TextureFormat::RGB24:
+	case TextureFormat::RGB24:
 		bufferSize = m_width * m_height * 3;
 		break;
-	case Resources::TextureFormat::RGBA32:
+	case TextureFormat::RGBA32:
 		bufferSize = m_width * m_height * 4;
 		break;
 	default:

@@ -11,7 +11,7 @@ namespace PrRenderer::Core {
 		void SubmitLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id) override;
 		void SetCamera(Camera* p_camera) override { m_camera = p_camera; };
 		void SubmitMesh(ECS::Entity& p_entity) override;
-		void SetCubemap(Resources::MaterialPtr p_cubemapMat) override;
+		void SetCubemap(MaterialPtr p_cubemapMat) override;
 
 		void PrepareFrame() override;
 		void BuildFrame() override;
@@ -45,10 +45,10 @@ namespace PrRenderer::Core {
 		size_t m_spotLightNumber = 0;
 		size_t m_dirLightNumber = 0;
 
-		RenderObjectPtr m_cubemapObject;
-		Resources::ShaderPtr m_debugShader;
-		Resources::MaterialPtr m_debugMaterial;
-		Camera* m_camera;
-		Frustrum m_frustrum;
+		RenderObjectPtr  m_cubemapObject;
+		ShaderPtr        m_debugShader;
+		MaterialPtr      m_debugMaterial;
+		Camera*          m_camera;
+		Frustrum         m_frustrum;
 	};
 }

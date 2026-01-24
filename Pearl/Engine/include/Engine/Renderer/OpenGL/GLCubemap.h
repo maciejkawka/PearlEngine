@@ -4,10 +4,10 @@
 
 namespace PrRenderer::OpenGL {
 
-	class GLCubemap : public Resources::Cubemap {
+	class GLCubemap : public Cubemap {
 	public:
 		GLCubemap();
-		GLCubemap(RendererID p_id, size_t p_width, size_t p_height, Resources::TextureFormat p_format);
+		GLCubemap(RendererID p_id, size_t p_width, size_t p_height, TextureFormat p_format);
 		~GLCubemap() override;
 
 		void Bind(unsigned int p_slot = 0) override;

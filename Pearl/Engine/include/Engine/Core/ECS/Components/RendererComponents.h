@@ -22,21 +22,21 @@ namespace PrCore::ECS {
 		~MeshRendererComponent() override = default;
 
 		bool                                               shadowCaster = true;
-		PrRenderer::Resources::MeshHandle                  mesh;
-		PrRenderer::Resources::MeshHandle                  shadowMesh;
-		std::vector<PrRenderer::Resources::MaterialHandle> materials;
+		PrRenderer::MeshHandle                  mesh;
+		PrRenderer::MeshHandle                  shadowMesh;
+		std::vector<PrRenderer::MaterialHandle> materials;
 
 		virtual void OnSerialize(Utils::JSON::json& p_serialized) override
 		{
 			if (shadowMesh != nullptr)
 			{
-				if (shadowMesh.GetOrigin() == PrCore::Resources::ResourceOrigin::Memory)
+				if (shadowMesh.GetOrigin() == PrCore::ResourceOrigin::Memory)
 					p_serialized["shadowMesh"] = shadowMesh->GetName();
 				else
 					p_serialized["shadowMesh"] = shadowMesh.GetPath();
 			}
 
-			if(mesh.GetOrigin() == PrCore::Resources::ResourceOrigin::Memory)
+			if(mesh.GetOrigin() == PrCore::ResourceOrigin::Memory)
 			{
 				p_serialized["mesh"] = mesh->GetName();
 			}
@@ -48,7 +48,7 @@ namespace PrCore::ECS {
 			Utils::JSON::json jsonMaterials;
 			for (auto& mat : materials)
 			{
-				if (mat.GetOrigin() == PrCore::Resources::ResourceOrigin::File)
+				if (mat.GetOrigin() == PrCore::ResourceOrigin::File)
 				{
 					Utils::JSON::json jsonMatElement;
 					jsonMatElement["path"] = mat.GetPath();
@@ -68,38 +68,38 @@ namespace PrCore::ECS {
 		{
 			std::string meshName = p_deserialized["mesh"];
 			if (meshName.find("Primitive_Cube") != std::string::npos)
-				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
+				mesh = PrRenderer::Mesh::CreatePrimitive(PrRenderer::PrimitiveType::Cube);
 			else if (meshName.find("Primitive_Sphere") != std::string::npos)
-				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Sphere);
+				mesh = PrRenderer::Mesh::CreatePrimitive(PrRenderer::PrimitiveType::Sphere);
 			else if (meshName.find("Primitive_Capsule") != std::string::npos)
-				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Capsule);
+				mesh = PrRenderer::Mesh::CreatePrimitive(PrRenderer::PrimitiveType::Capsule);
 			else if (meshName.find("Primitive_Cylinder") != std::string::npos)
-				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cylinder);
+				mesh = PrRenderer::Mesh::CreatePrimitive(PrRenderer::PrimitiveType::Cylinder);
 			else if (meshName.find("Primitive_Plane") != std::string::npos)
-				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Plane);
+				mesh = PrRenderer::Mesh::CreatePrimitive(PrRenderer::PrimitiveType::Plane);
 			else if (meshName.find("Primitive_Quad") != std::string::npos)
-				mesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Quad);
+				mesh = PrRenderer::Mesh::CreatePrimitive(PrRenderer::PrimitiveType::Quad);
 			else
-				mesh = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>(static_cast<std::string>(p_deserialized["mesh"]));
+				mesh = PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Mesh>(static_cast<std::string>(p_deserialized["mesh"]));
 
 			auto shadowMeshIt = p_deserialized.find("shadowMesh");
 			if (shadowMeshIt != p_deserialized.end())
 			{
 				std::string meshName = p_deserialized["shadowMesh"];
 				if (meshName.find("Primitive_Cube") != std::string::npos)
-					shadowMesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cube);
+					shadowMesh = PrRenderer::Mesh::CreatePrimitive(PrRenderer::PrimitiveType::Cube);
 				else if (meshName.find("Primitive_Sphere") != std::string::npos)
-					shadowMesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Sphere);
+					shadowMesh = PrRenderer::Mesh::CreatePrimitive(PrRenderer::PrimitiveType::Sphere);
 				else if (meshName.find("Primitive_Capsule") != std::string::npos)
-					shadowMesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Capsule);
+					shadowMesh = PrRenderer::Mesh::CreatePrimitive(PrRenderer::PrimitiveType::Capsule);
 				else if (meshName.find("Primitive_Cylinder") != std::string::npos)
-					shadowMesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Cylinder);
+					shadowMesh = PrRenderer::Mesh::CreatePrimitive(PrRenderer::PrimitiveType::Cylinder);
 				else if (meshName.find("Primitive_Plane") != std::string::npos)
-					shadowMesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Plane);
+					shadowMesh = PrRenderer::Mesh::CreatePrimitive(PrRenderer::PrimitiveType::Plane);
 				else if (meshName.find("Primitive_Quad") != std::string::npos)
-					shadowMesh = PrRenderer::Resources::Mesh::CreatePrimitive(PrRenderer::Resources::PrimitiveType::Quad);
+					shadowMesh = PrRenderer::Mesh::CreatePrimitive(PrRenderer::PrimitiveType::Quad);
 				else
-					shadowMesh = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Mesh>(static_cast<std::string>(p_deserialized["shadowMesh"]));
+					shadowMesh = PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Mesh>(static_cast<std::string>(p_deserialized["shadowMesh"]));
 			}
 
 			if (p_deserialized.contains("shadowCaster"))
@@ -109,7 +109,7 @@ namespace PrCore::ECS {
 			materials.resize(materialJson.size());
 			for (int i = 0; i < materialJson.size(); ++i)
 			{
-				auto mat = Resources::ResourceSystem::GetInstance().Load<PrRenderer::Resources::Material>(static_cast<std::string>(materialJson.at(i)["path"]));
+				auto mat = PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>(static_cast<std::string>(materialJson.at(i)["path"]));
 				materials[i] = mat;
 			}
 		}
@@ -118,7 +118,7 @@ namespace PrCore::ECS {
 	class LightComponent : public BaseComponent {
 	public:
 
-		PrRenderer::Resources::LightPtr m_light = std::make_shared<PrRenderer::Resources::Light>();
+		PrRenderer::LightPtr m_light = std::make_shared<PrRenderer::Light>();
 		bool m_shadowCast = true;
 		bool mainDirectLight = false;
 

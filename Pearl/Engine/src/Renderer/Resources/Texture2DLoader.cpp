@@ -13,8 +13,8 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include"stb/stb_image_write.h"
 
-using namespace PrRenderer::Resources;
-using namespace PrCore::Resources;
+using namespace PrRenderer;
+using namespace PrCore;
 
 Texture2DLoader::Texture2DLoader()
 {
@@ -22,7 +22,7 @@ Texture2DLoader::Texture2DLoader()
 	stbi_flip_vertically_on_write(true);
 }
 
-PrCore::Resources::IResourceDataPtr Texture2DLoader::LoadResource(const std::string& p_path)
+PrCore::IResourceDataPtr Texture2DLoader::LoadResource(const std::string& p_path)
 {
 	int width = 0;
 	int heigth = 0;
@@ -51,10 +51,10 @@ PrCore::Resources::IResourceDataPtr Texture2DLoader::LoadResource(const std::str
 		switch (channelsNumber)
 		{
 		case 3:
-			format = Resources::TextureFormat::RGB16F;
+			format = TextureFormat::RGB16F;
 			break;
 		case 4:
-			format = Resources::TextureFormat::RGBA16F;
+			format = TextureFormat::RGBA16F;
 			break;
 		default:
 			PRLOG_WARN("Cannot specify texture {0} channel format", p_path);
@@ -67,16 +67,16 @@ PrCore::Resources::IResourceDataPtr Texture2DLoader::LoadResource(const std::str
 		switch (channelsNumber)
 		{
 		case 1:
-			format = Resources::TextureFormat::R8;
+			format = TextureFormat::R8;
 			break;
 		case 2:
-			format = Resources::TextureFormat::RG16;
+			format = TextureFormat::RG16;
 			break;
 		case 3:
-			format = Resources::TextureFormat::RGB24;
+			format = TextureFormat::RGB24;
 			break;
 		case 4:
-			format = Resources::TextureFormat::RGBA32;
+			format = TextureFormat::RGBA32;
 			break;
 		default:
 			PRLOG_WARN("Cannot specify texture {0} channel format", p_path);
@@ -125,19 +125,19 @@ IResourceDataPtr Texture2DLoader::LoadFromMemoryResource(const void* p_buffer, s
 	switch (channelsNumber)
 	{
 	case 1:
-		format = Resources::TextureFormat::R8;
+		format = TextureFormat::R8;
 		break;
 	case 2:
-		format = Resources::TextureFormat::RG16;
+		format = TextureFormat::RG16;
 		break;
 	case 3:
-		format = Resources::TextureFormat::RGB24;
+		format = TextureFormat::RGB24;
 		break;
 	case 4:
-		format = Resources::TextureFormat::RGBA32;
+		format = TextureFormat::RGBA32;
 		break;
 	default:
-		format = Resources::TextureFormat::RGBA32;
+		format = TextureFormat::RGBA32;
 	}
 
 	// Create texture
@@ -179,16 +179,16 @@ bool Texture2DLoader::SaveResourceOnDisc(IResourceDataPtr p_resourceData, const 
 	int format = 0;
 	switch (texturePtr->GetFormat())
 	{
-	case Resources::TextureFormat::R8:
+	case TextureFormat::R8:
 		format = 1;
 		break;
-	case Resources::TextureFormat::RG16:
+	case TextureFormat::RG16:
 		format = 2;
 		break;
-	case Resources::TextureFormat::RGB24:
+	case TextureFormat::RGB24:
 		format = 3;
 		break;
-	case Resources::TextureFormat::RGBA32:
+	case TextureFormat::RGBA32:
 		format = 4;
 		break;
 	default:

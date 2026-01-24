@@ -79,13 +79,13 @@ void GLFramebuffer::ClearAttachmentColor(unsigned int p_attachemntIndex, const C
 	m_colorTextures[p_attachemntIndex]->ClearWithColor(p_color);
 }
 
-PrRenderer::Resources::TexturePtr GLFramebuffer::GetTexturePtr(unsigned int p_index)
+PrRenderer::TexturePtr GLFramebuffer::GetTexturePtr(unsigned int p_index)
 {
 	PR_ASSERT(p_index < m_colorTextures.size(), "Framebuffer attachemnt index over the size" + this->m_ID);
 	return m_colorTextures[p_index];
 }
 
-PrRenderer::Resources::TexturePtr PrRenderer::OpenGL::GLFramebuffer::GetDepthTexturePtr()
+PrRenderer::TexturePtr PrRenderer::OpenGL::GLFramebuffer::GetDepthTexturePtr()
 {
 	return m_depthTexture;
 }
@@ -104,7 +104,7 @@ void GLFramebuffer::UpdateFamebuffer()
 	if (!m_settings.colorTextureAttachments.textures.empty())
 		UpdateColorTextures();
 
-	if (m_settings.depthStencilAttachment.format != Resources::TextureFormat::None)
+	if (m_settings.depthStencilAttachment.format != TextureFormat::None)
 		UpdateDepthTexture();
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -151,7 +151,7 @@ void GLFramebuffer::CreateCubemapAttachment(int p_attachmentIndex)
 	}
 
 	// Create cubetexture ptr
-	auto cubemap = Resources::Cubemap::Create();
+	auto cubemap = Cubemap::Create();
 	cubemap->SetFormat(attachment.format);
 	cubemap->SetWidth(width);
 	cubemap->SetHeight(height);
@@ -191,7 +191,7 @@ void GLFramebuffer::CreateTextureAttachment(int p_attachmentIndex)
 	}
 
 	// Create Texture2DPtr
-	auto texture = Resources::Texture2D::Create();
+	auto texture = Texture2D::Create();
 	texture->SetFormat(attachment.format);
 	texture->SetWidth(width);
 	texture->SetHeight(height);
@@ -228,7 +228,7 @@ void GLFramebuffer::UpdateDepthTexture()
 	}
 
 	// Create Texture2DPtr
-	auto texture = Resources::Texture2D::Create();
+	auto texture = Texture2D::Create();
 	texture->SetFormat(attachment.format);
 	texture->SetWidth(width);
 	texture->SetHeight(height);
@@ -244,15 +244,15 @@ void GLFramebuffer::UpdateDepthTexture()
 
 	switch (attachment.format)
 	{
-	case Resources::TextureFormat::Depth24Stencil8:
+	case TextureFormat::Depth24Stencil8:
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, texture->GetRendererID(), 0);
 		break;
-	case Resources::TextureFormat::Depth16:
-	case Resources::TextureFormat::Depth24:
-	case Resources::TextureFormat::Depth32:
+	case TextureFormat::Depth16:
+	case TextureFormat::Depth24:
+	case TextureFormat::Depth32:
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture->GetRendererID(), 0);
 		break;
-	case Resources::TextureFormat::Stencil8:
+	case TextureFormat::Stencil8:
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_TEXTURE_2D, texture->GetRendererID(), 0);
 	default:
 		PRLOG_ERROR("Framebuffer ID:{0} wrong depth format", m_ID);

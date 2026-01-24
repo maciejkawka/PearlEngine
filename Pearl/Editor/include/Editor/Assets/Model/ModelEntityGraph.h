@@ -9,18 +9,18 @@ namespace PrEditor::Assets {
 	// It holds ECS basic information and then it is copied to the Scene
 	struct ModelEntity {
 
-		using MaterialVector = std::vector<PrRenderer::Resources::MaterialHandle>;
+		using MaterialVector = std::vector<PrRenderer::MaterialHandle>;
 		// General components
-		std::string                           name;
-		PrCore::Math::vec3                    position;
-		PrCore::Math::quat                    rotation;
-		PrCore::Math::vec3                    scale;
+		std::string              name;
+		PrCore::Math::vec3       position;
+		PrCore::Math::quat       rotation;
+		PrCore::Math::vec3       scale;
 
 		// Renderer components
-		PrRenderer::Resources::MeshHandle     mesh;
-		PrRenderer::Resources::MeshHandle     shadowMesh;
-		MaterialVector                        materials;
-		PrRenderer::Resources::LightPtr       light;
+		PrRenderer::MeshHandle   mesh;
+		PrRenderer::MeshHandle   shadowMesh;
+		MaterialVector           materials;
+		PrRenderer::LightPtr     light;
 
 		// Move info in the future
 	};

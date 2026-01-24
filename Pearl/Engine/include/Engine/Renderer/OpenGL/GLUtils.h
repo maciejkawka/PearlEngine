@@ -6,11 +6,11 @@
 namespace PrRenderer::OpenGL {
 
 	//Textures
-	unsigned int TextureFormatToGL(Resources::TextureFormat p_format);
-	unsigned int TextureFormatToInternalGL(Resources::TextureFormat p_format);
-	unsigned int TextureWrapToGL(Resources::TextureWrapMode p_wrap);
-	unsigned int TextureFilterToGL(Resources::TextureFiltering p_filter);
-	unsigned int TextureFormatToDataTypeGL(Resources::TextureFormat p_format);
+	unsigned int TextureFormatToGL(TextureFormat p_format);
+	unsigned int TextureFormatToInternalGL(TextureFormat p_format);
+	unsigned int TextureWrapToGL(TextureWrapMode p_wrap);
+	unsigned int TextureFilterToGL(TextureFiltering p_filter);
+	unsigned int TextureFormatToDataTypeGL(TextureFormat p_format);
 
 	//Buffers
 	unsigned int FramebufferMaskToGL(Buffers::FramebufferMask p_mask);

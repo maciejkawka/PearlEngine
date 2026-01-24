@@ -7,8 +7,8 @@
 
 using namespace PrEditor::Assets;
 
-ModelResource::ModelResource(std::unique_ptr<ModelEntityGraph>&& p_entityGraph, std::vector<PrRenderer::Resources::MaterialHandle>&& p_materials,
-	std::vector<PrRenderer::Resources::MeshHandle>&& p_meshes):
+ModelResource::ModelResource(std::unique_ptr<ModelEntityGraph>&& p_entityGraph, std::vector<PrRenderer::MaterialHandle>&& p_materials,
+	std::vector<PrRenderer::MeshHandle>&& p_meshes):
 	m_entityGraph(std::move(p_entityGraph)),
 	m_materials(std::move(p_materials)),
 	m_meshes(std::move(p_meshes))
@@ -70,8 +70,8 @@ size_t ModelResource::GetByteSize() const
 		size += sizeof(ModelEntityNode);
 		});
 
-	size += m_materials.size() * sizeof(PrRenderer::Resources::MaterialHandle);
-	size += m_meshes.size() * sizeof(PrRenderer::Resources::MeshHandle);
+	size += m_materials.size() * sizeof(PrRenderer::MaterialHandle);
+	size += m_meshes.size() * sizeof(PrRenderer::MeshHandle);
 
 	return size;
 }

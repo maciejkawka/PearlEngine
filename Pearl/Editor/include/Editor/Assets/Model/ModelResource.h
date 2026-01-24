@@ -9,25 +9,25 @@
 
 namespace PrEditor::Assets {
 
-	class ModelResource : public PrCore::Resources::IResourceData {
+	class ModelResource : public PrCore::IResourceData {
 	public:
-		ModelResource(std::unique_ptr<ModelEntityGraph>&& p_entityGraph, std::vector<PrRenderer::Resources::MaterialHandle>&& p_materials,
-			std::vector<PrRenderer::Resources::MeshHandle>&& p_meshes);
+		ModelResource(std::unique_ptr<ModelEntityGraph>&& p_entityGraph, std::vector<PrRenderer::MaterialHandle>&& p_materials,
+			std::vector<PrRenderer::MeshHandle>&& p_meshes);
 		~ModelResource() override = default;
 
-		const std::vector<PrRenderer::Resources::MaterialHandle>  GetMaterialList() const { return m_materials; }
-		const std::vector<PrRenderer::Resources::MeshHandle>      GetMeshList() const { return m_meshes; }
+		const std::vector<PrRenderer::MaterialHandle>  GetMaterialList() const { return m_materials; }
+		const std::vector<PrRenderer::MeshHandle>      GetMeshList() const { return m_meshes; }
 
-		const std::unique_ptr<ModelEntityGraph>&                  GetEntityGraph() const { return m_entityGraph; }
-		void                                                      AddEntitesToScene(PrCore::ECS::Scene* p_scene);
+		const std::unique_ptr<ModelEntityGraph>&       GetEntityGraph() const { return m_entityGraph; }
+		void                                           AddEntitesToScene(PrCore::ECS::Scene* p_scene);
 
-		size_t                                                    GetByteSize() const override;
+		size_t                                         GetByteSize() const override;
 
 	private:
-		std::unique_ptr<ModelEntityGraph> m_entityGraph;
+		std::unique_ptr<ModelEntityGraph>       m_entityGraph;
 
-		std::vector<PrRenderer::Resources::MaterialHandle> m_materials;
-		std::vector<PrRenderer::Resources::MeshHandle>     m_meshes;
+		std::vector<PrRenderer::MaterialHandle> m_materials;
+		std::vector<PrRenderer::MeshHandle>     m_meshes;
 	};
 
 	REGISTRER_RESOURCE_HANDLE(ModelResource);

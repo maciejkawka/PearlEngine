@@ -4,7 +4,7 @@
 
 namespace PrRenderer::OpenGL {
 
-	class GLShader : public Resources::Shader {
+	class GLShader : public Shader {
 	public:
 		GLShader() = delete;
 		GLShader(const std::string& p_vertexShader, const std::string& p_fragmentShader);

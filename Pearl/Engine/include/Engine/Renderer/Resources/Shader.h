@@ -14,9 +14,9 @@
 #include <string>
 #include <memory>
 
-namespace PrRenderer::Resources {
+namespace PrRenderer {
 
-	class Shader : public PrCore::Resources::IResourceData {
+	class Shader : public PrCore::IResourceData {
 	public:
 		Shader() = delete;
 		Shader(const std::string& p_vertexShader, const std::string& p_fragmentShader);

@@ -4,12 +4,12 @@
 
 namespace PrPhysics {
 
-	class ConvexMeshLoader : public PrCore::Resources::IResourceDataLoader {
+	class ConvexMeshLoader : public PrCore::IResourceDataLoader {
 	public:
-		PrCore::Resources::IResourceDataPtr LoadResource(const std::string& p_path) override;
+		PrCore::IResourceDataPtr LoadResource(const std::string& p_path) override;
 
-		void UnloadResource(PrCore::Resources::IResourceDataPtr p_resourceData) override;
+		void UnloadResource(PrCore::IResourceDataPtr p_resourceData) override;
 
-		bool SaveResourceOnDisc(PrCore::Resources::IResourceDataPtr p_resourceData, const std::string& p_path) override;
+		bool SaveResourceOnDisc(PrCore::IResourceDataPtr p_resourceData, const std::string& p_path) override;
 	};
 }

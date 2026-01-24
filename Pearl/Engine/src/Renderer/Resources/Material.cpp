@@ -12,7 +12,7 @@
 #define TEXSCALE_UNIFORM "albedoMap_scale"
 #define COLOR_UNIFORM "albedoValue"
 
-using namespace PrRenderer::Resources;
+using namespace PrRenderer;
 using namespace PrCore::Utils;
 
 Material::Material(ShaderHandle p_shader)
@@ -302,7 +302,7 @@ void Material::OnSerialize(PrCore::Utils::JSON::json& p_serialized)
 	p_serialized[Material::SerGuide::name] = m_name; // Debug only
 
 	PR_ASSERT(m_shader.IsValid(), "Shader is invalid! That's bad!");
-	if (m_shader.GetOrigin() == PrCore::Resources::ResourceOrigin::File)
+	if (m_shader.GetOrigin() == PrCore::ResourceOrigin::File)
 	{
 		p_serialized[SerGuide::shader] = m_shader.GetPath();
 	}
@@ -405,7 +405,7 @@ void Material::OnSerialize(PrCore::Utils::JSON::json& p_serialized)
 	PrCore::Utils::JSON::json textureArray;
 	for (auto& tex : m_textures)
 	{
-		if (tex.second != nullptr && tex.second.GetOrigin() == PrCore::Resources::ResourceOrigin::File)
+		if (tex.second != nullptr && tex.second.GetOrigin() == PrCore::ResourceOrigin::File)
 		{
 			PrCore::Utils::JSON::json texture;
 			texture[SerGuide::Texture::name] = tex.first;
@@ -419,7 +419,7 @@ void Material::OnSerialize(PrCore::Utils::JSON::json& p_serialized)
 	PrCore::Utils::JSON::json cubemapArray;
 	for (auto& tex : m_cubemaps)
 	{
-		if (tex.second.GetOrigin() == PrCore::Resources::ResourceOrigin::File)
+		if (tex.second.GetOrigin() == PrCore::ResourceOrigin::File)
 		{
 			PrCore::Utils::JSON::json cubemap;
 			cubemap[SerGuide::Texture::name] = tex.first;
@@ -446,11 +446,11 @@ void Material::OnDeserialize(const PrCore::Utils::JSON::json& p_deserialized)
 	}
 
 	std::string shader = p_deserialized[SerGuide::shader];
-	m_shader = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>(shader);
+	m_shader = PrSystems::Get<PrCore::ResourceSystem>()->Load<Shader>(shader);
 	if (m_shader == nullptr)
 	{
 		PRLOG_WARN("Renderer: Material {0}, shader {1} cannot be found. Default standard unlit", m_name, shader);
-		m_shader = PrCore::Resources::ResourceSystem::GetInstance().Load<Shader>("standard_unlit.shader");
+		m_shader = PrSystems::Get<PrCore::ResourceSystem>()->Load<Shader>("standard_unlit.shader");
 	}
 
 	m_renderOrder = p_deserialized[SerGuide::renderOrder];
@@ -522,7 +522,7 @@ void Material::OnDeserialize(const PrCore::Utils::JSON::json& p_deserialized)
 	for (auto& texture : texArray)
 	{
 		const std::string name = texture[SerGuide::Texture::name];
-		auto tex = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Texture>(static_cast<std::string>(texture[SerGuide::Texture::path]));
+		auto tex = PrSystems::Get<PrCore::ResourceSystem>()->Load<Texture>(static_cast<std::string>(texture[SerGuide::Texture::path]));
 		if (tex.IsValid())
 		{
 			m_textures[name] = tex;
@@ -533,7 +533,7 @@ void Material::OnDeserialize(const PrCore::Utils::JSON::json& p_deserialized)
 	for (auto& cubemap : cubeArray)
 	{
 		const std::string name = cubemap[SerGuide::Texture::name];
-		auto tex = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Cubemap>(static_cast<std::string>(cubemap[SerGuide::Texture::path]));
+		auto tex = PrSystems::Get<PrCore::ResourceSystem>()->Load<Cubemap>(static_cast<std::string>(cubemap[SerGuide::Texture::path]));
 		if (tex.IsValid())
 		{
 			m_cubemaps[name] = tex;

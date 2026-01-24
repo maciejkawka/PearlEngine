@@ -17,18 +17,19 @@ namespace PrRenderer::Core
 		IRenderBackend(p_settings)
 	{
 		//Prepare shaders
-		m_shadowMappingShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/shadows/generic_shadow_mapping.shader");
-		m_ToneMappingShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/deffered/front_pass.shader");
-		m_pbrLightShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/deffered/light_pass.shader");
-		m_pointshadowMappingShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/shadows/point_shadow_mapping.shader");
-		m_SSAOShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/deffered/ssao.shader");
-		m_SSAOBlurShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/deffered/ssao_blur.shader");
-		m_FXAAShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/deffered/fxaa.shader");
-		m_fogShdr = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/deffered/logarithmic _fog.shader");
-		m_downsample = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/deffered/downsample.shader");
-		m_upsample = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/deffered/upsample.shader");
+		auto pResourceSystem = PrSystems::Get<PrCore::ResourceSystem>();
+		m_shadowMappingShdr = pResourceSystem->Load<Shader>("shader/shadows/generic_shadow_mapping.shader");
+		m_ToneMappingShdr = pResourceSystem->Load<Shader>("shader/deffered/front_pass.shader");
+		m_pbrLightShdr = pResourceSystem->Load<Shader>("shader/deffered/light_pass.shader");
+		m_pointshadowMappingShdr = pResourceSystem->Load<Shader>("shader/shadows/point_shadow_mapping.shader");
+		m_SSAOShdr = pResourceSystem->Load<Shader>("shader/deffered/ssao.shader");
+		m_SSAOBlurShdr = pResourceSystem->Load<Shader>("shader/deffered/ssao_blur.shader");
+		m_FXAAShdr = pResourceSystem->Load<Shader>("shader/deffered/fxaa.shader");
+		m_fogShdr = pResourceSystem->Load<Shader>("shader/deffered/logarithmic _fog.shader");
+		m_downsample = pResourceSystem->Load<Shader>("shader/deffered/downsample.shader");
+		m_upsample = pResourceSystem->Load<Shader>("shader/deffered/upsample.shader");
 
-		m_renderContext.quadMesh = Resources::Mesh::CreatePrimitive(Resources::Quad);
+		m_renderContext.quadMesh = Mesh::CreatePrimitive(Quad);
 		m_renderContext.settings = m_settings;
 
 		m_screenWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
@@ -140,7 +141,7 @@ namespace PrRenderer::Core
 
 		for (auto& lightPtr : m_frame->lights)
 		{
-			if (lightPtr->GetType() != Resources::LightType::Directional)
+			if (lightPtr->GetType() != LightType::Directional)
 				continue;
 
 			if (!lightPtr->castShadow)
@@ -175,7 +176,7 @@ namespace PrRenderer::Core
 
 		for (auto lightPtr : m_frame->lights)
 		{
-			if (lightPtr->GetType() != Resources::LightType::Point)
+			if (lightPtr->GetType() != LightType::Point)
 				continue;
 
 			if (!lightPtr->castShadow)
@@ -226,7 +227,7 @@ namespace PrRenderer::Core
 
 		for (auto& lightPtr : m_frame->lights)
 		{
-			if (lightPtr->GetType() != Resources::LightType::Spot)
+			if (lightPtr->GetType() != LightType::Spot)
 				continue;
 
 			if (!lightPtr->castShadow)
@@ -414,10 +415,10 @@ namespace PrRenderer::Core
 		material->Unbind();
 	}
 
-	void DeferRenderBackend::RenderToShadowMap(Resources::ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
+	void DeferRenderBackend::RenderToShadowMap(ShaderPtr p_shaderPtr, PrCore::Math::mat4& p_lightMatrix, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
 	{
 		const auto frustrum = Frustrum(p_lightMatrix);
-		bool skipCulling = p_light->GetType() == Resources::LightType::Directional;
+		bool skipCulling = p_light->GetType() == LightType::Directional;
 
 		p_shaderPtr->Bind();
 		p_shaderPtr->SetUniformMat4("PIPELINE_LIGHT_MAT", p_lightMatrix);
@@ -425,7 +426,7 @@ namespace PrRenderer::Core
 		for (auto& object : *p_objects)
 		{
 			const auto& renderVA = object->vertexArrayShadowPtr ? object->vertexArrayShadowPtr : object->vertexArrayPtr;
-			auto submesh = object->vertexArrayShadowPtr ? Resources::SubMesh() : object->subMesh;
+			auto submesh = object->vertexArrayShadowPtr ? SubMesh() : object->subMesh;
 
 			if (object->type == RenderObjectType::Mesh)
 			{
@@ -454,7 +455,7 @@ namespace PrRenderer::Core
 		p_shaderPtr->Unbind();
 	}
 
-	void DeferRenderBackend::RenderToPointShadowMap(Resources::ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightView, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
+	void DeferRenderBackend::RenderToPointShadowMap(ShaderPtr p_pointShadowMapShader, PrCore::Math::mat4& p_lightView, LightObjectPtr p_light, std::list<RenderObjectPtr>* p_objects, const RenderContext* p_renderData)
 	{
 		const auto lightPos = p_light->GetPosition();
 		const auto frustrum = Frustrum(p_lightView);
@@ -466,7 +467,7 @@ namespace PrRenderer::Core
 		for (auto& object : *p_objects)
 		{
 			const auto& renderVA = object->vertexArrayShadowPtr ? object->vertexArrayShadowPtr : object->vertexArrayPtr;
-			auto submesh = object->vertexArrayShadowPtr ? Resources::SubMesh() : object->subMesh;
+			auto submesh = object->vertexArrayShadowPtr ? SubMesh() : object->subMesh;
 
 			if (object->type == RenderObjectType::Mesh)
 			{
@@ -532,14 +533,14 @@ namespace PrRenderer::Core
 			ssaoNoise.push_back(noise.z);
 		}
 
-		auto noiseTex = Resources::Texture2D::Create();
+		auto noiseTex = Texture2D::Create();
 		noiseTex->SetHeight(4);
 		noiseTex->SetWidth(4);
-		noiseTex->SetFormat(Resources::TextureFormat::RGB16F);
-		noiseTex->SetWrapModeU(Resources::TextureWrapMode::Repeat);
-		noiseTex->SetWrapModeV(Resources::TextureWrapMode::Repeat);
-		noiseTex->SetMagFiltering(Resources::TextureFiltering::Nearest);
-		noiseTex->SetMinFiltering(Resources::TextureFiltering::Nearest);
+		noiseTex->SetFormat(TextureFormat::RGB16F);
+		noiseTex->SetWrapModeU(TextureWrapMode::Repeat);
+		noiseTex->SetWrapModeV(TextureWrapMode::Repeat);
+		noiseTex->SetMagFiltering(TextureFiltering::Nearest);
+		noiseTex->SetMinFiltering(TextureFiltering::Nearest);
 		noiseTex->SetData(ssaoNoise.data());
 		noiseTex->SetMipMap(false);
 		noiseTex->Apply();
@@ -549,12 +550,12 @@ namespace PrRenderer::Core
 		m_renderContext.SSAOBuff.reset();
 
 		Buffers::FramebufferTexture ssaoTex;
-		ssaoTex.format = Resources::TextureFormat::R8;
-		ssaoTex.filteringMag = Resources::TextureFiltering::Nearest;
-		ssaoTex.filteringMin = Resources::TextureFiltering::Nearest;
+		ssaoTex.format = TextureFormat::R8;
+		ssaoTex.filteringMag = TextureFiltering::Nearest;
+		ssaoTex.filteringMin = TextureFiltering::Nearest;
 
 		Buffers::FramebufferTexture depthTex;
-		depthTex.format = Resources::TextureFormat::Depth32;
+		depthTex.format = TextureFormat::Depth32;
 
 		Buffers::FramebufferSettings settings;
 		settings.globalWidth = m_screenWidth;
@@ -573,10 +574,10 @@ namespace PrRenderer::Core
 		m_renderContext.postprocessTex.reset();
 
 		Buffers::FramebufferTexture texture;
-		texture.format = Resources::TextureFormat::RGB16F;
+		texture.format = TextureFormat::RGB16F;
 
 		Buffers::FramebufferTexture depthTex;
-		depthTex.format = Resources::TextureFormat::Depth16;
+		depthTex.format = TextureFormat::Depth16;
 
 		Buffers::FramebufferSettings settings;
 		settings.globalWidth = m_screenWidth;
@@ -596,12 +597,12 @@ namespace PrRenderer::Core
 			m_renderContext.bloomDownscaleTex[i].reset();
 
 			Buffers::FramebufferTexture bloomTexture;
-			bloomTexture.format = Resources::TextureFormat::RGBA16F;
-			bloomTexture.wrapModeU = Resources::TextureWrapMode::Clamp;
-			bloomTexture.wrapModeV = Resources::TextureWrapMode::Clamp;
+			bloomTexture.format = TextureFormat::RGBA16F;
+			bloomTexture.wrapModeU = TextureWrapMode::Clamp;
+			bloomTexture.wrapModeV = TextureWrapMode::Clamp;
 
 			Buffers::FramebufferTexture bloomDepthTex;
-			bloomDepthTex.format = Resources::TextureFormat::Depth16;
+			bloomDepthTex.format = TextureFormat::Depth16;
 
 			Buffers::FramebufferSettings bloomSettings;
 			bloomSettings.globalWidth = m_screenWidth >> (i + 1);
@@ -617,12 +618,12 @@ namespace PrRenderer::Core
 		m_renderContext.bloomTex.reset();
 
 		Buffers::FramebufferTexture bloomTexture;
-		bloomTexture.format = Resources::TextureFormat::RGBA16F;
-		bloomTexture.wrapModeU = Resources::TextureWrapMode::Clamp;
-		bloomTexture.wrapModeV = Resources::TextureWrapMode::Clamp;
+		bloomTexture.format = TextureFormat::RGBA16F;
+		bloomTexture.wrapModeU = TextureWrapMode::Clamp;
+		bloomTexture.wrapModeV = TextureWrapMode::Clamp;
 
 		Buffers::FramebufferTexture bloomDepthTex;
-		bloomDepthTex.format = Resources::TextureFormat::Depth16;
+		bloomDepthTex.format = TextureFormat::Depth16;
 
 		Buffers::FramebufferSettings bloomSettings;
 		bloomSettings.globalWidth = m_screenWidth;
@@ -644,27 +645,27 @@ namespace PrRenderer::Core
 
 		//Create new one
 		Buffers::FramebufferTexture gPos;
-		gPos.format = Resources::TextureFormat::RGBA16F;
-		gPos.filteringMag = Resources::TextureFiltering::Nearest;
-		gPos.filteringMin = Resources::TextureFiltering::Nearest;
+		gPos.format = TextureFormat::RGBA16F;
+		gPos.filteringMag = TextureFiltering::Nearest;
+		gPos.filteringMin = TextureFiltering::Nearest;
 
 		Buffers::FramebufferTexture gAlbedo;
-		gAlbedo.format = Resources::TextureFormat::RGBA16F;
+		gAlbedo.format = TextureFormat::RGBA16F;
 
 
 		Buffers::FramebufferTexture gNormal;
-		gNormal.format = Resources::TextureFormat::RGBA16F;
-		gNormal.filteringMag = Resources::TextureFiltering::Nearest;
-		gNormal.filteringMin = Resources::TextureFiltering::Nearest;
+		gNormal.format = TextureFormat::RGBA16F;
+		gNormal.filteringMag = TextureFiltering::Nearest;
+		gNormal.filteringMin = TextureFiltering::Nearest;
 
 		Buffers::FramebufferTexture gAo;
-		gAo.format = Resources::TextureFormat::RGBA16F;
+		gAo.format = TextureFormat::RGBA16F;
 
 
 		Buffers::FramebufferTexture gDepth;
-		gDepth.format = Resources::TextureFormat::Depth32;
-		gDepth.filteringMag = Resources::TextureFiltering::Nearest;
-		gDepth.filteringMin = Resources::TextureFiltering::Nearest;
+		gDepth.format = TextureFormat::Depth32;
+		gDepth.filteringMag = TextureFiltering::Nearest;
+		gDepth.filteringMin = TextureFiltering::Nearest;
 
 		Buffers::FramebufferSettings settings;
 		settings.globalWidth = m_screenWidth * 2; // Doubled size to imitate MSAA
@@ -683,10 +684,10 @@ namespace PrRenderer::Core
 
 		//Output framebuffer
 		Buffers::FramebufferTexture outputTex;
-		outputTex.format = Resources::TextureFormat::RGBA16F;
+		outputTex.format = TextureFormat::RGBA16F;
 
 		Buffers::FramebufferTexture outputDepth;
-		outputDepth.format = Resources::TextureFormat::Depth32;
+		outputDepth.format = TextureFormat::Depth32;
 
 		Buffers::FramebufferSettings outputSettings;
 		outputSettings.globalWidth = m_screenWidth;
@@ -703,7 +704,7 @@ namespace PrRenderer::Core
 	{
 		//Spot Lights Mapping
 		Buffers::FramebufferTexture spotDepthTex;
-		spotDepthTex.format = Resources::TextureFormat::Depth32;
+		spotDepthTex.format = TextureFormat::Depth32;
 
 		Buffers::FramebufferSettings spotLightSettings;
 		spotLightSettings.globalWidth = m_settings->spotLightCombineShadowMapSize;
@@ -716,7 +717,7 @@ namespace PrRenderer::Core
 
 		//Directional Light Mapping
 		Buffers::FramebufferTexture dirDepthTex;
-		dirDepthTex.format = Resources::TextureFormat::Depth32;
+		dirDepthTex.format = TextureFormat::Depth32;
 
 		Buffers::FramebufferSettings dirLightSettings;
 		dirLightSettings.globalWidth = m_settings->dirLightCombineMapSize;
@@ -729,9 +730,9 @@ namespace PrRenderer::Core
 
 		//Point Lights Mapping
 		Buffers::FramebufferTexture pointTex;
-		pointTex.format = Resources::TextureFormat::RGBA16F;
+		pointTex.format = TextureFormat::RGBA16F;
 		Buffers::FramebufferTexture pointDepthTex;
-		pointDepthTex.format = Resources::TextureFormat::Depth32;
+		pointDepthTex.format = TextureFormat::Depth32;
 
 		Buffers::FramebufferSettings pointLightSettings;
 		pointLightSettings.globalWidth = m_settings->pointLightCombineShadowMapSize;
@@ -745,7 +746,7 @@ namespace PrRenderer::Core
 
 		//Main Directional Light
 		Buffers::FramebufferTexture mainDirDepthTex;
-		mainDirDepthTex.format = Resources::TextureFormat::Depth32;
+		mainDirDepthTex.format = TextureFormat::Depth32;
 
 		Buffers::FramebufferSettings mainDirSettings;
 		mainDirSettings.globalWidth = m_settings->mainLightShadowCombineMapSize;
@@ -756,7 +757,7 @@ namespace PrRenderer::Core
 		m_renderContext.shadowMapMainDirTex = m_renderContext.shadowMapMainDirBuff->GetDepthTexturePtr();
 	}
 
-	void DeferRenderBackend::RenderCubeMap(Resources::MaterialPtr p_material, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderCubeMap(MaterialPtr p_material, const RenderContext* p_renderContext)
 	{
 		LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::LessEqual);
 
@@ -773,7 +774,7 @@ namespace PrRenderer::Core
 		LowRenderer::SetDepthAlgorythm(ComparaisonAlgorithm::Less);
 	}
 
-	void DeferRenderBackend::RenderToneMapping(Resources::ShaderPtr p_toneMapShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderToneMapping(ShaderPtr p_toneMapShader, const RenderContext* p_renderContext)
 	{
 		LowRenderer::EnableDepth(false);
 		LowRenderer::EnableCullFace(false);
@@ -857,7 +858,7 @@ namespace PrRenderer::Core
 		material->Unbind();
 	}
 
-	void DeferRenderBackend::RenderSSAO(Resources::ShaderPtr p_SSAOShader, Resources::ShaderPtr p_BlurSSAOShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderSSAO(ShaderPtr p_SSAOShader, ShaderPtr p_BlurSSAOShader, const RenderContext* p_renderContext)
 	{
 		p_renderContext->SSAOBuff->Bind();
 		p_SSAOShader->Bind();
@@ -917,7 +918,7 @@ namespace PrRenderer::Core
 		p_renderContext->gBuffer.buffer->Unbind();
 	}
 
-	void DeferRenderBackend::RenderFXAA(Resources::ShaderPtr p_FXAAShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderFXAA(ShaderPtr p_FXAAShader, const RenderContext* p_renderContext)
 	{
 		p_FXAAShader->Bind();
 
@@ -944,7 +945,7 @@ namespace PrRenderer::Core
 		p_FXAAShader->Unbind();
 	}
 
-	void DeferRenderBackend::RenderFog(Resources::ShaderPtr p_fogShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderFog(ShaderPtr p_fogShader, const RenderContext* p_renderContext)
 	{
 		p_renderContext->otuputBuff->Bind();
 		p_fogShader->Bind();
@@ -971,7 +972,7 @@ namespace PrRenderer::Core
 		p_fogShader->Unbind();
 	}
 
-	void DeferRenderBackend::RenderBloom(Resources::ShaderPtr p_downsampleShader, Resources::ShaderPtr p_upsampleShader, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderBloom(ShaderPtr p_downsampleShader, ShaderPtr p_upsampleShader, const RenderContext* p_renderContext)
 	{
 		// downsample
 		float& threshold = p_renderContext->settings->bloomThreshold;
@@ -1084,7 +1085,7 @@ namespace PrRenderer::Core
 		p_renderContext->otuputBuff->Unbind();
 	}
 
-	void DeferRenderBackend::RenderLight(Resources::ShaderPtr p_lightShdr, DirLightObjectPtr p_mianDirectLight, std::vector<LightObjectPtr>* p_lights, const RenderContext* p_renderContext)
+	void DeferRenderBackend::RenderLight(ShaderPtr p_lightShdr, DirLightObjectPtr p_mianDirectLight, std::vector<LightObjectPtr>* p_lights, const RenderContext* p_renderContext)
 	{
 		p_renderContext->otuputBuff->Bind();
 
@@ -1160,7 +1161,7 @@ namespace PrRenderer::Core
 
 		for (auto& lightPtr : *p_lights)
 		{
-			if (lightPtr->GetType()== Resources::LightType::Directional)
+			if (lightPtr->GetType()== LightType::Directional)
 			{
 				const auto& lightObject = std::static_pointer_cast<DirLightObject>(lightPtr);
 				dirLightMat.push_back(lightObject->packedMat);
@@ -1168,12 +1169,12 @@ namespace PrRenderer::Core
 					dirLightViewMat.push_back(viewMat);
 				dirLightIDs.push_back(lightObject->shadowMapPos);
 			}
-			else if (lightPtr->GetType() == Resources::LightType::Point)
+			else if (lightPtr->GetType() == LightType::Point)
 			{
 				pointlightMat.push_back(lightPtr->packedMat);
 				pointLighttexPos.push_back(lightPtr->shadowMapPos);
 			}
-			else if (lightPtr->GetType() == Resources::LightType::Spot)
+			else if (lightPtr->GetType() == LightType::Spot)
 			{
 				const auto& lightObject = std::static_pointer_cast<SpotLightObject>(lightPtr);
 				spotLightMat.push_back(lightObject->packedMat);
@@ -1239,7 +1240,7 @@ namespace PrRenderer::Core
 		m_renderContext.IRMap.reset();
 
 		Buffers::FramebufferTexture texture;
-		texture.format = Resources::TextureFormat::RGB16F;
+		texture.format = TextureFormat::RGB16F;
 		texture.cubeTexture = true;
 
 		Buffers::FramebufferSettings settings;
@@ -1249,8 +1250,8 @@ namespace PrRenderer::Core
 
 		auto framebuffer = Buffers::Framebufffer::Create(settings);
 
-		auto shader = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/cubemap/irradiance_map.shader");
-		auto cube = Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
+		auto shader = PrSystems::Get<PrCore::ResourceSystem>()->Load<Shader>("shader/cubemap/irradiance_map.shader");
+		auto cube = Mesh::CreatePrimitive(PrimitiveType::Cube);
 		auto cubemap = m_frame->cubemapObject->material->GetTexture("skybox");
 
 		PrCore::Math::mat4 captureProjection = PrCore::Math::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
@@ -1280,7 +1281,7 @@ namespace PrRenderer::Core
 			LowRenderer::Draw(cube->GetVertexArray());
 		}
 
-		m_renderContext.IRMap = std::static_pointer_cast<Resources::Cubemap>(framebuffer->GetTexturePtr(0));
+		m_renderContext.IRMap = std::static_pointer_cast<Cubemap>(framebuffer->GetTexturePtr(0));
 
 		shader->Unbind();
 		cubemap->Unbind();
@@ -1294,9 +1295,9 @@ namespace PrRenderer::Core
 		m_renderContext.prefilterMap.reset();
 
 		Buffers::FramebufferTexture texture;
-		texture.format = Resources::TextureFormat::RGB16F;
-		texture.filteringMin = Resources::TextureFiltering::LinearMipMapLinear;
-		texture.filteringMag = Resources::TextureFiltering::Linear;
+		texture.format = TextureFormat::RGB16F;
+		texture.filteringMin = TextureFiltering::LinearMipMapLinear;
+		texture.filteringMag = TextureFiltering::Linear;
 		texture.cubeTexture = true;
 
 		Buffers::FramebufferSettings settings;
@@ -1307,8 +1308,8 @@ namespace PrRenderer::Core
 
 		auto framebuffer = Buffers::Framebufffer::Create(settings);
 
-		auto shader = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/cubemap/prefiltered_cube.shader");
-		auto cube = Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Cube);
+		auto shader = PrSystems::Get<PrCore::ResourceSystem>()->Load<Shader>("shader/cubemap/prefiltered_cube.shader");
+		auto cube = Mesh::CreatePrimitive(PrimitiveType::Cube);
 		auto cubemap = m_frame->cubemapObject->material->GetTexture("skybox");
 
 		PrCore::Math::mat4 captureProjection = PrCore::Math::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
@@ -1343,7 +1344,7 @@ namespace PrRenderer::Core
 			}
 		}
 
-		m_renderContext.prefilterMap = std::static_pointer_cast<Resources::Cubemap>(framebuffer->GetTexturePtr());
+		m_renderContext.prefilterMap = std::static_pointer_cast<Cubemap>(framebuffer->GetTexturePtr());
 
 		shader->Unbind();
 		cubemap->Unbind();
@@ -1357,7 +1358,7 @@ namespace PrRenderer::Core
 		m_renderContext.brdfLUT.reset();
 
 		Buffers::FramebufferTexture texture;
-		texture.format = Resources::TextureFormat::RG16;
+		texture.format = TextureFormat::RG16;
 
 		Buffers::FramebufferSettings settings;
 		settings.globalHeight = 512;
@@ -1366,8 +1367,8 @@ namespace PrRenderer::Core
 
 		auto framebuffer = Buffers::Framebufffer::Create(settings);
 
-		auto shader = PrCore::Resources::ResourceSystem::GetInstance().Load<Resources::Shader>("shader/cubemap/lut_map.shader");
-		auto quad = Resources::Mesh::CreatePrimitive(Resources::PrimitiveType::Quad);
+		auto shader = PrSystems::Get<PrCore::ResourceSystem>()->Load<Shader>("shader/cubemap/lut_map.shader");
+		auto quad = Mesh::CreatePrimitive(PrimitiveType::Quad);
 
 		shader->Bind();
 		quad->Bind();

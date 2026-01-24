@@ -2,7 +2,7 @@
 
 #include"Renderer/Resources/Light.h"
 
-using namespace PrRenderer::Resources;
+using namespace PrRenderer;
 
 
 Light::Light():

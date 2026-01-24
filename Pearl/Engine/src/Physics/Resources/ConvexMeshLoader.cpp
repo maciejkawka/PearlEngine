@@ -12,7 +12,7 @@
 using namespace PrPhysics;
 using namespace physx;
 
-PrCore::Resources::IResourceDataPtr ConvexMeshLoader::LoadResource(const std::string& p_path)
+PrCore::IResourceDataPtr ConvexMeshLoader::LoadResource(const std::string& p_path)
 {
 	auto pFileSystem = PrSystems::Get<PrCore::FileSystem>();
 	auto file = pFileSystem->FileOpen(p_path);
@@ -30,13 +30,13 @@ PrCore::Resources::IResourceDataPtr ConvexMeshLoader::LoadResource(const std::st
 	return convexMeshPtr;
 }
 
-void ConvexMeshLoader::UnloadResource(PrCore::Resources::IResourceDataPtr p_resourceData)
+void ConvexMeshLoader::UnloadResource(PrCore::IResourceDataPtr p_resourceData)
 {
 	p_resourceData.reset();
 	p_resourceData = nullptr;
 }
 
-bool ConvexMeshLoader::SaveResourceOnDisc(PrCore::Resources::IResourceDataPtr p_resourceData, const std::string& p_path)
+bool ConvexMeshLoader::SaveResourceOnDisc(PrCore::IResourceDataPtr p_resourceData, const std::string& p_path)
 {
 	IConvexMeshPtr convexMeshPtr = std::static_pointer_cast<IConvexMesh>(p_resourceData);
 

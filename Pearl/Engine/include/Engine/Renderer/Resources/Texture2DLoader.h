@@ -2,11 +2,11 @@
 
 #include "Core/Resources/IResourceDataLoader.h"
 
-namespace PrRenderer::Resources {
+namespace PrRenderer {
 
-	using namespace PrCore::Resources;
+	using namespace PrCore;
 
-	class Texture2DLoader : public PrCore::Resources::IResourceDataLoader {
+	class Texture2DLoader : public PrCore::IResourceDataLoader {
 	public:
 
 		enum Texture2DFlag 
