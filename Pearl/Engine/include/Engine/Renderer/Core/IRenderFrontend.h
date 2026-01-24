@@ -1,9 +1,9 @@
 #pragma once
-#include"Core/ECS/ECS.h"
+#include "Core/ECS/ECS.h"
 
-#include"Renderer/Core/RenderTypes.h"
-#include"Renderer/Core/IRenderBackend.h"
-#include"Renderer/Resources/Material.h"
+#include "Renderer/Core/RenderTypes.h"
+#include "Renderer/Core/IRenderBackend.h"
+#include "Renderer/Resources/Material.h"
 
 namespace PrCore::ECS {
 	class MeshRendererComponent;
@@ -12,11 +12,11 @@ namespace PrCore::ECS {
 	class LightComponent;
 }
 
-namespace PrRenderer::Core {
+namespace PrRenderer {
 
 	using namespace PrCore;
 
-	class IRenderFrontend {
+	class IRenderFrontend : public PrCore::Utils::ISystem {
 	public:
 		explicit IRenderFrontend(RendererSettings& s_settings)
 		{

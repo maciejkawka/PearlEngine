@@ -333,9 +333,6 @@
     <ClInclude Include="include\Engine\Renderer\Core\CascadeShadowMapper.h">
       <Filter>Renderer\Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Renderer\Core\RenderSystem.h">
-      <Filter>Renderer\Core</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine\Core\Utils\PathUtils.h">
       <Filter>Core\Utils</Filter>
     </ClInclude>

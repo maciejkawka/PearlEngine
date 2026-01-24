@@ -6,7 +6,7 @@ namespace PrEditor::Components {
 
 	class BasicCamera {
 	public:
-		BasicCamera(PrRenderer::Core::CameraType p_cameraType);
+		BasicCamera(PrRenderer::CameraType p_cameraType);
 		BasicCamera();
 
 		~BasicCamera();
@@ -19,11 +19,11 @@ namespace PrEditor::Components {
 		inline const PrCore::Math::vec3& GetPosition() { return m_camera->GetRotation(); }
 		inline const PrCore::Math::vec3& GetRotation() { return m_camera->GetRotation(); }
 
-		PrRenderer::Core::Camera* GetCamera() { return m_camera; }
+		PrRenderer::Camera* GetCamera() { return m_camera; }
 
 	private:
-		PrRenderer::Core::Camera* m_camera;
-		PrCore::Math::vec2 m_lastMousePos;
+		PrRenderer::Camera* m_camera;
+		PrCore::Math::vec2  m_lastMousePos;
 		float m_rotationSpeed;
 		float m_movementSpeed;
 		float m_fastSpeed;

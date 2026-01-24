@@ -30,12 +30,12 @@ struct ArrayHash {
 	}
 };
 
-PrRenderer::Core::Color ToColor(const aiColor4D& p_vec4)
+PrRenderer::Color ToColor(const aiColor4D& p_vec4)
 {
 	return { p_vec4.r, p_vec4.g, p_vec4.b, p_vec4.a };
 }
 
-PrRenderer::Core::Color ToColor(const aiColor3D& p_vec4)
+PrRenderer::Color ToColor(const aiColor3D& p_vec4)
 {
 	return { p_vec4.r, p_vec4.g, p_vec4.b, 1.0f };
 }

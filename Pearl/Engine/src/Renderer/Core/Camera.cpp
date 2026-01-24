@@ -3,7 +3,7 @@
 #include"Renderer/Core/Camera.h"
 
 
-using namespace PrRenderer::Core;
+using namespace PrRenderer;
 namespace Math = PrCore::Math;
 
 Camera* Camera::s_mainCamera = nullptr;

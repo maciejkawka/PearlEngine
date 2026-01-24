@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/Math/Math.h"
 
-namespace PrRenderer::Core {
+namespace PrRenderer {
 
 	class Frustrum {
 	public:

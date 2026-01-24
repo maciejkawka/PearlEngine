@@ -23,7 +23,7 @@ namespace PrRenderer {
 		~Light() = default;
 
 		inline void SetType(LightType p_type) { m_type = p_type; }
-		inline void SetColor(PrRenderer::Core::Color p_color) { m_color = p_color; }
+		inline void SetColor(PrRenderer::Color p_color) { m_color = p_color; }
 
 		inline void SetAttenuation(float p_quadratic, float p_linear, float p_constant = 1.0f) {
 			m_linearAttenuation = p_linear; m_quadraticAttenuation = p_quadratic; m_constantAttenuation = p_constant;
@@ -34,7 +34,7 @@ namespace PrRenderer {
 		inline void SetOutterCone(float p_outter) { m_outterCone = p_outter; }
 
 		inline LightType GetType() const { return m_type; }
-		inline PrRenderer::Core::Color GetColor() const { return m_color; }
+		inline PrRenderer::Color GetColor() const { return m_color; }
 
 		inline float GetQuadraticAttenuation() const { return m_quadraticAttenuation; }
 		inline float GetLinearAttenuation() const { return m_linearAttenuation; }
@@ -47,7 +47,7 @@ namespace PrRenderer {
 		PrCore::Math::mat4 CreatePackedMatrix(const PrCore::Math::vec3& p_position, const PrCore::Math::vec3& p_direction) const;
 
 	private:
-		PrRenderer::Core::Color m_color;
+		PrRenderer::Color m_color;
 
 		float m_linearAttenuation;
 		float m_quadraticAttenuation;

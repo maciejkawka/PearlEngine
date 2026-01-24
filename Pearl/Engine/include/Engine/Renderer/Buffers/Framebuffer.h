@@ -1,10 +1,11 @@
 #pragma once
-#include<any>
-#include<vector>
-#include"Renderer/Core/Defines.h"
-#include"Renderer/Resources/Texture2D.h"
 
-namespace PrRenderer::Buffers {
+#include <any>
+#include <vector>
+#include "Renderer/Core/Defines.h"
+#include "Renderer/Resources/Texture2D.h"
+
+namespace PrRenderer {
 
 	class Framebufffer;
 	typedef std::shared_ptr<Framebufffer> FramebuffferPtr;
@@ -70,10 +71,11 @@ namespace PrRenderer::Buffers {
 	struct FramebufferSettings {
 		size_t globalWidth = 0;
 		size_t globalHeight = 0;
-		bool mipMaped = false;
-		int samples = 1;
-		FramebufferTexAttachments colorTextureAttachments;
-		FramebufferTexture depthStencilAttachment = TextureFormat::None;
+		bool   mipMaped = false;
+		int    samples = 1;
+
+		FramebufferTexAttachments    colorTextureAttachments;
+		FramebufferTexture           depthStencilAttachment = TextureFormat::None;
 	};
 
 	class Framebufffer {
@@ -85,7 +87,7 @@ namespace PrRenderer::Buffers {
 		virtual void Unbind() = 0;
 		virtual void SetAttachmentDetails(int p_attachment, int p_textureTarget, int p_mipLevel = 0) = 0;
 		virtual void Resize(size_t width, size_t height) = 0;
-		virtual void ClearAttachmentColor(unsigned int p_attachemntIndex, const Core::Color& p_color) = 0;
+		virtual void ClearAttachmentColor(unsigned int p_attachemntIndex, const Color& p_color) = 0;
 		
 		virtual TexturePtr GetTexturePtr(unsigned int p_index = 0) = 0;
 		virtual TexturePtr GetDepthTexturePtr() = 0;

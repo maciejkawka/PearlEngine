@@ -1,10 +1,11 @@
 #pragma once
-#include"Renderer/Core/Color.h"
 
-#include"Renderer/Buffers/VertexArray.h"
-#include"Renderer/Buffers/Framebuffer.h"
+#include "Renderer/Core/Color.h"
 
-namespace PrRenderer::Core {
+#include "Renderer/Buffers/VertexArray.h"
+#include "Renderer/Buffers/Framebuffer.h"
+
+namespace PrRenderer {
 
 	enum ClearFlag {
 		ColorBuffer = 1,
@@ -16,8 +17,7 @@ namespace PrRenderer::Core {
 
 	enum class GraphicsAPI {
 		OpenGL,
-		DirectX,
-		None
+		DirectX
 	};
 
 	enum class Primitives {
@@ -81,18 +81,18 @@ namespace PrRenderer::Core {
 
 		virtual void SetColorMask(bool p_red, bool p_green, bool p_blue, bool p_alpha) = 0;
 
-		virtual void Draw(Buffers::VertexArrayPtr p_vertexArray, size_t p_indicesCount = 0, unsigned int p_indicesOffset = 0, Core::Primitives p_primitives = Core::Primitives::Triangles) = 0;
-		virtual void DrawArray(Buffers::VertexBufferPtr p_vertexArray, Primitives p_primitives = Primitives::Triangles) = 0;
-		virtual void DrawInstanced(Buffers::VertexArrayPtr p_vertexArray, size_t p_instanceCount, Primitives p_primitives = Primitives::Triangles) = 0;
+		virtual void Draw(VertexArrayPtr p_vertexArray, size_t p_indicesCount = 0, unsigned int p_indicesOffset = 0, Primitives p_primitives = Primitives::Triangles) = 0;
+		virtual void DrawArray(VertexBufferPtr p_vertexArray, Primitives p_primitives = Primitives::Triangles) = 0;
+		virtual void DrawInstanced(VertexArrayPtr p_vertexArray, size_t p_instanceCount, Primitives p_primitives = Primitives::Triangles) = 0;
 		virtual void EnableCullFace(bool p_enable) = 0;
 		virtual void SetCullFaceMode(CullFaceMode p_mode) = 0;
 
-		virtual void  BlitFrameBuffers(Buffers::FramebuffferPtr p_readBuffer, Buffers::FramebuffferPtr p_drawBuffer, Buffers::FramebufferMask p_mask) = 0;
+		virtual void  BlitFrameBuffers(FramebuffferPtr p_readBuffer, FramebuffferPtr p_drawBuffer, FramebufferMask p_mask) = 0;
 		virtual void* ReadFrontBuffer(size_t& p_outWidthm, size_t& p_outHeight) = 0;
 
 		inline static GraphicsAPI GetGraphicsAPI() { return m_graphicsAPI; }
 
 	protected:
-		inline static GraphicsAPI m_graphicsAPI = GraphicsAPI::None;
+		inline static GraphicsAPI m_graphicsAPI = GraphicsAPI::OpenGL;
 	};
 }

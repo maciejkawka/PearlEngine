@@ -13,13 +13,13 @@ namespace PrRenderer::OpenGL {
 	unsigned int TextureFormatToDataTypeGL(TextureFormat p_format);
 
 	//Buffers
-	unsigned int FramebufferMaskToGL(Buffers::FramebufferMask p_mask);
+	unsigned int FramebufferMaskToGL(FramebufferMask p_mask);
 
 	//Renderer
-	unsigned int PrimitiveToGL(Core::Primitives p_primitives);
-	unsigned int ComparaisonToGL(Core::ComparaisonAlgorithm p_algorythm);
-	unsigned int BlendingToGL(Core::BlendingAlgorithm p_algorythm);
-	unsigned int CullFaceToGL(Core::CullFaceMode p_mode);
+	unsigned int PrimitiveToGL(Primitives p_primitives);
+	unsigned int ComparaisonToGL(ComparaisonAlgorithm p_algorythm);
+	unsigned int BlendingToGL(BlendingAlgorithm p_algorythm);
+	unsigned int CullFaceToGL(CullFaceMode p_mode);
 
 	//General
 	unsigned int BoolToGL(bool p_bool);

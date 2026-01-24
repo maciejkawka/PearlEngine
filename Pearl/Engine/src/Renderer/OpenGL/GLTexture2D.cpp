@@ -72,7 +72,7 @@ void GLTexture2D::Apply()
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void GLTexture2D::ClearWithColor(const PrRenderer::Core::Color& p_color)
+void GLTexture2D::ClearWithColor(const PrRenderer::Color& p_color)
 {
 	glClearTexImage(m_ID, 0, TextureFormatToGL(m_format), GL_FLOAT, &p_color);
 }

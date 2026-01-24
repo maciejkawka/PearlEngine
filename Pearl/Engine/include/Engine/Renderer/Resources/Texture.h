@@ -5,7 +5,7 @@
 
 #include<memory>
 
-namespace PrRenderer::Core {
+namespace PrRenderer {
 	class Color;
 }
 
@@ -70,7 +70,7 @@ namespace PrRenderer {
 		virtual void* FetchGPUData(int p_level = 0) = 0;
 		virtual void  Apply() = 0;
 
-		virtual void ClearWithColor(const Core::Color& p_color) = 0;
+		virtual void ClearWithColor(const Color& p_color) = 0;
 
 		virtual void SetMinFiltering(TextureFiltering p_minfiltering) { m_minFiltering = p_minfiltering; }
 		virtual void SetMagFiltering(TextureFiltering p_magfiltering) { m_magFiltering = p_magfiltering; }

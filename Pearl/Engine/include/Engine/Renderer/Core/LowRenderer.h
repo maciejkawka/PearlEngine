@@ -1,10 +1,10 @@
 #pragma once 
 
-#include"Renderer/Core/RendererAPI.h"
-#include"Renderer/Core/RenderCommand.h"
-#include"Renderer/Buffers/Framebuffer.h"
+#include "Renderer/Core/RendererAPI.h"
+#include "Renderer/Core/RenderCommand.h"
+#include "Renderer/Buffers/Framebuffer.h"
 
-namespace PrRenderer::Core {
+namespace PrRenderer {
 
 	class LowRenderer {
 	public:
@@ -47,16 +47,16 @@ namespace PrRenderer::Core {
 		// static void SetColorMask() 
 		
 		//Draw
-		static void Draw(Buffers::VertexArrayPtr p_vertexArray, size_t p_indicesCount = 0, unsigned int p_indicesOffset = 0, Core::Primitives p_primitives = Core::Primitives::Triangles);
-		static void DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives = Core::Primitives::Triangles);
-		static void DrawInstanced(Buffers::VertexArrayPtr p_vertexArray, size_t p_instanceCount, Primitives p_primitives = Primitives::Triangles);
+		static void Draw(VertexArrayPtr p_vertexArray, size_t p_indicesCount = 0, unsigned int p_indicesOffset = 0, Primitives p_primitives = Primitives::Triangles);
+		static void DrawArray(VertexBufferPtr p_vertexArray, Primitives p_primitives = Primitives::Triangles);
+		static void DrawInstanced(VertexArrayPtr p_vertexArray, size_t p_instanceCount, Primitives p_primitives = Primitives::Triangles);
 
 		//Other
 		static void EnableCullFace(bool p_enable);
 		static void SetCullFaceMode(CullFaceMode p_mode);
 
 		//Utils
-		static void BlitFrameBuffers(Buffers::FramebuffferPtr p_readBuffer, Buffers::FramebuffferPtr p_drawBuffer = nullptr, Buffers::FramebufferMask p_mask = Buffers::FramebufferMask::ColorBufferBit);
+		static void BlitFrameBuffers(FramebuffferPtr p_readBuffer, FramebuffferPtr p_drawBuffer = nullptr, FramebufferMask p_mask = FramebufferMask::ColorBufferBit);
 		static void* ReadFrontBuffer(size_t& p_outWidthm, size_t& p_outHeight);
 
 		//Commands
@@ -74,14 +74,14 @@ namespace PrRenderer::Core {
 		REGISTER_RENDER_COMMAND(EnableBlending, bool);
 		REGISTER_RENDER_COMMAND(SetBlendingAlgorythm, BlendingAlgorithm, BlendingAlgorithm);
 
-		REGISTER_RENDER_COMMAND(Draw, Buffers::VertexArrayPtr, size_t, unsigned int, Core::Primitives);
-		REGISTER_RENDER_COMMAND(DrawArray, Buffers::VertexBufferPtr, Core::Primitives);
-		REGISTER_RENDER_COMMAND(DrawInstanced, Buffers::VertexArrayPtr, size_t, Core::Primitives);
+		REGISTER_RENDER_COMMAND(Draw, VertexArrayPtr, size_t, unsigned int, Primitives);
+		REGISTER_RENDER_COMMAND(DrawArray, VertexBufferPtr, Primitives);
+		REGISTER_RENDER_COMMAND(DrawInstanced, VertexArrayPtr, size_t, Primitives);
 
 		REGISTER_RENDER_COMMAND(EnableCullFace, bool);
 		REGISTER_RENDER_COMMAND(SetCullFaceMode, CullFaceMode);
 
-		REGISTER_RENDER_COMMAND(BlitFrameBuffers, Buffers::FramebuffferPtr, Buffers::FramebuffferPtr, Buffers::FramebufferMask);
+		REGISTER_RENDER_COMMAND(BlitFrameBuffers, FramebuffferPtr, FramebuffferPtr, FramebufferMask);
 
 	private:
 		inline static RendererAPI* m_rendererAPI = nullptr;

@@ -11,7 +11,7 @@
 
 using namespace PrRenderer::OpenGL;
 
-GLFramebuffer::GLFramebuffer(const Buffers::FramebufferSettings& p_settings):
+GLFramebuffer::GLFramebuffer(const FramebufferSettings& p_settings):
 	Framebufffer()
 {
 	m_settings = p_settings;
@@ -73,7 +73,7 @@ void GLFramebuffer::Resize(size_t width, size_t height)
 	UpdateFamebuffer();
 }
 
-void GLFramebuffer::ClearAttachmentColor(unsigned int p_attachemntIndex, const Core::Color& p_color)
+void GLFramebuffer::ClearAttachmentColor(unsigned int p_attachemntIndex, const Color& p_color)
 {
 	PR_ASSERT(p_attachemntIndex < m_colorTextures.size(), "Framebuffer attachemnt index over the size" + this->m_ID);
 	m_colorTextures[p_attachemntIndex]->ClearWithColor(p_color);

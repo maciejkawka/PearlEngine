@@ -11,7 +11,7 @@
 #include "Core/Input/InputManager.h"
 #include "Core/Utils/Clock.h"
 
-namespace PrRenderer::Core
+namespace PrRenderer
 {
 	DeferRenderBackend::DeferRenderBackend(RendererSettingsPtr& p_settings) :
 		IRenderBackend(p_settings)
@@ -286,7 +286,7 @@ namespace PrRenderer::Core
 			PushCommand(CreateRC<RenderCubeMapRC>(m_frame->cubemapObject->material, &m_renderContext));
 
 		// Copy depth buffer to postprocess buffer
-		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.gBuffer.buffer, m_renderContext.otuputBuff, Buffers::FramebufferMask::DepthBufferBit));
+		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.gBuffer.buffer, m_renderContext.otuputBuff, FramebufferMask::DepthBufferBit));
 
 		// SSAO
 		if(m_settings->enableSSAO)
@@ -319,26 +319,26 @@ namespace PrRenderer::Core
 		// Fog
 		if (m_settings->enableFog)
 		{
-			PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
+			PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, FramebufferMask::ColorBufferBit));
 			PushCommand(CreateRC<RenderFogRC>(m_fogShdr.GetData(), &m_renderContext));
 		}
 
 		// Bloom
 		if(m_settings->enableBloom)
 		{
-			PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
+			PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, FramebufferMask::ColorBufferBit));
 			PushCommand(CreateRC<RenderBloomRC>(m_downsample.GetData(), m_upsample.GetData(), &m_renderContext));
 		}
 
 		// Tone Mapping
-		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
+		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, FramebufferMask::ColorBufferBit));
 		PushCommand(CreateRC<RenderToneMappingRC>(m_ToneMappingShdr.GetData(), &m_renderContext));
 
 		//Render Debug
 		PushCommand(CreateRC<RenderDebugRC>(&m_frame->debugObjects, &m_renderContext));
 
 		// FXAA Anti-Aliasing and Render front
-		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, Buffers::FramebufferMask::ColorBufferBit));
+		PushCommand(CreateRC<LowRenderer::BlitFrameBuffersRC>(m_renderContext.otuputBuff, m_renderContext.postprocessBuff, FramebufferMask::ColorBufferBit));
 		PushCommand(CreateRC<RenderFXAARC>(m_FXAAShdr.GetData(), &m_renderContext));
 	}
 
@@ -549,22 +549,22 @@ namespace PrRenderer::Core
 		//Generate SSAO Framebuffer
 		m_renderContext.SSAOBuff.reset();
 
-		Buffers::FramebufferTexture ssaoTex;
+		FramebufferTexture ssaoTex;
 		ssaoTex.format = TextureFormat::R8;
 		ssaoTex.filteringMag = TextureFiltering::Nearest;
 		ssaoTex.filteringMin = TextureFiltering::Nearest;
 
-		Buffers::FramebufferTexture depthTex;
+		FramebufferTexture depthTex;
 		depthTex.format = TextureFormat::Depth32;
 
-		Buffers::FramebufferSettings settings;
+		FramebufferSettings settings;
 		settings.globalWidth = m_screenWidth;
 		settings.globalHeight = m_screenHeight;
 		settings.mipMaped = false;
 		settings.colorTextureAttachments = { ssaoTex };
 		settings.depthStencilAttachment = depthTex;
 
-		m_renderContext.SSAOBuff = Buffers::Framebufffer::Create(settings);
+		m_renderContext.SSAOBuff = Framebufffer::Create(settings);
 		m_renderContext.SSAOTex = m_renderContext.SSAOBuff->GetTexturePtr();
 	}
 
@@ -573,20 +573,20 @@ namespace PrRenderer::Core
 		m_renderContext.postprocessBuff.reset();
 		m_renderContext.postprocessTex.reset();
 
-		Buffers::FramebufferTexture texture;
+		FramebufferTexture texture;
 		texture.format = TextureFormat::RGB16F;
 
-		Buffers::FramebufferTexture depthTex;
+		FramebufferTexture depthTex;
 		depthTex.format = TextureFormat::Depth16;
 
-		Buffers::FramebufferSettings settings;
+		FramebufferSettings settings;
 		settings.globalWidth = m_screenWidth;
 		settings.globalHeight = m_screenHeight;
 		settings.mipMaped = false;
 		settings.colorTextureAttachments = { texture };
 		settings.depthStencilAttachment = depthTex;
 
-		m_renderContext.postprocessBuff = Buffers::Framebufffer::Create(settings);
+		m_renderContext.postprocessBuff = Framebufffer::Create(settings);
 		m_renderContext.postprocessTex = m_renderContext.postprocessBuff->GetTexturePtr();
 
 		// Bloom
@@ -596,42 +596,42 @@ namespace PrRenderer::Core
 			m_renderContext.bloomDownscaleBuff[i].reset();
 			m_renderContext.bloomDownscaleTex[i].reset();
 
-			Buffers::FramebufferTexture bloomTexture;
+			FramebufferTexture bloomTexture;
 			bloomTexture.format = TextureFormat::RGBA16F;
 			bloomTexture.wrapModeU = TextureWrapMode::Clamp;
 			bloomTexture.wrapModeV = TextureWrapMode::Clamp;
 
-			Buffers::FramebufferTexture bloomDepthTex;
+			FramebufferTexture bloomDepthTex;
 			bloomDepthTex.format = TextureFormat::Depth16;
 
-			Buffers::FramebufferSettings bloomSettings;
+			FramebufferSettings bloomSettings;
 			bloomSettings.globalWidth = m_screenWidth >> (i + 1);
 			bloomSettings.globalHeight = m_screenHeight >> (i + 1);
 			bloomSettings.colorTextureAttachments = { bloomTexture };
 			bloomSettings.depthStencilAttachment = bloomDepthTex;
 
-			m_renderContext.bloomDownscaleBuff[i] = Buffers::Framebufffer::Create(bloomSettings);
+			m_renderContext.bloomDownscaleBuff[i] = Framebufffer::Create(bloomSettings);
 			m_renderContext.bloomDownscaleTex[i] = m_renderContext.bloomDownscaleBuff[i]->GetTexturePtr();
 		}
 
 		m_renderContext.bloomBuff.reset();
 		m_renderContext.bloomTex.reset();
 
-		Buffers::FramebufferTexture bloomTexture;
+		FramebufferTexture bloomTexture;
 		bloomTexture.format = TextureFormat::RGBA16F;
 		bloomTexture.wrapModeU = TextureWrapMode::Clamp;
 		bloomTexture.wrapModeV = TextureWrapMode::Clamp;
 
-		Buffers::FramebufferTexture bloomDepthTex;
+		FramebufferTexture bloomDepthTex;
 		bloomDepthTex.format = TextureFormat::Depth16;
 
-		Buffers::FramebufferSettings bloomSettings;
+		FramebufferSettings bloomSettings;
 		bloomSettings.globalWidth = m_screenWidth;
 		bloomSettings.globalHeight = m_screenHeight;
 		bloomSettings.colorTextureAttachments = { bloomTexture };
 		bloomSettings.depthStencilAttachment = bloomDepthTex;
 
-		m_renderContext.bloomBuff = Buffers::Framebufffer::Create(bloomSettings);
+		m_renderContext.bloomBuff = Framebufffer::Create(bloomSettings);
 		m_renderContext.bloomTex = m_renderContext.bloomBuff->GetTexturePtr();
 	}
 
@@ -644,37 +644,37 @@ namespace PrRenderer::Core
 		m_renderContext.gBuffer.buffer.reset();
 
 		//Create new one
-		Buffers::FramebufferTexture gPos;
+		FramebufferTexture gPos;
 		gPos.format = TextureFormat::RGBA16F;
 		gPos.filteringMag = TextureFiltering::Nearest;
 		gPos.filteringMin = TextureFiltering::Nearest;
 
-		Buffers::FramebufferTexture gAlbedo;
+		FramebufferTexture gAlbedo;
 		gAlbedo.format = TextureFormat::RGBA16F;
 
 
-		Buffers::FramebufferTexture gNormal;
+		FramebufferTexture gNormal;
 		gNormal.format = TextureFormat::RGBA16F;
 		gNormal.filteringMag = TextureFiltering::Nearest;
 		gNormal.filteringMin = TextureFiltering::Nearest;
 
-		Buffers::FramebufferTexture gAo;
+		FramebufferTexture gAo;
 		gAo.format = TextureFormat::RGBA16F;
 
 
-		Buffers::FramebufferTexture gDepth;
+		FramebufferTexture gDepth;
 		gDepth.format = TextureFormat::Depth32;
 		gDepth.filteringMag = TextureFiltering::Nearest;
 		gDepth.filteringMin = TextureFiltering::Nearest;
 
-		Buffers::FramebufferSettings settings;
+		FramebufferSettings settings;
 		settings.globalWidth = m_screenWidth * 2; // Doubled size to imitate MSAA
 		settings.globalHeight = m_screenHeight * 2; // Doubled size to imitate MSAA
 		settings.mipMaped = false;
 		settings.colorTextureAttachments = { gPos, gAlbedo, gNormal, gAo };
 		settings.depthStencilAttachment = gDepth;
 
-		auto framebuffer = Buffers::Framebufffer::Create(settings);
+		auto framebuffer = Framebufffer::Create(settings);
 		m_renderContext.gBuffer.positionTex = framebuffer->GetTexturePtr(0);
 		m_renderContext.gBuffer.albedoTex = framebuffer->GetTexturePtr(1);
 		m_renderContext.gBuffer.normalsTex = framebuffer->GetTexturePtr(2);
@@ -683,77 +683,77 @@ namespace PrRenderer::Core
 
 
 		//Output framebuffer
-		Buffers::FramebufferTexture outputTex;
+		FramebufferTexture outputTex;
 		outputTex.format = TextureFormat::RGBA16F;
 
-		Buffers::FramebufferTexture outputDepth;
+		FramebufferTexture outputDepth;
 		outputDepth.format = TextureFormat::Depth32;
 
-		Buffers::FramebufferSettings outputSettings;
+		FramebufferSettings outputSettings;
 		outputSettings.globalWidth = m_screenWidth;
 		outputSettings.globalHeight = m_screenHeight;
 		outputSettings.mipMaped = false;
 		outputSettings.colorTextureAttachments = outputTex;
 		outputSettings.depthStencilAttachment = outputDepth;
 
-		m_renderContext.otuputBuff = Buffers::Framebufffer::Create(outputSettings);
+		m_renderContext.otuputBuff = Framebufffer::Create(outputSettings);
 		m_renderContext.outputTex = m_renderContext.otuputBuff->GetTexturePtr(0);
 	}
 
 	void DeferRenderBackend::GenerateShadowMaps()
 	{
 		//Spot Lights Mapping
-		Buffers::FramebufferTexture spotDepthTex;
+		FramebufferTexture spotDepthTex;
 		spotDepthTex.format = TextureFormat::Depth32;
 
-		Buffers::FramebufferSettings spotLightSettings;
+		FramebufferSettings spotLightSettings;
 		spotLightSettings.globalWidth = m_settings->spotLightCombineShadowMapSize;
 		spotLightSettings.globalHeight = m_settings->spotLightCombineShadowMapSize;;
 		spotLightSettings.mipMaped = false;
 		spotLightSettings.depthStencilAttachment = spotDepthTex;
 
-		m_renderContext.shadowMapSpotBuff = Buffers::Framebufffer::Create(spotLightSettings);
+		m_renderContext.shadowMapSpotBuff = Framebufffer::Create(spotLightSettings);
 		m_renderContext.shadowMapSpotTex = m_renderContext.shadowMapSpotBuff->GetDepthTexturePtr();
 
 		//Directional Light Mapping
-		Buffers::FramebufferTexture dirDepthTex;
+		FramebufferTexture dirDepthTex;
 		dirDepthTex.format = TextureFormat::Depth32;
 
-		Buffers::FramebufferSettings dirLightSettings;
+		FramebufferSettings dirLightSettings;
 		dirLightSettings.globalWidth = m_settings->dirLightCombineMapSize;
 		dirLightSettings.globalHeight = m_settings->dirLightCombineMapSize;
 		dirLightSettings.mipMaped = false;
 		dirLightSettings.depthStencilAttachment = dirDepthTex;
-		m_renderContext.shadowMapDirBuff = Buffers::Framebufffer::Create(dirLightSettings);
+		m_renderContext.shadowMapDirBuff = Framebufffer::Create(dirLightSettings);
 		m_renderContext.shadowMapDirTex = m_renderContext.shadowMapDirBuff->GetDepthTexturePtr();
 
 
 		//Point Lights Mapping
-		Buffers::FramebufferTexture pointTex;
+		FramebufferTexture pointTex;
 		pointTex.format = TextureFormat::RGBA16F;
-		Buffers::FramebufferTexture pointDepthTex;
+		FramebufferTexture pointDepthTex;
 		pointDepthTex.format = TextureFormat::Depth32;
 
-		Buffers::FramebufferSettings pointLightSettings;
+		FramebufferSettings pointLightSettings;
 		pointLightSettings.globalWidth = m_settings->pointLightCombineShadowMapSize;
 		pointLightSettings.globalHeight = m_settings->pointLightCombineShadowMapSize;;
 		pointLightSettings.mipMaped = false;
 		pointLightSettings.colorTextureAttachments = pointTex;
 		pointLightSettings.depthStencilAttachment = pointDepthTex;
-		m_renderContext.shadowMapPointBuff = Buffers::Framebufffer::Create(pointLightSettings);
+		m_renderContext.shadowMapPointBuff = Framebufffer::Create(pointLightSettings);
 		m_renderContext.shadowMapPointTex = m_renderContext.shadowMapPointBuff->GetTexturePtr(0);
 		
 
 		//Main Directional Light
-		Buffers::FramebufferTexture mainDirDepthTex;
+		FramebufferTexture mainDirDepthTex;
 		mainDirDepthTex.format = TextureFormat::Depth32;
 
-		Buffers::FramebufferSettings mainDirSettings;
+		FramebufferSettings mainDirSettings;
 		mainDirSettings.globalWidth = m_settings->mainLightShadowCombineMapSize;
 		mainDirSettings.globalHeight = m_settings->mainLightShadowCombineMapSize;
 		mainDirSettings.mipMaped = false;
 		mainDirSettings.depthStencilAttachment = mainDirDepthTex;
-		m_renderContext.shadowMapMainDirBuff = Buffers::Framebufffer::Create(mainDirSettings);
+		m_renderContext.shadowMapMainDirBuff = Framebufffer::Create(mainDirSettings);
 		m_renderContext.shadowMapMainDirTex = m_renderContext.shadowMapMainDirBuff->GetDepthTexturePtr();
 	}
 
@@ -1239,16 +1239,16 @@ namespace PrRenderer::Core
 	{
 		m_renderContext.IRMap.reset();
 
-		Buffers::FramebufferTexture texture;
+		FramebufferTexture texture;
 		texture.format = TextureFormat::RGB16F;
 		texture.cubeTexture = true;
 
-		Buffers::FramebufferSettings settings;
+		FramebufferSettings settings;
 		settings.globalWidth = 32;
 		settings.globalHeight = 32;
 		settings.colorTextureAttachments = texture;
 
-		auto framebuffer = Buffers::Framebufffer::Create(settings);
+		auto framebuffer = Framebufffer::Create(settings);
 
 		auto shader = PrSystems::Get<PrCore::ResourceSystem>()->Load<Shader>("shader/cubemap/irradiance_map.shader");
 		auto cube = Mesh::CreatePrimitive(PrimitiveType::Cube);
@@ -1294,19 +1294,19 @@ namespace PrRenderer::Core
 	{
 		m_renderContext.prefilterMap.reset();
 
-		Buffers::FramebufferTexture texture;
+		FramebufferTexture texture;
 		texture.format = TextureFormat::RGB16F;
 		texture.filteringMin = TextureFiltering::LinearMipMapLinear;
 		texture.filteringMag = TextureFiltering::Linear;
 		texture.cubeTexture = true;
 
-		Buffers::FramebufferSettings settings;
+		FramebufferSettings settings;
 		settings.globalWidth = 128;
 		settings.globalHeight = 128;
 		settings.mipMaped = true;
 		settings.colorTextureAttachments = texture;
 
-		auto framebuffer = Buffers::Framebufffer::Create(settings);
+		auto framebuffer = Framebufffer::Create(settings);
 
 		auto shader = PrSystems::Get<PrCore::ResourceSystem>()->Load<Shader>("shader/cubemap/prefiltered_cube.shader");
 		auto cube = Mesh::CreatePrimitive(PrimitiveType::Cube);
@@ -1357,15 +1357,15 @@ namespace PrRenderer::Core
 	{
 		m_renderContext.brdfLUT.reset();
 
-		Buffers::FramebufferTexture texture;
+		FramebufferTexture texture;
 		texture.format = TextureFormat::RG16;
 
-		Buffers::FramebufferSettings settings;
+		FramebufferSettings settings;
 		settings.globalHeight = 512;
 		settings.globalWidth = 512;
 		settings.colorTextureAttachments = texture;
 
-		auto framebuffer = Buffers::Framebufffer::Create(settings);
+		auto framebuffer = Framebufffer::Create(settings);
 
 		auto shader = PrSystems::Get<PrCore::ResourceSystem>()->Load<Shader>("shader/cubemap/lut_map.shader");
 		auto quad = Mesh::CreatePrimitive(PrimitiveType::Quad);

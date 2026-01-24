@@ -8,8 +8,9 @@
 
 #include "Renderer/Core/DeferRenderBackend.h"
 #include "Renderer/Core/BoundingVolume.h"
+#include "Renderer/OpenGL/GLContext.h"
 
-using namespace PrRenderer::Core;
+using namespace PrRenderer;
 
 #define FRAME_DATA_COUNT 2
 #define MAX_INSTANCE_COUNT 200
@@ -20,6 +21,16 @@ static std::uint64_t m_frameID;
 DeferRenderFrontend::DeferRenderFrontend(RendererSettings& p_settings) :
 	IRenderFrontend(p_settings)
 {
+	if (p_settings.rendererAPI == GraphicsAPI::OpenGL)
+		m_renderContext = std::make_unique<OpenGL::GLContext>();
+	else
+	{
+		PR_ASSERT("It's a lie, engine does only support OpenGL");
+		m_renderContext = std::make_unique<OpenGL::GLContext>();
+	}
+
+	m_renderContext->Init();
+
 	//Prepare frame data
 	m_currentFrame = m_frameData[0];
 	m_previousFrame = m_frameData[1];

@@ -6,7 +6,7 @@ using namespace PrRenderer;
 
 
 Light::Light():
-	m_color(PrRenderer::Core::Color::White),
+	m_color(PrRenderer::Color::White),
 	m_linearAttenuation(0.5f),
 	m_quadraticAttenuation(0.5f),
 	m_constantAttenuation(1.0f),
@@ -18,7 +18,7 @@ Light::Light():
 }
 
 Light::Light(LightType p_type):
-	m_color(PrRenderer::Core::Color::White),
+	m_color(PrRenderer::Color::White),
 	m_linearAttenuation(0.5f),
 	m_quadraticAttenuation(0.5f),
 	m_constantAttenuation(1.0f),
@@ -30,7 +30,7 @@ Light::Light(LightType p_type):
 }
 
 Light::Light(LightType p_type, PrCore::Math::vec3 p_position):
-	m_color(PrRenderer::Core::Color::White),
+	m_color(PrRenderer::Color::White),
 	m_linearAttenuation(1.0f),
 	m_quadraticAttenuation(0.0f),
 	m_constantAttenuation(1.0f),
@@ -42,7 +42,7 @@ Light::Light(LightType p_type, PrCore::Math::vec3 p_position):
 }
 
 Light::Light(LightType p_type, PrCore::Math::vec3 p_position, PrCore::Math::vec3 p_direction):
-	m_color(PrRenderer::Core::Color::White),
+	m_color(PrRenderer::Color::White),
 	m_linearAttenuation(1.0f),
 	m_quadraticAttenuation(0.0f),
 	m_constantAttenuation(1.0f),

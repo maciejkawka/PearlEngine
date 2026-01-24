@@ -27,14 +27,14 @@ struct Vertex
 	PrCore::Math::vec3 pos;
 	PrCore::Math::vec3 normal;
 	PrCore::Math::vec2 uv;
-	PrRenderer::Core::Color color;
+	PrRenderer::Color color;
 
 	Vertex()
 	{
 		pos = PrCore::Math::vec3(0.f);
 		normal = PrCore::Math::vec3(0.f);
 		uv = PrCore::Math::vec2(0.f);
-		color = PrRenderer::Core::Color::Black;
+		color = PrRenderer::Color::Black;
 	}
 
 	bool operator==(const Vertex& vertex) const
@@ -81,7 +81,7 @@ PrCore::IResourceDataPtr MeshOBJLoader::LoadResource(const std::string& p_path)
 	std::vector<PrCore::Math::vec3> vertices;
 	std::vector<PrCore::Math::vec3> normals;
 	std::vector<PrCore::Math::vec4> tangents;
-	std::vector<Core::Color> colors;
+	std::vector<Color> colors;
 	std::vector<SubMesh> subMeshes;
 	Mesh::UVArray UVs;
 
@@ -135,7 +135,7 @@ PrCore::IResourceDataPtr MeshOBJLoader::LoadResource(const std::string& p_path)
 				vert.normal = normal;
 			}
 
-			PrRenderer::Core::Color color(PrRenderer::Core::Color::White);
+			PrRenderer::Color color(PrRenderer::Color::White);
 			if (!attrib.colors.empty())
 			{
 				color.r = attrib.colors[3 * index.vertex_index + 0];

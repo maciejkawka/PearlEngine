@@ -1,11 +1,12 @@
 #pragma once
-#include"Renderer/Core/Defines.h"
-#include"Renderer/Buffers/IndexBuffer.h"
-#include"Renderer/Buffers/VertexBuffer.h"
+
+#include "Renderer/Core/Defines.h"
+#include "Renderer/Buffers/IndexBuffer.h"
+#include "Renderer/Buffers/VertexBuffer.h"
 
 #include<vector>
 
-namespace PrRenderer::Buffers {
+namespace PrRenderer {
 
 	class VertexArray;
 	typedef std::shared_ptr<VertexArray> VertexArrayPtr;
@@ -29,10 +30,10 @@ namespace PrRenderer::Buffers {
 		static VertexArrayPtr Create();
 
 	protected:
-		RendererID m_bufferID;
-		size_t m_vertexBufferIndex;
-		std::vector<VertexBufferPtr> m_vertexBuffers;
-		IndexBufferPtr m_indexBuffer;
+		RendererID      m_bufferID;
+		size_t          m_vertexBufferIndex;
+		IndexBufferPtr  m_indexBuffer;
+		std::vector<VertexBufferPtr>   m_vertexBuffers;
 
 	};
 }

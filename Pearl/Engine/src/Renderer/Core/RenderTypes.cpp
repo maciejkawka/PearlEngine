@@ -2,7 +2,7 @@
 
 #include"Renderer/Core/RenderTypes.h"
 
-using namespace PrRenderer::Core;
+using namespace PrRenderer;
 
 SortingHash::SortingHash(const RenderObject& p_renderObject)
 {

@@ -35,31 +35,31 @@ void GLMesh::RecalculateTangents()
 
 void GLMesh::UpdateBuffers()
 {
-	auto vertexBuffer = Buffers::VertexBuffer::Create();
-	auto indexBuffer = Buffers::IndexBuffer::Create();
-	Buffers::BufferLayout bufferLayout;
+	auto vertexBuffer = VertexBuffer::Create();
+	auto indexBuffer = IndexBuffer::Create();
+	BufferLayout bufferLayout;
 
 	//Vertex
-	bufferLayout.AddElementBuffer({ "Vertex", Buffers::ShaderDataType::Float3 });
+	bufferLayout.AddElementBuffer({ "Vertex", ShaderDataType::Float3 });
 
 	//Normals
 	if (m_normals.empty() && m_normals.size() > 2)
 		m_normals = CalculateNormals();
-	bufferLayout.AddElementBuffer({ "Normals", Buffers::ShaderDataType::Float3 });
+	bufferLayout.AddElementBuffer({ "Normals", ShaderDataType::Float3 });
 
 	//Tangents
 	if (m_tangents.empty() && m_normals.size() > 2)
 		m_tangents = CalculateTangents();
-	bufferLayout.AddElementBuffer({ "Tangents", Buffers::ShaderDataType::Float4 });
+	bufferLayout.AddElementBuffer({ "Tangents", ShaderDataType::Float4 });
 
 	//UVs
 	for (int i = 0; i < m_maxUVs; i++)
 		if (!m_UVs[i].empty())
-			bufferLayout.AddElementBuffer({ ("UV" + std::to_string(i)), Buffers::ShaderDataType::Float2 });
+			bufferLayout.AddElementBuffer({ ("UV" + std::to_string(i)), ShaderDataType::Float2 });
 
 	//Colors
 	if (!m_colors.empty())
-		bufferLayout.AddElementBuffer({ "Color", Buffers::ShaderDataType::Float4 });
+		bufferLayout.AddElementBuffer({ "Color", ShaderDataType::Float4 });
 
 	//Create VertexBuffer
 	size_t bufferSize = bufferLayout.GetFloatStride() * m_verticesCount;
@@ -114,7 +114,7 @@ void GLMesh::UpdateBuffers()
 	m_VA->SetIndexBuffer(indexBuffer);
 	m_VA->SetVertexBuffer(vertexBuffer);
 
-	m_boxVolume = Core::BoxVolume(m_vertices);
+	m_boxVolume = BoxVolume(m_vertices);
 
 	// Submesh should always be at least 1 covering whole VertexArray
 	if (m_submeshes.size() == 0)

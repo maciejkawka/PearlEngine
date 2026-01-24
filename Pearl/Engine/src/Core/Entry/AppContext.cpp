@@ -1,23 +1,22 @@
 #include"Core/Common/pearl_pch.h"
 
-#include"Core/Entry/AppContext.h"
-#include"Core/Events/EventManager.h"
-#include"Core/Utils/Logger.h"
-#include"Core/Utils/Clock.h"
-#include"Core/Utils/PathUtils.h"
+#include "Core/Entry/AppContext.h"
+
+#include "Core/Events/EventManager.h"
+#include "Core/Utils/Logger.h"
+#include "Core/Utils/Clock.h"
+#include "Core/Utils/PathUtils.h"
 #include "Core/File/ConfigFile.h"
 #include "Core/File/FileSystem.h"
 #include "Core/ECS/SceneManager.h"
 #include "Core/Threading/ThreadSystem.h"
 #include "Core/Threading/JobSystem.h"
+#include "Core/Resources/ResourceDatabase.h"
+#include "Core/Resources/ResourceSystem.h"
 
 #include"Renderer/Core/DeferRenderFrontend.h"
-#include"Renderer/Core/RenderSystem.h"
 #include"Renderer/OpenGL/GLContext.h"
 
-#include "Core/Resources/ResourceDatabase.h"
-
-#include "Core/Resources/ResourceSystem.h"
 #include "Renderer/Resources/Shader.h"
 #include "Renderer/Resources/Cubemap.h"
 #include "Renderer/Resources/Material.h"
@@ -46,7 +45,6 @@ const std::string_view RendererConfig{ "config/renderer.cfg" };
 PrCore::Entry::AppContext::AppContext()
 {
 	m_window = nullptr;
-	m_rendererContext = nullptr;
 
 	//Init Engine Subsystems
 	PrSystems::Register<PrCore::Utils::ILogger, PrCore::Utils::Logger>();
@@ -96,7 +94,7 @@ PrCore::Entry::AppContext::AppContext()
 
 	//-----------------------
 	// Init Resource System
-	PRLOG_INFO("Init Resource Manager");
+	PRLOG_INFO("Init Resource System");
 	auto pResourceSystem = PrSystems::Register<ResourceSystem>();
 
 	{
@@ -126,6 +124,9 @@ PrCore::Entry::AppContext::AppContext()
 		pResourceSystem->RegisterDatabase<Cubemap>(std::move(cubemapDatabase));
 	}
 
+	//-----------------------
+	// Init Renderer System
+	PRLOG_INFO("Init Render System");
 	ConfigFile contexConfig;
 	if (contexConfig.OpenFromFile(GraphicConfig))
 	{
@@ -150,13 +151,10 @@ PrCore::Entry::AppContext::AppContext()
 		m_window = new Windowing::GLWindow(windowSettings);
 	}
 
-	m_rendererContext = new PrRenderer::OpenGL::GLContext();
-	m_rendererContext->Init();
-
 	ConfigFile rendererConfig;
 	if (rendererConfig.OpenFromFile(RendererConfig))
 	{
-		PrRenderer::Core::RendererSettings rendererSettings;
+		PrRenderer::RendererSettings rendererSettings;
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, dirLightMaxShadows);
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, dirLightShadowsMapSize);
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, dirLightCombineMapSize);
@@ -214,7 +212,9 @@ PrCore::Entry::AppContext::AppContext()
 
 		rendererConfig.GET_CONFIG_SETTING_NAME(rendererSettings, toneMappingExposure);
 
-		PrRenderer::Core::renderSystem = std::make_unique<PrRenderer::Core::DeferRenderFrontend>(rendererSettings);
+		rendererSettings.rendererAPI = PrRenderer::GraphicsAPI::OpenGL;
+
+		PrSystems::Register<PrRenderer::IRenderFrontend, PrRenderer::DeferRenderFrontend>(rendererSettings);
 	}
 
 	{
@@ -249,12 +249,13 @@ PrCore::Entry::AppContext::~AppContext()
 		PrPhysics::PhysicsSystem::Terminate();
 	}
 
-	PrRenderer::Core::renderSystem.reset();
-	delete m_rendererContext;
+	PRLOG_INFO("Terminating Render System");
+	PrSystems::Unregister< PrRenderer::IRenderFrontend>();
+
 	delete m_window;
 	Windowing::GLWindow::TerminateDevice();
 
-	PRLOG_INFO("Terminating Resource Manager");
+	PRLOG_INFO("Terminating Resource System");
 	PrSystems::Unregister<ResourceSystem>();
 
 	PRLOG_INFO("Terminating Event Manager");

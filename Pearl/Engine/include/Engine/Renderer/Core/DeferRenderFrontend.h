@@ -1,12 +1,16 @@
 #pragma once
+
 #include "Renderer/Core/IRenderFrontend.h"
 #include "Renderer/Resources/Shader.h"
 
-namespace PrRenderer::Core {
+namespace PrRenderer {
+
+	class Context;
 
 	class DeferRenderFrontend : public IRenderFrontend {
 	public:
 		explicit DeferRenderFrontend(RendererSettings& p_settings);
+		virtual ~DeferRenderFrontend() = default;
 
 		void SubmitLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id) override;
 		void SetCamera(Camera* p_camera) override { m_camera = p_camera; };
@@ -50,5 +54,7 @@ namespace PrRenderer::Core {
 		MaterialPtr      m_debugMaterial;
 		Camera*          m_camera;
 		Frustrum         m_frustrum;
+
+		std::unique_ptr<Context> m_renderContext{ nullptr };
 	};
 }

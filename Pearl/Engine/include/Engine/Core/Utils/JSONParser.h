@@ -1,6 +1,6 @@
 #pragma once
 
-#include"Renderer/Core/Color.h"
+#include "Renderer/Core/Color.h"
 
 #include "json/json.hpp"
 
@@ -17,7 +17,7 @@ namespace PrCore::Utils {
 		JSONParser() = delete;
 		JSONParser(JSONParser& p_copy) = delete;
 
-		static PrRenderer::Core::Color ToColor(const JSON::json& p_json);
+		static PrRenderer::Color ToColor(const JSON::json& p_json);
 
 		static Math::vec2 ToVec2(const JSON::json& p_json);
 		static Math::vec3 ToVec3(const JSON::json& p_json);
@@ -27,7 +27,7 @@ namespace PrCore::Utils {
 		static Math::mat4 ToMat4(const JSON::json& p_json);
 		static Math::mat3 ToMat3(const JSON::json& p_json);
 
-		static JSON::json ParseColor(const PrRenderer::Core::Color& p_color);
+		static JSON::json ParseColor(const PrRenderer::Color& p_color);
 
 		static JSON::json ParseVec2(const Math::vec2& p_vec2);
 		static JSON::json ParseVec3(const Math::vec3& p_vec3);

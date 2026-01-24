@@ -3,7 +3,7 @@
 
 namespace PrRenderer::OpenGL {
 
-	class GLIndexBuffer : public Buffers::IndexBuffer{
+	class GLIndexBuffer : public IndexBuffer{
 	public:
 		GLIndexBuffer();
 		GLIndexBuffer(uint32_t* p_indices, uint32_t p_size);

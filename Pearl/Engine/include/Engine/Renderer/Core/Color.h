@@ -1,7 +1,8 @@
 #pragma once
-#include"Core/Math/Math.h"
 
-namespace PrRenderer::Core {
+#include "Core/Math/Math.h"
+
+namespace PrRenderer {
 	
 	class Color: public PrCore::Math::vec4 {
 	public:

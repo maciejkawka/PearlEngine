@@ -1,11 +1,12 @@
 #pragma once
-#include<cstdint>
-#include<initializer_list>
-#include<string>
 
-#include"Core/Utils/Logger.h"
+#include <cstdint>
+#include <initializer_list>
+#include <string>
 
-namespace PrRenderer::Buffers {
+#include "Core/Utils/Logger.h"
+
+namespace PrRenderer {
 
 	enum class ShaderDataType{
 		Unknown = 0,

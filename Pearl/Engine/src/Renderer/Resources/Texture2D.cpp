@@ -9,9 +9,9 @@ using namespace PrRenderer;
 std::shared_ptr<Texture2D> Texture2D::Create()
 {
 	Texture2DPtr texture = nullptr;
-	switch (Core::RendererAPI::GetGraphicsAPI())
+	switch (RendererAPI::GetGraphicsAPI())
 	{
-	case Core::GraphicsAPI::OpenGL: texture = std::make_shared<OpenGL::GLTexture2D>(); break;
+	case GraphicsAPI::OpenGL: texture = std::make_shared<OpenGL::GLTexture2D>(); break;
 
 	default:
 	{
@@ -23,7 +23,7 @@ std::shared_ptr<Texture2D> Texture2D::Create()
 	return texture;
 }
 
-std::shared_ptr<Texture2D> Texture2D::CreateUnitTex(const Core::Color& p_unitColor)
+std::shared_ptr<Texture2D> Texture2D::CreateUnitTex(const Color& p_unitColor)
 {
 	// Create empty texture and fills it with unit data
 	auto texture = Create();

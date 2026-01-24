@@ -15,7 +15,7 @@ namespace PrRenderer::OpenGL {
 		void GenerateMipMaps() override;
 
 		void Apply() override;
-		void ClearWithColor(const Core::Color& p_color) override;
+		void ClearWithColor(const Color& p_color) override;
 
 		size_t GetByteSize() const override;
 		void*  FetchGPUData(int p_level = 0) override;

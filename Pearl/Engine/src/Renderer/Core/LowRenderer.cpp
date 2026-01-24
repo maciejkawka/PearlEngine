@@ -3,7 +3,7 @@
 #include"Renderer/Core/LowRenderer.h"
 #include"Renderer/OpenGL/GLRenderer.h"
 
-using namespace PrRenderer::Core;
+using namespace PrRenderer;
 
 void LowRenderer::Init(GraphicsAPI p_API)
 {
@@ -86,17 +86,17 @@ void LowRenderer::SetColorMask(bool p_red, bool p_green, bool p_blue, bool p_alp
 	m_rendererAPI->SetColorMask(p_red, p_green, p_blue, p_alpha);
 }
 
-void LowRenderer::Draw(Buffers::VertexArrayPtr p_vertexArray, size_t p_indicesCount , unsigned int p_indicesOffset, Core::Primitives p_primitives)
+void LowRenderer::Draw(VertexArrayPtr p_vertexArray, size_t p_indicesCount , unsigned int p_indicesOffset, Primitives p_primitives)
 {
 	m_rendererAPI->Draw(p_vertexArray, p_indicesCount, p_indicesOffset, p_primitives);
 }
 
-void LowRenderer::DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives)
+void LowRenderer::DrawArray(VertexBufferPtr p_vertexArray, Primitives p_primitives)
 {
 	m_rendererAPI->DrawArray(p_vertexArray, p_primitives);
 }
 
-void LowRenderer::DrawInstanced(Buffers::VertexArrayPtr p_vertexArray, size_t p_instanceCount, Primitives p_primitives)
+void LowRenderer::DrawInstanced(VertexArrayPtr p_vertexArray, size_t p_instanceCount, Primitives p_primitives)
 {
 	m_rendererAPI->DrawInstanced(p_vertexArray, p_instanceCount, p_primitives);
 }
@@ -111,7 +111,7 @@ void LowRenderer::SetCullFaceMode(CullFaceMode p_mode)
 	m_rendererAPI->SetCullFaceMode(p_mode);
 }
 
-void LowRenderer::BlitFrameBuffers(Buffers::FramebuffferPtr p_readBuffer, Buffers::FramebuffferPtr p_drawBuffer, Buffers::FramebufferMask p_mask)
+void LowRenderer::BlitFrameBuffers(FramebuffferPtr p_readBuffer, FramebuffferPtr p_drawBuffer, FramebufferMask p_mask)
 {
 	m_rendererAPI->BlitFrameBuffers(p_readBuffer, p_drawBuffer, p_mask);
 }

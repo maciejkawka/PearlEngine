@@ -5,13 +5,13 @@
 #include"Renderer/Core/RendererAPI.h"
 #include"Renderer/OpenGl/GLIndexBuffer.h"
 
-using namespace PrRenderer::Buffers;
+using namespace PrRenderer;
 
 IndexBufferPtr IndexBuffer::Create()
 {
-	switch (Core::RendererAPI::GetGraphicsAPI())
+	switch (RendererAPI::GetGraphicsAPI())
 	{
-	case Core::GraphicsAPI::OpenGL: return std::make_shared<OpenGL::GLIndexBuffer>();
+	case GraphicsAPI::OpenGL: return std::make_shared<OpenGL::GLIndexBuffer>();
 
 	default:
 	{

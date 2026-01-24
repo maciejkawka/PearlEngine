@@ -1,7 +1,7 @@
 #include "Core/Common/pearl_pch.h"
 #include "Renderer/Core/BoundingVolume.h"
 
-using namespace PrRenderer::Core;
+using namespace PrRenderer;
 
 Frustrum::Frustrum(const PrCore::Math::mat4& m_transformMatrix)
 {
@@ -224,7 +224,7 @@ bool BoxVolume::IsOnFrustrum(const Frustrum& p_frustrum, PrCore::Math::mat4 p_tr
 		newMax.z - translatedCenter.z
 	);
 
-	//PrRenderer::Core::DefferedRendererFrontend::GetInstance().DrawCube(translatedCenter, newExtends * 2.0f,  true);
+	//PrRenderer::DefferedRendererFrontend::GetInstance().DrawCube(translatedCenter, newExtends * 2.0f,  true);
 
 	// Check if AABB in frustrum
 	for (int i = 0; i < 6; i++)

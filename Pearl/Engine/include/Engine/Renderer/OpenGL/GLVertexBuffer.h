@@ -3,7 +3,7 @@
 
 namespace PrRenderer::OpenGL {
 
-	class GLVertexBuffer : public Buffers::VertexBuffer {
+	class GLVertexBuffer : public VertexBuffer {
 	public:
 		GLVertexBuffer();
 		GLVertexBuffer(void* p_data, size_t p_size);

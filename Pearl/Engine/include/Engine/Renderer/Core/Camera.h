@@ -1,8 +1,9 @@
 #pragma once
-#include"Renderer/Core/Color.h"
-#include"Core/Math/Math.h"
 
-namespace PrRenderer::Core {
+#include "Renderer/Core/Color.h"
+#include "Core/Math/Math.h"
+
+namespace PrRenderer {
 
 	enum class CameraType {
 		Perspective,

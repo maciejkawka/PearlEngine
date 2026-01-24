@@ -3,7 +3,6 @@
 #include "Core/ECS/Systems/TestSystem.h"
 #include "Core/ECS/Components/PhysicsComponents.h"
 
-#include "Renderer/Core/RenderSystem.h"
 #include "Renderer/Core/Color.h"
 
 #include "Physics/Core/Physics.h"
@@ -11,10 +10,11 @@
 #include "Physics/Events/Events.h"
 #include "Core/File/FileSystem.h"
 #include "Renderer/Core/LowRenderer.h"
+#include "Renderer/Core/IRenderFrontend.h"
 #include "Renderer/Resources/Texture2DLoader.h"
 
 using namespace PrCore::ECS;
-using namespace PrRenderer::Core;
+using namespace PrRenderer;
 
 void RenderStressTest::OnEnable()
 {
@@ -43,16 +43,17 @@ void RenderStressTest::OnEnable()
 	}
 
 	std::srand(std::time(0));
-	auto randColor = []()->PrRenderer::Core::Color
+	auto randColor = []()->PrRenderer::Color
 	{
-		auto color = PrRenderer::Core::Color(std::rand() % 20, std::rand() % 20, std::rand() % 20, std::rand() % 20);
+		auto color = PrRenderer::Color(std::rand() % 20, std::rand() % 20, std::rand() % 20, std::rand() % 20);
 		return color;
 	};
 
-	renderSystem->SetCubemap(nullptr);
+	auto pRenderer = PrSystems::Get<PrRenderer::IRenderFrontend>();
+	pRenderer->SetCubemap(nullptr);
 
-	renderSystem->SetDebugColor(PrRenderer::Core::Color::Red);
-	m_camera = renderSystem->GetCamera();
+	pRenderer->SetDebugColor(PrRenderer::Color::Red);
+	m_camera = pRenderer->GetCamera();
 	m_camera->SetPosition({ 15, 9, 3 });
 	m_camera->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 0, 0))));
 
@@ -62,7 +63,7 @@ void RenderStressTest::OnEnable()
 	m_cameraTransform->SetPosition(m_camera->GetPosition());
 	m_cameraTransform->SetRotation(m_camera->GetRotation());
 
-	auto settings = renderSystem->GetSettingsPtr();
+	auto settings = pRenderer->GetSettingsPtr();
 	settings->enableFog = false;
 
 	m_maxLight = 0;
@@ -76,7 +77,7 @@ void RenderStressTest::OnEnable()
 	{
 		entity.GetComponent<NameComponent>()->name;
 		mesh->mainMaterial = std::make_shared<PrRenderer::Material>(*mesh->mainMaterial.GetData());
-		PrRenderer::Core::Color color = randColor();
+		PrRenderer::Color color = randColor();
 		light->m_light->SetColor(color);
 		mesh->mainMaterial->SetColor(color);
 		mesh->shadowCaster = false;
@@ -96,7 +97,7 @@ void RenderStressTest::OnEnable()
 		}
 	}
 
-	renderSystem->SetCubemap(PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/hrd_skymap.mat").GetData());
+	pRenderer->SetCubemap(PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/hrd_skymap.mat").GetData());
 	m_mainLightPtr->SetColor(m_lightColor);
 
 	PrPhysics::PhysicsSystem::GetInstancePtr()->SetGravity(PrCore::Math::vec3{ 0.0f });
@@ -229,7 +230,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 		{
 			auto name = hit.entity.GetComponent<NameComponent>()->name;
 			PRLOG_INFO("Raycast hit entity name {} distance: {}", name, hit.distance);
-			PrRenderer::Core::renderSystem->SetDebugColor(PrRenderer::Core::Color::Green);
+			PrSystems::Get<IRenderFrontend>()->SetDebugColor(PrRenderer::Color::Green);
 
 			if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::F) && hit.entity.HasComponent<RigidBodyDynamicComponent>())
 			{
@@ -238,8 +239,8 @@ void RenderStressTest::OnUpdate(float p_dt)
 			}
 		}
 		else
-			PrRenderer::Core::renderSystem->SetDebugColor(PrRenderer::Core::Color::Red);
-		PrRenderer::Core::renderSystem->DrawDebugLine(m_camera->GetPosition() - up, m_camera->GetPosition() + forward * distance);
+			PrSystems::Get<IRenderFrontend>()->SetDebugColor(PrRenderer::Color::Red);
+		PrSystems::Get<IRenderFrontend>()->DrawDebugLine(m_camera->GetPosition() - up, m_camera->GetPosition() + forward * distance);
 	}
 
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(Input::PrKey::L))
@@ -251,8 +252,8 @@ void RenderStressTest::OnUpdate(float p_dt)
 	{
 		auto forwardVector = sun.GetComponent<TransformComponent>()->GetForwardVector();
 		auto rotation = sun.GetComponent<TransformComponent>()->GetRotation();
-		PrRenderer::Core::renderSystem->DrawDebugSphere(PrCore::Math::vec3{ 0,20,0 }, 1.0f, false);
-		PrRenderer::Core::renderSystem->DrawDebugLine(PrCore::Math::vec3{ 0,20,0 }, PrCore::Math::vec3{ 0,20,0 } + forwardVector * 5.0f);
+		PrSystems::Get<IRenderFrontend>()->DrawDebugSphere(PrCore::Math::vec3{ 0,20,0 }, 1.0f, false);
+		PrSystems::Get<IRenderFrontend>()->DrawDebugLine(PrCore::Math::vec3{ 0,20,0 }, PrCore::Math::vec3{ 0,20,0 } + forwardVector * 5.0f);
 		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::K))
 		{
 			glm::quat deltaRot = glm::angleAxis(glm::radians(20 * p_dt), glm::vec3(1, 0, 0));
@@ -270,7 +271,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 
 		if (cubemap == 0)
 		{
-			renderSystem->SetCubemap(PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/hrd_skymap.mat").GetData());
+			PrSystems::Get<IRenderFrontend>()->SetCubemap(PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/hrd_skymap.mat").GetData());
 			m_mainLightPtr->SetColor(m_lightColor);
 
 			//auto entity = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("jacaranda_tree_leaves");
@@ -278,7 +279,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 		}
 		else if (cubemap == 1)
 		{
-			renderSystem->SetCubemap(PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/cubemap_default.mat").GetData());
+			PrSystems::Get<IRenderFrontend>()->SetCubemap(PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/cubemap_default.mat").GetData());
 			m_mainLightPtr->SetColor(m_lightColor);
 
 			//auto entity = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("jacaranda_tree_leaves");
@@ -286,7 +287,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 		}
 		else if (cubemap == 2)
 		{
-			renderSystem->SetCubemap(nullptr);
+			PrSystems::Get<IRenderFrontend>()->SetCubemap(nullptr);
 			m_mainLightPtr->SetColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 		}
 	}
@@ -362,7 +363,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 			//Math::mat4 transformMat = Math::translate(Math::mat4(1.0f), box.GetCenter())
 				//* Math::scale(Math::mat4(1.0f), box.GetSize() * 1.2f);
 
-			renderSystem->DrawDebugCube(transform->GetWorldMatrix(), true);
+			PrSystems::Get<IRenderFrontend>()->DrawDebugCube(transform->GetWorldMatrix(), true);
 			//if (light->m_shadowCast)
 				//renderSystem->DrawDebugSphere(position + 0.5f, 0.2f, true);
 		}
@@ -401,7 +402,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::F11))
 	{
 		size_t width, hegiht;
-		auto buffer = PrRenderer::Core::LowRenderer::ReadFrontBuffer(width, hegiht);
+		auto buffer = PrRenderer::LowRenderer::ReadFrontBuffer(width, hegiht);
 
 		auto tex = PrRenderer::Texture2D::Create();
 		tex->SetFormat(PrRenderer::TextureFormat::RGB24);
@@ -428,7 +429,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 	}
 
 	// Retup renderer settings
-	auto settings = renderSystem->GetSettingsPtr();
+	auto settings = PrSystems::Get<IRenderFrontend>()->GetSettingsPtr();
 
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::E))
 		settings->enableInstancing = !settings->enableInstancing;
@@ -454,8 +455,8 @@ void RenderStressTest::OnCollisionEnter(PrCore::EventPtr p_event)
 
 	if (collisionInfo.entityA.HasComponent<PrCore::ECS::LightComponent>() && nameB == "Quad")
 	{
-		collisionInfo.entityA.GetComponent<PrCore::ECS::LightComponent>()->m_light->SetColor(static_cast<PrCore::Math::vec4>(PrRenderer::Core::Color::Red) * 15.0f);
-		collisionInfo.entityA.GetComponent<PrCore::ECS::MeshRendererComponent>()->mainMaterial->SetColor(PrRenderer::Core::Color::Red * 10.0f);
+		collisionInfo.entityA.GetComponent<PrCore::ECS::LightComponent>()->m_light->SetColor(static_cast<PrCore::Math::vec4>(PrRenderer::Color::Red) * 15.0f);
+		collisionInfo.entityA.GetComponent<PrCore::ECS::MeshRendererComponent>()->mainMaterial->SetColor(PrRenderer::Color::Red * 10.0f);
 	}
 
     //PRLOG_INFO("On collision enter, EntityA: {}, EntityB {}", nameA, nameB);
@@ -469,7 +470,7 @@ void RenderStressTest::OnCollisionExit(PrCore::EventPtr p_event)
 
 	if (collisionInfo.entityA.HasComponent<PrCore::ECS::LightComponent>() && nameB == "Quad")
 	{
-		auto color = PrRenderer::Core::Color(std::rand() % 20, std::rand() % 20, std::rand() % 20, std::rand() % 20);
+		auto color = PrRenderer::Color(std::rand() % 20, std::rand() % 20, std::rand() % 20, std::rand() % 20);
 		collisionInfo.entityA.GetComponent<PrCore::ECS::LightComponent>()->m_light->SetColor(static_cast<PrCore::Math::vec4>(color));
 		collisionInfo.entityA.GetComponent<PrCore::ECS::MeshRendererComponent>()->mainMaterial->SetColor(color);
 	}

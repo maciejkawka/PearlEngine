@@ -6,7 +6,7 @@
 
 #include <list>
 
-namespace PrRenderer::Core {
+namespace PrRenderer {
 
 	class DeferRenderBackend : public IRenderBackend {
 	public:
@@ -23,7 +23,7 @@ namespace PrRenderer::Core {
 
 		struct gBuffer
 		{
-			Buffers::FramebuffferPtr buffer;
+			FramebuffferPtr buffer;
 			TexturePtr positionTex; //Position (RGB) + Depth (A)
 			TexturePtr albedoTex; //Albedo (RGB) + Roughness (A)
 			TexturePtr normalsTex; // Normals (RGB) + Metalness (A)
@@ -35,38 +35,38 @@ namespace PrRenderer::Core {
 			gBuffer                             gBuffer;
 
 			// PBR Lighting
-			Buffers::FramebuffferPtr            otuputBuff;
+			FramebuffferPtr                     otuputBuff;
 			TexturePtr                          outputTex;
 			CubemapPtr                          IRMap;
 			CubemapPtr                          prefilterMap;
 			TexturePtr                          brdfLUT;
 
 			// SSAO
-			Buffers::FramebuffferPtr            SSAOBuff;
+			FramebuffferPtr                     SSAOBuff;
 			TexturePtr                          SSAOTex;
 			TexturePtr                          SSAONoiseTex;
 			std::vector<PrCore::Math::vec3>     ssaoKernel;
 
 			// Postprocess 
-			Buffers::FramebuffferPtr            postprocessBuff;
+			FramebuffferPtr                     postprocessBuff;
 			TexturePtr                          postprocessTex;
-			Buffers::FramebuffferPtr            bloomDownscaleBuff[BLOOM_SIZE];
+			FramebuffferPtr                     bloomDownscaleBuff[BLOOM_SIZE];
 			TexturePtr                          bloomDownscaleTex[BLOOM_SIZE];
-			Buffers::FramebuffferPtr            bloomBuff;
+			FramebuffferPtr                     bloomBuff;
 			TexturePtr                          bloomTex;
 
 			// Shadow mapping
 			// One point light uses 6 subparts of the texture, so number of lights = TextureSize / (ShadowMapTexture * 6)
-			Buffers::FramebuffferPtr            shadowMapPointBuff;
+			FramebuffferPtr                     shadowMapPointBuff;
 			TexturePtr                          shadowMapPointTex;
 
-			Buffers::FramebuffferPtr            shadowMapSpotBuff;
+			FramebuffferPtr                     shadowMapSpotBuff;
 			TexturePtr                          shadowMapSpotTex;
 
-			Buffers::FramebuffferPtr            shadowMapDirBuff;
+			FramebuffferPtr                     shadowMapDirBuff;
 			TexturePtr                          shadowMapDirTex;
 
-			Buffers::FramebuffferPtr            shadowMapMainDirBuff;
+			FramebuffferPtr                     shadowMapMainDirBuff;
 			TexturePtr                          shadowMapMainDirTex;
 
 			//Aux

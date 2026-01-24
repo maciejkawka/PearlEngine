@@ -4,9 +4,9 @@
 
 using namespace PrCore::Utils;
 
-PrRenderer::Core::Color JSONParser::ToColor(const JSON::json& p_json)
+PrRenderer::Color JSONParser::ToColor(const JSON::json& p_json)
 {
-	return 	PrRenderer::Core::Color(p_json["r"],
+	return 	PrRenderer::Color(p_json["r"],
 		p_json["g"],
 		p_json["b"],
 		p_json["a"]);
@@ -51,7 +51,7 @@ PrCore::Math::mat3 JSONParser::ToMat3(const JSON::json& p_json)
 	);
 }
 
-JSON::json JSONParser::ParseColor(const PrRenderer::Core::Color& p_color)
+JSON::json JSONParser::ParseColor(const PrRenderer::Color& p_color)
 {
 	JSON::json color;
 	color["r"] = p_color.r;

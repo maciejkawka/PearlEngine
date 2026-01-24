@@ -22,11 +22,11 @@ PrCore::IResourceDataPtr HdrCubemapLoader::LoadResource(const std::string& p_pat
 	auto shader = PrSystems::Get<ResourceSystem>()->Load<Shader>("shader/cubemap/hdr_to_cubemap.shader").GetData();
 
 	//Create Framebuffer 
-	Buffers::FramebufferSettings fbSettings;
+	FramebufferSettings fbSettings;
 	fbSettings.globalHeight = texture->GetWidth();
 	fbSettings.globalWidth = texture->GetWidth();
 ;
-	Buffers::FramebufferTexture fbTex;
+	FramebufferTexture fbTex;
 	fbTex.cubeTexture = true;
 	fbTex.format = TextureFormat::RGB24;
 	fbTex.filteringMag = TextureFiltering::Nearest;
@@ -34,7 +34,7 @@ PrCore::IResourceDataPtr HdrCubemapLoader::LoadResource(const std::string& p_pat
 
 	fbSettings.colorTextureAttachments.textures.push_back(fbTex);
 
-	auto framebuffer = Buffers::Framebufffer::Create(fbSettings);
+	auto framebuffer = Framebufffer::Create(fbSettings);
 
 	//Convert HDR to cubemap
 	PrCore::Math::mat4 captureProjection = PrCore::Math::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
@@ -62,8 +62,8 @@ PrCore::IResourceDataPtr HdrCubemapLoader::LoadResource(const std::string& p_pat
 		framebuffer->SetAttachmentDetails(0, i);
 		shader->SetUniformMat4("view", captureViews[i]);
 
-		Core::LowRenderer::Clear(Core::ClearFlag::ColorBuffer | Core::ClearFlag::DepthBuffer);
-		Core::LowRenderer::Draw(cube->GetVertexArray());
+		LowRenderer::Clear(ClearFlag::ColorBuffer | ClearFlag::DepthBuffer);
+		LowRenderer::Draw(cube->GetVertexArray());
 	}
 
 	shader->Unbind();

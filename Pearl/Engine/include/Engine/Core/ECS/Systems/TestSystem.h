@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Core/ECS/BaseSystem.h"
 #include "Core/ECS/Components.h"
 #include "Core/Input/InputManager.h"
@@ -36,12 +37,12 @@ namespace PrCore::ECS
 		void OnDisable() override;
 		void OnUpdate(float p_dt) override;
 
-		TransformComponent* m_cameraTransform;
-		PrRenderer::Core::Camera* m_camera;
-		int m_selectedLight = 0;
-		int m_maxLight = 0;
-		PrRenderer::LightPtr m_mainLightPtr;
-		PrRenderer::Core::Color m_lightColor;
+		TransformComponent*     m_cameraTransform;
+		PrRenderer::Camera*     m_camera;
+		int                     m_selectedLight = 0;
+		int                     m_maxLight = 0;
+		PrRenderer::LightPtr    m_mainLightPtr;
+		PrRenderer::Color       m_lightColor;
 
 
 		inline virtual void OnSerialize(Utils::JSON::json& p_serialized) override {}

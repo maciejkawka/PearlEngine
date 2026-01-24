@@ -7,7 +7,7 @@
 using namespace PrEditor::Components;
 namespace Input = PrCore::Input;
 
-BasicCamera::BasicCamera(PrRenderer::Core::CameraType p_cameraType):
+BasicCamera::BasicCamera(PrRenderer::CameraType p_cameraType):
 	m_lastMousePos(PrCore::Math::vec2(0.0f)),
 	m_rotationSpeed(5.0f),
 	m_movementSpeed(3.0f),
@@ -15,10 +15,10 @@ BasicCamera::BasicCamera(PrRenderer::Core::CameraType p_cameraType):
 	m_normalSpeed(m_movementSpeed),
 	m_camera(nullptr)
 {	
-	m_camera = new PrRenderer::Core::Camera(p_cameraType);
+	m_camera = new PrRenderer::Camera(p_cameraType);
 	m_camera->SetFar(200.0f);
 	m_camera->SetPosition({ 0,0,4 });
-	PrRenderer::Core::Camera::SetMainCamera(m_camera);
+	PrRenderer::Camera::SetMainCamera(m_camera);
 }
 
 BasicCamera::BasicCamera():
@@ -29,15 +29,15 @@ BasicCamera::BasicCamera():
 	m_normalSpeed(m_movementSpeed),
 	m_camera(nullptr)
 {
-	m_camera = new PrRenderer::Core::Camera();
+	m_camera = new PrRenderer::Camera();
 	m_camera->SetPosition({ 0,0,4 });
-	PrRenderer::Core::Camera::SetMainCamera(m_camera);
+	PrRenderer::Camera::SetMainCamera(m_camera);
 }
 
 BasicCamera::~BasicCamera()
 {
-	if(PrRenderer::Core::Camera::GetMainCamera() == m_camera)
-		PrRenderer::Core::Camera::SetMainCamera(nullptr);
+	if(PrRenderer::Camera::GetMainCamera() == m_camera)
+		PrRenderer::Camera::SetMainCamera(nullptr);
 
 	delete m_camera;
 }

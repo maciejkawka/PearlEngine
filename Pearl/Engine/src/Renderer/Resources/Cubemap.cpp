@@ -9,9 +9,9 @@ using namespace PrRenderer;
 std::shared_ptr<Cubemap> Cubemap::Create()
 {
 	CubemapPtr texture;
-	switch (Core::RendererAPI::GetGraphicsAPI())
+	switch (RendererAPI::GetGraphicsAPI())
 	{
-	case Core::GraphicsAPI::OpenGL: texture = std::make_shared<OpenGL::GLCubemap>(); break;
+	case GraphicsAPI::OpenGL: texture = std::make_shared<OpenGL::GLCubemap>(); break;
 
 	default:
 	{
@@ -26,9 +26,9 @@ std::shared_ptr<Cubemap> Cubemap::Create()
 std::shared_ptr<PrRenderer::Cubemap> Cubemap::Create(RendererID p_id, size_t p_width, size_t p_height, TextureFormat p_format)
 {
 	CubemapPtr texture;
-	switch (Core::RendererAPI::GetGraphicsAPI())
+	switch (RendererAPI::GetGraphicsAPI())
 	{
-	case Core::GraphicsAPI::OpenGL: texture = std::make_shared<OpenGL::GLCubemap>(p_id, p_width, p_height, p_format); break;
+	case GraphicsAPI::OpenGL: texture = std::make_shared<OpenGL::GLCubemap>(p_id, p_width, p_height, p_format); break;
 
 	default:
 	{
@@ -40,7 +40,7 @@ std::shared_ptr<PrRenderer::Cubemap> Cubemap::Create(RendererID p_id, size_t p_w
 	return texture;
 }
 
-std::shared_ptr<Cubemap> Cubemap::CreateUnitTex(const Core::Color& p_unitColor)
+std::shared_ptr<Cubemap> Cubemap::CreateUnitTex(const Color& p_unitColor)
 {
 	// Create empty texture and fills it with unit data
 	auto texture = Create();

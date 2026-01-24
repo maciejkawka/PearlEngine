@@ -1,11 +1,11 @@
 #pragma once
 
-#include"Renderer/Core/MeshRenderObject.h"
+#include "Renderer/Core/MeshRenderObject.h"
 
-#include<vector>
-#include<utility>
+#include <vector>
+#include <utility>
 
-namespace PrRenderer::Core {
+namespace PrRenderer {
 
 	class RenderSortingHash {
 	public:

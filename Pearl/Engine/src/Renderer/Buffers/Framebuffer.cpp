@@ -4,13 +4,13 @@
 #include "Renderer/Core/RendererAPI.h"
 #include "Renderer/OpenGL/GLFramebuffer.h"
 
-using namespace PrRenderer::Buffers;
+using namespace PrRenderer;
 
 FramebuffferPtr Framebufffer::Create(const FramebufferSettings& p_settings)
 {
-	switch (Core::RendererAPI::GetGraphicsAPI())
+	switch (RendererAPI::GetGraphicsAPI())
 	{
-	case Core::GraphicsAPI::OpenGL: return std::make_shared<OpenGL::GLFramebuffer>(p_settings);
+	case GraphicsAPI::OpenGL: return std::make_shared<OpenGL::GLFramebuffer>(p_settings);
 
 	default:
 	{

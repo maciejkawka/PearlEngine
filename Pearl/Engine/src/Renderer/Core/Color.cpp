@@ -2,7 +2,7 @@
 
 #include"Renderer/Core/Color.h"
 
-using namespace PrRenderer::Core;
+using namespace PrRenderer;
 
 const Color Color::Red = Color(1.0f, 0.0f, 0.0f);
 const Color Color::Green = Color(0.0f, 1.0f, 0.0f);

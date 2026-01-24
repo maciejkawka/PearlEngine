@@ -8,7 +8,7 @@ namespace PrRenderer {
 	public:
 		// Texture factories
 		static std::shared_ptr<Texture2D> Create();
-		static std::shared_ptr<Texture2D> CreateUnitTex(const Core::Color& p_unitColor);
+		static std::shared_ptr<Texture2D> CreateUnitTex(const Color& p_unitColor);
 	};
 
 	REGISTRER_RESOURCE_HANDLE(Texture2D);

@@ -5,13 +5,13 @@
 #include"Renderer/Buffers/VertexBuffer.h"
 #include"Renderer/Core/RendererAPI.h"
 
-using namespace PrRenderer::Buffers;
+using namespace PrRenderer;
 
 VertexBufferPtr VertexBuffer::Create()
 {
-	switch (Core::RendererAPI::GetGraphicsAPI())
+	switch (RendererAPI::GetGraphicsAPI())
 	{
-	case Core::GraphicsAPI::OpenGL: return std::make_shared<OpenGL::GLVertexBuffer>();
+	case GraphicsAPI::OpenGL: return std::make_shared<OpenGL::GLVertexBuffer>();
 
 	default:
 	{
@@ -23,9 +23,9 @@ VertexBufferPtr VertexBuffer::Create()
 
 VertexBufferPtr VertexBuffer::Create(void* p_data, size_t p_size)
 {
-	switch (Core::RendererAPI::GetGraphicsAPI())
+	switch (RendererAPI::GetGraphicsAPI())
 	{
-	case Core::GraphicsAPI::OpenGL: return std::make_shared<OpenGL::GLVertexBuffer>(p_data, p_size);
+	case GraphicsAPI::OpenGL: return std::make_shared<OpenGL::GLVertexBuffer>(p_data, p_size);
 
 	default:
 	{

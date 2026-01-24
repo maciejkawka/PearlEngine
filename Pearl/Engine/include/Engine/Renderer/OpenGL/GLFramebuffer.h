@@ -4,9 +4,9 @@
 #include<set>
 namespace PrRenderer::OpenGL {
 
-	class GLFramebuffer : public Buffers::Framebufffer {
+	class GLFramebuffer : public Framebufffer {
 	public:
-		GLFramebuffer(const Buffers::FramebufferSettings& p_settings);
+		GLFramebuffer(const FramebufferSettings& p_settings);
 		~GLFramebuffer() override;
 
 		void Bind() override;
@@ -14,7 +14,7 @@ namespace PrRenderer::OpenGL {
 		void SetAttachmentDetails(int p_attachment, int p_textureTarget, int p_mipLevel = 0) override;
 
 		void         Resize(size_t width, size_t height) override;
-		virtual void ClearAttachmentColor(unsigned int p_attachemntIndex, const Core::Color& p_color) override;
+		virtual void ClearAttachmentColor(unsigned int p_attachemntIndex, const Color& p_color) override;
 
 		virtual TexturePtr GetTexturePtr(unsigned int p_index = 0) override;
 		virtual TexturePtr GetDepthTexturePtr() override;

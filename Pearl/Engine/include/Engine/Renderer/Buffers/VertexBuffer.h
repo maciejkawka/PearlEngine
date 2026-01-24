@@ -1,8 +1,9 @@
 #pragma once
-#include"Renderer/Core/Defines.h"
-#include"Renderer/Buffers/BufferLayout.h"
 
-namespace PrRenderer::Buffers{
+#include "Renderer/Core/Defines.h"
+#include "Renderer/Buffers/BufferLayout.h"
+
+namespace PrRenderer{
 
 	class VertexBuffer;
 	typedef std::shared_ptr<VertexBuffer> VertexBufferPtr;
@@ -27,8 +28,8 @@ namespace PrRenderer::Buffers{
 		static VertexBufferPtr Create();
 		static VertexBufferPtr Create(void* p_data, size_t p_size);
 	protected:
-		RendererID m_bufferID;
+		RendererID   m_bufferID;
 		BufferLayout m_bufferLayout;
-		size_t m_size;
+		size_t       m_size;
 	};
 }

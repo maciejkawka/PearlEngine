@@ -120,7 +120,6 @@
     <ClInclude Include="include\Engine\Renderer\Core\DeferRenderBackend.h" />
     <ClInclude Include="include\Engine\Renderer\Core\IRenderBackend.h" />
     <ClInclude Include="include\Engine\Renderer\Core\IRenderFrontend.h" />
-    <ClInclude Include="include\Engine\Renderer\Core\RenderSystem.h" />
     <ClInclude Include="include\Engine\Renderer\Core\RenderTypes.h" />
     <ClInclude Include="include\Engine\Renderer\Core\RenderObjectBuffer.h" />
     <ClInclude Include="include\Engine\Renderer\OpenGL\GLCubemap.h" />

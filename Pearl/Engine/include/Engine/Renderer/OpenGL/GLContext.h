@@ -4,11 +4,10 @@
 
 namespace PrRenderer::OpenGL {
 
-	class GLContext : public Core::Context {
+	class GLContext : public Context {
 	public:
-		GLContext(const Core::ContextSettings& p_contextSettings = Core::ContextSettings());
-
-		~GLContext();
+		GLContext(const ContextSettings& p_contextSettings = ContextSettings());
+		virtual ~GLContext();
 
 		void Init() override;
 	};

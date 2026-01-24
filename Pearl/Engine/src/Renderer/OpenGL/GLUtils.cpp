@@ -163,35 +163,35 @@ unsigned int PrRenderer::OpenGL::TextureFormatToDataTypeGL(TextureFormat p_forma
 	}
 }
 
-unsigned int PrRenderer::OpenGL::FramebufferMaskToGL(Buffers::FramebufferMask p_mask)
+unsigned int PrRenderer::OpenGL::FramebufferMaskToGL(FramebufferMask p_mask)
 {
 	switch(p_mask)
 	{
-	case Buffers::FramebufferMask::ColorBufferBit:
+	case FramebufferMask::ColorBufferBit:
 		return GL_COLOR_BUFFER_BIT;
-	case Buffers::FramebufferMask::DepthBufferBit:
+	case FramebufferMask::DepthBufferBit:
 		return GL_DEPTH_BUFFER_BIT;
-	case Buffers::FramebufferMask::StencilBufferBit:
+	case FramebufferMask::StencilBufferBit:
 		return GL_STENCIL_BUFFER_BIT;
 	default: 
 		return 0;
 	}
 }
 
-unsigned int PrRenderer::OpenGL::PrimitiveToGL(Core::Primitives p_primitives)
+unsigned int PrRenderer::OpenGL::PrimitiveToGL(Primitives p_primitives)
 {
 	switch (p_primitives)
 	{
-	case Core::Primitives::Points:
+	case Primitives::Points:
 		return GL_POINTS;
 		break;
-	case Core::Primitives::LineStrip:
+	case Primitives::LineStrip:
 		return GL_LINE_STRIP;
 		break;
-	case Core::Primitives::TriangleStrip:
+	case Primitives::TriangleStrip:
 		return GL_TRIANGLE_STRIP;
 		break;
-	case Core::Primitives::Triangles:
+	case Primitives::Triangles:
 		return GL_TRIANGLES;
 		break;
 	default:
@@ -199,32 +199,32 @@ unsigned int PrRenderer::OpenGL::PrimitiveToGL(Core::Primitives p_primitives)
 	}
 }
 
-unsigned int PrRenderer::OpenGL::ComparaisonToGL(Core::ComparaisonAlgorithm p_algorythm)
+unsigned int PrRenderer::OpenGL::ComparaisonToGL(ComparaisonAlgorithm p_algorythm)
 {
 	switch (p_algorythm)
 	{
-	case Core::ComparaisonAlgorithm::Never:
+	case ComparaisonAlgorithm::Never:
 		return GL_NEVER;
 		break;
-	case Core::ComparaisonAlgorithm::Less:
+	case ComparaisonAlgorithm::Less:
 		return GL_LESS;
 		break;
-	case Core::ComparaisonAlgorithm::Equal:
+	case ComparaisonAlgorithm::Equal:
 		return GL_EQUAL;
 		break;
-	case Core::ComparaisonAlgorithm::LessEqual:
+	case ComparaisonAlgorithm::LessEqual:
 		return GL_LEQUAL;
 		break;
-	case Core::ComparaisonAlgorithm::Greater:
+	case ComparaisonAlgorithm::Greater:
 		return GL_GREATER;
 		break;
-	case Core::ComparaisonAlgorithm::NotEqual:
+	case ComparaisonAlgorithm::NotEqual:
 		return GL_NOTEQUAL;
 		break;
-	case Core::ComparaisonAlgorithm::GreaterEqual:
+	case ComparaisonAlgorithm::GreaterEqual:
 		return GL_GEQUAL;
 		break;
-	case Core::ComparaisonAlgorithm::Always:
+	case ComparaisonAlgorithm::Always:
 		return GL_ALWAYS;
 		break;
 	default:
@@ -232,44 +232,44 @@ unsigned int PrRenderer::OpenGL::ComparaisonToGL(Core::ComparaisonAlgorithm p_al
 	}
 }
 
-unsigned int PrRenderer::OpenGL::BlendingToGL(Core::BlendingAlgorithm p_algorythm)
+unsigned int PrRenderer::OpenGL::BlendingToGL(BlendingAlgorithm p_algorythm)
 {
 	switch(p_algorythm)
 	{
-	case Core::BlendingAlgorithm::Zero: 
+	case BlendingAlgorithm::Zero: 
 		return GL_ZERO;
-	case Core::BlendingAlgorithm::One:
+	case BlendingAlgorithm::One:
 		return GL_ONE;
-	case Core::BlendingAlgorithm::SourceColor:
+	case BlendingAlgorithm::SourceColor:
 		return GL_SRC_COLOR;
-	case Core::BlendingAlgorithm::OneMinusSorceColor:
+	case BlendingAlgorithm::OneMinusSorceColor:
 		return GL_ONE_MINUS_SRC_COLOR;
-	case Core::BlendingAlgorithm::DestinationColor:
+	case BlendingAlgorithm::DestinationColor:
 		return GL_DST_COLOR;
-	case Core::BlendingAlgorithm::OneMinusDestinationColor:
+	case BlendingAlgorithm::OneMinusDestinationColor:
 		return GL_ONE_MINUS_DST_COLOR;
-	case Core::BlendingAlgorithm::SourceAlpha:
+	case BlendingAlgorithm::SourceAlpha:
 		return GL_SRC_ALPHA;
-	case Core::BlendingAlgorithm::OneMinusSourceAlpha:
+	case BlendingAlgorithm::OneMinusSourceAlpha:
 		return GL_ONE_MINUS_SRC_ALPHA;
-	case Core::BlendingAlgorithm::DestinationAlpha:
+	case BlendingAlgorithm::DestinationAlpha:
 		return GL_DST_ALPHA;
-	case Core::BlendingAlgorithm::OneMinusDestinationAlpha:
+	case BlendingAlgorithm::OneMinusDestinationAlpha:
 		return GL_ONE_MINUS_DST_ALPHA;
 	default:
 		return -1;
 	}
 }
 
-unsigned int PrRenderer::OpenGL::CullFaceToGL(Core::CullFaceMode p_mode)
+unsigned int PrRenderer::OpenGL::CullFaceToGL(CullFaceMode p_mode)
 {
 	switch (p_mode)
 	{
-	case Core::CullFaceMode::Back:
+	case CullFaceMode::Back:
 		return GL_BACK;
-	case Core::CullFaceMode::Front:
+	case CullFaceMode::Front:
 		return GL_FRONT;
-	case Core::CullFaceMode::BackAndFront:
+	case CullFaceMode::BackAndFront:
 		return GL_FRONT_AND_BACK;
 	default:
 		return -1;

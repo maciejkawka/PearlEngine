@@ -10,18 +10,18 @@ using namespace PrRenderer::OpenGL;
 
 GLRenderer::GLRenderer()
 {
-	RendererAPI::m_graphicsAPI = Core::GraphicsAPI::OpenGL;
+	RendererAPI::m_graphicsAPI = GraphicsAPI::OpenGL;
 }
 
-void GLRenderer::Clear(Core::ClearFlag p_flag)
+void GLRenderer::Clear(ClearFlag p_flag)
 {
 	int mask = 0;
 
-	if (p_flag & Core::ClearFlag::ColorBuffer)
+	if (p_flag & ClearFlag::ColorBuffer)
 		mask |= GL_COLOR_BUFFER_BIT;
-	if (p_flag & Core::ClearFlag::DepthBuffer)
+	if (p_flag & ClearFlag::DepthBuffer)
 		mask |= GL_DEPTH_BUFFER_BIT;
-	if (p_flag & Core::ClearFlag::StencilBuffer)
+	if (p_flag & ClearFlag::StencilBuffer)
 		mask |= GL_STENCIL_BUFFER_BIT;
 
 	glClear(mask);
@@ -32,7 +32,7 @@ void GLRenderer::ClearColor(float p_r, float p_g, float p_b, float p_a)
 	glClearColor(p_r, p_g, p_b, p_a);
 }
 
-void GLRenderer::ClearColor(Core::Color& p_color)
+void GLRenderer::ClearColor(Color& p_color)
 {
 	glClearColor(p_color.r, p_color.g, p_color.b, p_color.a);
 }
@@ -72,7 +72,7 @@ void GLRenderer::SetDepthTest(bool p_enable)
 	glDepthMask(BoolToGL(p_enable));
 }
 
-void GLRenderer::SetDepthAlgorythm(Core::ComparaisonAlgorithm p_algorythm)
+void GLRenderer::SetDepthAlgorythm(ComparaisonAlgorithm p_algorythm)
 {
 	glDepthFunc(ComparaisonToGL(p_algorythm));
 }
@@ -85,7 +85,7 @@ void GLRenderer::EnableBlending(bool p_enable)
 		glDisable(GL_BLEND);
 }
 
-void GLRenderer::SetBlendingAlgorythm(Core::BlendingAlgorithm p_source, Core::BlendingAlgorithm p_dest)
+void GLRenderer::SetBlendingAlgorythm(BlendingAlgorithm p_source, BlendingAlgorithm p_dest)
 {
 	glBlendFunc(BlendingToGL(p_source), BlendingToGL(p_dest));
 }
@@ -95,7 +95,7 @@ void GLRenderer::SetColorMask(bool p_red, bool p_green, bool p_blue, bool p_alph
 	glColorMask(BoolToGL(p_red), BoolToGL(p_green), BoolToGL(p_blue), BoolToGL(p_alpha));
 }
 
-void GLRenderer::Draw(Buffers::VertexArrayPtr p_vertexArray, size_t p_indicesCount, unsigned int p_indicesOffset, Core::Primitives p_primitives)
+void GLRenderer::Draw(VertexArrayPtr p_vertexArray, size_t p_indicesCount, unsigned int p_indicesOffset, Primitives p_primitives)
 {
 	auto indices = p_vertexArray->GetIndexBuffer();
 	if (indices == nullptr)
@@ -108,12 +108,12 @@ void GLRenderer::Draw(Buffers::VertexArrayPtr p_vertexArray, size_t p_indicesCou
 	}
 }
 
-void GLRenderer::DrawArray(Buffers::VertexBufferPtr p_vertexArray, Core::Primitives p_primitives)
+void GLRenderer::DrawArray(VertexBufferPtr p_vertexArray, Primitives p_primitives)
 {
 	glDrawArrays(PrimitiveToGL(p_primitives), 0, p_vertexArray->GetVertexNumber());
 }
 
-void GLRenderer::DrawInstanced(Buffers::VertexArrayPtr p_vertexArray, size_t p_instanceCount, Core::Primitives p_primitives)
+void GLRenderer::DrawInstanced(VertexArrayPtr p_vertexArray, size_t p_instanceCount, Primitives p_primitives)
 {
 	auto indices = p_vertexArray->GetIndexBuffer();
 	if (indices == nullptr)
@@ -130,12 +130,12 @@ void GLRenderer::EnableCullFace(bool p_enable)
 		glDisable(GL_CULL_FACE);
 }
 
-void GLRenderer::SetCullFaceMode(Core::CullFaceMode p_mode)
+void GLRenderer::SetCullFaceMode(CullFaceMode p_mode)
 {
 	glCullFace(CullFaceToGL(p_mode));
 }
 
-void GLRenderer::BlitFrameBuffers(Buffers::FramebuffferPtr p_readBuffer, Buffers::FramebuffferPtr p_drawBuffer, Buffers::FramebufferMask p_mask)
+void GLRenderer::BlitFrameBuffers(FramebuffferPtr p_readBuffer, FramebuffferPtr p_drawBuffer, FramebufferMask p_mask)
 {
 	PR_ASSERT(p_readBuffer != nullptr, "Read buffer is nullptr");
 

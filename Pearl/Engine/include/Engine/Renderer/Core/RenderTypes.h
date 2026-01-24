@@ -1,8 +1,10 @@
 #pragma once
-#include"Renderer/Resources/Material.h"
-#include"Renderer/Core/Camera.h"
-#include"Renderer/Resources/Mesh.h"
-#include"Renderer/Resources/Light.h"
+
+#include "Renderer/Core/Camera.h"
+#include "Renderer/Core/RendererAPI.h"
+#include "Renderer/Resources/Material.h"
+#include "Renderer/Resources/Mesh.h"
+#include "Renderer/Resources/Light.h"
 
 #define SHADOW_CASCADES_COUNT 4
 #define MAX_LIGHT_POINT_COUNT 40
@@ -10,7 +12,7 @@
 #define MAX_LIGHT_DIRECT_COUNT 8
 #define BLOOM_SIZE 4
 
-namespace PrRenderer::Core {
+namespace PrRenderer {
 
 	struct RenderObject;
 
@@ -85,8 +87,8 @@ namespace PrRenderer::Core {
 		RenderObjectType         type;
 		size_t                   id;
 		MaterialPtr              material;
-		Buffers::VertexArrayPtr  vertexArrayPtr;
-		Buffers::VertexArrayPtr  vertexArrayShadowPtr;
+		VertexArrayPtr           vertexArrayPtr;
+		VertexArrayPtr           vertexArrayShadowPtr;
 		SubMesh                  subMesh;
 		BoxVolume                boxVolume;
 		SortingHash              sortingHash;
@@ -279,6 +281,7 @@ namespace PrRenderer::Core {
 		//Tone Mapping
 		float              toneMappingExposure = 1.0f;
 
+		GraphicsAPI        rendererAPI = GraphicsAPI::OpenGL;
 	};
 	using RendererSettingsPtr = std::shared_ptr<RendererSettings>;
 
@@ -360,7 +363,7 @@ namespace PrRenderer::Core {
 //RenderUtils
 namespace RenderUtils
 {
-	inline size_t CalculateDepthValue(const PrCore::Math::vec3& p_position, PrRenderer::Core::Camera* p_camera)
+	inline size_t CalculateDepthValue(const PrCore::Math::vec3& p_position, PrRenderer::Camera* p_camera)
 	{
 		auto camera = p_camera;
 		auto distance = PrCore::Math::distance(p_position, camera->GetPosition());

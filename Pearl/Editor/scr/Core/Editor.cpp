@@ -6,10 +6,9 @@
 #include "Engine/Core/Events/EventManager.h"
 #include "Engine/Core/ECS/SceneManager.h"
 
-#include "Renderer/Core/RenderSystem.h"
-
 #include "Renderer/Resources/Shader.h"
 #include "Renderer/Resources/Material.h"
+#include "Renderer/Core/IRenderFrontend.h"
 #include "Physics/Core/PhysicsSystem.h"
 #include "Editor/Assets/Exporter/SceneExporter.h"
 
@@ -20,10 +19,10 @@ Editor::Editor()
 {
 	m_appContext = new EditorContext();
 	m_testFeatures = new Components::TestFeatures();
-	m_basicCamera = new Components::BasicCamera(PrRenderer::Core::CameraType::Perspective);
+	m_basicCamera = new Components::BasicCamera(PrRenderer::CameraType::Perspective);
 	m_basicCamera->GetCamera()->SetSize(5.0f);
 
-	PrRenderer::Core::renderSystem->SetCamera(m_basicCamera->GetCamera());
+	PrSystems::Get<PrRenderer::IRenderFrontend>()->SetCamera(m_basicCamera->GetCamera());
 }
 
 Editor::~Editor()
@@ -36,7 +35,7 @@ Editor::~Editor()
 void Editor::PreFrame()
 {
 	m_appContext->m_window->PollEvents();
-	PrRenderer::Core::renderSystem->PrepareFrame();
+	PrSystems::Get<PrRenderer::IRenderFrontend>()->PrepareFrame();
 
 	//Exit
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
@@ -49,10 +48,10 @@ void Editor::OnFrame(float p_deltaTime)
 
 	//Camera Settings
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::O))
-		PrRenderer::Core::Camera::GetMainCamera()->SetType(PrRenderer::Core::CameraType::Ortographic);
+		PrRenderer::Camera::GetMainCamera()->SetType(PrRenderer::CameraType::Ortographic);
 
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::P))
-		PrRenderer::Core::Camera::GetMainCamera()->SetType(PrRenderer::Core::CameraType::Perspective);
+		PrRenderer::Camera::GetMainCamera()->SetType(PrRenderer::CameraType::Perspective);
 
 	//Show Mouse Pos
 	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::LEFT_CONTROL))
@@ -99,7 +98,8 @@ void Editor::OnFrame(float p_deltaTime)
 		scene->OnDisable();
 	}
 
-	auto testInfo = PrRenderer::Core::renderSystem->GetPreviousFrameInfo();
+	auto pRenderer = PrSystems::Get<PrRenderer::IRenderFrontend>();
+	auto testInfo = pRenderer->GetPreviousFrameInfo();
 	
 	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F3))
 		for (auto event : testInfo.timeEvents)
@@ -114,14 +114,14 @@ void Editor::OnFrame(float p_deltaTime)
 	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F6))
 		PRLOG_INFO("Draw objects {0}", testInfo.drawObjects	);
 
-	PrRenderer::Core::renderSystem->BuildFrame();
-	PrRenderer::Core::renderSystem->GetRendererBackend()->PreparePipeline();
+	pRenderer->BuildFrame();
+	pRenderer->GetRendererBackend()->PreparePipeline();
 }
 
 void Editor::PostFrame()
 {
-	PrRenderer::Core::renderSystem->GetRendererBackend()->Render();
-	PrRenderer::Core::renderSystem->GetRendererBackend()->PostRender();
+	PrSystems::Get<PrRenderer::IRenderFrontend>()->GetRendererBackend()->Render();
+	PrSystems::Get<PrRenderer::IRenderFrontend>()->GetRendererBackend()->PostRender();
 
 	m_appContext->m_window->SwapBuffers();
 	PrCore::Input::InputManager::GetInstance().ResetFlags();

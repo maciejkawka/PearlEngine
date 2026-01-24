@@ -23,7 +23,7 @@ namespace PrRenderer {
 		// Texture factories
 		static std::shared_ptr<Cubemap> Create();
 		static std::shared_ptr<Cubemap> Create(RendererID p_id, size_t p_width, size_t p_height, TextureFormat p_format);
-		static std::shared_ptr<Cubemap> CreateUnitTex(const Core::Color& p_unitColor);
+		static std::shared_ptr<Cubemap> CreateUnitTex(const Color& p_unitColor);
 
 		virtual void SetWrapModeR(TextureWrapMode p_wrapR) { m_wrapR = p_wrapR; }
 		TextureWrapMode GetWrapModeR() const { return m_wrapR; }

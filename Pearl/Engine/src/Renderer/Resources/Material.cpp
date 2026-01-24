@@ -29,15 +29,15 @@ Material::Material(ShaderHandle p_shader)
 		auto& uniform = unformPair.second;
 
 		if (uniform.type == UniformType::Texture2D)
-			m_textures[uniformName] = TextureHandle{ Texture2D::CreateUnitTex(PrRenderer::Core::Color::Black) };
+			m_textures[uniformName] = TextureHandle{ Texture2D::CreateUnitTex(PrRenderer::Color::Black) };
 		if (uniform.type == UniformType::Cubemap)
-			m_cubemaps[uniformName] = CubemapHandle{ Cubemap::CreateUnitTex(Core::Color::Black) };
+			m_cubemaps[uniformName] = CubemapHandle{ Cubemap::CreateUnitTex(Color::Black) };
 	}
 
 	if (blackTexture == nullptr)
-		blackTexture = Texture2D::CreateUnitTex(Core::Color::Black);
+		blackTexture = Texture2D::CreateUnitTex(Color::Black);
 	if (blackCubemap == nullptr)
-		blackCubemap = Cubemap::CreateUnitTex(Core::Color::Black);
+		blackCubemap = Cubemap::CreateUnitTex(Color::Black);
 }
 
 Material::Material(const Material& p_material)
@@ -51,9 +51,9 @@ Material::Material(const Material& p_material)
 	m_textures = p_material.m_textures;
 
 	if (blackTexture == nullptr)
-		blackTexture = Texture2D::CreateUnitTex(Core::Color::Black);
+		blackTexture = Texture2D::CreateUnitTex(Color::Black);
 	if (blackCubemap == nullptr)
-		blackCubemap = Cubemap::CreateUnitTex(Core::Color::Black);
+		blackCubemap = Cubemap::CreateUnitTex(Color::Black);
 }
 
 Material::Material() :
@@ -62,19 +62,19 @@ Material::Material() :
 	m_renderOrder(0)
 {
 	if (blackTexture == nullptr)
-		blackTexture = Texture2D::CreateUnitTex(Core::Color::Black);
+		blackTexture = Texture2D::CreateUnitTex(Color::Black);
 	if (blackCubemap == nullptr)
-		blackCubemap = Cubemap::CreateUnitTex(Core::Color::Black);
+		blackCubemap = Cubemap::CreateUnitTex(Color::Black);
 }
 
-void Material::SetColor(const Core::Color& p_color)
+void Material::SetColor(const Color& p_color)
 {
 	SetProperty<PrCore::Math::vec4>(COLOR_UNIFORM, p_color);
 }
 
-const PrRenderer::Core::Color& Material::GetColor() const
+const PrRenderer::Color& Material::GetColor() const
 {
-	return static_cast<const PrRenderer::Core::Color&>(GetProperty<PrCore::Math::vec4>(COLOR_UNIFORM));
+	return static_cast<const PrRenderer::Color&>(GetProperty<PrCore::Math::vec4>(COLOR_UNIFORM));
 }
 
 void Material::Bind()
@@ -508,12 +508,12 @@ void Material::OnDeserialize(const PrCore::Utils::JSON::json& p_deserialized)
 	{
 		if (uniform.second.type == UniformType::Texture2D)
 		{
-			TextureHandle invalidTex{ Texture2D::CreateUnitTex(PrRenderer::Core::Color::Black) };
+			TextureHandle invalidTex{ Texture2D::CreateUnitTex(PrRenderer::Color::Black) };
 			m_textures.insert({ uniform.first, invalidTex });
 		}
 		else if (uniform.second.type == UniformType::Cubemap)
 		{
-			CubemapHandle invalidTex{ Cubemap::CreateUnitTex(PrRenderer::Core::Color::Black) };
+			CubemapHandle invalidTex{ Cubemap::CreateUnitTex(PrRenderer::Color::Black) };
 			m_cubemaps.insert({ uniform.first, invalidTex });
 		}
 	}

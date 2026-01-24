@@ -1,7 +1,8 @@
 #pragma once
-#include"Renderer/Core/Defines.h"
 
-namespace PrRenderer::Buffers {
+#include "Renderer/Core/Defines.h"
+
+namespace PrRenderer {
 
 	class IndexBuffer;
 	typedef std::shared_ptr<IndexBuffer> IndexBufferPtr;
@@ -23,6 +24,6 @@ namespace PrRenderer::Buffers {
 
 	protected:
 		RendererID m_bufferID;
-		size_t m_size;
+		size_t     m_size;
 	};
 }

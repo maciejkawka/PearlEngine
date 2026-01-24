@@ -6,6 +6,11 @@
 #include <tuple>
 #include <array>
 
+namespace PrRenderer
+{
+	class IRenderFrontend;
+}
+
 namespace PrCore
 {
 	namespace Utils
@@ -33,7 +38,8 @@ using EngineSystems = std::tuple<
 	PrCore::ThreadSystem,
 	PrCore::ResourceSystem,
 	PrCore::Utils::Clock,
-	PrCore::Utils::ILogger
+	PrCore::Utils::ILogger,
+	PrRenderer::IRenderFrontend
 >;
 
 // PrSystems is in global namespace for an easy usage. 

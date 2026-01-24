@@ -27,7 +27,7 @@ void Mesh::SetIndices(std::vector<unsigned int>&& p_indices)
 	m_stateChanged = true;
 }
 
-void Mesh::SetColors(std::vector<Core::Color>&& p_colors)
+void Mesh::SetColors(std::vector<Color>&& p_colors)
 {
 	if (p_colors.size() != m_verticesCount)
 	{
@@ -101,9 +101,9 @@ void Mesh::SetSubmesh(size_t p_index, const SubMesh& p_submesh)
 
 MeshPtr Mesh::Create()
 {
-	switch (Core::RendererAPI::GetGraphicsAPI())
+	switch (RendererAPI::GetGraphicsAPI())
 	{
-	case Core::GraphicsAPI::OpenGL: return std::make_shared<OpenGL::GLMesh>();
+	case GraphicsAPI::OpenGL: return std::make_shared<OpenGL::GLMesh>();
 
 	default:
 	{

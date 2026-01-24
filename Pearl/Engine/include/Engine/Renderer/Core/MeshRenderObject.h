@@ -3,7 +3,7 @@
 #include "Renderer/Resources/Material.h"
 #include "Renderer/Resources/Mesh.h"
 
-namespace PrRenderer::Core {
+namespace PrRenderer {
 
     struct MeshRenderObject {
 

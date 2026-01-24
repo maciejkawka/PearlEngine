@@ -157,23 +157,23 @@ namespace PrCore::ECS {
 	public:
 		CameraComponent() = default;
 
-		inline void SetType(PrRenderer::Core::CameraType p_type) { m_camera.SetType(p_type); }
-		inline void SetClearColor(const PrRenderer::Core::Color& p_clearColor) { m_camera.SetClearColor(p_clearColor); }
+		inline void SetType(PrRenderer::CameraType p_type) { m_camera.SetType(p_type); }
+		inline void SetClearColor(const PrRenderer::Color& p_clearColor) { m_camera.SetClearColor(p_clearColor); }
 		inline void SetFar(float p_far) {m_camera.SetFar(p_far); }
 		inline void SetNear(float p_near) { m_camera.SetNear(p_near); }
 		inline void SetFOV(float p_FOV) { m_camera.SetFOV(p_FOV); }
 		inline void SetRatio(float p_ratio) { m_camera.SetRatio(p_ratio); }
 		inline void SetSize(float p_size) { m_camera.SetSize(p_size); }
 
-		inline PrRenderer::Core::CameraType GetType() { return m_camera.GetType(); }
-		inline PrRenderer::Core::Color GetClearColor() { return m_camera.GetClearColor(); }
+		inline PrRenderer::CameraType GetType() { return m_camera.GetType(); }
+		inline PrRenderer::Color GetClearColor() { return m_camera.GetClearColor(); }
 		inline float GetFar() { return m_camera.GetFar(); }
 		inline float GetNear() { return m_camera.GetNear(); }
 		inline float GetFOV() { return m_camera.GetFOV(); }
 		inline float GetRatio() { return m_camera.GetRatio(); }
 		inline float GetSize() { return m_camera.GetSize(); }
 
-		inline PrRenderer::Core::Camera* GetCamera() { return &m_camera; }
+		inline PrRenderer::Camera* GetCamera() { return &m_camera; }
 
 
 		virtual void OnSerialize(Utils::JSON::json& p_serialized) override
@@ -199,6 +199,6 @@ namespace PrCore::ECS {
 		}
 
 	private:
-		PrRenderer::Core::Camera m_camera;
+		PrRenderer::Camera m_camera;
 	};
 }

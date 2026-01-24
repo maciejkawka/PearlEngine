@@ -29,7 +29,7 @@ void GLVertexArray::Unbind()
 	glBindVertexArray(0);
 }
 
-void GLVertexArray::SetVertexBuffer(const Buffers::VertexBufferPtr p_vertexBuffer)
+void GLVertexArray::SetVertexBuffer(const VertexBufferPtr p_vertexBuffer)
 {
 	glBindVertexArray(m_bufferID);
 	p_vertexBuffer->Bind();
@@ -39,10 +39,10 @@ void GLVertexArray::SetVertexBuffer(const Buffers::VertexBufferPtr p_vertexBuffe
 	{
 		switch (element.type)
 		{
-		case Buffers::ShaderDataType::Float:
-		case Buffers::ShaderDataType::Float2:
-		case Buffers::ShaderDataType::Float3:
-		case Buffers::ShaderDataType::Float4:
+		case ShaderDataType::Float:
+		case ShaderDataType::Float2:
+		case ShaderDataType::Float3:
+		case ShaderDataType::Float4:
 		{
 			glVertexAttribPointer(m_vertexBufferIndex,
 				element.GetTypeSize(),
@@ -55,10 +55,10 @@ void GLVertexArray::SetVertexBuffer(const Buffers::VertexBufferPtr p_vertexBuffe
 			break;
 		}
 
-		case Buffers::ShaderDataType::Int:
-		case Buffers::ShaderDataType::Int2:
-		case Buffers::ShaderDataType::Int3:
-		case Buffers::ShaderDataType::Int4:
+		case ShaderDataType::Int:
+		case ShaderDataType::Int2:
+		case ShaderDataType::Int3:
+		case ShaderDataType::Int4:
 		{
 			glVertexAttribIPointer(m_vertexBufferIndex,
 				element.GetTypeSize(),
@@ -70,7 +70,7 @@ void GLVertexArray::SetVertexBuffer(const Buffers::VertexBufferPtr p_vertexBuffe
 			break;
 		}
 
-		case Buffers::ShaderDataType::Bool:
+		case ShaderDataType::Bool:
 		{
 			glVertexAttribIPointer(m_vertexBufferIndex,
 				element.GetTypeSize(),
@@ -82,8 +82,8 @@ void GLVertexArray::SetVertexBuffer(const Buffers::VertexBufferPtr p_vertexBuffe
 			break;
 		}
 
-		case Buffers::ShaderDataType::Mat3:
-		case Buffers::ShaderDataType::Mat4:
+		case ShaderDataType::Mat3:
+		case ShaderDataType::Mat4:
 		{
 			for (uint32_t column = 0; column < element.size; column++)
 			{
@@ -111,7 +111,7 @@ void GLVertexArray::SetVertexBuffer(const Buffers::VertexBufferPtr p_vertexBuffe
 	glBindVertexArray(0);
 }
 
-void GLVertexArray::SetIndexBuffer(const Buffers::IndexBufferPtr p_indexBuffer)
+void GLVertexArray::SetIndexBuffer(const IndexBufferPtr p_indexBuffer)
 {
 	glBindVertexArray(m_bufferID);
 	m_indexBuffer = p_indexBuffer;

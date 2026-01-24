@@ -1,8 +1,8 @@
 #pragma once
 
-#include"Core/Math/Math.h"
+#include "Core/Math/Math.h"
 
-namespace PrRenderer::Core {
+namespace PrRenderer {
 
 	struct CascadeShadowUtility
 	{

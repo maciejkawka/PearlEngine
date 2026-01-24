@@ -27,9 +27,9 @@ Shader::Shader(const std::string& p_vertexShader, const std::string& p_fragmentS
 std::shared_ptr<Shader> Shader::Create(const std::string& p_vertexShader, const std::string& p_fragmentShader)
 {
 	ShaderPtr shader = nullptr;
-	switch (Core::RendererAPI::GetGraphicsAPI())
+	switch (RendererAPI::GetGraphicsAPI())
 	{
-	case Core::GraphicsAPI::OpenGL: shader = std::make_shared<OpenGL::GLShader>(p_vertexShader, p_fragmentShader); break;
+	case GraphicsAPI::OpenGL: shader = std::make_shared<OpenGL::GLShader>(p_vertexShader, p_fragmentShader); break;
 
 	default:
 	{
@@ -44,9 +44,9 @@ std::shared_ptr<Shader> Shader::Create(const std::string& p_vertexShader, const 
 std::shared_ptr<Shader> Shader::Create(const std::string& p_vertexShader, const std::string& p_fragmentShader, const std::string& p_geometeryShader)
 {
 	ShaderPtr shader = nullptr;
-	switch (Core::RendererAPI::GetGraphicsAPI())
+	switch (RendererAPI::GetGraphicsAPI())
 	{
-	case Core::GraphicsAPI::OpenGL: shader = std::make_shared<OpenGL::GLShader>(p_vertexShader, p_fragmentShader, p_geometeryShader); break;
+	case GraphicsAPI::OpenGL: shader = std::make_shared<OpenGL::GLShader>(p_vertexShader, p_fragmentShader, p_geometeryShader); break;
 
 	default:
 	{

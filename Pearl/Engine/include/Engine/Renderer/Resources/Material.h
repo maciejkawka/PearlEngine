@@ -24,8 +24,8 @@ namespace PrRenderer {
 		Material(ShaderHandle p_shader);
 		Material(const Material& p_material);
 
-		void               SetColor(const Core::Color& p_color);
-		const Core::Color& GetColor() const;
+		void               SetColor(const Color& p_color);
+		const Color& GetColor() const;
 
 		inline void SetShader(ShaderPtr p_shader)
 		{

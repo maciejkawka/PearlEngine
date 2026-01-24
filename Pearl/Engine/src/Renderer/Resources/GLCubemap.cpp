@@ -107,7 +107,7 @@ void GLCubemap::Apply()
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
-void GLCubemap::ClearWithColor(const Core::Color& p_color)
+void GLCubemap::ClearWithColor(const Color& p_color)
 {
 	glClearTexImage(m_ID, 0, TextureFormatToGL(m_format), GL_FLOAT, &p_color);
 }

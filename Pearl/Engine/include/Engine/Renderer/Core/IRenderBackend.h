@@ -1,11 +1,11 @@
 #pragma once
-#include"Renderer/Core/RenderTypes.h"
-#include"Renderer/Core/RenderCommand.h"
+#include "Renderer/Core/RenderTypes.h"
+#include "Renderer/Core/RenderCommand.h"
 
-#include"Core/Events/Event.h"
-#include<deque>
+#include "Core/Events/Event.h"
+#include <deque>
 
-namespace PrRenderer::Core {
+namespace PrRenderer {
 
 	class IRenderBackend {
 	public:

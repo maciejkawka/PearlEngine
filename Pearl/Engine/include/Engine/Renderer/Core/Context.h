@@ -1,6 +1,6 @@
 #pragma once
 
-namespace PrRenderer::Core {
+namespace PrRenderer {
 
 	class Context {
 	public:
