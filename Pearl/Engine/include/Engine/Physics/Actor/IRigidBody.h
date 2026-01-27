@@ -41,6 +41,7 @@ namespace PrPhysics {
 
 	class IRigidActor : public IActor {
 	public:
+		virtual ~IRigidActor() = default;
 
 		virtual uint32_t            GetInternalActorIndex() const = 0;
 		virtual uint32_t            GetShapesNumber() const = 0;
@@ -57,7 +58,8 @@ namespace PrPhysics {
 
 	class IRigidBody : public IRigidActor {
 	public:
-		
+		virtual ~IRigidBody() = default;
+
 		virtual void                      SetCMassLocalPose(const Transform& p_transform) = 0;
 		virtual const Transform&          GetCMassLocalPose() const = 0;
 
@@ -114,12 +116,14 @@ namespace PrPhysics {
 
 	class IRigidStatic : public IRigidActor {
 	public:
-
+		virtual ~IRigidStatic() = default;
 	};
 	using IRigidStaticPtr = std::shared_ptr<IRigidStatic>;
 
 	class IRigidBodyDynamic : public IRigidBody {
 	public:
+		virtual ~IRigidBodyDynamic() = default;
+
 		virtual void                      SetKinematicTarget(const Transform& p_destination) = 0;
 		virtual bool                      GetKinematicTarget(Transform& p_target)	const = 0;
 							              

@@ -21,10 +21,6 @@ void PhysicsUpdateSystem::OnUpdate(float p_dt)
 		for (auto& actor : m_createdActors)
 			m_physics->AddActor(actor);
 		m_createdActors.clear();
-
-		for (auto& actor : m_removedActors)
-			m_physics->AddActor(actor);
-		m_createdActors.clear();
 	}
 
 	m_entityViewer.MT_EntitesWithComponents<TransformComponent, RigidBodyStaticComponent>([](Entity entity, auto transform, auto rigidStatic) {
@@ -67,17 +63,9 @@ void PhysicsUpdateSystem::OnCreate()
 	dynamicAddedListener.Connect<&PhysicsUpdateSystem::OnComponentDynamicCreated>(this);
 	PrSystems::Get<EventManager>()->AddListener(dynamicAddedListener, ComponentAddedEvent<RigidBodyDynamicComponent>::s_type);
 
-	EventListener dynamicRemovedListener;
-	dynamicRemovedListener.Connect<&PhysicsUpdateSystem::OnComponentDynamicRemoved>(this);
-	PrSystems::Get<EventManager>()->AddListener(dynamicRemovedListener, ComponentRemovedEvent<RigidBodyDynamicComponent>::s_type);
-
 	EventListener staticAddedListener;
 	staticAddedListener.Connect<&PhysicsUpdateSystem::OnComponentStaticCreated>(this);
 	PrSystems::Get<EventManager>()->AddListener(staticAddedListener, ComponentAddedEvent<RigidBodyStaticComponent>::s_type);
-
-	EventListener staticRemovedListener;
-	staticRemovedListener.Connect<&PhysicsUpdateSystem::OnComponentStaticRemoved>(this);
-	PrSystems::Get<EventManager>()->AddListener(staticRemovedListener, ComponentRemovedEvent<RigidBodyStaticComponent>::s_type);
 }
 
 void PhysicsUpdateSystem::OnComponentDynamicCreated(PrCore::EventPtr p_eventType)
@@ -88,12 +76,6 @@ void PhysicsUpdateSystem::OnComponentDynamicCreated(PrCore::EventPtr p_eventType
 	component->rigidBody = m_physics->CreateRigidDynamic(PrPhysics::Transform{});
 	component->rigidBody->SetEntity(componentEvent->m_entity);
 	m_createdActors.push_back(component->rigidBody);
-}
-
-void PhysicsUpdateSystem::OnComponentDynamicRemoved(PrCore::EventPtr p_eventType)
-{
-	auto rigidBody = std::static_pointer_cast<ComponentAddedEvent<RigidBodyDynamicComponent>>(p_eventType)->m_component->rigidBody;
-	m_removedActors.push_back(rigidBody);
 }
 
 void PhysicsUpdateSystem::OnComponentStaticCreated(PrCore::EventPtr p_eventType)
@@ -113,8 +95,42 @@ void PhysicsUpdateSystem::OnComponentStaticCreated(PrCore::EventPtr p_eventType)
 	m_createdActors.push_back(component->rigidBody);
 }
 
-void PhysicsUpdateSystem::OnComponentStaticRemoved(PrCore::EventPtr p_eventType)
+PhysicsCleanupSyatem::PhysicsCleanupSyatem()
+{
+	m_physics = PrPhysics::PhysicsSystem::GetInstancePtr();
+}
+
+void PhysicsCleanupSyatem::OnCreate()
+{
+	m_updateGroup = (uint8_t)UpdateGroup::Custom;
+
+	EventListener dynamicRemovedListener;
+	dynamicRemovedListener.Connect<&PhysicsCleanupSyatem::OnComponentDynamicRemoved>(this);
+	PrSystems::Get<EventManager>()->AddListener(dynamicRemovedListener, ComponentRemovedEvent<RigidBodyDynamicComponent>::s_type);
+
+	EventListener staticRemovedListener;
+	staticRemovedListener.Connect<&PhysicsCleanupSyatem::OnComponentStaticRemoved>(this);
+	PrSystems::Get<EventManager>()->AddListener(staticRemovedListener, ComponentRemovedEvent<RigidBodyStaticComponent>::s_type);
+}
+
+void PhysicsCleanupSyatem::OnUpdate(float p_dt)
+{
+	for (auto& actor : m_removedActors)
+	{
+		m_physics->RemoveActor(actor);
+	}
+
+	m_removedActors.clear();
+}
+
+void PhysicsCleanupSyatem::OnComponentStaticRemoved(PrCore::EventPtr p_eventType)
 {
 	auto rigidBody = std::static_pointer_cast<ComponentAddedEvent<RigidBodyStaticComponent>>(p_eventType)->m_component->rigidBody;
+	m_removedActors.push_back(rigidBody);
+}
+
+void PhysicsCleanupSyatem::OnComponentDynamicRemoved(PrCore::EventPtr p_eventType)
+{
+	auto rigidBody = std::static_pointer_cast<ComponentAddedEvent<RigidBodyDynamicComponent>>(p_eventType)->m_component->rigidBody;
 	m_removedActors.push_back(rigidBody);
 }

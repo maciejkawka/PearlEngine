@@ -35,6 +35,11 @@ namespace PrPhysics {
 				physx::PxActor* actorA = pairHeader.actors[0];
 				physx::PxActor* actorB = pairHeader.actors[1];
 
+				if (actorA->userData == nullptr || actorB->userData == nullptr)
+				{
+					return;
+				}
+
 				CollisionInfo collisionInfo;
 				collisionInfo.entityA = *static_cast<PrCore::ECS::Entity*>(actorA->userData);
 				collisionInfo.entityB = *static_cast<PrCore::ECS::Entity*>(actorB->userData);

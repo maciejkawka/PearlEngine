@@ -15,7 +15,7 @@ namespace PrPhysics {
 	class PhysRigidBodyStatic : public IRigidStatic {
 	public:
 		PhysRigidBodyStatic(physx::PxRigidStatic* p_rigidStatic);
-		~PhysRigidBodyStatic();
+		virtual ~PhysRigidBodyStatic();
 
 		void* GetNativePtr() override;
 		void  ReleaseNativePtr() override;
@@ -54,7 +54,7 @@ namespace PrPhysics {
 	class PhysRigidBodyDynamic : public IRigidBodyDynamic {
 	public:
 		PhysRigidBodyDynamic(physx::PxRigidDynamic* p_rigidDynamic);
-		~PhysRigidBodyDynamic();
+		virtual ~PhysRigidBodyDynamic();
 
 		void             SetCMassLocalPose(const Transform& p_transform) override;
 		const Transform& GetCMassLocalPose() const override;

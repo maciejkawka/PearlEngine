@@ -72,7 +72,7 @@ void Editor::OnFrame(float p_deltaTime)
 	//Scene Update
 	auto scenes = PrCore::ECS::SceneManager::GetInstance().GetAllScenes();
 
-	for(auto scene : scenes)
+	for (auto scene : scenes)
 	{
 		scene->OnEnable();
 
@@ -81,7 +81,7 @@ void Editor::OnFrame(float p_deltaTime)
 		//Physics Tick
 		m_physicsStepAccumulator += p_deltaTime;
 		int i = 0;
-		while(m_physicsStepAccumulator >= m_physicsFixStep)
+		while (m_physicsStepAccumulator >= m_physicsFixStep)
 		{
 			scene->PhysicsUpdate(m_physicsFixStep);
 			scene->FixUpdate(m_physicsFixStep);
@@ -91,11 +91,13 @@ void Editor::OnFrame(float p_deltaTime)
 		scene->LateUpdate(p_deltaTime);
 
 		scene->UpdateHierrarchicalEntities(p_deltaTime);
-		scene->CleanDestroyedEntities();
 
 		scene->RenderUpdate(p_deltaTime);
 
 		scene->OnDisable();
+
+		scene->CleanDestroyedEntities();
+		scene->PhysicsCleanup(p_deltaTime);
 	}
 
 	auto pRenderer = PrSystems::Get<PrRenderer::IRenderFrontend>();

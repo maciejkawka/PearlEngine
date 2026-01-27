@@ -39,7 +39,7 @@ namespace PrPhysics {
 
 		// Scene Manipulations
 		bool AddActor(IActorPtr p_actor);
-		void RemoveActor(IActorPtr p_actor, bool p_wakeOnLastTouch = true);
+		void RemoveActor(IActorPtr p_actor, bool p_wakeOnLastTouch = false);
 
 		void                 SetGravity(const PrCore::Math::vec3& p_gravity);
 		 PrCore::Math::vec3  GetGravity() const;

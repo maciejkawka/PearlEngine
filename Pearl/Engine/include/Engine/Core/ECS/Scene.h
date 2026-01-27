@@ -42,6 +42,7 @@ namespace PrCore::ECS {
 
 		void RenderUpdate(float p_dt) const;
 		void PhysicsUpdate(float p_dt) const;
+		void PhysicsCleanup(float p_dt) const;
 
 		//Getters and Setters
 		inline std::string GetSceneName() const { return m_name; }

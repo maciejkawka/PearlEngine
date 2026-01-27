@@ -118,8 +118,14 @@ namespace PrRenderer {
 	REGISTRER_RESOURCE_HANDLE(Material);
 	typedef std::shared_ptr<Material> MaterialPtr;
 
+	template<>
+	inline void Material::SetProperty<PrRenderer::Color>(const std::string& p_name, const PrRenderer::Color& p_value)
+	{
+		SetProperty(p_name, static_cast<PrCore::Math::vec3>(p_value));
+	}
+
 	template<typename T>
-	void Material::SetProperty(const std::string& p_name, const T& p_value)
+	inline void Material::SetProperty(const std::string& p_name, const T& p_value)
 	{
 		auto find = m_uniforms.find(p_name);
 		if (find != m_uniforms.end())

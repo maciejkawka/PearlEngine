@@ -145,6 +145,11 @@ void Scene::PhysicsUpdate(float p_dt) const
 	m_systemManager->UpdateSystem<PhysicsUpdateSystem>(p_dt);
 }
 
+void Scene::PhysicsCleanup(float p_dt) const
+{
+	m_systemManager->UpdateSystem<PhysicsCleanupSyatem>(p_dt);
+}
+
 size_t Scene::GetEntitiesCount() const
 {
 	return m_entityManager->GetEntityCount();

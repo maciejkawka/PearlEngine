@@ -24,6 +24,7 @@ namespace PrPhysics {
 	class IActor: public INativePtrHandle {
 	public:
 		virtual ~IActor() = default;
+
 		virtual ActorType    GetType() = 0;
 
 		virtual	void         SetName(const char* p_name) = 0;

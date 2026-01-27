@@ -17,12 +17,14 @@ PhysRigidBodyStatic::PhysRigidBodyStatic(physx::PxRigidStatic* p_rigidStatic) :
 PhysRigidBodyStatic::~PhysRigidBodyStatic()
 {
 	delete m_impl->userData;
+	m_impl->userData = nullptr;
 	m_impl->release();
 }
 
 void PhysRigidBodyStatic::ReleaseNativePtr()
 {
 	delete m_impl->userData;
+	m_impl->userData = nullptr;
 	m_impl->release();
 }
 
@@ -128,6 +130,7 @@ PhysRigidBodyDynamic::PhysRigidBodyDynamic(physx::PxRigidDynamic* p_rigidDynamic
 PhysRigidBodyDynamic::~PhysRigidBodyDynamic()
 {
 	delete m_impl->userData;
+	m_impl->userData = nullptr;
 	m_impl->release();
 }
 
@@ -412,6 +415,7 @@ void* PhysRigidBodyDynamic::GetNativePtr()
 void PhysRigidBodyDynamic::ReleaseNativePtr()
 {
 	delete m_impl->userData;
+	m_impl->userData = nullptr;
 	m_impl->release();
 }
 

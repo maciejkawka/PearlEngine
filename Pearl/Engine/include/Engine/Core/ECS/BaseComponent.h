@@ -6,5 +6,6 @@ namespace PrCore::ECS {
 	class BaseComponent: public Utils::ISerializable {
 	public:
 		BaseComponent() = default;
+		virtual ~BaseComponent() = default;
 	};
 }

@@ -22,7 +22,7 @@ namespace PrEditor::Core {
 		Components::BasicCamera* m_basicCamera;
 		Components::TestFeatures* m_testFeatures;
 
-		const float m_physicsFixStep = 1.0f / 30.0f;
+		const float m_physicsFixStep = 1.0f / 60.0f;
 		float       m_physicsStepAccumulator = 0.0f;
 	};
 
