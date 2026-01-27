@@ -6,11 +6,6 @@
 #include <tuple>
 #include <array>
 
-namespace PrRenderer
-{
-	class IRenderFrontend;
-}
-
 namespace PrCore
 {
 	namespace Utils
@@ -26,6 +21,16 @@ namespace PrCore
 	class ResourceSystem;
 }
 
+namespace PrPhysics
+{
+	class PhysicsSystem;
+}
+
+namespace PrRenderer
+{
+	class IRenderFrontend;
+}
+
 // Tuple with all systems used in the engine,
 // extend this list when new system is added.
 // IMPORTANT!
@@ -39,7 +44,8 @@ using EngineSystems = std::tuple<
 	PrCore::ResourceSystem,
 	PrCore::Utils::Clock,
 	PrCore::Utils::ILogger,
-	PrRenderer::IRenderFrontend
+	PrRenderer::IRenderFrontend,
+	PrPhysics::PhysicsSystem
 >;
 
 // PrSystems is in global namespace for an easy usage. 

@@ -2,6 +2,7 @@
 
 #include "Core/ECS/Systems/TestSystem.h"
 #include "Core/ECS/Components/PhysicsComponents.h"
+#include "Core/ECS/Components/SphereBullet.h"
 
 #include "Renderer/Core/Color.h"
 
@@ -100,7 +101,7 @@ void RenderStressTest::OnEnable()
 	pRenderer->SetCubemap(PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/hrd_skymap.mat").GetData());
 	m_mainLightPtr->SetColor(m_lightColor);
 
-	PrPhysics::PhysicsSystem::GetInstancePtr()->SetGravity(PrCore::Math::vec3{ 0.0f });
+	PrSystems::Get<PrPhysics::PhysicsSystem>()->SetGravity(PrCore::Math::vec3{ 0.0f });
 
 	auto pan = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("Plane.003");
 
@@ -148,7 +149,7 @@ void RenderStressTest::OnEnable()
 		PrPhysics::Material material;
 		material.restitution = 0.9f;
 		auto rigidBody = physcomponent->rigidBody;
-		auto shape = PrPhysics::PhysicsSystem::GetInstancePtr()->CreateShape(PrPhysics::SphereGeometry{ transform->GetScale().x * 0.5f }, material);
+		auto shape = PrSystems::Get<PrPhysics::PhysicsSystem>()->CreateShape(PrPhysics::SphereGeometry{ transform->GetScale().x * 0.5f }, material);
 		rigidBody->AttachShape(shape);
 		rigidBody->SetMass(10.0f);
 	}
@@ -191,7 +192,7 @@ void RenderStressTest::OnEnable()
 		//auto resourceHandle = PrSystems::Get<ResourceSystem>()->Register<PrPhysics::IConvexMesh>(convexMesh);
 		//PrSystems::Get<ResourceSystem>()->SaveToFile<PrPhysics::IConvexMesh>(resourceHandle.GetID(), "ThisIsTest.phys");
 
-		auto shape = PrPhysics::PhysicsSystem::GetInstancePtr()->CreateShape(PrPhysics::ConvexGeometry{ convexMesh, transform->GetLocalScale() }, material);
+		auto shape = PrSystems::Get<PrPhysics::PhysicsSystem>()->CreateShape(PrPhysics::ConvexGeometry{ convexMesh, transform->GetLocalScale() }, material);
 		rigidbody->AttachShape(shape);
 	}
 
@@ -206,11 +207,11 @@ void RenderStressTest::OnUpdate(float p_dt)
 {
 	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::N))
 	{
-		PrPhysics::PhysicsSystem::GetInstancePtr()->SetGravity(PrCore::Math::vec3{ 0.0f });
+		PrSystems::Get<PrPhysics::PhysicsSystem>()->SetGravity(PrCore::Math::vec3{ 0.0f });
 	}
 	else if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::M))
 	{
-		PrPhysics::PhysicsSystem::GetInstancePtr()->SetGravity(PrCore::Math::vec3{ 0.0f, -9.81f, 0.0f });
+		PrSystems::Get<PrPhysics::PhysicsSystem>()->SetGravity(PrCore::Math::vec3{ 0.0f, -9.81f, 0.0f });
 	}
 
 	//Update Camera Transform
@@ -226,7 +227,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 	{
 		float distance = 50.0f;
 		PrPhysics::RaycastHit hit;
-		if (PrPhysics::PhysicsSystem::GetInstancePtr()->Raycast(m_camera->GetPosition(), forward, distance, hit))
+		if (PrSystems::Get<PrPhysics::PhysicsSystem>()->Raycast(m_camera->GetPosition(), forward, distance, hit))
 		{
 			auto name = hit.entity.GetComponent<NameComponent>()->name;
 			PRLOG_INFO("Raycast hit entity name {} distance: {}", name, hit.distance);
@@ -370,9 +371,33 @@ void RenderStressTest::OnUpdate(float p_dt)
 		i++;
 	}
 
+	for (auto [entity, bullet, meshRenderer] : m_entityViewer.EntitesWithComponents<SphereBullet, MeshRendererComponent>())
+	{
+		bullet->time += p_dt;
+		if (bullet->time >= bullet->maxTime)
+		{
+			auto color = PrRenderer::Color::Magenta * (5 * bullet->time);
+			meshRenderer->mainMaterial->SetColor(color);
+			entity.Destroy();
+		}
+		else if (bullet->time >= (bullet->maxTime - 0.2f))
+		{
+			auto color = PrRenderer::Color::Magenta * (5 * bullet->time);
+			meshRenderer->mainMaterial->SetColor(color);
+		}
+		else
+		{
+			auto color = PrRenderer::Color::Red * (5 * bullet->time);
+			meshRenderer->mainMaterial->SetColor(color);
+			meshRenderer->mainMaterial->SetProperty("emissionInt", (float)std::pow(2, bullet->time));
+		}
+	}
+
 	if (PrCore::Input::InputManager::GetInstance().IsButtonPressed(PrCore::Input::PrMouseButton::BUTTON_LEFT))
 	{
-		auto physicsPtr = PrPhysics::PhysicsSystem::GetInstancePtr();
+		static int counter = 0;
+
+		auto physicsPtr = PrSystems::Get<PrPhysics::PhysicsSystem>();
 
 		PrPhysics::Material material;
 		material.staticFriction = 0.0f;
@@ -390,12 +415,31 @@ void RenderStressTest::OnUpdate(float p_dt)
 		auto logoMesh = entity.AddComponent<PrCore::ECS::MeshRendererComponent>();
 		logoTransform->SetPosition(m_camera->GetPosition() + m_cameraTransform->GetForwardVector() * 2.0f);
 		logoTransform->SetLocalScale(PrCore::Math::vec3(1.0f));
-		logoMesh->mainMaterial = PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/emissionCapsule.mat");
+		auto newMaterial = std::make_shared<PrRenderer::Material>(*PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/capsule.mat").GetData());
+		newMaterial->SetProperty("roughnessValue", 0.9f);
+		newMaterial->SetProperty("emissionColor", PrRenderer::Color::Red);
+		newMaterial->SetTexture("emissionMap", PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Texture>("texture/checkerboard.png"));
+		logoMesh->mainMaterial = newMaterial;
 		logoMesh->mesh = PrRenderer::Mesh::CreatePrimitive(PrRenderer::PrimitiveType::Sphere);
+		logoMesh->shadowCaster = false;
 
 		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::LEFT_CONTROL))
 		{
 			rigidBody->SetLinearVelocity(m_cameraTransform->GetForwardVector() * 50.0f);
+		}
+
+		entity.AddComponent<PrCore::ECS::SphereBullet>();
+
+		if (++counter % 2 == 0)
+		{
+			auto lightComponent = entity.AddComponent<LightComponent>();
+			auto light = std::make_shared<PrRenderer::Light>();
+			light->SetType(PrRenderer::LightType::Point);
+			light->SetColor(PrRenderer::Color::Red * 10.0f);
+			light->SetRange(60.0f);
+			light->SetAttenuation(0.5f, 0.5f);
+			lightComponent->m_light = light;
+			lightComponent->m_shadowCast = true;
 		}
 	}
 

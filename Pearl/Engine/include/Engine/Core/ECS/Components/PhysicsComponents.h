@@ -147,7 +147,7 @@ namespace PrCore::ECS {
 				break;
 			};
 
-			auto shape = PrPhysics::PhysicsSystem::GetInstancePtr()->CreateShape(*geometery, material);
+			auto shape = PrSystems::Get<PrPhysics::PhysicsSystem>()->CreateShape(*geometery, material);
 			shape->SetFlags(jsonShape["flags"]);
 			rigidBody->AttachShape(shape);
 		}
@@ -308,7 +308,7 @@ namespace PrCore::ECS {
 				break;
 			};
 
-			auto shape = PrPhysics::PhysicsSystem::GetInstancePtr()->CreateShape(*geometery, material);
+			auto shape = PrSystems::Get<PrPhysics::PhysicsSystem>()->CreateShape(*geometery, material);
 			shape->SetFlags(jsonShape["flags"]);
 			rigidBody->AttachShape(shape);
 		}

@@ -25,7 +25,7 @@ PrCore::IResourceDataPtr TriangleMeshLoader::LoadResource(const std::string& p_p
 	pFileSystem->FileRead(file, buff, size);
 	pFileSystem->FileClose(file);
 
-	auto convexMeshPtr = PhysicsSystem::GetInstancePtr()->CreateTriangleMesh(buff, size);
+	auto convexMeshPtr = PrSystems::Get<PhysicsSystem>()->CreateTriangleMesh(buff, size);
 	delete[] buff;
 
 	return convexMeshPtr;

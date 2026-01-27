@@ -70,6 +70,11 @@ namespace PrPhysics {
 				physx::PxActor* actorA = pair.triggerActor;
 				physx::PxActor* actorB = pair.otherActor;
 
+				if (actorA->userData == nullptr || actorB->userData == nullptr)
+				{
+					return;
+				}
+
 				CollisionInfo collisionInfo;
 				collisionInfo.entityA = *static_cast<PrCore::ECS::Entity*>(actorA->userData);
 				collisionInfo.entityB = *static_cast<PrCore::ECS::Entity*>(actorB->userData);

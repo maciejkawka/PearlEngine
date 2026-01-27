@@ -90,7 +90,7 @@ TestFeatures::TestFeatures()
 	scene101->RegisterSystem<PrCore::ECS::RenderStressTest>();
 	scene101->RegisterSystem<PrCore::ECS::PhysicsUpdateSystem>();
 
-	auto physicsPtr1 = PrPhysics::PhysicsSystem::GetInstancePtr();
+	auto physicsPtr1 = PrSystems::Get<PrPhysics::PhysicsSystem>();
 
 	PrPhysics::Material material1;
 	material1.staticFriction = 0.0f;
@@ -125,7 +125,7 @@ TestFeatures::TestFeatures()
 	//root->SetPosition(PrCore::Math::vec3{ 0,5.0f,0.0f });
 
 	//Add physics
-	auto physicsPtr = PrPhysics::PhysicsSystem::GetInstancePtr();
+	auto physicsPtr = PrSystems::Get<PrPhysics::PhysicsSystem>();
 
 	PrPhysics::Material material;
 	material.staticFriction = 0.0f;

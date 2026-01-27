@@ -24,7 +24,7 @@ PrCore::IResourceDataPtr ConvexMeshLoader::LoadResource(const std::string& p_pat
 	pFileSystem->FileRead(file, buff, size);
 	pFileSystem->FileClose(file);
 
-	auto convexMeshPtr = PhysicsSystem::GetInstancePtr()->CreateConvexMesh(buff, size);
+	auto convexMeshPtr = PrSystems::Get<PrPhysics::PhysicsSystem>()->CreateConvexMesh(buff, size);
 	delete[] buff;
 
 	return convexMeshPtr;

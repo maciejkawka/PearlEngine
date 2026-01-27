@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Utils/Singleton.h"
+#include "Core/Utils/SystemProvider.h"
 #include "Physics/Core/IFactory.h"
 
 namespace PrPhysics {
@@ -32,7 +32,7 @@ namespace PrPhysics {
 		PrCore::Math::vec3   normal;
 	};
 
-	class PhysicsSystem : public PrCore::Utils::Singleton<PhysicsSystem> {
+	class PhysicsSystem : public PrCore::Utils::ISystem {
 	public:
 		PhysicsSystem(const PhysicsSettings& p_settings);
 		~PhysicsSystem();

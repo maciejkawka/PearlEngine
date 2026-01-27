@@ -217,9 +217,12 @@ PrCore::Entry::AppContext::AppContext()
 		PrSystems::Register<PrRenderer::IRenderFrontend, PrRenderer::DeferRenderFrontend>(rendererSettings);
 	}
 
+	//-----------------------
+	// Init Physics System
+	PRLOG_INFO("Init Physics System");
 	{
 		PrPhysics::PhysicsSettings physSettings;
-		PrPhysics::PhysicsSystem::Init(physSettings);
+		PrSystems::Register<PrPhysics::PhysicsSystem>(physSettings);
 
 		auto convexMeshDatabase = std::make_unique<PrRenderer::ResourceDatabase>();
 		convexMeshDatabase->RegisterLoader(".physc", std::make_unique<PrPhysics::ConvexMeshLoader>());
@@ -241,12 +244,13 @@ PrCore::Entry::AppContext::~AppContext()
 	ECS::SceneManager::Terminate();
 	Input::InputManager::Terminate();
 
+	PRLOG_INFO("Terminating Physics System");
 	{
 		PrSystems::Get<ResourceSystem>()->UnloadAll<PrPhysics::IConvexMesh>();
 		PrSystems::Get<ResourceSystem>()->UnregisterLoader<PrPhysics::IConvexMesh>(".physc");
 		PrSystems::Get<ResourceSystem>()->UnloadAll<PrPhysics::ITriangleMesh>();
 		PrSystems::Get<ResourceSystem>()->UnregisterLoader<PrPhysics::ITriangleMesh>(".physt");
-		PrPhysics::PhysicsSystem::Terminate();
+		PrSystems::Unregister<PrPhysics::PhysicsSystem>();
 	}
 
 	PRLOG_INFO("Terminating Render System");

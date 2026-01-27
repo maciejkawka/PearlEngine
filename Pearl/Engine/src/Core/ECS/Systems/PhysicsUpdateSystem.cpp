@@ -11,7 +11,7 @@ using namespace PrCore::ECS;
 
 PhysicsUpdateSystem::PhysicsUpdateSystem()
 {
-	m_physics = PrPhysics::PhysicsSystem::GetInstancePtr();
+	m_physics = PrSystems::Get<PrPhysics::PhysicsSystem>();
 }
 
 void PhysicsUpdateSystem::OnUpdate(float p_dt)
@@ -97,7 +97,7 @@ void PhysicsUpdateSystem::OnComponentStaticCreated(PrCore::EventPtr p_eventType)
 
 PhysicsCleanupSyatem::PhysicsCleanupSyatem()
 {
-	m_physics = PrPhysics::PhysicsSystem::GetInstancePtr();
+	m_physics = PrSystems::Get<PrPhysics::PhysicsSystem>();
 }
 
 void PhysicsCleanupSyatem::OnCreate()
