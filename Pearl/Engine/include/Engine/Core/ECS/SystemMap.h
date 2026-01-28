@@ -1,8 +1,9 @@
 #pragma once
-#include"Core/ECS/SystemManager.h"
-#include"Core/ECS/Systems.h"
 
-namespace PrCore::ECS {
+#include "Core/ECS/SystemManager.h"
+#include "Core/ECS/Systems.h"
+
+namespace PrCore {
 
 	void DeduceSystemTypeByString(SystemManager* p_systemManager, std::string p_typeName)
 	{

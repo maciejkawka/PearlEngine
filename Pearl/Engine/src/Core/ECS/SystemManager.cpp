@@ -1,8 +1,8 @@
 #include "Core/Common/pearl_pch.h"
 #include "Core/ECS/SystemManager.h"
-#include"Core/ECS/SystemMap.h"
+#include "Core/ECS/SystemMap.h"
 
-using namespace PrCore::ECS;
+using namespace PrCore;
 
 SystemManager::SystemManager(EntityManager* p_entityManager):
 m_entityManager(p_entityManager),
@@ -56,7 +56,7 @@ void SystemManager::UpdateGroup(uint8_t p_systemGroup, float p_dt)
 	}
 }
 
-void SystemManager::UpdateGroup(ECS::UpdateGroup p_systemGroup, float p_dt)
+void SystemManager::UpdateGroup(UpdateGroupType p_systemGroup, float p_dt)
 {
 	UpdateGroup((uint8_t)p_systemGroup, p_dt);
 }

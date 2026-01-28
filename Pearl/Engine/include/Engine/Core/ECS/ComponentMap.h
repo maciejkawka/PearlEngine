@@ -1,8 +1,9 @@
 #pragma once
+
 #include "Core/ECS/SystemManager.h"
 #include "Core/ECS/Components.h"
 
-namespace PrCore::ECS {
+namespace PrCore {
 	
 	//Component Map to be update for each component
 	//This Map need to be tracked all time

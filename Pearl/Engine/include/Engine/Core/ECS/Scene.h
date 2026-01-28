@@ -1,11 +1,11 @@
 #pragma once
-#include<string>
+#include <string>
 
-#include"Core/ECS/EntityManager.h"
-#include"Core/Utils/UUID.h"
-#include"Core/Utils/ISerializable.h"
+#include "Core/ECS/EntityManager.h"
+#include "Core/Utils/UUID.h"
+#include "Core/Utils/ISerializable.h"
 
-namespace PrCore::ECS {
+namespace PrCore {
 
 	class SystemManager;
 	class EntityManager;

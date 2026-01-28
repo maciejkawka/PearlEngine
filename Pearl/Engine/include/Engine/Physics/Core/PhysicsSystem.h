@@ -25,7 +25,7 @@ namespace PrPhysics {
 
 	struct RaycastHit
 	{
-		PrCore::ECS::Entity entity;
+		PrCore::Entity       entity;
 
 		float                distance;
 		PrCore::Math::vec3   position;

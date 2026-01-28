@@ -1,4 +1,4 @@
-#include"Core/Common/pearl_pch.h"
+#include "Core/Common/pearl_pch.h"
 
 #include "Core/ECS/Scene.h"
 #include "Core/ECS/SystemManager.h"
@@ -7,7 +7,7 @@
 #include "Core/ECS/Systems/TransformSystem.h"
 #include "Core/ECS/Systems/PhysicsUpdateSystem.h"
 
-using namespace PrCore::ECS;
+using namespace PrCore;
 
 Scene::Scene(const std::string& p_name) :
 	m_name(p_name)
@@ -94,24 +94,24 @@ void Scene::OnEnable() const
 
 void Scene::Update(float p_dt) const
 {
-	m_systemManager->UpdateGroup(UpdateGroup::Update, p_dt);
+	m_systemManager->UpdateGroup(UpdateGroupType::Update, p_dt);
 }
 
 void Scene::FixUpdate(float p_dt) const
 {
-	m_systemManager->UpdateGroup(UpdateGroup::FixUpdate, p_dt);
+	m_systemManager->UpdateGroup(UpdateGroupType::FixUpdate, p_dt);
 }
 
 void Scene::LateUpdate(float p_dt) const
 {
-	m_systemManager->UpdateGroup(UpdateGroup::LateUpdate, p_dt);
+	m_systemManager->UpdateGroup(UpdateGroupType::LateUpdate, p_dt);
 }
 
 void Scene::CleanDestroyedEntities() const
 {
 	EntityViewer viewer(m_entityManager);
 
-	viewer.MT_HierarchicalEntitiesWithComponents<ParentComponent>([](ECS::Entity entity, ParentComponent* parentComponent)
+	viewer.MT_HierarchicalEntitiesWithComponents<ParentComponent>([](Entity entity, ParentComponent* parentComponent)
 		{
 			if (entity.HasComponent<ToDestoryTag>())
 				return;

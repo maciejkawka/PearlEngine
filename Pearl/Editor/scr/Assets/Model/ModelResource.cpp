@@ -15,16 +15,16 @@ ModelResource::ModelResource(std::unique_ptr<ModelEntityGraph>&& p_entityGraph, 
 {
 }
 
-void ModelResource::AddEntitesToScene(PrCore::ECS::Scene* p_scene)
+void ModelResource::AddEntitesToScene(PrCore::Scene* p_scene)
 {
 	PR_ASSERT(p_scene != nullptr, "Scene pointer is null");
 
-	std::unordered_map<std::string_view, PrCore::ECS::Entity> entityMap;
+	std::unordered_map<std::string_view, PrCore::Entity> entityMap;
 	if (m_entityGraph)
 	{
 		m_entityGraph->ForEachNodes([&p_scene, &entityMap](const ModelEntityNode* p_node) {
 
-			using namespace PrCore::ECS;
+			using namespace PrCore;
 
 			auto entity = p_node->entity;
 			auto parent = p_node->parent;

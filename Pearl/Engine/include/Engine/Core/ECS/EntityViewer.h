@@ -1,8 +1,9 @@
 #pragma once
-#include"Core/ECS/EntityManager.h"
-#include"Core/Threading/JobSystem.h"
 
-namespace PrCore::ECS {
+#include "Core/ECS/EntityManager.h"
+#include "Core/Threading/JobSystem.h"
+
+namespace PrCore {
 
 	constexpr size_t g_MTBatchSize = 256;
 
@@ -67,7 +68,7 @@ namespace PrCore::ECS {
 		// Multi Thread Versions
 		//--------------------------------------------------------
 		template<size_t BatchSize = g_MTBatchSize>
-		void MT_AllEntities(std::function<void(ECS::Entity)> jobFunction)
+		void MT_AllEntities(std::function<void(Entity)> jobFunction)
 		{
 			static_assert(BatchSize > 0, "BatchSize cannot be 0");
 			PR_ASSERT(jobFunction, "Function is null");
@@ -78,13 +79,13 @@ namespace PrCore::ECS {
 		}
 
 		template<typename... ComponentType>
-		void MT_EntitesWithComponents(std::function<void(ECS::Entity, std::add_pointer_t<ComponentType>...)> jobFunction)
+		void MT_EntitesWithComponents(std::function<void(Entity, std::add_pointer_t<ComponentType>...)> jobFunction)
 		{
 			MT_EntitesWithComponents<g_MTBatchSize, ComponentType...>(jobFunction);
 		}
 
 		template<size_t BatchSize, typename... ComponentType>
-		void MT_EntitesWithComponents(std::function<void(ECS::Entity, std::add_pointer_t<ComponentType>...)> jobFunction)
+		void MT_EntitesWithComponents(std::function<void(Entity, std::add_pointer_t<ComponentType>...)> jobFunction)
 		{
 			static_assert(BatchSize > 0, "BatchSize cannot be 0");
 			PR_ASSERT(jobFunction, "Function is null");
@@ -95,7 +96,7 @@ namespace PrCore::ECS {
 		}
 
 		template<size_t BatchSize = g_MTBatchSize>
-		void  MT_AllHierarchicalEntities(std::function<void(ECS::Entity)> jobFunction)
+		void  MT_AllHierarchicalEntities(std::function<void(Entity)> jobFunction)
 		{
 			static_assert(BatchSize > 0, "BatchSize cannot be 0");
 			PR_ASSERT(jobFunction, "Function is null");
@@ -130,13 +131,13 @@ namespace PrCore::ECS {
 		}
 
 		template<typename... ComponentType>
-		void MT_HierarchicalEntitiesWithComponents(std::function<void(ECS::Entity, std::add_pointer_t<ComponentType>...)> jobFunction)
+		void MT_HierarchicalEntitiesWithComponents(std::function<void(Entity, std::add_pointer_t<ComponentType>...)> jobFunction)
 		{
 			MT_HierarchicalEntitiesWithComponents<g_MTBatchSize, ComponentType...>(jobFunction);
 		}
 
 		template<size_t BatchSize, typename... ComponentType>
-		void MT_HierarchicalEntitiesWithComponents(std::function<void(ECS::Entity, std::add_pointer_t<ComponentType>...)> jobFunction)
+		void MT_HierarchicalEntitiesWithComponents(std::function<void(Entity, std::add_pointer_t<ComponentType>...)> jobFunction)
 		{
 			static_assert(BatchSize > 0, "BatchSize cannot be 0");
 			PR_ASSERT(jobFunction, "Function is null");

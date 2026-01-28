@@ -9,8 +9,8 @@ namespace PrPhysics {
 
 	struct CollisionInfo
 	{
-		PrCore::ECS::Entity entityA;
-		PrCore::ECS::Entity entityB;
+		PrCore::Entity entityA;
+		PrCore::Entity entityB;
 	};
 
 	class CollisionEnter : public PrCore::Event {

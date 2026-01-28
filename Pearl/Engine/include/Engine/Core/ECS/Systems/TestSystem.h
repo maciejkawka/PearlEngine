@@ -6,7 +6,7 @@
 #include "Core/Utils/SystemProvider.h"
 #include "Physics/Actor/IActor.h"
 
-namespace PrCore::ECS
+namespace PrCore
 {
 	class TestSystem : public BaseSystem {
 	public:

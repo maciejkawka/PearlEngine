@@ -1,7 +1,8 @@
 #pragma once
-#include"Core/Utils/ISerializable.h"
 
-namespace PrCore::ECS {
+#include "Core/Utils/ISerializable.h"
+
+namespace PrCore {
 
 	class BaseComponent: public Utils::ISerializable {
 	public:

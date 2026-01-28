@@ -4,7 +4,7 @@
 
 #include "Core/Utils/UUID.h"
 
-namespace PrCore::ECS {
+namespace PrCore {
 	
 	class UUIDComponent : public BaseComponent {
 	public:

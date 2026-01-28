@@ -1,7 +1,8 @@
 #pragma once
+
 #include "Core/Utils/Assert.h"
 
-namespace PrCore::ECS {
+namespace PrCore {
 
 	template<class T>
 	ComponentPool<T>::ComponentPool()
@@ -25,7 +26,7 @@ namespace PrCore::ECS {
 	template<class T>
 	T* ComponentPool<T>::AllocateData(ID p_ID)
 	{
-		static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::ECS::BaseComponent");
+		static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::BaseComponent");
 
 		PR_ASSERT(p_ID.GetIndex() <= MAX_ENTITIES, "Wrong ID");
 		PR_ASSERT(p_ID.IsValid(), "Wrong ID");
@@ -44,7 +45,7 @@ namespace PrCore::ECS {
 	template<class T>
 	T* ComponentPool<T>::GetData(ID p_ID)
 	{
-		static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::ECS::BaseComponent");
+		static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::BaseComponent");
 
 		PR_ASSERT(p_ID.GetIndex() <= MAX_ENTITIES, "Wrong ID");
 		PR_ASSERT(p_ID.IsValid(), "Wrong ID");
@@ -57,7 +58,7 @@ namespace PrCore::ECS {
 	template<class T>
 	void ComponentPool<T>::RemoveData(ID p_ID)
 	{
-		static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::ECS::BaseComponent");
+		static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::BaseComponent");
 
 		PR_ASSERT(p_ID.GetIndex() <= MAX_ENTITIES, "Wrong ID");
 		PR_ASSERT(p_ID.IsValid(), "Wrong ID");
@@ -72,7 +73,7 @@ namespace PrCore::ECS {
 	template<class T>
 	bool ComponentPool<T>::DataExist(ID p_ID)
 	{
-		static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::ECS::BaseComponent");
+		static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::BaseComponent");
 
 		PR_ASSERT(p_ID.GetIndex() <= MAX_ENTITIES, "Wrong ID");
 		PR_ASSERT(p_ID.IsValid(), "Wrong ID");
@@ -84,7 +85,7 @@ namespace PrCore::ECS {
 	template<class T>
 	void ComponentPool<T>::EntityDestroyed(ID p_ID)
 	{
-		static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::ECS::BaseComponent");
+		static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::BaseComponent");
 
 		PR_ASSERT(p_ID.GetIndex() <= MAX_ENTITIES, "Wrong ID");
 		PR_ASSERT(p_ID.IsValid(), "Wrong ID");
@@ -95,7 +96,7 @@ namespace PrCore::ECS {
 	template<class T>
 	 BaseComponent* ComponentPool<T>::GetRawData(ID p_ID)
 	 {
-		 static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::ECS::BaseComponent");
+		 static_assert(std::is_base_of<BaseComponent, T>::value, "Component must expand PrCore::BaseComponent");
 
 		 PR_ASSERT(p_ID.GetIndex() <= MAX_ENTITIES, "Wrong ID");
 		 PR_ASSERT(p_ID.IsValid(), "Wrong ID");

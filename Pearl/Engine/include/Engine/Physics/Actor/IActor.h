@@ -36,8 +36,8 @@ namespace PrPhysics {
 		virtual void         SetActorFlag(ActorFlag p_flag, bool p_value) = 0;
 		virtual ActorFlag    GetActorFlag() = 0;
 
-		virtual PrCore::ECS::Entity GetEntity() = 0;
-		virtual void                SetEntity(PrCore::ECS::Entity p_entity) = 0;
+		virtual PrCore::Entity      GetEntity() = 0;
+		virtual void                SetEntity(PrCore::Entity p_entity) = 0;
 	};
 	using IActorPtr = std::shared_ptr<IActor>;
 }

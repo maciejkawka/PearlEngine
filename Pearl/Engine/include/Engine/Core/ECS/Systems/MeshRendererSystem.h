@@ -3,7 +3,7 @@
 #include "Core/ECS/BaseSystem.h"
 #include "Core/ECS/Components.h"
 
-namespace PrCore::ECS {
+namespace PrCore {
 
 	class MeshRendererSystem: public BaseSystem {
 	public:

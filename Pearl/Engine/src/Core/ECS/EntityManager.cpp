@@ -2,11 +2,11 @@
 
 #include "Core/ECS/EntityManager.h"
 #include "Core/ECS/BaseComponent.h"
-#include"Core/Events/EventManager.h"
-#include"Core/Events/ECSEvents.h"
+#include "Core/Events/EventManager.h"
+#include "Core/Events/ECSEvents.h"
 #include "Core/ECS/ComponentMap.h"
 
-using namespace PrCore::ECS;
+using namespace PrCore;
 
 void Entity::Destroy()
 {

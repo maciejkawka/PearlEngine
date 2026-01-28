@@ -1,8 +1,10 @@
 #pragma once
-#include "Scene.h"
-#include"Core/ECS/SystemManager.h"
 
-namespace PrCore::ECS {
+#include "Scene.h"
+
+#include "Core/ECS/SystemManager.h"
+
+namespace PrCore {
 
 	template<class System>
 	void Scene::RegisterSystem()

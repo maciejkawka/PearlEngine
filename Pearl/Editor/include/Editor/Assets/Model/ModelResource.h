@@ -19,7 +19,7 @@ namespace PrEditor::Assets {
 		const std::vector<PrRenderer::MeshHandle>      GetMeshList() const { return m_meshes; }
 
 		const std::unique_ptr<ModelEntityGraph>&       GetEntityGraph() const { return m_entityGraph; }
-		void                                           AddEntitesToScene(PrCore::ECS::Scene* p_scene);
+		void                                           AddEntitesToScene(PrCore::Scene* p_scene);
 
 		size_t                                         GetByteSize() const override;
 

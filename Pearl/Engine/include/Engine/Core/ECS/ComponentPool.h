@@ -1,12 +1,13 @@
 #pragma once
-#include"Core/ECS/Defines.h"
-#include"Core/ECS/BaseComponent.h"
-#include"Core/Utils/NonCopyable.h"
 
-#include<array>
-#include<unordered_map>
+#include "Core/ECS/Defines.h"
+#include "Core/ECS/BaseComponent.h"
+#include "Core/Utils/NonCopyable.h"
 
-namespace PrCore::ECS {
+#include <array>
+#include <unordered_map>
+
+namespace PrCore {
 
 	class IComponentPool : public Utils::NonCopyable {
 	public:

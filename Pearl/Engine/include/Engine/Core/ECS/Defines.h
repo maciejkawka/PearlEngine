@@ -1,8 +1,9 @@
 #pragma once
-#include<cstdint>
-#include<bitset>
 
-namespace PrCore::ECS {
+#include <cstdint>
+#include <bitset>
+
+namespace PrCore {
 
 	constexpr unsigned int MAX_ENTITIES = 10000;
 	constexpr unsigned int MAX_COMPONENTS = 64;
@@ -50,9 +51,9 @@ namespace PrCore::ECS {
 namespace std {
 
 	template<>
-	struct hash<PrCore::ECS::ID>
+	struct hash<PrCore::ID>
 	{
-		inline size_t operator()(const PrCore::ECS::ID& p_ID) const {
+		inline size_t operator()(const PrCore::ID& p_ID) const {
 			return p_ID.GetID();
 		}
 	};

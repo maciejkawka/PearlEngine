@@ -8,22 +8,22 @@ namespace PrCore {
 
 	class EntityCreatedEvent : public Event {
 	public:
-		EntityCreatedEvent(ECS::Entity p_entity) :
+		EntityCreatedEvent(Entity p_entity) :
 			m_entity(p_entity)
 		{}
 
-		ECS::Entity m_entity;
+		Entity m_entity;
 
 		DEFINE_EVENT_GUID(0x38ca239c);
 	};
 
 	class EntityDestroyedEvent : public Event {
 	public:
-		EntityDestroyedEvent(ECS::Entity p_entity) :
+		EntityDestroyedEvent(Entity p_entity) :
 			m_entity(p_entity)
 		{}
 
-		ECS::Entity m_entity;
+		Entity m_entity;
 
 		DEFINE_EVENT_GUID(0x1153264b);
 	};
@@ -31,12 +31,12 @@ namespace PrCore {
 	template<class Component>
 	class ComponentAddedEvent : public Event {
 	public:
-		ComponentAddedEvent(ECS::Entity p_entity, Component* p_component) :
+		ComponentAddedEvent(Entity p_entity, Component* p_component) :
 			m_entity(p_entity),
 			m_component(p_component)
 		{}
 
-		ECS::Entity m_entity;
+		Entity m_entity;
 		Component* m_component;
 
 		virtual inline EventType GetType() const { return s_type; }
@@ -49,12 +49,12 @@ namespace PrCore {
 	template<class Component>
 	class ComponentRemovedEvent : public Event {
 	public:
-		ComponentRemovedEvent(ECS::Entity p_entity, Component* p_component) :
+		ComponentRemovedEvent(Entity p_entity, Component* p_component) :
 			m_entity(p_entity),
 			m_component(p_component)
 		{}
 
-		ECS::Entity m_entity;
+		Entity m_entity;
 		Component* m_component;
 
 		virtual inline EventType GetType() const { return s_type; }

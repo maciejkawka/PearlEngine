@@ -1,8 +1,9 @@
 #pragma once
+
 #include "Core/Events/ECSEvents.h"
 #include "Core/Events/EventManager.h"
 
-namespace PrCore::ECS {
+namespace PrCore {
 
 	template<class T>
 	T* Entity::AddComponent()

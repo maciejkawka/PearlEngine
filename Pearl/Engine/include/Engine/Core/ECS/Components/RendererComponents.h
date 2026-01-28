@@ -1,14 +1,14 @@
 #pragma once
 
-#include"Core/ECS/BaseComponent.h"
-#include"Core/Resources/ResourceSystem.h"
-#include"Renderer/Resources/Mesh.h"
-#include"Renderer/Resources/Material.h"
-#include"Renderer/Core/Color.h"
-#include"Renderer/Core/Camera.h"
-#include"Renderer/Resources/Light.h"
+#include "Core/ECS/BaseComponent.h"
+#include "Core/Resources/ResourceSystem.h"
+#include "Renderer/Resources/Mesh.h"
+#include "Renderer/Resources/Material.h"
+#include "Renderer/Core/Color.h"
+#include "Renderer/Core/Camera.h"
+#include "Renderer/Resources/Light.h"
 
-namespace PrCore::ECS {
+namespace PrCore {
 
 // Access first material in the component
 #define mainMaterial materials[0]

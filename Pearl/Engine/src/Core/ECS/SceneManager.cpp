@@ -1,10 +1,10 @@
 #include "Core/Common/pearl_pch.h"
 
-#include"Core/ECS/SceneManager.h"
-#include"Core/File/FileSystem.h"
-#include"Core/ECS/Scene.h"
+#include "Core/ECS/SceneManager.h"
+#include "Core/File/FileSystem.h"
+#include "Core/ECS/Scene.h"
 
-using namespace PrCore::ECS;
+using namespace PrCore;
 
 SceneManager::~SceneManager()
 {

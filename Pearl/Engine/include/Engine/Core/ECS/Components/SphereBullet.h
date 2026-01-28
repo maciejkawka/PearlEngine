@@ -2,7 +2,7 @@
 
 #include "Core/ECS/BaseComponent.h"
 
-namespace PrCore::ECS {
+namespace PrCore {
 
 	class SphereBullet : public BaseComponent {
 	public:

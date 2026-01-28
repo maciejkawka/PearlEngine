@@ -11,7 +11,7 @@ PhysRigidBodyStatic::PhysRigidBodyStatic(physx::PxRigidStatic* p_rigidStatic) :
 	m_impl(p_rigidStatic)
 {
 	PR_ASSERT(!m_impl->userData, "PxActor::userData is not null. Something is wrong");
-	m_impl->userData = new PrCore::ECS::Entity();
+	m_impl->userData = new PrCore::Entity();
 }
 
 PhysRigidBodyStatic::~PhysRigidBodyStatic()
@@ -110,21 +110,21 @@ PrPhysics::ActorFlag PhysRigidBodyStatic::GetActorFlag()
 	return CastFlag<ActorFlag>(m_impl->getActorFlags());
 }
 
-PrCore::ECS::Entity PhysRigidBodyStatic::GetEntity()
+PrCore::Entity PhysRigidBodyStatic::GetEntity()
 {
-	return *static_cast<PrCore::ECS::Entity*>(m_impl->userData);
+	return *static_cast<PrCore::Entity*>(m_impl->userData);
 }
 
-void PhysRigidBodyStatic::SetEntity(PrCore::ECS::Entity p_entity)
+void PhysRigidBodyStatic::SetEntity(PrCore::Entity p_entity)
 {
-	*static_cast<PrCore::ECS::Entity*>(m_impl->userData) = p_entity;
+	*static_cast<PrCore::Entity*>(m_impl->userData) = p_entity;
 }
 
 PhysRigidBodyDynamic::PhysRigidBodyDynamic(physx::PxRigidDynamic* p_rigidDynamic) :
 	m_impl(p_rigidDynamic)
 {
 	PR_ASSERT(!m_impl->userData, "PxActor::userData is not null. Something is wrong");
-	m_impl->userData = new PrCore::ECS::Entity();
+	m_impl->userData = new PrCore::Entity();
 }
 
 PhysRigidBodyDynamic::~PhysRigidBodyDynamic()
@@ -419,12 +419,12 @@ void PhysRigidBodyDynamic::ReleaseNativePtr()
 	m_impl->release();
 }
 
-PrCore::ECS::Entity PhysRigidBodyDynamic::GetEntity()
+PrCore::Entity PhysRigidBodyDynamic::GetEntity()
 {
-	return *static_cast<PrCore::ECS::Entity*>(m_impl->userData);
+	return *static_cast<PrCore::Entity*>(m_impl->userData);
 }
 
-void PhysRigidBodyDynamic::SetEntity(PrCore::ECS::Entity p_entity)
+void PhysRigidBodyDynamic::SetEntity(PrCore::Entity p_entity)
 {
-	*static_cast<PrCore::ECS::Entity*>(m_impl->userData) = p_entity;
+	*static_cast<PrCore::Entity*>(m_impl->userData) = p_entity;
 }

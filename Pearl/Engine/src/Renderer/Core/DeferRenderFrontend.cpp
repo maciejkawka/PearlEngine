@@ -47,7 +47,7 @@ DeferRenderFrontend::DeferRenderFrontend(RendererSettings& p_settings) :
 	m_rendererBackend = std::make_shared<DeferRenderBackend>(m_renderSettings);
 }
 
-void DeferRenderFrontend::SubmitLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id)
+void DeferRenderFrontend::SubmitLight(LightComponent* p_lightComponent, TransformComponent* p_transformComponent, size_t p_id)
 {
 	// If Main light
 	if(p_lightComponent->mainDirectLight)
@@ -144,17 +144,17 @@ void DeferRenderFrontend::SubmitLight(ECS::LightComponent* p_lightComponent, ECS
 	m_currentFrame->lights.push_back(std::move(lightObject));
 }
 
-void DeferRenderFrontend::SubmitMesh(ECS::Entity& p_entity)
+void DeferRenderFrontend::SubmitMesh(Entity& p_entity)
 {
-	PR_ASSERT(p_entity.HasComponent<ECS::MeshRendererComponent>(), "FrontendRenderer: entity does not have a MeshRendererComponent");
-	PR_ASSERT(p_entity.HasComponent<ECS::TransformComponent>(), "FrontendRenderer: entity does not have a TransformComponent");
+	PR_ASSERT(p_entity.HasComponent<MeshRendererComponent>(), "FrontendRenderer: entity does not have a MeshRendererComponent");
+	PR_ASSERT(p_entity.HasComponent<TransformComponent>(), "FrontendRenderer: entity does not have a TransformComponent");
 
-	auto meshComponent = p_entity.GetComponent<ECS::MeshRendererComponent>();
+	auto meshComponent = p_entity.GetComponent<MeshRendererComponent>();
 	auto mesh = meshComponent->mesh;
 	if (mesh == nullptr)
 		return;
 
-	auto transformComponent = p_entity.GetComponent<ECS::TransformComponent>();
+	auto transformComponent = p_entity.GetComponent<TransformComponent>();
 	auto worldMatrix = transformComponent->GetWorldMatrix();
 	auto shadowMesh = meshComponent->shadowMesh;
 	bool shouldCull = !mesh->GetBoxVolume().IsOnFrustrum(m_frustrum, worldMatrix);

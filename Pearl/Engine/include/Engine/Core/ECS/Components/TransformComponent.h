@@ -8,7 +8,7 @@
 
 #include "Core/Math/Math.h"
 
-namespace PrCore::ECS {
+namespace PrCore {
 
 	class TransformComponent : public BaseComponent {
 	public:
@@ -114,7 +114,7 @@ namespace PrCore::ECS {
 		{
 			if (p_deserialized.contains("parentUuid"))
 			{
-				parent = SceneManager::GetInstance().GetActiveScene()->GetEntityByID(p_deserialized["parentUuid"]);
+				parent = PrSystems::Get<SceneManager>()->GetActiveScene()->GetEntityByID(p_deserialized["parentUuid"]);
 				isDirty = true;
 			}
 		}

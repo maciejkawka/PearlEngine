@@ -1,10 +1,10 @@
-#include"Core/Common/pearl_pch.h"
+#include "Core/Common/pearl_pch.h"
 
 #include "Core/ECS/Systems/MeshRendererSystem.h"
 #include "Core/Resources/ResourceSystem.h"
 #include "Renderer/Core/IRenderFrontend.h"
 
-using namespace PrCore::ECS;
+using namespace PrCore;
 using namespace PrRenderer;
 
 MeshRendererSystem::~MeshRendererSystem()
@@ -13,7 +13,7 @@ MeshRendererSystem::~MeshRendererSystem()
 
 void MeshRendererSystem::OnCreate()
 {
-	m_updateGroup = (uint8_t)UpdateGroup::Custom;
+	m_updateGroup = (uint8_t)UpdateGroupType::Custom;
 }
 
 void MeshRendererSystem::OnEnable()

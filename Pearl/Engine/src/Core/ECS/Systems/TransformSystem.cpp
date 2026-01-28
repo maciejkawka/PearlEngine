@@ -1,14 +1,14 @@
-#include"Core/Common/pearl_pch.h"
+#include "Core/Common/pearl_pch.h"
 
-#include"Core/ECS/Systems/TransformSystem.h"
+#include "Core/ECS/Systems/TransformSystem.h"
 
 #include "Core/ECS/Components.h"
 
-using namespace PrCore::ECS;
+using namespace PrCore;
 
 void HierarchyTransform::OnCreate()
 {
-	m_updateGroup = static_cast<uint8_t>(UpdateGroup::Custom);
+	m_updateGroup = static_cast<uint8_t>(UpdateGroupType::Custom);
 }
 
 void HierarchyTransform::OnUpdate(float p_dt)

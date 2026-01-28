@@ -70,7 +70,7 @@ void Editor::OnFrame(float p_deltaTime)
 	m_testFeatures->Update(p_deltaTime);
 
 	//Scene Update
-	auto scenes = PrCore::ECS::SceneManager::GetInstance().GetAllScenes();
+	auto scenes = PrSystems::Get<SceneManager>()->GetAllScenes();
 
 	for (auto scene : scenes)
 	{
@@ -134,8 +134,8 @@ void Editor::PostFrame()
 	{
 		Assets::SceneExporter exporter;
 		exporter.SaveMemoryResourcesToFile("OceanNew/");
-		auto scene = PrCore::ECS::SceneManager::GetInstance().GetActiveScene();
-		PrCore::ECS::SceneManager::GetInstance().SaveSceneByReference(scene, "scene/scene_export.pearl");
+		auto scene = PrSystems::Get<SceneManager>()->GetActiveScene();
+		PrSystems::Get<SceneManager>()->SaveSceneByReference(scene, "scene/scene_export.pearl");
 	}
 }
 

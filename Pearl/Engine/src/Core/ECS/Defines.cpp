@@ -2,7 +2,7 @@
 
 #include "Core/ECS/Defines.h"
 
-using namespace PrCore::ECS;
+using namespace PrCore;
 
 ID::ID() : m_ID(0)
 #ifdef _DEBUG

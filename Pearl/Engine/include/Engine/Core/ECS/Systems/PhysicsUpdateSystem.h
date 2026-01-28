@@ -3,7 +3,7 @@
 #include "Core/ECS/BaseSystem.h"
 #include "Physics/Core/PhysicsSystem.h"
 
-namespace PrCore::ECS {
+namespace PrCore {
 
 	class PhysicsUpdateSystem : public BaseSystem {
 	public:

@@ -8,18 +8,17 @@
 #include "Core/Utils/StringUtils.h"
 #include "Core/Utils/SystemProvider.h"
 
-using namespace PrCore::ECS;
+using namespace PrCore;
 
 class EcsSystemTest : public ::testing::Test {
 public:
 	static void SetUpTestSuite()
 	{
-		//This will be replaced with mocked versions in the future when I implement system localizer 
 		PrSystems::Register<PrCore::Utils::ILogger, Mock::MockLogger>();
 		PrSystems::Register<PrCore::ThreadSystem>();
 		auto pJobSystem = PrSystems::Register<PrCore::JobSystem>(8);
 		PrSystems::Register<PrCore::EventManager>();
-		PrCore::ECS::SceneManager::Init();
+		PrSystems::Register<PrCore::SceneManager>();
 
 		auto workerNum = pJobSystem->GetWorkerNum();
 		EXPECT_EQ(workerNum, 8);
@@ -27,8 +26,7 @@ public:
 
 	static void TearDownTestSuite()
 	{
-		//This will be replaced with mocked versions in the future when I implement system localizer 
-		PrCore::ECS::SceneManager::Terminate();
+		PrSystems::Unregister<PrCore::SceneManager>();
 		PrSystems::Unregister<PrCore::EventManager>();
 		PrSystems::Unregister<PrCore::JobSystem>();
 		PrSystems::Unregister<PrCore::ThreadSystem>();
@@ -135,7 +133,7 @@ public:
 
 	LateUpdate()
 	{
-		m_updateGroup = (uint8_t)UpdateGroup::LateUpdate;
+		m_updateGroup = (uint8_t)UpdateGroupType::LateUpdate;
 	}
 
 	void OnUpdate(float p_dt) override
@@ -169,7 +167,7 @@ public:
 
 TEST_F(EcsSystemTest, EntityModifications)
 {
-	auto sceneManager = PrCore::ECS::SceneManager::GetInstancePtr();
+	auto sceneManager = PrSystems::Get<PrCore::SceneManager>();
 	auto scene = sceneManager->CreateScene("TestScene");
 
 	EXPECT_STREQ(scene->GetSceneName().c_str(), "TestScene");
@@ -228,7 +226,7 @@ TEST_F(EcsSystemTest, EntityModifications)
 
 TEST_F(EcsSystemTest, SystemUpdate)
 {
-	auto sceneManager = PrCore::ECS::SceneManager::GetInstancePtr();
+	auto sceneManager = PrSystems::Get<PrCore::SceneManager>();
 	auto scene = sceneManager->CreateScene("TestScene");
 
 	scene->RegisterSystem<UnitTestSystem>();
@@ -293,7 +291,7 @@ TEST_F(EcsSystemTest, SystemUpdate)
 
 TEST_F(EcsSystemTest, HierrarchicalEntities)
 {
-	auto sceneManager = PrCore::ECS::SceneManager::GetInstancePtr();
+	auto sceneManager = PrSystems::Get<PrCore::SceneManager>();
 	auto scene = sceneManager->CreateScene("TestScene");
 	scene->RegisterSystem<HierarchyTransform>();
 
@@ -307,23 +305,23 @@ TEST_F(EcsSystemTest, HierrarchicalEntities)
 	{
 		auto parentEntity = scene->CreateEntity("ParentEntuty");
 
-		auto transform = parentEntity.AddComponent<PrCore::ECS::TransformComponent>();
+		auto transform = parentEntity.AddComponent<PrCore::TransformComponent>();
 		auto position = PrCore::Math::vec3(0, 0, 0);
 		transform->SetPosition(position);
 		transform->SetLocalScale(PrCore::Math::vec3{ 1 });
 
-		parentEntity.AddComponent<PrCore::ECS::ParentComponent>()->SetParent(root);
+		parentEntity.AddComponent<PrCore::ParentComponent>()->SetParent(root);
 		parentEntities.push_back(parentEntity);
 
 		for (int j = 0; j < 80; j++)
 		{
 			auto childEntity = scene->CreateEntity("ChildEntity");
-			auto transform = childEntity.AddComponent<PrCore::ECS::TransformComponent>();
+			auto transform = childEntity.AddComponent<PrCore::TransformComponent>();
 			auto position = PrCore::Math::vec3(1, 2, 3);
 			transform->SetPosition(position);
 			transform->SetLocalScale(PrCore::Math::vec3{ 10 });
 
-			auto parent = childEntity.AddComponent<PrCore::ECS::ParentComponent>();
+			auto parent = childEntity.AddComponent<PrCore::ParentComponent>();
 			parent->parent = parentEntity;
 
 			childrenEntities.push_back(childEntity);

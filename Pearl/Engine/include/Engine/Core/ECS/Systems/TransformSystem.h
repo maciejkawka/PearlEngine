@@ -2,7 +2,7 @@
 
 #include "Core/ECS/BaseSystem.h"
 
-namespace PrCore::ECS {
+namespace PrCore {
 
 	class HierarchyTransform: public BaseSystem {
 	public:

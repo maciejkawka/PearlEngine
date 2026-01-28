@@ -1,12 +1,13 @@
 #pragma once
-#include "Core/Utils/Singleton.h"
+
+#include "Core/Utils/SystemProvider.h"
 #include "Core/Utils/UUID.h"
 
-namespace PrCore::ECS {
+namespace PrCore {
 
 	class Scene;
 
-	class SceneManager: public Utils::Singleton<SceneManager> {
+	class SceneManager: public Utils::ISystem {
 	public:
 		~SceneManager();
 

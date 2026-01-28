@@ -48,7 +48,7 @@ PrCore::Entry::AppContext::AppContext()
 	// Init Engine Subsystems
 	PrSystems::Register<PrCore::Utils::ILogger, PrCore::Utils::Logger>();
 	PRLOG_INFO("Building AppContext");
-	
+
 	PRLOG_INFO("Init Clock");
 	PrSystems::Register<PrCore::Utils::Clock>();
 
@@ -238,14 +238,18 @@ PrCore::Entry::AppContext::AppContext()
 	PRLOG_INFO("Init Input Manager");
 	PrSystems::Register<InputManager>();
 
-	ECS::SceneManager::Init();
+	//-----------------------
+	// Init Scene Manager
+	PRLOG_INFO("Init Scene Manager");
+	PrSystems::Register<SceneManager>();
 }
 
 PrCore::Entry::AppContext::~AppContext()
 {
 	PRLOG_INFO("Deleting AppContext");
 
-	ECS::SceneManager::Terminate();
+	PRLOG_INFO("Terminating Scene Manager");
+	PrSystems::Unregister<SceneManager>();
 
 	PRLOG_INFO("Terminating Input Manager");
 	PrSystems::Unregister<InputManager>();

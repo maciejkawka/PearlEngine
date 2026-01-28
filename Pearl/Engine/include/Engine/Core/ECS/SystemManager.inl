@@ -1,12 +1,13 @@
 #pragma once
+
 #include <type_traits>
 
-namespace PrCore::ECS {
+namespace PrCore {
 
 	template<class System>
 	void SystemManager::RegisterSystem()
 	{
-		static_assert(std::is_base_of<BaseSystem, System>::value, "System must expand PrCore::ECS::BaseSystem");
+		static_assert(std::is_base_of<BaseSystem, System>::value, "System must expand PrCore::BaseSystem");
 
 		PR_ASSERT(m_systemTypeCounter < MAX_SYSTEMS, "Cannot register more systems");
 
@@ -38,7 +39,7 @@ namespace PrCore::ECS {
 	template<class System>
 	void SystemManager::UpdateSystem(float p_dt)
 	{
-		static_assert(std::is_base_of<BaseSystem, System>::value, "System must expand PrCore::ECS::BaseSystem");
+		static_assert(std::is_base_of<BaseSystem, System>::value, "System must expand PrCore::BaseSystem");
 
 		auto systemID = GetSystemID<System>();
 		if (m_systems[systemID] != nullptr)
@@ -49,7 +50,7 @@ namespace PrCore::ECS {
 	template<class System>
 	void SystemManager::SetActiveSystem(bool p_isActive)
 	{
-		static_assert(std::is_base_of<BaseSystem, System>::value, "System must expand PrCore::ECS::BaseSystem");
+		static_assert(std::is_base_of<BaseSystem, System>::value, "System must expand PrCore::BaseSystem");
 
 		auto systemID = GetSystemID<System>();
 		auto system = m_systems[systemID];
@@ -68,7 +69,7 @@ namespace PrCore::ECS {
 	template<class System>
 	bool SystemManager::IsActiveSystem()
 	{
-		static_assert(std::is_base_of<BaseSystem, System>::value, "System must expand PrCore::ECS::BaseSystem");
+		static_assert(std::is_base_of<BaseSystem, System>::value, "System must expand PrCore::BaseSystem");
 
 		size_t systemID = GetSystemID<System>();
 		return m_systems[systemID]->IsActive();
@@ -77,7 +78,7 @@ namespace PrCore::ECS {
 	template<class System>
 	size_t SystemManager::GetSystemID()
 	{
-		static_assert(std::is_base_of<BaseSystem, System>::value, "System must expand PrCore::ECS::BaseSystem");
+		static_assert(std::is_base_of<BaseSystem, System>::value, "System must expand PrCore::BaseSystem");
 		static size_t s_SystemID = m_systemTypeCounter++;
 		return s_SystemID;
 	}

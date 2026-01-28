@@ -7,7 +7,7 @@
 #include "Physics/Actor/IRigidBody.h"
 #include "Physics/Shape/IGeometry.h"
 
-namespace PrCore::ECS {
+namespace PrCore {
 
 	class RigidBodyDynamicComponent : public BaseComponent {
 	public:

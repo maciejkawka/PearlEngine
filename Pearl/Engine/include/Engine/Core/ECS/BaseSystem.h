@@ -1,22 +1,23 @@
 #pragma once
-#include"Core/ECS/EntityViewer.h"
-#include"Core/Utils/ISerializable.h"
 
-namespace PrCore::ECS {
+#include "Core/ECS/EntityViewer.h"
+#include "Core/Utils/ISerializable.h"
 
-	enum class UpdateGroup : uint8_t
+namespace PrCore {
+
+	enum class UpdateGroupType : uint8_t
 	{
-		Custom = 0,
-		Update = 1<<3,
-		FixUpdate = 1<<4,
-		LateUpdate = 1<<7
+		Custom      = 0,
+		Update      = 1<<3,
+		FixUpdate   = 1<<4,
+		LateUpdate  = 1<<7
 	};
 
 	class BaseSystem: public Utils::ISerializable {
 	public:
 		BaseSystem() :
 			m_entityViewer(nullptr),
-			m_updateGroup((uint8_t)UpdateGroup::Update),
+			m_updateGroup((uint8_t)UpdateGroupType::Update),
 			m_isActive(true)
 		{}
 

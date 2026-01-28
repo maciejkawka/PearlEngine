@@ -1,8 +1,8 @@
 #include "Core/Common/pearl_pch.h"
 
-#include"Core/ECS/Components/TransformComponent.h"
+#include "Core/ECS/Components/TransformComponent.h"
 
-using namespace PrCore::ECS;
+using namespace PrCore;
 
 TransformComponent::TransformComponent()
 {

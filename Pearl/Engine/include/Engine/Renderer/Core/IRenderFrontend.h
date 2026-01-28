@@ -5,7 +5,7 @@
 #include "Renderer/Core/IRenderBackend.h"
 #include "Renderer/Resources/Material.h"
 
-namespace PrCore::ECS {
+namespace PrCore {
 	class MeshRendererComponent;
 	class TransformComponent;
 	class CameraComponent;
@@ -30,9 +30,9 @@ namespace PrRenderer {
 		virtual ~IRenderFrontend() = default;
 
 		//Render Entities
-		virtual void SubmitLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id) = 0;
+		virtual void SubmitLight(LightComponent* p_lightComponent, TransformComponent* p_transformComponent, size_t p_id) = 0;
 		virtual void SetCamera(Camera* p_camera) = 0;
-		virtual void SubmitMesh(ECS::Entity& p_entity) = 0;
+		virtual void SubmitMesh(Entity& p_entity) = 0;
 		virtual void SetCubemap(MaterialPtr p_cubemap) = 0;
 		///////////////////////////////////////
 

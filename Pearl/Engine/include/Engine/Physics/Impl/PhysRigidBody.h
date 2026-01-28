@@ -6,10 +6,10 @@
 
 namespace PrPhysics {
 
-	static PrCore::ECS::Entity ConvertToEntity(physx::PxActor* p_physxActor)
+	static PrCore::Entity ConvertToEntity(physx::PxActor* p_physxActor)
 	{
 		PR_ASSERT(p_physxActor->userData, "PxActor::userData is null. Something is wrong");
-		return *static_cast<PrCore::ECS::Entity*>(p_physxActor->userData);
+		return *static_cast<PrCore::Entity*>(p_physxActor->userData);
 	}
 
 	class PhysRigidBodyStatic : public IRigidStatic {
@@ -41,8 +41,8 @@ namespace PrPhysics {
 		void      SetActorFlag(ActorFlag p_flag, bool p_value) override;
 		ActorFlag GetActorFlag() override;
 
-		PrCore::ECS::Entity GetEntity() override;
-		void                SetEntity(PrCore::ECS::Entity p_entity) override;
+		PrCore::Entity GetEntity() override;
+		void                SetEntity(PrCore::Entity p_entity) override;
 
 	private:
 		physx::PxRigidStatic* m_impl;
@@ -146,8 +146,8 @@ namespace PrPhysics {
 		void* GetNativePtr() override;
 		void  ReleaseNativePtr() override;
 
-		PrCore::ECS::Entity GetEntity() override;
-		void                SetEntity(PrCore::ECS::Entity p_entity) override;
+		PrCore::Entity GetEntity() override;
+		void                SetEntity(PrCore::Entity p_entity) override;
 
 	private:
 		physx::PxRigidDynamic* m_impl;

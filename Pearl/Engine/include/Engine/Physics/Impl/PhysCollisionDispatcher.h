@@ -41,8 +41,8 @@ namespace PrPhysics {
 				}
 
 				CollisionInfo collisionInfo;
-				collisionInfo.entityA = *static_cast<PrCore::ECS::Entity*>(actorA->userData);
-				collisionInfo.entityB = *static_cast<PrCore::ECS::Entity*>(actorB->userData);
+				collisionInfo.entityA = *static_cast<PrCore::Entity*>(actorA->userData);
+				collisionInfo.entityB = *static_cast<PrCore::Entity*>(actorB->userData);
 
 				if (pair.events & PxPairFlag::Enum::eNOTIFY_TOUCH_FOUND)
 				{
@@ -76,8 +76,8 @@ namespace PrPhysics {
 				}
 
 				CollisionInfo collisionInfo;
-				collisionInfo.entityA = *static_cast<PrCore::ECS::Entity*>(actorA->userData);
-				collisionInfo.entityB = *static_cast<PrCore::ECS::Entity*>(actorB->userData);
+				collisionInfo.entityA = *static_cast<PrCore::Entity*>(actorA->userData);
+				collisionInfo.entityB = *static_cast<PrCore::Entity*>(actorB->userData);
 
 				if (pair.status & PxPairFlag::Enum::eNOTIFY_TOUCH_FOUND)
 				{

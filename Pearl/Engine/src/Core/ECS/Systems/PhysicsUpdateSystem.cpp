@@ -7,7 +7,7 @@
 #include "Core/ECS/Components/CoreComponents.h"
 #include "Core/Input/InputManager.h"
 
-using namespace PrCore::ECS;
+using namespace PrCore;
 
 PhysicsUpdateSystem::PhysicsUpdateSystem()
 {
@@ -57,7 +57,7 @@ void PhysicsUpdateSystem::OnUpdate(float p_dt)
 
 void PhysicsUpdateSystem::OnCreate()
 {
-	m_updateGroup = (uint8_t)UpdateGroup::Custom;
+	m_updateGroup = (uint8_t)UpdateGroupType::Custom;
 
 	EventListener dynamicAddedListener;
 	dynamicAddedListener.Connect<&PhysicsUpdateSystem::OnComponentDynamicCreated>(this);
@@ -84,7 +84,7 @@ void PhysicsUpdateSystem::OnComponentStaticCreated(PrCore::EventPtr p_eventType)
 	auto component = componentEvent->m_component;
 
 	PrPhysics::Transform physTransform{};
-	if (auto transformComponent = componentEvent->m_entity.GetComponent<PrCore::ECS::TransformComponent>())
+	if (auto transformComponent = componentEvent->m_entity.GetComponent<PrCore::TransformComponent>())
 	{
 		physTransform.position = transformComponent->GetPosition();
 		physTransform.rotation = transformComponent->GetRotation();
@@ -102,7 +102,7 @@ PhysicsCleanupSyatem::PhysicsCleanupSyatem()
 
 void PhysicsCleanupSyatem::OnCreate()
 {
-	m_updateGroup = (uint8_t)UpdateGroup::Custom;
+	m_updateGroup = (uint8_t)UpdateGroupType::Custom;
 
 	EventListener dynamicRemovedListener;
 	dynamicRemovedListener.Connect<&PhysicsCleanupSyatem::OnComponentDynamicRemoved>(this);

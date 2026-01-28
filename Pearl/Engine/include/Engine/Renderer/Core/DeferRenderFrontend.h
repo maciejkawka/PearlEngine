@@ -12,9 +12,9 @@ namespace PrRenderer {
 		explicit DeferRenderFrontend(RendererSettings& p_settings);
 		virtual ~DeferRenderFrontend() = default;
 
-		void SubmitLight(ECS::LightComponent* p_lightComponent, ECS::TransformComponent* p_transformComponent, size_t p_id) override;
+		void SubmitLight(LightComponent* p_lightComponent, TransformComponent* p_transformComponent, size_t p_id) override;
 		void SetCamera(Camera* p_camera) override { m_camera = p_camera; };
-		void SubmitMesh(ECS::Entity& p_entity) override;
+		void SubmitMesh(Entity& p_entity) override;
 		void SetCubemap(MaterialPtr p_cubemapMat) override;
 
 		void PrepareFrame() override;

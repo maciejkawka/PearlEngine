@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Core/ECS/ComponentPool.h"
 
 #include "Core/Utils/NonCopyable.h"
@@ -6,12 +7,12 @@
 
 #include"Core/Events/Event.h"
 
-#include<vector>
-#include<bitset>
-#include<queue>
-#include<memory>
+#include <vector>
+#include <bitset>
+#include <queue>
+#include <memory>
 
-namespace PrCore::ECS {
+namespace PrCore {
 
 	class EntityManager;
 	class EntityViewer;
@@ -444,8 +445,8 @@ namespace PrCore::ECS {
 
 namespace std {
 	template<>
-	struct hash<PrCore::ECS::Entity> {
-		size_t operator()(const PrCore::ECS::Entity& p_entity) const {
+	struct hash<PrCore::Entity> {
+		size_t operator()(const PrCore::Entity& p_entity) const {
 
 			return p_entity.GetID().GetID();
 		}

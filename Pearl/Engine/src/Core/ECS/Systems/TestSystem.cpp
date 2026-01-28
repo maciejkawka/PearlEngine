@@ -14,7 +14,7 @@
 #include "Renderer/Core/IRenderFrontend.h"
 #include "Renderer/Resources/Texture2DLoader.h"
 
-using namespace PrCore::ECS;
+using namespace PrCore;
 using namespace PrRenderer;
 
 void RenderStressTest::OnEnable()
@@ -58,9 +58,9 @@ void RenderStressTest::OnEnable()
 	m_camera->SetPosition({ 15, 9, 3 });
 	m_camera->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 0, 0))));
 
-	auto scene = PrCore::ECS::SceneManager::GetInstance().GetAllScenes()[0];
+	auto scene = PrSystems::Get<SceneManager>()->GetAllScenes()[0];
 	auto entity = scene->CreateEntity("CameraCube");
-	m_cameraTransform = entity.AddComponent<PrCore::ECS::TransformComponent>();
+	m_cameraTransform = entity.AddComponent<PrCore::TransformComponent>();
 	m_cameraTransform->SetPosition(m_camera->GetPosition());
 	m_cameraTransform->SetRotation(m_camera->GetRotation());
 
@@ -93,8 +93,8 @@ void RenderStressTest::OnEnable()
 			m_mainLightPtr->SetColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 			light->mainDirectLight = true;
 
-			auto elo = entity.GetComponent<PrCore::ECS::TransformComponent>()->GetRotation();
-			//entity.GetComponent<PrCore::ECS::TransformComponent>()->SetRotation(PrCore::Math::inverse(elo));
+			auto elo = entity.GetComponent<PrCore::TransformComponent>()->GetRotation();
+			//entity.GetComponent<PrCore::TransformComponent>()->SetRotation(PrCore::Math::inverse(elo));
 		}
 	}
 
@@ -103,7 +103,7 @@ void RenderStressTest::OnEnable()
 
 	PrSystems::Get<PrPhysics::PhysicsSystem>()->SetGravity(PrCore::Math::vec3{ 0.0f });
 
-	auto pan = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("Plane.003");
+	auto pan = PrSystems::Get<SceneManager>()->GetActiveScene()->GetEntityByName("Plane.003");
 
 	if(pan.IsValid())
 	{
@@ -133,7 +133,7 @@ void RenderStressTest::OnEnable()
 		//pan.GetComponent<MeshRendererComponent>()->materials[1]->SetTexture("albedoMap", texture.GetData());
 	}
 
-	//PrCore::ECS::SceneManager::GetInstance().SaveSceneByReference(PrCore::ECS::SceneManager::GetInstance().GetActiveScene(), "scene/deserializeTest.pearl");
+	//PrCore::SceneManager::GetInstance().SaveSceneByReference(PrCore::SceneManager::GetInstance().GetActiveScene(), "scene/deserializeTest.pearl");
 
 
 
@@ -144,7 +144,7 @@ void RenderStressTest::OnEnable()
 		if (light->mainDirectLight)
 			continue;
 
-		auto physcomponent = entity.AddComponent<PrCore::ECS::RigidBodyDynamicComponent>();
+		auto physcomponent = entity.AddComponent<PrCore::RigidBodyDynamicComponent>();
 
 		PrPhysics::Material material;
 		material.restitution = 0.9f;
@@ -157,10 +157,10 @@ void RenderStressTest::OnEnable()
 	// Pan
 	//{
 	//	PrPhysics::Material material;
-	//	auto pan = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("Pan");
-	//	auto boxVolume = pan.GetComponent<PrCore::ECS::MeshRendererComponent>()->mesh->GetBoxVolume();
-	//	auto transform = pan.GetComponent<PrCore::ECS::TransformComponent>();
-	//	auto rigidbodyComponent = pan.AddComponent<PrCore::ECS::RigidBodyDynamicComponent>();
+	//	auto pan = PrCore::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("Pan");
+	//	auto boxVolume = pan.GetComponent<PrCore::MeshRendererComponent>()->mesh->GetBoxVolume();
+	//	auto transform = pan.GetComponent<PrCore::TransformComponent>();
+	//	auto rigidbodyComponent = pan.AddComponent<PrCore::RigidBodyDynamicComponent>();
 
 	//	PrPhysics::BoxGeometery box;
 	//	box.halfExtents = boxVolume.GetExtends() * transform->GetScale();
@@ -176,10 +176,10 @@ void RenderStressTest::OnEnable()
 
 	// Test
 	{
-		auto pan = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("Pan");
-		auto render = pan.GetComponent<PrCore::ECS::MeshRendererComponent>();
-		auto transform = pan.GetComponent<PrCore::ECS::TransformComponent>();
-		auto rigidbody = pan.AddComponent<PrCore::ECS::RigidBodyDynamicComponent>()->rigidBody;
+		auto pan = PrSystems::Get<SceneManager>()->GetActiveScene()->GetEntityByName("Pan");
+		auto render = pan.GetComponent<PrCore::MeshRendererComponent>();
+		auto transform = pan.GetComponent<PrCore::TransformComponent>();
+		auto rigidbody = pan.AddComponent<PrCore::RigidBodyDynamicComponent>()->rigidBody;
 
 		PrPhysics::Material material;
 		material.staticFriction = 0.0f;
@@ -196,7 +196,7 @@ void RenderStressTest::OnEnable()
 		rigidbody->AttachShape(shape);
 	}
 
-	PrCore::ECS::SceneManager::GetInstance().SaveSceneByName(PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetSceneName(), "scene/test_deseriallize.pearl");
+	PrSystems::Get<SceneManager>()->SaveSceneByName(PrSystems::Get<SceneManager>()->GetActiveScene()->GetSceneName(), "scene/test_deseriallize.pearl");
 }
 
 void RenderStressTest::OnDisable()
@@ -248,7 +248,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 		m_selectedLight = (++m_selectedLight) % m_maxLight;
 
 
-	auto sun = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("Sun");
+	auto sun = PrSystems::Get<SceneManager>()->GetActiveScene()->GetEntityByName("Sun");
 	if(sun.IsValid())
 	{
 		auto forwardVector = sun.GetComponent<TransformComponent>()->GetForwardVector();
@@ -275,16 +275,16 @@ void RenderStressTest::OnUpdate(float p_dt)
 			PrSystems::Get<IRenderFrontend>()->SetCubemap(PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/hrd_skymap.mat").GetData());
 			m_mainLightPtr->SetColor(m_lightColor);
 
-			//auto entity = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("jacaranda_tree_leaves");
-			//entity.GetComponent<PrCore::ECS::MeshRendererComponent>()->materials[1]->SetColor({ 0.0f, 0.0f, 0.0f, 0.0f });
+			//auto entity = PrCore::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("jacaranda_tree_leaves");
+			//entity.GetComponent<PrCore::MeshRendererComponent>()->materials[1]->SetColor({ 0.0f, 0.0f, 0.0f, 0.0f });
 		}
 		else if (cubemap == 1)
 		{
 			PrSystems::Get<IRenderFrontend>()->SetCubemap(PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/cubemap_default.mat").GetData());
 			m_mainLightPtr->SetColor(m_lightColor);
 
-			//auto entity = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("jacaranda_tree_leaves");
-			//entity.GetComponent<PrCore::ECS::MeshRendererComponent>()->materials[1]->SetColor({ 1.0f, 0.6f, 0.0f, 0.0f });
+			//auto entity = PrCore::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("jacaranda_tree_leaves");
+			//entity.GetComponent<PrCore::MeshRendererComponent>()->materials[1]->SetColor({ 1.0f, 0.6f, 0.0f, 0.0f });
 		}
 		else if (cubemap == 2)
 		{
@@ -404,15 +404,15 @@ void RenderStressTest::OnUpdate(float p_dt)
 		material.dynamicFriction = 0.1f;
 		material.restitution = .1f;
 
-		auto entity = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->CreateEntity("PhysicsBox");
-		auto physcomponent = entity.AddComponent<PrCore::ECS::RigidBodyDynamicComponent>();
+		auto entity = PrSystems::Get<SceneManager>()->GetActiveScene()->CreateEntity("PhysicsBox");
+		auto physcomponent = entity.AddComponent<PrCore::RigidBodyDynamicComponent>();
 
 		auto rigidBody = physcomponent->rigidBody;
 		auto shape = physicsPtr->CreateShape(PrPhysics::SphereGeometry{ 0.5f }, material);
 		rigidBody->AttachShape(shape);
 
-		auto logoTransform = entity.AddComponent<PrCore::ECS::TransformComponent>();
-		auto logoMesh = entity.AddComponent<PrCore::ECS::MeshRendererComponent>();
+		auto logoTransform = entity.AddComponent<PrCore::TransformComponent>();
+		auto logoMesh = entity.AddComponent<PrCore::MeshRendererComponent>();
 		logoTransform->SetPosition(m_camera->GetPosition() + m_cameraTransform->GetForwardVector() * 2.0f);
 		logoTransform->SetLocalScale(PrCore::Math::vec3(1.0f));
 		auto newMaterial = std::make_shared<PrRenderer::Material>(*PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/capsule.mat").GetData());
@@ -428,7 +428,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 			rigidBody->SetLinearVelocity(m_cameraTransform->GetForwardVector() * 50.0f);
 		}
 
-		entity.AddComponent<PrCore::ECS::SphereBullet>();
+		entity.AddComponent<PrCore::SphereBullet>();
 
 		if (++counter % 2 == 0)
 		{
@@ -462,7 +462,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 	}
 
 
-	auto pan = PrCore::ECS::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("Plane.003");
+	auto pan = PrSystems::Get<SceneManager>()->GetActiveScene()->GetEntityByName("Plane.003");
 
 	if (pan.IsValid())
 	{
@@ -494,13 +494,13 @@ void RenderStressTest::OnUpdate(float p_dt)
 void RenderStressTest::OnCollisionEnter(PrCore::EventPtr p_event)
 {
 	auto collisionInfo = std::static_pointer_cast<PrPhysics::CollisionEnter>(p_event)->m_collisionInfo;
-	auto nameA = collisionInfo.entityA.GetComponent<PrCore::ECS::NameComponent>()->name;
-    auto nameB = collisionInfo.entityB.GetComponent<PrCore::ECS::NameComponent>()->name;
+	auto nameA = collisionInfo.entityA.GetComponent<PrCore::NameComponent>()->name;
+    auto nameB = collisionInfo.entityB.GetComponent<PrCore::NameComponent>()->name;
 
-	if (collisionInfo.entityA.HasComponent<PrCore::ECS::LightComponent>() && nameB == "Quad")
+	if (collisionInfo.entityA.HasComponent<PrCore::LightComponent>() && nameB == "Quad")
 	{
-		collisionInfo.entityA.GetComponent<PrCore::ECS::LightComponent>()->m_light->SetColor(static_cast<PrCore::Math::vec4>(PrRenderer::Color::Red) * 15.0f);
-		collisionInfo.entityA.GetComponent<PrCore::ECS::MeshRendererComponent>()->mainMaterial->SetColor(PrRenderer::Color::Red * 10.0f);
+		collisionInfo.entityA.GetComponent<PrCore::LightComponent>()->m_light->SetColor(static_cast<PrCore::Math::vec4>(PrRenderer::Color::Red) * 15.0f);
+		collisionInfo.entityA.GetComponent<PrCore::MeshRendererComponent>()->mainMaterial->SetColor(PrRenderer::Color::Red * 10.0f);
 	}
 
     //PRLOG_INFO("On collision enter, EntityA: {}, EntityB {}", nameA, nameB);
@@ -509,14 +509,14 @@ void RenderStressTest::OnCollisionEnter(PrCore::EventPtr p_event)
 void RenderStressTest::OnCollisionExit(PrCore::EventPtr p_event)
 {
 	auto collisionInfo = std::static_pointer_cast<PrPhysics::CollisionExit>(p_event)->m_collisionInfo;
-	auto nameA = collisionInfo.entityA.GetComponent<PrCore::ECS::NameComponent>()->name;
-	auto nameB = collisionInfo.entityB.GetComponent<PrCore::ECS::NameComponent>()->name;
+	auto nameA = collisionInfo.entityA.GetComponent<PrCore::NameComponent>()->name;
+	auto nameB = collisionInfo.entityB.GetComponent<PrCore::NameComponent>()->name;
 
-	if (collisionInfo.entityA.HasComponent<PrCore::ECS::LightComponent>() && nameB == "Quad")
+	if (collisionInfo.entityA.HasComponent<PrCore::LightComponent>() && nameB == "Quad")
 	{
 		auto color = PrRenderer::Color(std::rand() % 20, std::rand() % 20, std::rand() % 20, std::rand() % 20);
-		collisionInfo.entityA.GetComponent<PrCore::ECS::LightComponent>()->m_light->SetColor(static_cast<PrCore::Math::vec4>(color));
-		collisionInfo.entityA.GetComponent<PrCore::ECS::MeshRendererComponent>()->mainMaterial->SetColor(color);
+		collisionInfo.entityA.GetComponent<PrCore::LightComponent>()->m_light->SetColor(static_cast<PrCore::Math::vec4>(color));
+		collisionInfo.entityA.GetComponent<PrCore::MeshRendererComponent>()->mainMaterial->SetColor(color);
 	}
 
 	//PRLOG_INFO("On collision exit, EntityA: {}, EntityB {}", nameA, nameB);
@@ -525,22 +525,22 @@ void RenderStressTest::OnCollisionExit(PrCore::EventPtr p_event)
 void RenderStressTest::OnCollisionStay(PrCore::EventPtr p_event)
 {
 	auto collisionInfo = std::static_pointer_cast<PrPhysics::CollisionStay>(p_event)->m_collisionInfo;
-	auto nameA = collisionInfo.entityA.GetComponent<PrCore::ECS::NameComponent>()->name;
-	auto nameB = collisionInfo.entityB.GetComponent<PrCore::ECS::NameComponent>()->name;
+	auto nameA = collisionInfo.entityA.GetComponent<PrCore::NameComponent>()->name;
+	auto nameB = collisionInfo.entityB.GetComponent<PrCore::NameComponent>()->name;
 }
 
 void RenderStressTest::OnTriggerEnter(PrCore::EventPtr p_event)
 {
 	auto collisionInfo = std::static_pointer_cast<PrPhysics::TriggerEnter>(p_event)->m_collisionInfo;
-	auto nameA = collisionInfo.entityA.GetComponent<PrCore::ECS::NameComponent>()->name;
-	auto nameB = collisionInfo.entityB.GetComponent<PrCore::ECS::NameComponent>()->name;
+	auto nameA = collisionInfo.entityA.GetComponent<PrCore::NameComponent>()->name;
+	auto nameB = collisionInfo.entityB.GetComponent<PrCore::NameComponent>()->name;
 	PRLOG_INFO("On trigger enter, EntityA: {}, EntityB {}", nameA, nameB);
 }
 
 void RenderStressTest::OnTriggerExit(PrCore::EventPtr p_event)
 {
 	auto collisionInfo = std::static_pointer_cast<PrPhysics::TriggerExit>(p_event)->m_collisionInfo;
-	auto nameA = collisionInfo.entityA.GetComponent<PrCore::ECS::NameComponent>()->name;
-	auto nameB = collisionInfo.entityB.GetComponent<PrCore::ECS::NameComponent>()->name;
+	auto nameA = collisionInfo.entityA.GetComponent<PrCore::NameComponent>()->name;
+	auto nameB = collisionInfo.entityB.GetComponent<PrCore::NameComponent>()->name;
 	PRLOG_INFO("On trigger exit, EntityA: {}, EntityB {}", nameA, nameB);
 }
