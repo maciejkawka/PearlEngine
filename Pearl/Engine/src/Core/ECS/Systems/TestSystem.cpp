@@ -58,8 +58,7 @@ void RenderStressTest::OnEnable()
 	m_camera->SetPosition({ 15, 9, 3 });
 	m_camera->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 0, 0))));
 
-	auto scene = PrSystems::Get<SceneManager>()->GetAllScenes()[0];
-	auto entity = scene->CreateEntity("CameraCube");
+	auto entity = m_entityViewer.CreateEntity("CameraCube");
 	m_cameraTransform = entity.AddComponent<PrCore::TransformComponent>();
 	m_cameraTransform->SetPosition(m_camera->GetPosition());
 	m_cameraTransform->SetRotation(m_camera->GetRotation());
@@ -103,7 +102,7 @@ void RenderStressTest::OnEnable()
 
 	PrSystems::Get<PrPhysics::PhysicsSystem>()->SetGravity(PrCore::Math::vec3{ 0.0f });
 
-	auto pan = PrSystems::Get<SceneManager>()->GetActiveScene()->GetEntityByName("Plane.003");
+	auto pan = m_entityViewer.GetEntityByName("Plane.003");
 
 	if(pan.IsValid())
 	{
@@ -157,7 +156,7 @@ void RenderStressTest::OnEnable()
 	// Pan
 	//{
 	//	PrPhysics::Material material;
-	//	auto pan = PrCore::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("Pan");
+	//	auto pan = m_entityViewer.GetEntityByName("Pan");
 	//	auto boxVolume = pan.GetComponent<PrCore::MeshRendererComponent>()->mesh->GetBoxVolume();
 	//	auto transform = pan.GetComponent<PrCore::TransformComponent>();
 	//	auto rigidbodyComponent = pan.AddComponent<PrCore::RigidBodyDynamicComponent>();
@@ -176,7 +175,7 @@ void RenderStressTest::OnEnable()
 
 	// Test
 	{
-		auto pan = PrSystems::Get<SceneManager>()->GetActiveScene()->GetEntityByName("Pan");
+		auto pan = m_entityViewer.GetEntityByName("Pan");
 		auto render = pan.GetComponent<PrCore::MeshRendererComponent>();
 		auto transform = pan.GetComponent<PrCore::TransformComponent>();
 		auto rigidbody = pan.AddComponent<PrCore::RigidBodyDynamicComponent>()->rigidBody;
@@ -248,7 +247,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 		m_selectedLight = (++m_selectedLight) % m_maxLight;
 
 
-	auto sun = PrSystems::Get<SceneManager>()->GetActiveScene()->GetEntityByName("Sun");
+	auto sun = m_entityViewer.GetEntityByName("Sun");
 	if(sun.IsValid())
 	{
 		auto forwardVector = sun.GetComponent<TransformComponent>()->GetForwardVector();
@@ -275,7 +274,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 			PrSystems::Get<IRenderFrontend>()->SetCubemap(PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/hrd_skymap.mat").GetData());
 			m_mainLightPtr->SetColor(m_lightColor);
 
-			//auto entity = PrCore::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("jacaranda_tree_leaves");
+			//auto entity = m_entityViewer.GetEntityByName("jacaranda_tree_leaves");
 			//entity.GetComponent<PrCore::MeshRendererComponent>()->materials[1]->SetColor({ 0.0f, 0.0f, 0.0f, 0.0f });
 		}
 		else if (cubemap == 1)
@@ -283,7 +282,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 			PrSystems::Get<IRenderFrontend>()->SetCubemap(PrSystems::Get<ResourceSystem>()->Load<PrRenderer::Material>("stress_test/cubemap_default.mat").GetData());
 			m_mainLightPtr->SetColor(m_lightColor);
 
-			//auto entity = PrCore::SceneManager::GetInstance().GetActiveScene()->GetEntityByName("jacaranda_tree_leaves");
+			//auto entity = m_entityViewer.GetEntityByName("jacaranda_tree_leaves");
 			//entity.GetComponent<PrCore::MeshRendererComponent>()->materials[1]->SetColor({ 1.0f, 0.6f, 0.0f, 0.0f });
 		}
 		else if (cubemap == 2)
@@ -404,7 +403,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 		material.dynamicFriction = 0.1f;
 		material.restitution = .1f;
 
-		auto entity = PrSystems::Get<SceneManager>()->GetActiveScene()->CreateEntity("PhysicsBox");
+		auto entity = m_entityViewer.CreateEntity("PhysicsBox");
 		auto physcomponent = entity.AddComponent<PrCore::RigidBodyDynamicComponent>();
 
 		auto rigidBody = physcomponent->rigidBody;
@@ -462,7 +461,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 	}
 
 
-	auto pan = PrSystems::Get<SceneManager>()->GetActiveScene()->GetEntityByName("Plane.003");
+	auto pan = m_entityViewer.GetEntityByName("Plane.003");
 
 	if (pan.IsValid())
 	{

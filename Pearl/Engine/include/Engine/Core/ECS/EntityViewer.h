@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/ECS/EntityManager.h"
+#include "Core/ECS/Components/CoreComponents.h"
 #include "Core/Threading/JobSystem.h"
 
 namespace PrCore {
@@ -39,6 +40,65 @@ namespace PrCore {
 		EntityViewer(EntityManager* p_entityManager) :
 			m_entityManager(p_entityManager)
 		{}
+
+		// Entity Queries
+		//--------------------------------------------------------
+		Entity CreateEntity(const std::string& p_name = "Entity")
+		{
+			auto entity = m_entityManager->CreateEntity();
+
+			auto UUID = entity.AddComponent<UUIDComponent>();
+			UUID->UUID = Utils::UUIDGenerator().Generate();
+
+			auto name = entity.AddComponent<NameComponent>();
+			name->name = p_name;
+
+			auto tag = entity.AddComponent<TagComponent>();
+			tag->tag = "Untagged";
+
+			return entity;
+		}
+
+		void DestoryEntity(Entity p_entity)
+		{
+			p_entity.AddComponent<ToDestoryTag>();
+		}
+
+		Entity GetEntityByName(const std::string& p_name)
+		{
+			auto entityViewer = m_entityManager->GetEntitiesWithComponents<NameComponent>();
+			for (auto [entity, name] : entityViewer)
+			{
+				if (name->name == p_name)
+					return entity;
+			}
+
+			return Entity();
+		}
+	
+		Entity GetEntityByID(Utils::UUID p_UUID)
+		{
+			auto entityViewer = m_entityManager->GetEntitiesWithComponents<UUIDComponent>();
+			for (auto [entity, uuid] : entityViewer)
+			{
+				if (uuid->UUID == p_UUID)
+					return entity;
+			}
+
+			return Entity();
+		}
+
+		Entity GetEntityByTag(const std::string& p_tag)
+		{
+			auto entityViewer = m_entityManager->GetEntitiesWithComponents<TagComponent>();
+			for (auto [entity, tag] : entityViewer)
+			{
+				if (tag->tag == p_tag)
+					return entity;
+			}
+
+			return Entity();
+		}
 
 		// Single Thread Versions
 		//--------------------------------------------------------
