@@ -233,7 +233,11 @@ PrCore::Entry::AppContext::AppContext()
 		pResourceSystem->RegisterDatabase<PrPhysics::ITriangleMesh>(std::move(triangleMeshDatabase));
 	}
 
-	Input::InputManager::Init();
+	//-----------------------
+	// Init Input Manager
+	PRLOG_INFO("Init Input Manager");
+	PrSystems::Register<InputManager>();
+
 	ECS::SceneManager::Init();
 }
 
@@ -242,7 +246,9 @@ PrCore::Entry::AppContext::~AppContext()
 	PRLOG_INFO("Deleting AppContext");
 
 	ECS::SceneManager::Terminate();
-	Input::InputManager::Terminate();
+
+	PRLOG_INFO("Terminating Input Manager");
+	PrSystems::Unregister<InputManager>();
 
 	PRLOG_INFO("Terminating Physics System");
 	{

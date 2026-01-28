@@ -12,10 +12,10 @@ namespace PrCore {
 	public:
 		KeyPressedEvent(int p_key)
 		{
-			m_key = (Input::PrKey)p_key;
+			m_key = (PrKey)p_key;
 		}
 
-		Input::PrKey m_key;
+		PrKey m_key;
 
 		DEFINE_EVENT_GUID(0x80e66091);
 	};
@@ -24,10 +24,10 @@ namespace PrCore {
 	public:
 		KeyReleasedEvent(int p_key)
 		{
-			m_key = (Input::PrKey)p_key;
+			m_key = (PrKey)p_key;
 		}
 
-		Input::PrKey m_key;
+		PrKey m_key;
 
 		DEFINE_EVENT_GUID(0x26dfe3a);
 	};
@@ -36,10 +36,10 @@ namespace PrCore {
 	public:
 		MouseButtonPressedEvent(int p_button)
 		{
-			m_button = (Input::PrMouseButton)p_button;
+			m_button = (PrMouseButton)p_button;
 		}
 
-		Input::PrMouseButton m_button;
+		PrMouseButton m_button;
 
 		DEFINE_EVENT_GUID(0xb84be5a9);
 	};
@@ -48,10 +48,10 @@ namespace PrCore {
 	public:
 		MouseButtonReleasedEvent(int p_button)
 		{
-			m_button = (Input::PrMouseButton)p_button;
+			m_button = (PrMouseButton)p_button;
 		}
 
-		Input::PrMouseButton m_button;
+		PrMouseButton m_button;
 
 		DEFINE_EVENT_GUID(0xe4f62295);
 	};

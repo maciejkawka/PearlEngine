@@ -205,11 +205,11 @@ void RenderStressTest::OnDisable()
 
 void RenderStressTest::OnUpdate(float p_dt)
 {
-	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::N))
+	if (PrSystems::Get<InputManager>()->IsKeyPressed(PrCore::PrKey::N))
 	{
 		PrSystems::Get<PrPhysics::PhysicsSystem>()->SetGravity(PrCore::Math::vec3{ 0.0f });
 	}
-	else if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::M))
+	else if (PrSystems::Get<InputManager>()->IsKeyPressed(PrCore::PrKey::M))
 	{
 		PrSystems::Get<PrPhysics::PhysicsSystem>()->SetGravity(PrCore::Math::vec3{ 0.0f, -9.81f, 0.0f });
 	}
@@ -233,7 +233,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 			PRLOG_INFO("Raycast hit entity name {} distance: {}", name, hit.distance);
 			PrSystems::Get<IRenderFrontend>()->SetDebugColor(PrRenderer::Color::Green);
 
-			if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::F) && hit.entity.HasComponent<RigidBodyDynamicComponent>())
+			if (PrSystems::Get<InputManager>()->IsKeyPressed(PrCore::PrKey::F) && hit.entity.HasComponent<RigidBodyDynamicComponent>())
 			{
 				auto rigidbody = hit.entity.GetComponent<RigidBodyDynamicComponent>()->rigidBody;
 				rigidbody->AddForce(forward * 30.0f, PrPhysics::ForceMode::Impulsive);
@@ -244,7 +244,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 		PrSystems::Get<IRenderFrontend>()->DrawDebugLine(m_camera->GetPosition() - up, m_camera->GetPosition() + forward * distance);
 	}
 
-	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(Input::PrKey::L))
+	if (PrSystems::Get<InputManager>()->IsKeyPressed(PrKey::L))
 		m_selectedLight = (++m_selectedLight) % m_maxLight;
 
 
@@ -255,7 +255,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 		auto rotation = sun.GetComponent<TransformComponent>()->GetRotation();
 		PrSystems::Get<IRenderFrontend>()->DrawDebugSphere(PrCore::Math::vec3{ 0,20,0 }, 1.0f, false);
 		PrSystems::Get<IRenderFrontend>()->DrawDebugLine(PrCore::Math::vec3{ 0,20,0 }, PrCore::Math::vec3{ 0,20,0 } + forwardVector * 5.0f);
-		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::K))
+		if (PrSystems::Get<InputManager>()->IsKeyHold(PrCore::PrKey::K))
 		{
 			glm::quat deltaRot = glm::angleAxis(glm::radians(20 * p_dt), glm::vec3(1, 0, 0));
 			sun.GetComponent<TransformComponent>()->SetRotation(deltaRot * rotation);
@@ -264,7 +264,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 
 	// Setup cubemap
 	static int cubemap = 0;
-	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::G))
+	if (PrSystems::Get<InputManager>()->IsKeyPressed(PrCore::PrKey::G))
 	{
 		cubemap++;
 		if (cubemap > 2)
@@ -317,32 +317,32 @@ void RenderStressTest::OnUpdate(float p_dt)
 
 			auto position = transform->GetPosition();
 			auto loko = transform->GetPosition();
-			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::UP))
+			if (PrSystems::Get<InputManager>()->IsKeyHold(PrKey::UP))
 			{
 				auto addVec = forward * 20.0f * p_dt;
 				addVec.y = 0.0f;
 				position += addVec;
 			}
-			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::DOWN))
+			if (PrSystems::Get<InputManager>()->IsKeyHold(PrKey::DOWN))
 			{
 				auto addVec = forward * 20.0f * p_dt;
 				addVec.y = 0.0f;
 				position -= addVec;
 			}
-			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::LEFT))
+			if (PrSystems::Get<InputManager>()->IsKeyHold(PrKey::LEFT))
 				position -= right * 20.0f * p_dt;
-			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::RIGHT))
+			if (PrSystems::Get<InputManager>()->IsKeyHold(PrKey::RIGHT))
 				position += right * 20.0f * p_dt;
-			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::PAGE_UP))
+			if (PrSystems::Get<InputManager>()->IsKeyHold(PrKey::PAGE_UP))
 				position.y += 20.0f * p_dt;
-			if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::PAGE_DOWN))
+			if (PrSystems::Get<InputManager>()->IsKeyHold(PrKey::PAGE_DOWN))
 				position.y -= 20.0f * p_dt;
 
 			// Change color intensity
 			//auto color = light->m_light->GetColor();
-			//if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::KP_8))
+			//if (PrSystems::Get<InputManager>()->IsKeyHold(PrKey::KP_8))
 			//	color += 10.0f * p_dt;
-			//if (PrCore::Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::KP_2))
+			//if (PrSystems::Get<InputManager>()->IsKeyHold(PrKey::KP_2))
 			//	color -= 10.0f * p_dt;
 
 			//if (loko != position)
@@ -393,7 +393,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 		}
 	}
 
-	if (PrCore::Input::InputManager::GetInstance().IsButtonPressed(PrCore::Input::PrMouseButton::BUTTON_LEFT))
+	if (PrSystems::Get<InputManager>()->IsButtonPressed(PrCore::PrMouseButton::BUTTON_LEFT))
 	{
 		static int counter = 0;
 
@@ -423,7 +423,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 		logoMesh->mesh = PrRenderer::Mesh::CreatePrimitive(PrRenderer::PrimitiveType::Sphere);
 		logoMesh->shadowCaster = false;
 
-		if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::LEFT_CONTROL))
+		if (PrSystems::Get<InputManager>()->IsKeyHold(PrCore::PrKey::LEFT_CONTROL))
 		{
 			rigidBody->SetLinearVelocity(m_cameraTransform->GetForwardVector() * 50.0f);
 		}
@@ -443,7 +443,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 		}
 	}
 
-	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::F11))
+	if (PrSystems::Get<InputManager>()->IsKeyPressed(PrCore::PrKey::F11))
 	{
 		size_t width, hegiht;
 		auto buffer = PrRenderer::LowRenderer::ReadFrontBuffer(width, hegiht);
@@ -475,19 +475,19 @@ void RenderStressTest::OnUpdate(float p_dt)
 	// Retup renderer settings
 	auto settings = PrSystems::Get<IRenderFrontend>()->GetSettingsPtr();
 
-	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::E))
+	if (PrSystems::Get<InputManager>()->IsKeyPressed(PrCore::PrKey::E))
 		settings->enableInstancing = !settings->enableInstancing;
 
-	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::R))
+	if (PrSystems::Get<InputManager>()->IsKeyPressed(PrCore::PrKey::R))
 		settings->enableFog = !settings->enableFog;
 
-	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::T))
+	if (PrSystems::Get<InputManager>()->IsKeyPressed(PrCore::PrKey::T))
 		settings->enableFXAAA = !settings->enableFXAAA;
 
-	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::Y))
+	if (PrSystems::Get<InputManager>()->IsKeyPressed(PrCore::PrKey::Y))
 		settings->enableSSAO = !settings->enableSSAO;
 
-	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::U))
+	if (PrSystems::Get<InputManager>()->IsKeyPressed(PrCore::PrKey::U))
 		settings->enableBloom = !settings->enableBloom;
 }
 

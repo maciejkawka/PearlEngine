@@ -3,6 +3,7 @@
 #include "Core/ECS/BaseSystem.h"
 #include "Core/ECS/Components.h"
 #include "Core/Input/InputManager.h"
+#include "Core/Utils/SystemProvider.h"
 #include "Physics/Actor/IActor.h"
 
 namespace PrCore::ECS
@@ -15,7 +16,7 @@ namespace PrCore::ECS
 			for (auto [entity, transform, _] : m_entityViewer.EntitesWithComponents<TransformComponent, CameraComponent>())
 			{
 				auto position = transform->GetPosition();
-				if (Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::W))
+				if (PrSystems::Get<InputManager>()->IsKeyHold(PrKey::W))
 					position.x += p_dt;
 
 				transform->SetPosition(position);

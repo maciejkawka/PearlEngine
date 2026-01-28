@@ -20,6 +20,7 @@ namespace PrCore
 	class ThreadSystem;
 	class ResourceSystem;
 	class IWindow;
+	class InputManager;
 }
 
 namespace PrPhysics
@@ -41,6 +42,7 @@ using EngineSystems = std::tuple<
 	PrCore::EventManager,
 	PrCore::FileSystem,
 	PrCore::IWindow,
+	PrCore::InputManager,
 	PrCore::JobSystem,
 	PrCore::ThreadSystem,
 	PrCore::ResourceSystem,

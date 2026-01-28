@@ -1,10 +1,10 @@
-#include"Core/Common/pearl_pch.h"
+#include "Core/Common/pearl_pch.h"
 
-#include"Core/Input/InputManager.h"
-#include"Core/Events/EventManager.h"
-#include"Core/Events/InputEvents.h"
+#include "Core/Input/InputManager.h"
+#include "Core/Events/EventManager.h"
+#include "Core/Events/InputEvents.h"
 
-using namespace PrCore::Input;
+using namespace PrCore;
 
 InputManager::InputManager() :
 	s_mouseXPos(0.0f),

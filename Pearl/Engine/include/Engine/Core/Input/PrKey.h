@@ -1,7 +1,6 @@
 #pragma once
 
-namespace PrCore::Input {
-
+namespace PrCore {
 
 	enum class PrKey {
 		UNKNOWN		= -1,

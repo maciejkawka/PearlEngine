@@ -38,7 +38,7 @@ void Editor::PreFrame()
 	PrSystems::Get<PrRenderer::IRenderFrontend>()->PrepareFrame();
 
 	//Exit
-	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::ESCAPE))
+	if (PrSystems::Get<PrCore::InputManager>()->IsKeyPressed(PrCore::PrKey::ESCAPE))
 		m_shouldClose = true;
 }
 
@@ -47,16 +47,16 @@ void Editor::OnFrame(float p_deltaTime)
 	m_basicCamera->Update(p_deltaTime);
 
 	//Camera Settings
-	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::O))
+	if (PrSystems::Get<PrCore::InputManager>()->IsKeyPressed(PrCore::PrKey::O))
 		PrRenderer::Camera::GetMainCamera()->SetType(PrRenderer::CameraType::Ortographic);
 
-	if (PrCore::Input::InputManager::GetInstance().IsKeyPressed(PrCore::Input::PrKey::P))
+	if (PrSystems::Get<PrCore::InputManager>()->IsKeyPressed(PrCore::PrKey::P))
 		PrRenderer::Camera::GetMainCamera()->SetType(PrRenderer::CameraType::Perspective);
 
 	//Show Mouse Pos
-	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::LEFT_CONTROL))
+	if (PrSystems::Get<PrCore::InputManager>()->IsKeyHold(PrCore::PrKey::LEFT_CONTROL))
 	{
-		auto mousePos = PrCore::Input::InputManager::GetInstance().GetMousePosition();
+		auto mousePos = PrSystems::Get<PrCore::InputManager>()->GetMousePosition();
 		auto xPos = mousePos.x;
 		auto yPos = mousePos.y;
 
@@ -64,7 +64,7 @@ void Editor::OnFrame(float p_deltaTime)
 	}
 
 	//Show FPS
-	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F1))
+	if (PrSystems::Get<PrCore::InputManager>()->IsKeyHold(PrCore::PrKey::F1))
 		PRLOG_INFO("{0}", (int)(1 / p_deltaTime));
 
 	m_testFeatures->Update(p_deltaTime);
@@ -103,17 +103,17 @@ void Editor::OnFrame(float p_deltaTime)
 	auto pRenderer = PrSystems::Get<PrRenderer::IRenderFrontend>();
 	auto testInfo = pRenderer->GetPreviousFrameInfo();
 	
-	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F3))
+	if (PrSystems::Get<PrCore::InputManager>()->IsKeyHold(PrCore::PrKey::F3))
 		for (auto event : testInfo.timeEvents)
 			PRLOG_INFO("Event {0}, Time: {1}", event.first, event.second);
 
-	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F4))
+	if (PrSystems::Get<PrCore::InputManager>()->IsKeyHold(PrCore::PrKey::F4))
 		PRLOG_INFO("Culled objects {0}", testInfo.culledObjects);
 
-	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F5))
+	if (PrSystems::Get<PrCore::InputManager>()->IsKeyHold(PrCore::PrKey::F5))
 		PRLOG_INFO("Draw triangles {0}", testInfo.drawTriangles);
 
-	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F6))
+	if (PrSystems::Get<PrCore::InputManager>()->IsKeyHold(PrCore::PrKey::F6))
 		PRLOG_INFO("Draw objects {0}", testInfo.drawObjects	);
 
 	pRenderer->BuildFrame();
@@ -126,11 +126,11 @@ void Editor::PostFrame()
 	PrSystems::Get<PrRenderer::IRenderFrontend>()->GetRendererBackend()->PostRender();
 
 	m_appContext->m_window->SwapBuffers();
-	PrCore::Input::InputManager::GetInstance().ResetFlags();
+	PrSystems::Get<PrCore::InputManager>()->ResetFlags();
 
 	PrSystems::Get<EventManager>()->Update();
 
-	if (PrCore::Input::InputManager::GetInstance().IsKeyHold(PrCore::Input::PrKey::F8))
+	if (PrSystems::Get<PrCore::InputManager>()->IsKeyHold(PrCore::PrKey::F8))
 	{
 		Assets::SceneExporter exporter;
 		exporter.SaveMemoryResourcesToFile("OceanNew/");

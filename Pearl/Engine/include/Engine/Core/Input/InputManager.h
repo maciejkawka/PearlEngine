@@ -1,17 +1,18 @@
 #pragma once
-#include"PrKey.h"
-#include"PrMouseButton.h"
-#include"PrKeyState.h"
 
-#include"Core/Utils/Singleton.h"
-#include"Core/Events/Event.h"
-#include"Core/Math/Math.h"
+#include "PrKey.h"
+#include "PrMouseButton.h"
+#include "PrKeyState.h"
 
-#include<unordered_map>
+#include "Core/Events/Event.h"
+#include "Core/Math/Math.h"
+#include "Core/Utils/SystemProvider.h"
 
-namespace PrCore::Input {
+#include <unordered_map>
 
-	class InputManager: public Utils::Singleton<InputManager> {
+namespace PrCore {
+
+	class InputManager : public Utils::ISystem {
 
 		typedef std::unordered_map<PrKey, PrInputState>				KeyStateMap;
 		typedef std::unordered_map<PrKey, bool>						KeyHoldMap;
@@ -19,6 +20,9 @@ namespace PrCore::Input {
 		typedef std::unordered_map<PrMouseButton, bool>				ButtonHoldMap;
 
 	public:
+		InputManager();
+		~InputManager();
+
 		bool IsKeyPressed(PrKey p_key) const;
 		bool IsKeyReleased(PrKey p_key) const;
 		bool IsKeyHold(PrKey p_key) const;
@@ -38,9 +42,6 @@ namespace PrCore::Input {
 		void ResetFlags();
 
 	private:
-		InputManager();
-		~InputManager();
-
 		void OnKeyPressed(EventPtr p_event);
 		void OnKeyReleased(EventPtr p_event);
 
@@ -54,14 +55,12 @@ namespace PrCore::Input {
 		KeyHoldMap s_keyHold;
 		ButtonStateMap s_buttonState;
 		ButtonHoldMap s_buttonHold;
-		
+
 		double s_mouseXPos;
 		double s_mouseYPos;
 		double s_mouseScroll;
 
 		bool s_anyPressed;
 		bool s_anyHold;
-
-		friend Singleton<InputManager>;
 	};
 }

@@ -1,5 +1,6 @@
 #pragma once
-namespace PrCore::Input {
+
+namespace PrCore {
 
 	enum class PrInputState {
 		PRESS			= 1,

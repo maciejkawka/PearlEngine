@@ -1,11 +1,9 @@
-#include"Core/Utils/Logger.h"
+#include "Editor/Components/BasicCamera.h"
 
-#include"Editor/Components/BasicCamera.h"
-
-#include"Core/Input/InputManager.h"
+#include "Core/Input/InputManager.h"
+#include "Core/Utils/Logger.h"
 
 using namespace PrEditor::Components;
-namespace Input = PrCore::Input;
 
 BasicCamera::BasicCamera(PrRenderer::CameraType p_cameraType):
 	m_lastMousePos(PrCore::Math::vec2(0.0f)),
@@ -48,38 +46,38 @@ void BasicCamera::Update(float p_dt)
 	auto rotationRadians = m_camera->GetRotation();
 	auto rotation = PrCore::Math::degrees(rotationRadians);
 
-	auto deltaMousePos = m_lastMousePos - PrCore::Input::InputManager::GetInstance().GetMousePosition();
+	auto deltaMousePos = m_lastMousePos - PrSystems::Get<PrCore::InputManager>()->GetMousePosition();
 
-	if (Input::InputManager::GetInstance().IsButtonHold(PrCore::Input::PrMouseButton::BUTTON_2))
+	if (PrSystems::Get<PrCore::InputManager>()->IsButtonHold(PrCore::PrMouseButton::BUTTON_2))
 	{
 		rotation.y += m_rotationSpeed * deltaMousePos.x * p_dt;
 		rotation.x += m_rotationSpeed * deltaMousePos.y * p_dt;
 	}
 
-	if (Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::W))
+	if (PrSystems::Get<PrCore::InputManager>()->IsKeyHold(PrCore::PrKey::W))
 	{
 		position += PrCore::Math::rotate(PrCore::Math::quat(rotationRadians), PrCore::Math::vec3(0, 0, -1)) * m_movementSpeed * p_dt;
 	}
-	if (Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::S))
+	if (PrSystems::Get<PrCore::InputManager>()->IsKeyHold(PrCore::PrKey::S))
 	{
 		position += PrCore::Math::rotate(PrCore::Math::quat(rotationRadians), PrCore::Math::vec3(0, 0, 1)) * m_movementSpeed * p_dt;
 	}
-	if (Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::A))
+	if (PrSystems::Get<PrCore::InputManager>()->IsKeyHold(PrCore::PrKey::A))
 	{
 		position += PrCore::Math::rotate(PrCore::Math::quat(rotationRadians), PrCore::Math::vec3(-1, 0, 0)) * m_movementSpeed * p_dt;
 	}
-	if (Input::InputManager::GetInstance().IsKeyHold(Input::PrKey::D))
+	if (PrSystems::Get<PrCore::InputManager>()->IsKeyHold(PrCore::PrKey::D))
 	{
 		position += PrCore::Math::rotate(PrCore::Math::quat(rotationRadians), PrCore::Math::vec3(1, 0, 0)) * m_movementSpeed * p_dt;
 	}
 
-	if (Input::InputManager::GetInstance().IsKeyPressed(Input::PrKey::LEFT_SHIFT))
+	if (PrSystems::Get<PrCore::InputManager>()->IsKeyPressed(PrCore::PrKey::LEFT_SHIFT))
 		m_movementSpeed = m_fastSpeed;
-	else if(Input::InputManager::GetInstance().IsKeyReleased(Input::PrKey::LEFT_SHIFT))
+	else if(PrSystems::Get<PrCore::InputManager>()->IsKeyReleased(PrCore::PrKey::LEFT_SHIFT))
 		m_movementSpeed = m_normalSpeed;
 
 	m_camera->SetPosition(position);
 	m_camera->SetRotation(PrCore::Math::radians(rotation));
 
-	m_lastMousePos = Input::InputManager::GetInstance().GetMousePosition();
+	m_lastMousePos = PrSystems::Get<PrCore::InputManager>()->GetMousePosition();
 }
