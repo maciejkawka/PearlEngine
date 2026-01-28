@@ -39,8 +39,8 @@ void GLFramebuffer::Unbind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	auto& window = PrCore::Windowing::Window::GetMainWindow();
-	glViewport(0, 0, window.GetWidth(), window.GetHeight());
+	auto window = PrSystems::Get<PrCore::IWindow>();
+	glViewport(0, 0, window->GetWidth(), window->GetHeight());
 }
 
 void GLFramebuffer::SetAttachmentDetails(int p_attachment, int p_textureTarget, int p_mipLevel)

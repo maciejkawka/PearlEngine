@@ -161,8 +161,8 @@ void* GLRenderer::ReadFrontBuffer(size_t& p_outWidth, size_t& p_outHeight)
 	glReadBuffer(GL_FRONT);
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
-	p_outWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
-	p_outHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();
+	p_outWidth = PrSystems::Get<PrCore::IWindow>()->GetWidth();
+	p_outHeight = PrSystems::Get<PrCore::IWindow>()->GetHeight();
 
 	byte* buffer = new byte[p_outWidth * p_outHeight * 3];
 	glReadPixels(0, 0, p_outWidth, p_outHeight, GL_RGB, GL_UNSIGNED_BYTE, buffer);

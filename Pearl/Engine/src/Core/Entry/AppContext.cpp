@@ -13,6 +13,7 @@
 #include "Core/Threading/JobSystem.h"
 #include "Core/Resources/ResourceDatabase.h"
 #include "Core/Resources/ResourceSystem.h"
+#include "Core/Windowing/GLWindow.h"
 
 #include"Renderer/Core/DeferRenderFrontend.h"
 #include"Renderer/OpenGL/GLContext.h"
@@ -44,9 +45,7 @@ const std::string_view RendererConfig{ "config/renderer.cfg" };
 
 PrCore::Entry::AppContext::AppContext()
 {
-	m_window = nullptr;
-
-	//Init Engine Subsystems
+	// Init Engine Subsystems
 	PrSystems::Register<PrCore::Utils::ILogger, PrCore::Utils::Logger>();
 	PRLOG_INFO("Building AppContext");
 	
@@ -91,7 +90,6 @@ PrCore::Entry::AppContext::AppContext()
 	PRLOG_INFO("Init Event Manager");
 	PrSystems::Register<EventManager>();
 
-
 	//-----------------------
 	// Init Resource System
 	PRLOG_INFO("Init Resource System");
@@ -125,21 +123,19 @@ PrCore::Entry::AppContext::AppContext()
 	}
 
 	//-----------------------
-	// Init Renderer System
-	PRLOG_INFO("Init Render System");
+	// Init Window
+	PRLOG_INFO("Init Window");
 	ConfigFile contexConfig;
 	if (contexConfig.OpenFromFile(GraphicConfig))
 	{
-		Windowing::WindowContext context;
+		WindowContext context;
 		context.debugMode = contexConfig.GetSetting<bool>("debugMode");
 		context.forwardCompatibility = contexConfig.GetSetting<bool>("forwardCompatibility");
 		context.multiSampling = contexConfig.GetSetting("multiSampling");
 		context.versionMinor = contexConfig.GetSetting("versionMinor");
 		context.versionMajor = contexConfig.GetSetting("versionMajor");
-		Windowing::GLWindow::InitDevice(context);
 
-
-		Windowing::WindowSettings windowSettings;
+		WindowSettings windowSettings;
 		windowSettings.title = contexConfig.GetSetting<std::string>("title");
 		windowSettings.height = contexConfig.GetSetting("height");
 		windowSettings.width = contexConfig.GetSetting("width");
@@ -148,9 +144,13 @@ PrCore::Entry::AppContext::AppContext()
 		windowSettings.decorated = contexConfig.GetSetting<bool>("decorated");
 		windowSettings.vSync = contexConfig.GetSetting<bool>("vSync");
 		windowSettings.iconPath = contexConfig.GetSetting<std::string>("iconPath");
-		m_window = new Windowing::GLWindow(windowSettings);
+
+		m_window = PrSystems::Register<IWindow, GLWindow>(context, windowSettings);
 	}
 
+	//-----------------------
+	// Init Renderer System
+	PRLOG_INFO("Init Render System");
 	ConfigFile rendererConfig;
 	if (rendererConfig.OpenFromFile(RendererConfig))
 	{
@@ -256,8 +256,8 @@ PrCore::Entry::AppContext::~AppContext()
 	PRLOG_INFO("Terminating Render System");
 	PrSystems::Unregister< PrRenderer::IRenderFrontend>();
 
-	delete m_window;
-	Windowing::GLWindow::TerminateDevice();
+	PRLOG_INFO("Terminating Window");
+	PrSystems::Unregister<IWindow>();
 
 	PRLOG_INFO("Terminating Resource System");
 	PrSystems::Unregister<ResourceSystem>();

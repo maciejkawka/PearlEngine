@@ -1,20 +1,20 @@
 #pragma once
-#include"Window.h"
-#include"WindowContext.h"
-#include"WindowSettings.h"
+
+#include "Window.h"
+#include "WindowContext.h"
+#include "WindowSettings.h"
 
 class GLFWwindow;
 
-namespace PrCore::Windowing {
+namespace PrCore {
 
-	class GLWindow : public Window {
+	class GLWindow : public IWindow {
 	public:
-		GLWindow(const WindowSettings& p_settings = WindowSettings());
+		GLWindow(const WindowContext& p_context, const WindowSettings& p_settings);
+		virtual ~GLWindow();
 
-		~GLWindow();
-
-		static void InitDevice(const WindowContext& p_context);
-		static void TerminateDevice();
+		bool InitDevice(const WindowContext& p_context);
+		void TerminateDevice();
 
 		void PollEvents() override;
 		void SwapBuffers() override;
@@ -33,11 +33,8 @@ namespace PrCore::Windowing {
 	private:
 		void BindCallbacks();
 
-		GLFWwindow* m_window;
-		WindowSettings m_settings;
-
-		static WindowContext s_context;
-		static bool s_init;
-		static int s_windowsCount;
+		GLFWwindow*    m_window;
+		WindowSettings m_settings{};
+		WindowContext  m_context{};
 	};
 }

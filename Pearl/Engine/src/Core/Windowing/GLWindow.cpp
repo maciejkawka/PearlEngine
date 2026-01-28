@@ -1,35 +1,25 @@
-#include"Core/Common/pearl_pch.h"
+#include "Core/Common/pearl_pch.h"
+		 
+#include "Core/Windowing/GLWindow.h"
+#include "GLFW/glfw3.h"
+#include "Core/Utils/Logger.h"
+#include "Core/Events/EventManager.h"
+#include "Core/Events/WindowEvents.h"
+#include "Core/Events/InputEvents.h"
+		 
+#include "Core/File/FileSystem.h"
+#include "stb/stb_image.h"
 
-#include"Core/Windowing/GLWindow.h"
-#include"GLFW/glfw3.h"
-#include"Core/Utils/Logger.h"
-#include"Core/Events/EventManager.h"
-#include"Core/Events/WindowEvents.h"
-#include"Core/Events/InputEvents.h"
+using namespace PrCore;
 
-#include"Core/File/FileSystem.h"
-#include"stb/stb_image.h"
-
-using namespace PrCore::Windowing;
-
-WindowContext GLWindow::s_context;
-bool GLWindow::s_init = false;
-int GLWindow::s_windowsCount = 0;
-
-void GLWindow::InitDevice(const WindowContext& p_context)
+bool GLWindow::InitDevice(const WindowContext& p_context)
 {
-	if (s_init)
-	{
-		PRLOG_WARN("Window Context already initiated!");
-		return;
-	}
-
-	s_init = glfwInit();
-	if (!s_init)
+	const bool init = glfwInit();
+	if (!init)
 	{
 		PRLOG_ERROR("Filed to initaite GLFW");
 		glfwTerminate();
-		return;
+		return false;
 	}
 
 	PRLOG_INFO("Init GLFW");
@@ -39,13 +29,12 @@ void GLWindow::InitDevice(const WindowContext& p_context)
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, p_context.debugMode);
 	glfwWindowHint(GLFW_SAMPLES, p_context.multiSampling);
 
-	s_context = p_context;
+	m_context = p_context;
+	return true;
 }
 
 void GLWindow::TerminateDevice()
 {
-	if (s_windowsCount > 0)
-		PRLOG_WARN("Not all windows were closed");
 	glfwTerminate();
 	PRLOG_INFO("Terminate GLFW");
 }
@@ -60,10 +49,10 @@ void GLWindow::SwapBuffers()
 	glfwSwapBuffers(m_window);
 }
 
-GLWindow::GLWindow(const WindowSettings& p_settings) :
+GLWindow::GLWindow(const WindowContext& p_context, const WindowSettings& p_settings) :
 	m_window(nullptr)
 {
-	if (!s_init)
+	if (!InitDevice(p_context))
 	{
 		PRLOG_ERROR("Cannot create a window, GLFW not init!");
 		return;
@@ -93,21 +82,18 @@ GLWindow::GLWindow(const WindowSettings& p_settings) :
 	else
 		glfwSwapInterval(0);
 
-	s_windowsCount++;
 	glfwSetWindowUserPointer(m_window, &m_settings);
 	BindCallbacks();
 	glfwMakeContextCurrent(m_window);
 
 	if (!m_settings.iconPath.empty())
 		SetIcon(std::string{ PrSystems::Get<FileSystem>()->GetEngineAssetsPath() } + m_settings.iconPath);
-
-	s_mainWindow = this;
 }
 
 GLWindow::~GLWindow()
 {
+	TerminateDevice();
 	glfwDestroyWindow(m_window);
-	s_windowsCount--;
 
 	PRLOG_INFO("Deleting Window");
 }

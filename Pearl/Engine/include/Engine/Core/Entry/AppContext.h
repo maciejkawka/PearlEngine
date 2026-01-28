@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Windowing/GLWindow.h"
+#include "Core/Windowing/Window.h"
 #include "Core/Input/InputManager.h"
 
 #include "Renderer/Core/Context.h"
@@ -14,6 +14,6 @@ namespace PrCore::Entry {
 		AppContext();
 		virtual ~AppContext();
 
-		PrCore::Windowing::GLWindow* m_window;
+		PrCore::IWindow* m_window;
 	};
 }

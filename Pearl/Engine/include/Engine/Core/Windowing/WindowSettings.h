@@ -1,7 +1,8 @@
 #pragma once
-#include<string>
 
-namespace PrCore::Windowing {
+#include <string>
+
+namespace PrCore {
 	
 	struct WindowSettings {
 

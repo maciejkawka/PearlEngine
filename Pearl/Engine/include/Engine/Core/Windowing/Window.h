@@ -1,11 +1,14 @@
 #pragma once
-#include<string>
 
-namespace PrCore::Windowing {
+#include "Core/Utils/SystemProvider.h"
 
-	class Window {
+#include <string>
+
+namespace PrCore {
+
+	class IWindow : public Utils::ISystem {
 	public:
-		virtual ~Window() {}
+		virtual ~IWindow() = default;
 
 		virtual void PollEvents() = 0;
 		virtual void SwapBuffers() = 0;
@@ -20,16 +23,12 @@ namespace PrCore::Windowing {
 		virtual bool IsVSync() const = 0;
 
 		virtual void SetIcon(std::string p_path) = 0;
-		
-		inline static Window& GetMainWindow() { return *s_mainWindow; }
+
 		//TODO
 		//virtual void SetCoursorMode() = 0;
 		//virtual GetCoursorMode() =0;
 
 		//Virtual void SetCoursorShape() = 0;
 		//virtual GetCoursorShape() =0;
-
-	protected:
-		inline static Window* s_mainWindow = nullptr;
 	};
 }

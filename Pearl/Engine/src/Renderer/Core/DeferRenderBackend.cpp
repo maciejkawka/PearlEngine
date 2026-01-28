@@ -32,8 +32,8 @@ namespace PrRenderer
 		m_renderContext.quadMesh = Mesh::CreatePrimitive(Quad);
 		m_renderContext.settings = m_settings;
 
-		m_screenWidth = PrCore::Windowing::Window::GetMainWindow().GetWidth();
-		m_screenHeight = PrCore::Windowing::Window::GetMainWindow().GetHeight();
+		m_screenWidth = PrSystems::Get<PrCore::IWindow>()->GetWidth();
+		m_screenHeight = PrSystems::Get<PrCore::IWindow>()->GetHeight();
 
 		// Prepare bffers
 		GenerategGBuffersContext();
@@ -246,8 +246,8 @@ namespace PrRenderer
 			PushCommand(CreateRC<RenderToShadowMapRC>(m_shadowMappingShdr.GetData(), lightProjMatrix * lightViewMatrix, lightPtr, &m_frame->shadowCasters, &m_renderContext));
 		}
 
-		PushCommand(CreateRC<LowRenderer::SetViewportRC>(PrCore::Windowing::Window::GetMainWindow().GetWidth(),
-			PrCore::Windowing::Window::GetMainWindow().GetHeight(), 0, 0));
+		PushCommand(CreateRC<LowRenderer::SetViewportRC>(PrSystems::Get<PrCore::IWindow>()->GetWidth(),
+			PrSystems::Get<PrCore::IWindow>()->GetHeight(), 0, 0));
 
 		//---------------------------------
 
@@ -880,7 +880,7 @@ namespace PrRenderer
 		p_SSAOShader->SetUniformMat4("projectionMat", p_renderContext->camera->GetProjectionMatrix());
 		p_SSAOShader->SetUniformMat4("viewMat", p_renderContext->camera->GetViewMatrix());
 		p_SSAOShader->SetUniformVec3Array("samples", p_renderContext->ssaoKernel.data(), p_renderContext->ssaoKernel.size());
-		p_SSAOShader->SetUniformVec2("screenSize", PrCore::Math::vec2{ PrCore::Windowing::Window::GetMainWindow().GetWidth(), PrCore::Windowing::Window::GetMainWindow().GetHeight() });
+		p_SSAOShader->SetUniformVec2("screenSize", PrCore::Math::vec2{ PrSystems::Get<PrCore::IWindow>()->GetWidth(), PrSystems::Get<PrCore::IWindow>()->GetHeight() });
 
 		p_SSAOShader->SetUniformInt("kernelSize", p_renderContext->settings->SSAOKenrelSize);
 		p_SSAOShader->SetUniformFloat("radius", p_renderContext->settings->SSAORadius);
@@ -930,7 +930,7 @@ namespace PrRenderer
 		p_FXAAShader->SetUniformInt("screenTexture", 0);
 		p_FXAAShader->SetUniformBool("enableFXAA", p_renderContext->settings->enableFXAAA);
 
-		p_FXAAShader->SetUniformVec2("inverseScreenSize", PrCore::Math::vec2{ 1.0f / PrCore::Windowing::Window::GetMainWindow().GetWidth(), 1.0f / PrCore::Windowing::Window::GetMainWindow().GetHeight() });
+		p_FXAAShader->SetUniformVec2("inverseScreenSize", PrCore::Math::vec2{ 1.0f / PrSystems::Get<PrCore::IWindow>()->GetWidth(), 1.0f / PrSystems::Get<PrCore::IWindow>()->GetHeight() });
 		p_FXAAShader->SetUniformFloat("edge_threshold_min", p_renderContext->settings->FXAAThreasholdMin);
 		p_FXAAShader->SetUniformFloat("edge_threshold_max", p_renderContext->settings->FXAAThreasholdMax);
 		p_FXAAShader->SetUniformFloat("edge_iterations", p_renderContext->settings->FXAAEdgeIterations);
@@ -986,8 +986,8 @@ namespace PrRenderer
 
 		for (int i = 0; i < BLOOM_SIZE; i++)
 		{
-			float width = PrCore::Windowing::Window::GetMainWindow().GetWidth() >> (i + 1);
-			float height = PrCore::Windowing::Window::GetMainWindow().GetHeight() >> (i + 1);
+			float width = PrSystems::Get<PrCore::IWindow>()->GetWidth() >> (i + 1);
+			float height = PrSystems::Get<PrCore::IWindow>()->GetHeight() >> (i + 1);
 
 			p_renderContext->bloomDownscaleBuff[i]->Bind();
 			LowRenderer::Clear(ColorBuffer | DepthBuffer);
@@ -1011,8 +1011,8 @@ namespace PrRenderer
 		p_renderContext->quadMesh->Bind();
 		for (int i = BLOOM_SIZE - 1; i > 0; --i)
 		{
-			float width = PrCore::Windowing::Window::GetMainWindow().GetWidth() >> (i + 1);
-			float height = PrCore::Windowing::Window::GetMainWindow().GetHeight() >> (i + 1);
+			float width = PrSystems::Get<PrCore::IWindow>()->GetWidth() >> (i + 1);
+			float height = PrSystems::Get<PrCore::IWindow>()->GetHeight() >> (i + 1);
 
 			p_renderContext->bloomDownscaleBuff[PrCore::Math::max(i - 1, 0)]->Bind();
 
@@ -1025,8 +1025,8 @@ namespace PrRenderer
 		}
 
 		//Last draw into final blur
-		float width = PrCore::Windowing::Window::GetMainWindow().GetWidth() >> 1;
-		float height = PrCore::Windowing::Window::GetMainWindow().GetHeight() >> 1;
+		float width = PrSystems::Get<PrCore::IWindow>()->GetWidth() >> 1;
+		float height = PrSystems::Get<PrCore::IWindow>()->GetHeight() >> 1;
 
 		p_renderContext->bloomBuff->Bind();
 		LowRenderer::Clear(ColorBuffer | DepthBuffer);
