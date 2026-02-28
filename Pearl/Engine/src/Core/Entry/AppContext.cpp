@@ -37,6 +37,8 @@
 #include "Physics/Resources/ConvexMeshLoader.h"
 #include "Physics/Resources/TriangleMeshLoader.h"
 
+#include "Audio/Impl/FmodAudioSystem.h"
+
 #include "Core/Utils/SystemProvider.h"
 //
 
@@ -234,6 +236,11 @@ PrCore::Entry::AppContext::AppContext()
 	}
 
 	//-----------------------
+	// Init Physics System
+	PRLOG_INFO("Init Audio System");
+	PrSystems::Register<PrAudio::IAudioSystem, PrAudio::FmodAudioSystem>();
+
+	//-----------------------
 	// Init Input Manager
 	PRLOG_INFO("Init Input Manager");
 	PrSystems::Register<InputManager>();
@@ -253,6 +260,9 @@ PrCore::Entry::AppContext::~AppContext()
 
 	PRLOG_INFO("Terminating Input Manager");
 	PrSystems::Unregister<InputManager>();
+
+	PRLOG_INFO("Terminating Audio System");
+	PrSystems::Unregister<PrAudio::IAudioSystem>();
 
 	PRLOG_INFO("Terminating Physics System");
 	{

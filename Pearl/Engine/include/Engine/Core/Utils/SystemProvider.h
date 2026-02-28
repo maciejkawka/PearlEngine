@@ -6,6 +6,11 @@
 #include <tuple>
 #include <array>
 
+namespace PrAudio
+{
+	class IAudioSystem;
+}
+
 namespace PrCore
 {
 	namespace Utils
@@ -40,6 +45,7 @@ namespace PrRenderer
 // If system is not going to be replaced or mocked in unit tests just use the concrete implementation in here
 // There is no need to provide the interface if it is not necessery
 using EngineSystems = std::tuple<
+	PrAudio::IAudioSystem,
 	PrCore::EventManager,
 	PrCore::FileSystem,
 	PrCore::IWindow,

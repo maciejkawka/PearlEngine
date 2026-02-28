@@ -12,6 +12,8 @@
 #include "Physics/Core/PhysicsSystem.h"
 #include "Editor/Assets/Exporter/SceneExporter.h"
 
+#include "Audio/Core/IAudioSystem.h"
+
 using namespace PrEditor::Core;
 using namespace PrCore;
 
@@ -87,6 +89,8 @@ void Editor::OnFrame(float p_deltaTime)
 			scene->FixUpdate(m_physicsFixStep);
 			m_physicsStepAccumulator -= m_physicsFixStep;
 		}
+
+		PrSystems::Get<PrAudio::IAudioSystem>()->Update();
 
 		scene->LateUpdate(p_deltaTime);
 

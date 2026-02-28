@@ -82,6 +82,21 @@
     <Filter Include="Physics\Resources">
       <UniqueIdentifier>{713ebf68-4782-43b3-bef2-62586659d630}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Audio">
+      <UniqueIdentifier>{66a7f2fe-e558-4a37-80cf-86d2d055c4db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Audio\Core">
+      <UniqueIdentifier>{ca95cf59-2fd0-429d-b0ce-86ac8d771093}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Audio\Impl">
+      <UniqueIdentifier>{0467f093-6ed5-4ce6-93bc-e7586ae7e79f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Audio\Utils">
+      <UniqueIdentifier>{8f835c49-0a0e-4b78-bcdc-8f17bc732a84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Audio\Resources">
+      <UniqueIdentifier>{19193f56-b67c-4482-9262-9ee4eb677b32}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Engine\Core\Entry\AppContext.h">
@@ -507,6 +522,34 @@
     <ClInclude Include="include\Engine\Core\ECS\Components\SphereBullet.h">
       <Filter>Core\ECS\Components</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Audio\Impl\ConvertUtils.h">
+      <Filter>Audio\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Audio\Impl\FmodSoundEvent.h">
+      <Filter>Audio\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Audio\Impl\FmodAudioSystem.h">
+      <Filter>Audio\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Audio\Resources\SoundBankLoader.h">
+      <Filter>Audio\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Audio\Resources\ISoundBank.h">
+      <Filter>Audio\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Audio\Core\IAudioSystem.h">
+      <Filter>Audio\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Audio\Core\ISoundBus.h">
+      <Filter>Audio\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Audio\Core\ISoundEvent.h">
+      <Filter>Audio\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Audio\Core\Types.h">
+      <Filter>Audio\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Audio\Impl\FmodSoundBus.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -740,6 +783,13 @@
     <ClCompile Include="src\Core\Utils\Assert.cpp">
       <Filter>Core\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\Audio\Impl\FmodAudioSystem.cpp">
+      <Filter>Audio\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\Impl\FmodSoundEvent.cpp">
+      <Filter>Audio\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\Impl\FmodSoundBus.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="include\Engine\Core\ECS\ComponentPool.inl">
