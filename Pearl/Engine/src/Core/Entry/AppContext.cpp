@@ -38,6 +38,8 @@
 #include "Physics/Resources/TriangleMeshLoader.h"
 
 #include "Audio/Impl/FmodAudioSystem.h"
+#include "Audio/Resources/ISoundBank.h"
+#include "Audio/Resources/SoundBankLoader.h"
 
 #include "Core/Utils/SystemProvider.h"
 //
@@ -226,19 +228,25 @@ PrCore::Entry::AppContext::AppContext()
 		PrPhysics::PhysicsSettings physSettings;
 		PrSystems::Register<PrPhysics::PhysicsSystem>(physSettings);
 
-		auto convexMeshDatabase = std::make_unique<PrRenderer::ResourceDatabase>();
+		auto convexMeshDatabase = std::make_unique<ResourceDatabase>();
 		convexMeshDatabase->RegisterLoader(".physc", std::make_unique<PrPhysics::ConvexMeshLoader>());
 		pResourceSystem->RegisterDatabase<PrPhysics::IConvexMesh>(std::move(convexMeshDatabase));
 
-		auto triangleMeshDatabase = std::make_unique<PrRenderer::ResourceDatabase>();
+		auto triangleMeshDatabase = std::make_unique<ResourceDatabase>();
 		triangleMeshDatabase->RegisterLoader(".physt", std::make_unique<PrPhysics::TriangleMeshLoader>());
 		pResourceSystem->RegisterDatabase<PrPhysics::ITriangleMesh>(std::move(triangleMeshDatabase));
 	}
 
 	//-----------------------
-	// Init Physics System
+	// Init Audio System
 	PRLOG_INFO("Init Audio System");
-	PrSystems::Register<PrAudio::IAudioSystem, PrAudio::FmodAudioSystem>();
+	{
+		PrSystems::Register<PrAudio::IAudioSystem, PrAudio::FmodAudioSystem>();
+		auto soundBankDatabase = std::make_unique<ResourceDatabase>();
+		soundBankDatabase->RegisterLoader(".bank", std::make_unique<PrAudio::SoundBankLoader>());
+		pResourceSystem->RegisterDatabase<PrAudio::ISoundBank>(std::move(soundBankDatabase));
+	}
+
 
 	//-----------------------
 	// Init Input Manager
@@ -262,7 +270,11 @@ PrCore::Entry::AppContext::~AppContext()
 	PrSystems::Unregister<InputManager>();
 
 	PRLOG_INFO("Terminating Audio System");
-	PrSystems::Unregister<PrAudio::IAudioSystem>();
+	{
+		PrSystems::Get<ResourceSystem>()->UnloadAll<PrAudio::ISoundBank>();
+		PrSystems::Get<ResourceSystem>()->UnregisterLoader<PrAudio::ISoundBank>(".bank");
+		PrSystems::Unregister<PrAudio::IAudioSystem>();
+	}
 
 	PRLOG_INFO("Terminating Physics System");
 	{

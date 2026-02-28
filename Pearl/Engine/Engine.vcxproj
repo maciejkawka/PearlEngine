@@ -17,6 +17,7 @@
     <ClInclude Include="include\Engine\Audio\Core\Types.h" />
     <ClInclude Include="include\Engine\Audio\Impl\ConvertUtils.h" />
     <ClInclude Include="include\Engine\Audio\Impl\FmodAudioSystem.h" />
+    <ClInclude Include="include\Engine\Audio\Impl\FmodSoundBank.h" />
     <ClInclude Include="include\Engine\Audio\Impl\FmodSoundBus.h" />
     <ClInclude Include="include\Engine\Audio\Impl\FmodSoundEvent.h" />
     <ClInclude Include="include\Engine\Audio\Resources\ISoundBank.h" />
@@ -164,9 +165,11 @@
     <ClInclude Include="include\Engine\Renderer\Core\RenderCommand.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Audio\Impl\FmodSoundBank.cpp" />
     <ClCompile Include="src\Audio\Impl\FmodSoundBus.cpp" />
     <ClCompile Include="src\Audio\Impl\FmodSoundEvent.cpp" />
     <ClCompile Include="src\Audio\Impl\FmodAudioSystem.cpp" />
+    <ClCompile Include="src\Audio\Resources\SoundBankLoader.cpp" />
     <ClCompile Include="src\Core\ECS\Systems\PhysicsUpdateSystem.cpp" />
     <ClCompile Include="src\Core\File\FileWrapper.cpp" />
     <ClCompile Include="src\Core\File\FileSystem.cpp" />

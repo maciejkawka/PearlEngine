@@ -34,7 +34,8 @@ namespace PrAudio {
 		void  SetGlobalParameter(const std::string& p_name, float p_value) override;
 
 		ISoundEventPtr CreateSoundEvent(std::string_view p_path, bool p_preload = false) override;
-		ISoundBusPtr GetSoundBus(std::string_view p_path) override;
+		ISoundBusPtr   GetSoundBus(std::string_view p_path) override;
+		ISoundBankPtr  LoadSoundBank(std::string_view p_path) override;
 
 	private:
 		FMOD::Studio::System* m_studioSystem;

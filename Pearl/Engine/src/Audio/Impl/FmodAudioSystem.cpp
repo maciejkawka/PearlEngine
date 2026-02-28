@@ -5,11 +5,69 @@
 #include "Audio/Impl/FmodAudioSystem.h"
 #include "Audio/Impl/FmodSoundEvent.h"
 #include "Audio/Impl/FmodSoundBus.h"
+#include "Audio/Impl/FmodSoundBank.h"
 #include "Audio/Impl/ConvertUtils.h"
 
 #include "fmod/fmod_studio.hpp"
+#include "fmod/fmod.h"
 
+#include "Core/File/FileSystem.h"
 namespace PrAudio {
+
+	//////////////////////
+	// File IO Callbacks
+	FMOD_RESULT F_CALL FmodOpenCallback(
+		const char* name,
+		unsigned int* filesize,
+		void** handle,
+		void* userdata
+	)
+	{
+		auto pFileSystem = PrSystems::Get<PrCore::FileSystem>();
+		PrCore::FileHandle file = pFileSystem->FileOpen(name);
+		if (!file)
+			return FMOD_ERR_FILE_NOTFOUND;
+
+		*filesize = pFileSystem->FileSize(file);
+		*handle = file;
+		return FMOD_OK;
+	}
+
+	FMOD_RESULT F_CALL FmodCloseCallback(void* handle, void* userdata)
+	{
+		auto pFileSystem = PrSystems::Get<PrCore::FileSystem>();
+		pFileSystem->FileClose(handle);
+		return FMOD_OK;
+	}
+
+	FMOD_RESULT F_CALL FmodReadCallback(
+		void* handle,
+		void* buffer,
+		unsigned int sizebytes,
+		unsigned int* bytesread,
+		void* userdata
+	)
+	{
+		auto pFileSystem = PrSystems::Get<PrCore::FileSystem>();
+		*bytesread = pFileSystem->FileRead(handle, buffer, sizebytes);
+
+		if (*bytesread < sizebytes)
+		{
+			if (pFileSystem->FileEOF(handle))
+			{
+				return FMOD_ERR_FILE_EOF;
+			}
+		}
+
+		return FMOD_OK;
+	}
+
+	FMOD_RESULT F_CALL FmodSeekCallback(void* handle, unsigned int pos, void* userdata)
+	{
+		PrSystems::Get<PrCore::FileSystem>()->FileSeek(handle, pos);
+		return FMOD_OK;
+	}
+	//////////////////////
 
 	FmodAudioSystem::FmodAudioSystem()
 	{
@@ -20,7 +78,7 @@ namespace PrAudio {
 			PRLOG_ERROR("FMOD error");
 		}
 
-		result = m_studioSystem->initialize(512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0);
+		result = m_studioSystem->initialize(512, FMOD_STUDIO_INIT_LIVEUPDATE, FMOD_INIT_NORMAL, 0);
 		if (result != FMOD_OK)
 		{
 			PRLOG_ERROR("FMOD error");
@@ -32,27 +90,16 @@ namespace PrAudio {
 			PRLOG_ERROR("FMOD error");
 		}
 
-		///////////////////////////////////////
-		// Test
-		auto assetPath = PrSystems::Get<PrCore::FileSystem>()->GetGameAssetsPath();
-		auto makePath = PrCore::PathUtils::MakePath(assetPath, "Master Bank.bank");
-		auto makePathString = PrCore::PathUtils::MakePath(assetPath, "Master Bank.strings.bank");
-
-		FMOD::Studio::Bank* masterBank = NULL;
-		m_studioSystem->loadBankFile(makePath.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &masterBank);
-
-		FMOD::Studio::Bank* stringBank = NULL;
-		m_studioSystem->loadBankFile(makePathString.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &stringBank);
-
-		//FMOD::Studio::EventDescription* eventDescription = NULL;
-		//m_studioSystem->getEvent("event:/Player/Song", &eventDescription);
-
-		//FMOD::Studio::EventInstance* eventInstance = NULL;
-		//eventDescription->createInstance(&eventInstance);
-
-		//eventInstance->setVolume(0.1f);
-		//eventInstance->start();
-		///////////////////////////////////////
+		// Set File IO Callbacks
+		m_coreSystem->setFileSystem(
+			FmodOpenCallback,
+			FmodCloseCallback,
+			FmodReadCallback,
+			FmodSeekCallback,
+			nullptr,
+			nullptr,
+			4096
+		);
 	}
 
 	FmodAudioSystem::~FmodAudioSystem()
@@ -160,5 +207,17 @@ namespace PrAudio {
 
 		auto soundBusPtr = std::make_shared<FmodSoundBus>(soundBus);
 		return soundBusPtr;
+	}
+
+	ISoundBankPtr FmodAudioSystem::LoadSoundBank(std::string_view p_path)
+	{
+		FMOD::Studio::Bank* bank;
+		m_studioSystem->loadBankFile(p_path.data(), FMOD_STUDIO_LOAD_BANK_NORMAL, &bank);
+
+		if (!bank)
+			return nullptr;
+
+		auto soundBankPtr = std::make_shared<FmodSoundBank>(bank);
+		return soundBankPtr;
 	}
 }

@@ -91,9 +91,6 @@
     <Filter Include="Audio\Impl">
       <UniqueIdentifier>{0467f093-6ed5-4ce6-93bc-e7586ae7e79f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Audio\Utils">
-      <UniqueIdentifier>{8f835c49-0a0e-4b78-bcdc-8f17bc732a84}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Audio\Resources">
       <UniqueIdentifier>{19193f56-b67c-4482-9262-9ee4eb677b32}</UniqueIdentifier>
     </Filter>
@@ -549,7 +546,12 @@
     <ClInclude Include="include\Engine\Audio\Core\Types.h">
       <Filter>Audio\Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\Audio\Impl\FmodSoundBus.h" />
+    <ClInclude Include="include\Engine\Audio\Impl\FmodSoundBank.h">
+      <Filter>Audio\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Audio\Impl\FmodSoundBus.h">
+      <Filter>Audio\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -789,7 +791,15 @@
     <ClCompile Include="src\Audio\Impl\FmodSoundEvent.cpp">
       <Filter>Audio\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="src\Audio\Impl\FmodSoundBus.cpp" />
+    <ClCompile Include="src\Audio\Impl\FmodSoundBank.cpp">
+      <Filter>Audio\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\Impl\FmodSoundBus.cpp">
+      <Filter>Audio\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\Resources\SoundBankLoader.cpp">
+      <Filter>Audio\Resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\Engine\Core\ECS\ComponentPool.inl">
