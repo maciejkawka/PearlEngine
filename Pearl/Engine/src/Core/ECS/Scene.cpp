@@ -6,6 +6,7 @@
 #include "Core/ECS/Systems/MeshRendererSystem.h"
 #include "Core/ECS/Systems/TransformSystem.h"
 #include "Core/ECS/Systems/PhysicsUpdateSystem.h"
+#include "Core/ECS/Systems/AudioSystem.h"
 
 using namespace PrCore;
 
@@ -133,6 +134,11 @@ void Scene::UpdateHierrarchicalEntities(float p_dt) const
 void Scene::OnDisable() const
 {
 	m_systemManager->UpdateOnDisable();
+}
+
+void Scene::AudioUpdate(float p_dt) const
+{
+	m_systemManager->UpdateSystem<AudioSystem>(p_dt);
 }
 
 void Scene::RenderUpdate(float p_dt) const

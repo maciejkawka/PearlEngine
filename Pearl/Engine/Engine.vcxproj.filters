@@ -552,6 +552,12 @@
     <ClInclude Include="include\Engine\Audio\Impl\FmodSoundBus.h">
       <Filter>Audio\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\Core\ECS\Systems\AudioSystem.h">
+      <Filter>Core\ECS\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\Core\ECS\Components\AudioComponents.h">
+      <Filter>Core\ECS\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Entry\AppContext.cpp">
@@ -799,6 +805,9 @@
     </ClCompile>
     <ClCompile Include="src\Audio\Resources\SoundBankLoader.cpp">
       <Filter>Audio\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ECS\Systems\AudioSystem.cpp">
+      <Filter>Core\ECS\Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

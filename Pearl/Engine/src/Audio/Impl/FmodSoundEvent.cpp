@@ -173,6 +173,9 @@ namespace PrAudio {
 	{
 		if (m_eventInstance)
 		{
+			// Inverse forward vector, FMOD forward is +Z whereas Pearl Engine is -Z
+			p_3DAttributes.forwardVec = -p_3DAttributes.forwardVec;
+
 			auto attributes = ToFmod(p_3DAttributes);
 			m_eventInstance->set3DAttributes(&attributes);
 		}
@@ -193,6 +196,19 @@ namespace PrAudio {
 	{
 		PR_ASSERT(p_index < 4, "Rever index must be 0-4");
 		return m_reverb[p_index];
+	}
+
+	bool FmodSoundEvent::IsPlaying()
+	{
+		if (m_eventInstance)
+		{
+			FMOD_STUDIO_PLAYBACK_STATE playbackState;
+			m_eventInstance->getPlaybackState(&playbackState);
+
+			return playbackState == FMOD_STUDIO_PLAYBACK_STATE::FMOD_STUDIO_PLAYBACK_PLAYING;
+		}
+
+		return false;
 	}
 
 	bool FmodSoundEvent::IsStream()

@@ -22,6 +22,7 @@
     <ClInclude Include="include\Engine\Audio\Impl\FmodSoundEvent.h" />
     <ClInclude Include="include\Engine\Audio\Resources\ISoundBank.h" />
     <ClInclude Include="include\Engine\Audio\Resources\SoundBankLoader.h" />
+    <ClInclude Include="include\Engine\Core\ECS\Components\AudioComponents.h" />
     <ClInclude Include="include\Engine\Core\ECS\Components\CoreComponents.h" />
     <ClInclude Include="include\Engine\Core\ECS\BaseComponent.h" />
     <ClInclude Include="include\Engine\Core\ECS\BaseSystem.h" />
@@ -41,6 +42,7 @@
     <ClInclude Include="include\Engine\Core\ECS\SystemManager.h" />
     <ClInclude Include="include\Engine\Core\ECS\SystemMap.h" />
     <ClInclude Include="include\Engine\Core\ECS\Systems.h" />
+    <ClInclude Include="include\Engine\Core\ECS\Systems\AudioSystem.h" />
     <ClInclude Include="include\Engine\Core\ECS\Systems\MeshRendererSystem.h" />
     <ClInclude Include="include\Engine\Core\ECS\Systems\PhysicsUpdateSystem.h" />
     <ClInclude Include="include\Engine\Core\ECS\Systems\TestSystem.h" />
@@ -170,6 +172,7 @@
     <ClCompile Include="src\Audio\Impl\FmodSoundEvent.cpp" />
     <ClCompile Include="src\Audio\Impl\FmodAudioSystem.cpp" />
     <ClCompile Include="src\Audio\Resources\SoundBankLoader.cpp" />
+    <ClCompile Include="src\Core\ECS\Systems\AudioSystem.cpp" />
     <ClCompile Include="src\Core\ECS\Systems\PhysicsUpdateSystem.cpp" />
     <ClCompile Include="src\Core\File\FileWrapper.cpp" />
     <ClCompile Include="src\Core\File\FileSystem.cpp" />

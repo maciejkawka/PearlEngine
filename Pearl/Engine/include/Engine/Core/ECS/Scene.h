@@ -40,6 +40,7 @@ namespace PrCore {
 		void OnDisable() const;
 		void CleanDestroyedEntities() const;
 
+		void AudioUpdate(float p_dt) const;
 		void RenderUpdate(float p_dt) const;
 		void PhysicsUpdate(float p_dt) const;
 		void PhysicsCleanup(float p_dt) const;

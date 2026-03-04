@@ -24,4 +24,9 @@ void HierarchyTransform::OnUpdate(float p_dt)
 			transform->SetWorldMatrix(parentTransform->GetWorldMatrix() * transform->GetLocalMatrix());
 			transform->DecomposeWorldMatrix();
 		});
+
+	m_entityViewer.MT_EntitesWithComponents<TransformComponent>([](const Entity entity, TransformComponent* transform)
+		{
+			transform->SetDiry(false);
+		});
 }

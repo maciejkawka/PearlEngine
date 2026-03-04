@@ -90,7 +90,7 @@ void Editor::OnFrame(float p_deltaTime)
 			m_physicsStepAccumulator -= m_physicsFixStep;
 		}
 
-		PrSystems::Get<PrAudio::IAudioSystem>()->Update();
+		scene->AudioUpdate(p_deltaTime);
 
 		scene->LateUpdate(p_deltaTime);
 

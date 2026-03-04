@@ -32,6 +32,8 @@ namespace PrAudio {
 		virtual void  SetReverbLevel(int p_index, float p_level) = 0;
 		virtual float GetReverbLevel(int p_index) = 0;
 
+		virtual bool  IsPlaying() = 0;
+
 		virtual bool  IsStream() = 0;
 		virtual bool  Is3D() = 0;
 		virtual bool  IsSnapShot() = 0;

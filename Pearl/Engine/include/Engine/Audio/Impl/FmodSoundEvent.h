@@ -40,6 +40,8 @@ namespace PrAudio {
 		void  SetReverbLevel(int p_index, float p_level) override;
 		float GetReverbLevel(int p_index) override;
 
+		bool  IsPlaying() override;
+
 		bool  IsStream() override;
 		bool  Is3D() override;
 		bool  IsSnapShot() override;

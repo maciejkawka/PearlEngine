@@ -168,6 +168,9 @@ namespace PrAudio {
 
 	void FmodAudioSystem::SetListenerAttributes(Attributes3D& p_listenerAttributes)
 	{
+		// Inverse forward vector, FMOD forward is +Z whereas Pearl Engine is -Z
+		p_listenerAttributes.forwardVec = -p_listenerAttributes.forwardVec;
+
 		auto fmodAttributes = ToFmod(p_listenerAttributes);
 		m_studioSystem->setListenerAttributes(0, &fmodAttributes);
 	}
