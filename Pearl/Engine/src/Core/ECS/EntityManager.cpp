@@ -12,7 +12,10 @@ void Entity::Destroy()
 {
 	PR_ASSERT(m_entityManager != nullptr, "EntityManager is nullptr");
 
-	AddComponent<ToDestoryTag>();
+	if (!HasComponent<ToDestoryTag>())
+	{
+		AddComponent<ToDestoryTag>();
+	}
 }
 
 bool Entity::IsValid() const
