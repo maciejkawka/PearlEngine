@@ -3,6 +3,7 @@
 #include "Core/ECS/Systems/TestSystem.h"
 #include "Core/ECS/Components/PhysicsComponents.h"
 #include "Core/ECS/Components/SphereBullet.h"
+#include "Core/ECS/Components/AudioComponents.h"
 
 #include "Renderer/Core/Color.h"
 
@@ -13,6 +14,10 @@
 #include "Renderer/Core/LowRenderer.h"
 #include "Renderer/Core/IRenderFrontend.h"
 #include "Renderer/Resources/Texture2DLoader.h"
+
+#include "Audio/Core/IAudioSystem.h"
+#include "Audio/Core/ISoundEvent.h"
+#include "Audio/Core/ISoundBus.h"
 
 using namespace PrCore;
 using namespace PrRenderer;
@@ -62,6 +67,8 @@ void RenderStressTest::OnEnable()
 	m_cameraTransform = entity.AddComponent<PrCore::TransformComponent>();
 	m_cameraTransform->SetPosition(m_camera->GetPosition());
 	m_cameraTransform->SetRotation(m_camera->GetRotation());
+
+	entity.AddComponent<AudioListenerComponent>();
 
 	auto settings = pRenderer->GetSettingsPtr();
 	settings->enableFog = false;
@@ -248,7 +255,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 
 
 	auto sun = m_entityViewer.GetEntityByName("Sun");
-	if(sun.IsValid())
+	if (sun.IsValid())
 	{
 		auto forwardVector = sun.GetComponent<TransformComponent>()->GetForwardVector();
 		auto rotation = sun.GetComponent<TransformComponent>()->GetRotation();
@@ -310,7 +317,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 	for (auto [entity, transform, light] : m_entityViewer.EntitesWithComponents<TransformComponent, LightComponent>())
 	{
 		//This is selected light
-		if (i ==m_selectedLight)
+		if (i == m_selectedLight)
 		{
 			//auto box = mesh->mesh->GetBoxVolume();
 
@@ -370,6 +377,14 @@ void RenderStressTest::OnUpdate(float p_dt)
 		i++;
 	}
 
+	for (auto [entity, light] : m_entityViewer.EntitesWithComponents<LightComponent>())
+	{
+		if (entity.GetComponent<NameComponent>()->name == "PhysicxExplosion")
+		{
+			entity.Destroy();
+		}
+	}
+
 	for (auto [entity, bullet, meshRenderer] : m_entityViewer.EntitesWithComponents<SphereBullet, MeshRendererComponent>())
 	{
 		bullet->time += p_dt;
@@ -378,6 +393,30 @@ void RenderStressTest::OnUpdate(float p_dt)
 			auto color = PrRenderer::Color::Magenta * (5 * bullet->time);
 			meshRenderer->mainMaterial->SetColor(color);
 			entity.Destroy();
+
+			//auto audioEvent = entity.GetComponent<PrCore::AudioSourceComponent>();
+			//audioEvent->audioEvent->PlayOneShot();
+
+			PrPhysics::Material material;
+			material.staticFriction = 0.0f;
+			material.dynamicFriction = 0.1f;
+			material.restitution = .1f;
+
+			auto explosion = m_entityViewer.CreateEntity("PhysicxExplosion");
+
+			auto transform = explosion.AddComponent<TransformComponent>();
+			transform->SetPosition(entity.GetComponent< TransformComponent>()->GetPosition());
+
+
+			auto light = explosion.AddComponent<LightComponent>()->m_light;
+			light->SetColor(Color(1.0f, 0.05f, 0.0f) * 200.0f);
+			light->SetType(PrRenderer::LightType::Point);
+
+
+			auto rigid = explosion.AddComponent<RigidBodyStaticComponent>();
+			auto shape = PrSystems::Get<PrPhysics::PhysicsSystem>()->CreateShape(PrPhysics::SphereGeometry{ 5.0f }, material);
+			shape->SetFlags(PrPhysics::ShapeFlags::Trigger);
+			rigid->rigidBody->AttachShape(shape);
 		}
 		else if (bullet->time >= (bullet->maxTime - 0.2f))
 		{
@@ -403,7 +442,7 @@ void RenderStressTest::OnUpdate(float p_dt)
 		material.dynamicFriction = 0.1f;
 		material.restitution = .1f;
 
-		auto entity = m_entityViewer.CreateEntity("PhysicsBox");
+		auto entity = m_entityViewer.CreateEntity("TNT");
 		auto physcomponent = entity.AddComponent<PrCore::RigidBodyDynamicComponent>();
 
 		auto rigidBody = physcomponent->rigidBody;
@@ -428,6 +467,10 @@ void RenderStressTest::OnUpdate(float p_dt)
 		}
 
 		entity.AddComponent<PrCore::SphereBullet>();
+
+		auto audioSource = entity.AddComponent<PrCore::AudioSourceComponent>();
+		audioSource->audioEvent = PrSystems::Get<PrAudio::IAudioSystem>()->CreateSoundEvent("event:/Explosion");
+		audioSource->audioEvent->Play();
 
 		if (++counter % 2 == 0)
 		{
@@ -488,6 +531,50 @@ void RenderStressTest::OnUpdate(float p_dt)
 
 	if (PrSystems::Get<InputManager>()->IsKeyPressed(PrCore::PrKey::U))
 		settings->enableBloom = !settings->enableBloom;
+
+
+	// Test Audio
+	static bool addAudio = true;
+	if (addAudio && m_entityViewer.GetEntityByName("Pan").IsValid())
+	{
+		auto audioSource = m_entityViewer.GetEntityByName("Pan").AddComponent<AudioSourceComponent>();
+		audioSource->audioEvent = PrSystems::Get<PrAudio::IAudioSystem>()->CreateSoundEvent("event:/Music");
+		addAudio = false;
+	}
+
+	if (PrSystems::Get<InputManager>()->IsKeyPressed(PrCore::PrKey::P))
+	{
+		if (auto audioSource = m_entityViewer.GetEntityByName("Pan").GetComponent<AudioSourceComponent>())
+			audioSource->audioEvent->Play();
+	}
+
+	auto audio = PrSystems::Get<PrAudio::IAudioSystem>();
+	static auto music = audio->CreateSoundEvent("event:/Music");
+
+	if (m_entityViewer.GetEntityByName("Pan").IsValid())
+	{
+		auto transformComponent = m_entityViewer.GetEntityByName("Pan").GetComponent<TransformComponent>();
+		PrAudio::Attributes3D attributes1;
+		attributes1.position = transformComponent->GetPosition();
+		attributes1.upVec = transformComponent->GetUpVector();
+		attributes1.forwardVec = transformComponent->GetForwardVector();
+		music->Set3DAttributes(attributes1);
+	}
+
+	if (PrSystems::Get<InputManager>()->IsKeyPressed(PrCore::PrKey::M))
+	{
+	//	music->SetParameter("Music_Controller", 1.0f);
+	//	music->Play();
+	}
+
+	if (PrSystems::Get<InputManager>()->IsKeyPressed(PrCore::PrKey::L))
+	{
+		auto bus = audio->GetSoundBus("bus:/FX");
+		if (bus->GetMute())
+			bus->SetMute(false);
+		else
+			bus->SetMute(true);
+	}
 }
 
 void RenderStressTest::OnCollisionEnter(PrCore::EventPtr p_event)
@@ -495,6 +582,9 @@ void RenderStressTest::OnCollisionEnter(PrCore::EventPtr p_event)
 	auto collisionInfo = std::static_pointer_cast<PrPhysics::CollisionEnter>(p_event)->m_collisionInfo;
 	auto nameA = collisionInfo.entityA.GetComponent<PrCore::NameComponent>()->name;
     auto nameB = collisionInfo.entityB.GetComponent<PrCore::NameComponent>()->name;
+
+	if (nameA == "TNT" || nameB == "TNT")
+		return;
 
 	if (collisionInfo.entityA.HasComponent<PrCore::LightComponent>() && nameB == "Quad")
 	{
@@ -510,6 +600,9 @@ void RenderStressTest::OnCollisionExit(PrCore::EventPtr p_event)
 	auto collisionInfo = std::static_pointer_cast<PrPhysics::CollisionExit>(p_event)->m_collisionInfo;
 	auto nameA = collisionInfo.entityA.GetComponent<PrCore::NameComponent>()->name;
 	auto nameB = collisionInfo.entityB.GetComponent<PrCore::NameComponent>()->name;
+
+	if (nameA == "TNT" || nameB == "TNT")
+		return;
 
 	if (collisionInfo.entityA.HasComponent<PrCore::LightComponent>() && nameB == "Quad")
 	{
@@ -531,15 +624,49 @@ void RenderStressTest::OnCollisionStay(PrCore::EventPtr p_event)
 void RenderStressTest::OnTriggerEnter(PrCore::EventPtr p_event)
 {
 	auto collisionInfo = std::static_pointer_cast<PrPhysics::TriggerEnter>(p_event)->m_collisionInfo;
+
+	if (!collisionInfo.entityA.IsValid() || !collisionInfo.entityB.IsValid())
+		return;
+
 	auto nameA = collisionInfo.entityA.GetComponent<PrCore::NameComponent>()->name;
 	auto nameB = collisionInfo.entityB.GetComponent<PrCore::NameComponent>()->name;
 	PRLOG_INFO("On trigger enter, EntityA: {}, EntityB {}", nameA, nameB);
+
+
+	if (nameA == "PhysicxExplosion" && nameB == "PhysicxExplosion")
+		return;
+
+	if (nameA == "PhysicxExplosion" && nameB == "TNT")
+		return;
+
+	if (nameA == "PhysicxExplosion" && collisionInfo.entityB.HasComponent<RigidBodyDynamicComponent>())
+	{
+		auto transformA = collisionInfo.entityA.GetComponent<TransformComponent>();
+		auto transformB = collisionInfo.entityB.GetComponent<TransformComponent>();
+
+		auto explisionNormal = transformB->GetPosition() - transformA->GetPosition();
+		auto normilized = PrCore::Math::normalize(explisionNormal);
+
+		auto rigidBody = collisionInfo.entityB.GetComponent<RigidBodyDynamicComponent>();
+		rigidBody->rigidBody->AddForce(normilized * 50.0f, PrPhysics::ForceMode::Impulsive);
+	}
+
+	if (nameB == "PhysicxExplosion" && collisionInfo.entityA.HasComponent<RigidBodyDynamicComponent>())
+	{
+		auto transformB = collisionInfo.entityB.GetComponent<TransformComponent>();
+		auto transformA = collisionInfo.entityA.GetComponent<TransformComponent>();
+
+		auto explisionNormal = transformA->GetPosition() - transformB->GetPosition();
+
+		auto rigidBody = collisionInfo.entityA.GetComponent<RigidBodyDynamicComponent>();
+		rigidBody->rigidBody->AddForce(PrCore::Math::vec3{ 0.0f, 10.0f, 0.0f }, PrPhysics::ForceMode::Impulsive);
+	}
 }
 
 void RenderStressTest::OnTriggerExit(PrCore::EventPtr p_event)
 {
-	auto collisionInfo = std::static_pointer_cast<PrPhysics::TriggerExit>(p_event)->m_collisionInfo;
-	auto nameA = collisionInfo.entityA.GetComponent<PrCore::NameComponent>()->name;
-	auto nameB = collisionInfo.entityB.GetComponent<PrCore::NameComponent>()->name;
-	PRLOG_INFO("On trigger exit, EntityA: {}, EntityB {}", nameA, nameB);
+	//auto collisionInfo = std::static_pointer_cast<PrPhysics::TriggerExit>(p_event)->m_collisionInfo;
+	//auto nameA = collisionInfo.entityA.GetComponent<PrCore::NameComponent>()->name;
+	//auto nameB = collisionInfo.entityB.GetComponent<PrCore::NameComponent>()->name;
+	//PRLOG_INFO("On trigger exit, EntityA: {}, EntityB {}", nameA, nameB);
 }

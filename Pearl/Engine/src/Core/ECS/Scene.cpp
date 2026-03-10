@@ -124,6 +124,11 @@ void Scene::CleanDestroyedEntities() const
 
 	for (auto [entity, _] : viewer.EntitesWithComponents<ToDestoryTag>())
 		m_entityManager->DestoryEntity(entity.GetID());
+
+	viewer.MT_EntitesWithComponents<TransformComponent>([](const Entity entity, TransformComponent* transform)
+		{
+			transform->SetDiry(false);
+		});
 }
 
 void Scene::UpdateHierrarchicalEntities(float p_dt) const

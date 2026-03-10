@@ -47,9 +47,9 @@
     <ClInclude Include="include\Engine\Core\ECS\Systems\PhysicsUpdateSystem.h" />
     <ClInclude Include="include\Engine\Core\ECS\Systems\TestSystem.h" />
     <ClInclude Include="include\Engine\Core\ECS\Systems\TransformSystem.h" />
-    <ClInclude Include="include\Engine\Core\Entry\AppContext.h" />
-    <ClInclude Include="include\Engine\Core\Entry\Application.h" />
-    <ClInclude Include="include\Engine\Core\Entry\EntryPoint.h" />
+    <ClInclude Include="include\Engine\Core\Entry\GameFramework.h" />
+    <ClInclude Include="include\Engine\Core\Entry\IContext.h" />
+    <ClInclude Include="include\Engine\Core\Entry\EngineCore.h" />
     <ClInclude Include="include\Engine\Core\Events\Delegate.h" />
     <ClInclude Include="include\Engine\Core\Events\ECSEvents.h" />
     <ClInclude Include="include\Engine\Core\Events\Event.h" />
@@ -174,6 +174,7 @@
     <ClCompile Include="src\Audio\Resources\SoundBankLoader.cpp" />
     <ClCompile Include="src\Core\ECS\Systems\AudioSystem.cpp" />
     <ClCompile Include="src\Core\ECS\Systems\PhysicsUpdateSystem.cpp" />
+    <ClCompile Include="src\Core\Entry\EngineCore.cpp" />
     <ClCompile Include="src\Core\File\FileWrapper.cpp" />
     <ClCompile Include="src\Core\File\FileSystem.cpp" />
     <ClCompile Include="src\Core\Resources\ResourceDatabase.cpp" />
@@ -186,8 +187,6 @@
     <ClCompile Include="src\Core\ECS\Systems\MeshRendererSystem.cpp" />
     <ClCompile Include="src\Core\ECS\Systems\TestSystem.cpp" />
     <ClCompile Include="src\Core\ECS\Systems\TransformSystem.cpp" />
-    <ClCompile Include="src\Core\Entry\AppContext.cpp" />
-    <ClCompile Include="src\Core\Entry\Application.cpp" />
     <ClCompile Include="src\Core\Events\EventManager.cpp" />
     <ClCompile Include="src\Core\File\ConfigFile.cpp" />
     <ClCompile Include="src\Core\File\MemoryStream.cpp" />

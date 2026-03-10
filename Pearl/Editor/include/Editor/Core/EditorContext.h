@@ -1,12 +1,27 @@
 #pragma once
-#include"Engine/Core/Entry/AppContext.h"
 
-namespace PrEditor::Core {
+#include "Engine/Core/Entry/IContext.h"
+#include "Engine/Core/Events/Event.h"
 
-	class EditorContext : public PrCore::Entry::AppContext {
+#include "Editor/Components/BasicCamera.h"
+#include "Editor/Components/TestFeatures.h"
+
+namespace PrEditor {
+
+	class EditorContext : public PrCore::IContext {
 	public:
-		EditorContext();
-		~EditorContext();
-	};
+		bool OnInitalize(const PrCore::EngineCoreParams& p_params) override;
+		void OnTerminate() override;
+		bool OnUpdate(float p_dt) override;
 
+		bool ShouldClose() override;
+
+	private:
+		void OnWindowClose(PrCore::EventPtr p_event);
+
+		Components::BasicCamera* m_basicCamera;
+		Components::TestFeatures* m_testFeatures;
+
+		bool m_shouldClose = false;
+	};
 }

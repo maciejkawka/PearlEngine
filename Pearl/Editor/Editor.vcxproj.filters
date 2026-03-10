@@ -22,9 +22,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="scr\Core\Editor.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="scr\Core\EditorContext.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -51,9 +48,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Editor\Core\Editor.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="include\Editor\Core\EditorContext.h">
       <Filter>Core</Filter>
     </ClInclude>

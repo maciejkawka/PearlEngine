@@ -14,6 +14,7 @@
 #include"Core/ECS/Systems/TransformSystem.h"
 #include"Core/ECS/Systems/MeshRendererSystem.h"
 #include"Core/ECS/Systems/PhysicsUpdateSystem.h"
+#include"Core/ECS/Systems/AudioSystem.h"
 #include "Core/ECS/Components/PhysicsComponents.h"
 
 // Temporary register loaders
@@ -42,8 +43,12 @@
 #include "Physics/Actor/IRigidBody.h"
 #include "Editor/Assets/Exporter/SceneExporter.h"
 
+#include "Audio/Core/IAudioSystem.h"
+#include "Audio/Resources/ISoundBank.h"
 //
+
 using namespace PrEditor::Components;
+using namespace PrCore;
 
 PrPhysics::IRigidBodyDynamicPtr ptrActor;
 PrPhysics::IShapePtr ptrShape;
@@ -55,40 +60,14 @@ TestFeatures::TestFeatures()
 	using namespace PrCore;
 	using namespace PrRenderer;
 
-	auto scene101 = PrCore::ECS::SceneManager::GetInstance().LoadScene("scene/physics_test.pearl");
+	auto scene101 = PrSystems::Get<SceneManager>()->LoadScene("scene/physics_test.pearl");
+	scene101->RegisterSystem<PrCore::AudioSystem>();
+
+	PrSystems::Get<PrCore::ResourceSystem>()->Load<PrAudio::ISoundBank>("Master Bank.bank");
+	PrSystems::Get<PrCore::ResourceSystem>()->Load<PrAudio::ISoundBank>("Master Bank.strings.bank");
+
+	//scene101->RegisterSystem<PrCore::PhysicsUpdateSystem>();
 	return;
-	//scene101->RegisterSystem<PrCore::ECS::PhysicsUpdateSystem>();
-
-	//auto physicsPtr1 = PrPhysics::PhysicsSystem::GetInstancePtr();
-
-	//PrPhysics::Material material1;
-	//material1.staticFriction = 0.0f;
-	//material1.dynamicFriction = 0.1f;
-	//material1.restitution = .1f;
-
-	//auto groundCollider = scene101->CreateEntity("Quad");
-	//auto transformComponent = groundCollider.AddComponent<PrCore::ECS::TransformComponent>();
-	//transformComponent->SetPosition({ 0, 5.0f, 0.0f });
-	//transformComponent->SetRotation(glm::angleAxis(glm::radians(90.0f), glm::vec3(0, 0, 1)));
-
-	//auto rigidBody = groundCollider.AddComponent<PrCore::ECS::RigidBodyStaticComponent>()->rigidBody;
-	//auto shape = physicsPtr1->CreateShape(PrPhysics::PlaneGeometry{}, material1);
-	//rigidBody->AttachShape(shape);
-
-	//return;
-
-	//auto scene101 = PrCore::ECS::SceneManager::GetInstance().CreateScene("export_test");
-
-	auto modeHandl = PrSystems::Get<PrCore::ResourceSystem>()->Load<Assets::ModelResource>("Model/SceneOceanNewTest.glb");
-	modeHandl->AddEntitesToScene(scene101);
-
-	auto root = scene101->GetEntityByName("sceneoceannewtest").GetComponent<PrCore::ECS::TransformComponent>();
-	root->SetPosition(PrCore::Math::vec3{ 0,5.0f,0.0f });
-
-	scene101->RegisterSystem<PrCore::ECS::HierarchyTransform>();
-	scene101->RegisterSystem<PrCore::ECS::MeshRendererSystem>();
-	scene101->RegisterSystem<PrCore::ECS::RenderStressTest>();
-	scene101->RegisterSystem<PrCore::ECS::PhysicsUpdateSystem>();
 
 	auto physicsPtr1 = PrSystems::Get<PrPhysics::PhysicsSystem>();
 
@@ -98,30 +77,62 @@ TestFeatures::TestFeatures()
 	material1.restitution = .1f;
 
 	auto groundCollider = scene101->CreateEntity("Quad");
-	auto transformComponent = groundCollider.AddComponent<PrCore::ECS::TransformComponent>();
+	auto transformComponent = groundCollider.AddComponent<PrCore::TransformComponent>();
 	transformComponent->SetPosition({ 0, 5.0f, 0.0f });
 	transformComponent->SetRotation(glm::angleAxis(glm::radians(90.0f), glm::vec3(0, 0, 1)));
 
-	auto rigidBody = groundCollider.AddComponent<PrCore::ECS::RigidBodyStaticComponent>()->rigidBody;
+	auto rigidBody = groundCollider.AddComponent<PrCore::RigidBodyStaticComponent>()->rigidBody;
 	auto shape = physicsPtr1->CreateShape(PrPhysics::PlaneGeometry{}, material1);
 	rigidBody->AttachShape(shape);
 
-	//Assets::SceneExporter exporter;
-	//exporter.BasicExporter("Export/");
-	//PrCore::ECS::SceneManager::GetInstance().SaveSceneByReference(scene101, "scene/test_export.pearl");
+	//return;
+
+	//auto scene101 = PrCore::SceneManager::GetInstance().CreateScene("export_test");
+
+	auto modeHandl = PrSystems::Get<PrCore::ResourceSystem>()->Load<Assets::ModelResource>("Model/SceneOceanNewTest.glb");
+	modeHandl->AddEntitesToScene(scene101);
+
+	auto root = scene101->GetEntityByName("sceneoceannewtest").GetComponent<PrCore::TransformComponent>();
+	root->SetPosition(PrCore::Math::vec3{ 0,5.0f,0.0f });
+
+	scene101->RegisterSystem<PrCore::HierarchyTransform>();
+	scene101->RegisterSystem<PrCore::MeshRendererSystem>();
+	scene101->RegisterSystem<PrCore::RenderStressTest>();
+	scene101->RegisterSystem<PrCore::PhysicsUpdateSystem>();
+
 	return;
+	//auto physicsPtr1 = PrSystems::Get<PrPhysics::PhysicsSystem>();
+
+	//PrPhysics::Material material1;
+	//material1.staticFriction = 0.0f;
+	//material1.dynamicFriction = 0.1f;
+	//material1.restitution = .1f;
+
+	//auto groundCollider = scene101->CreateEntity("Quad");
+	//auto transformComponent = groundCollider.AddComponent<PrCore::TransformComponent>();
+	//transformComponent->SetPosition({ 0, 5.0f, 0.0f });
+	//transformComponent->SetRotation(glm::angleAxis(glm::radians(90.0f), glm::vec3(0, 0, 1)));
+
+	//auto rigidBody = groundCollider.AddComponent<PrCore::RigidBodyStaticComponent>()->rigidBody;
+	//auto shape = physicsPtr1->CreateShape(PrPhysics::PlaneGeometry{}, material1);
+	//rigidBody->AttachShape(shape);
+
+	////Assets::SceneExporter exporter;
+	////exporter.BasicExporter("Export/");
+	////PrCore::SceneManager::GetInstance().SaveSceneByReference(scene101, "scene/test_export.pearl");
+	//return;
 	
 
 
 	// Load Stress Test
-	auto scene10 = PrCore::ECS::SceneManager::GetInstance().LoadScene("scene/physics_test.pearl");
-	scene10->RegisterSystem<PrCore::ECS::HierarchyTransform>();
-	scene10->RegisterSystem<PrCore::ECS::PhysicsUpdateSystem>();
+	auto scene10 = PrSystems::Get<SceneManager>()->LoadScene("scene/physics_test.pearl");
+	scene10->RegisterSystem<PrCore::HierarchyTransform>();
+	scene10->RegisterSystem<PrCore::PhysicsUpdateSystem>();
 
 	//auto modeHandl = PrSystems::Get<PrCore::ResourceSystem>()->Load<Assets::ModelResource>("Model/ocean.glb");
 	//modeHandl->AddEntitesToScene(scene10);
 
-	//auto root = scene10->GetEntityByName("ocean").GetComponent<PrCore::ECS::TransformComponent>();
+	//auto root = scene10->GetEntityByName("ocean").GetComponent<PrCore::TransformComponent>();
 	//root->SetPosition(PrCore::Math::vec3{ 0,5.0f,0.0f });
 
 	//Add physics
@@ -135,11 +146,11 @@ TestFeatures::TestFeatures()
 	//GroundCollider
 	{
 		auto groundCollider = scene10->CreateEntity("Quad");
-		auto transformComponent = groundCollider.AddComponent<PrCore::ECS::TransformComponent>();
+		auto transformComponent = groundCollider.AddComponent<PrCore::TransformComponent>();
 		transformComponent->SetPosition({ 0, 0.0f, 0.0f });
 		transformComponent->SetRotation(glm::angleAxis(glm::radians(90.0f), glm::vec3(0, 0, 1)));
 
-		auto rigidBody = groundCollider.AddComponent<PrCore::ECS::RigidBodyStaticComponent>()->rigidBody;
+		auto rigidBody = groundCollider.AddComponent<PrCore::RigidBodyStaticComponent>()->rigidBody;
 		auto shape = physicsPtr->CreateShape(PrPhysics::PlaneGeometry{}, material);
 		rigidBody->AttachShape(shape);
 	}
@@ -147,13 +158,13 @@ TestFeatures::TestFeatures()
 	//Ocean Trigger
 	{
 		auto triggerEntity = scene10->CreateEntity("TriggerPoint");
-		auto rigidbodyComponent = triggerEntity.AddComponent<PrCore::ECS::RigidBodyDynamicComponent>();
-		auto transformComponent = triggerEntity.AddComponent<PrCore::ECS::TransformComponent>();
+		auto rigidbodyComponent = triggerEntity.AddComponent<PrCore::RigidBodyDynamicComponent>();
+		auto transformComponent = triggerEntity.AddComponent<PrCore::TransformComponent>();
 		transformComponent->SetPosition({ 3.0f, 3.0f, 3.0f });
 		transformComponent->SetLocalScale({ 30.0f, 2.0f, 30.0f });
 		//transformComponent->SetRotation(PrCore::Math::angleAxis(glm::radians(90.0f), glm::vec3(0, 0, 1)));
 
-		auto logoMesh = triggerEntity.AddComponent<PrCore::ECS::MeshRendererComponent>();
+		auto logoMesh = triggerEntity.AddComponent<PrCore::MeshRendererComponent>();
 		logoMesh->mainMaterial = PrSystems::Get<PrCore::ResourceSystem>()->Load<PrRenderer::Material>("stress_test/capsuleTransparent.mat");
 		logoMesh->mainMaterial->SetRenderType(PrRenderer::RenderType::Transparent);
 		logoMesh->mesh = PrRenderer::Mesh::CreatePrimitive(PrRenderer::PrimitiveType::Cube);
@@ -171,14 +182,14 @@ TestFeatures::TestFeatures()
 		for (int j = 0; j < 10; j += 2)
 		{	
 			auto entity = scene10->CreateEntity("PhysicsBox");
-			auto physcomponent = entity.AddComponent<PrCore::ECS::RigidBodyDynamicComponent>();
+			auto physcomponent = entity.AddComponent<PrCore::RigidBodyDynamicComponent>();
 			
 			auto rigidBody = physcomponent->rigidBody;
 			auto shape = physicsPtr->CreateShape(PrPhysics::BoxGeometery{ 0.5f, 0.5f, 0.5f }, material);
 			rigidBody->AttachShape(shape);
 
-			auto logoTransform = entity.AddComponent<PrCore::ECS::TransformComponent>();
-			auto logoMesh = entity.AddComponent<PrCore::ECS::MeshRendererComponent>();
+			auto logoTransform = entity.AddComponent<PrCore::TransformComponent>();
+			auto logoMesh = entity.AddComponent<PrCore::MeshRendererComponent>();
 
 			logoTransform->SetPosition(PrCore::Math::vec3({ 15, 25.0f + i * 3, j * 2 }));
 			logoTransform->SetLocalScale(PrCore::Math::vec3(1.0f));
@@ -192,14 +203,14 @@ TestFeatures::TestFeatures()
 		for (int j = 0; j < 10; j += 2)
 		{			
 			auto entity = scene10->CreateEntity("PhysicsBox");
-			auto physcomponent = entity.AddComponent<PrCore::ECS::RigidBodyDynamicComponent>();
+			auto physcomponent = entity.AddComponent<PrCore::RigidBodyDynamicComponent>();
 
 			auto rigidBody = physcomponent->rigidBody;
 			auto shape = physicsPtr->CreateShape(PrPhysics::SphereGeometry{ 0.5f }, material);
 			rigidBody->AttachShape(shape);
 
-			auto logoTransform = entity.AddComponent<PrCore::ECS::TransformComponent>();
-			auto logoMesh = entity.AddComponent<PrCore::ECS::MeshRendererComponent>();
+			auto logoTransform = entity.AddComponent<PrCore::TransformComponent>();
+			auto logoMesh = entity.AddComponent<PrCore::MeshRendererComponent>();
 			logoTransform->SetPosition(PrCore::Math::vec3({ -10, 25.0f + i * 3, j * 2 }));
 			logoTransform->SetLocalScale(PrCore::Math::vec3(1.0f));
 			logoMesh->mainMaterial = PrSystems::Get<PrCore::ResourceSystem>()->Load<PrRenderer::Material>("stress_test/emissionCapsule.mat");
@@ -209,14 +220,14 @@ TestFeatures::TestFeatures()
 
 	{
 		auto entity = scene10->CreateEntity("ParentBox");
-		auto physcomponent = entity.AddComponent<PrCore::ECS::RigidBodyDynamicComponent>();
+		auto physcomponent = entity.AddComponent<PrCore::RigidBodyDynamicComponent>();
 
 		auto rigidBody = physcomponent->rigidBody;
 		auto shape = physicsPtr->CreateShape(PrPhysics::SphereGeometry{ 0.5f }, material);
 		rigidBody->AttachShape(shape);
 
-		auto logoTransform = entity.AddComponent<PrCore::ECS::TransformComponent>();
-		auto logoMesh = entity.AddComponent<PrCore::ECS::MeshRendererComponent>();
+		auto logoTransform = entity.AddComponent<PrCore::TransformComponent>();
+		auto logoMesh = entity.AddComponent<PrCore::MeshRendererComponent>();
 		logoTransform->SetPosition(PrCore::Math::vec3({ -50, 50, 10 }));
 		logoTransform->SetLocalScale(PrCore::Math::vec3(1.0f));
 		logoMesh->mainMaterial = PrSystems::Get<PrCore::ResourceSystem>()->Load<PrRenderer::Material>("stress_test/emissionCapsule.mat");
@@ -225,11 +236,11 @@ TestFeatures::TestFeatures()
 		for (int j = 0; j < 10; j += 2)
 		{
 			auto entityChild = scene10->CreateEntity("Child");
-			auto parentComponent = entityChild.AddComponent<PrCore::ECS::ParentComponent>();
+			auto parentComponent = entityChild.AddComponent<PrCore::ParentComponent>();
 			parentComponent->SetParent(entity);
 
-			auto logoTransform = entityChild.AddComponent<PrCore::ECS::TransformComponent>();
-			auto logoMesh = entityChild.AddComponent<PrCore::ECS::MeshRendererComponent>();
+			auto logoTransform = entityChild.AddComponent<PrCore::TransformComponent>();
+			auto logoMesh = entityChild.AddComponent<PrCore::MeshRendererComponent>();
 			logoTransform->SetLocalPosition(PrCore::Math::vec3({ -5, -5 + j * 3, 0 }));
 			logoTransform->SetLocalScale(PrCore::Math::vec3(1.0f));
 			logoMesh->mainMaterial = PrSystems::Get<PrCore::ResourceSystem>()->Load<PrRenderer::Material>("stress_test/emissionCapsule.mat");
@@ -237,7 +248,7 @@ TestFeatures::TestFeatures()
 		}
 	}
 
-	//PrCore::ECS::SceneManager::GetInstance().SaveSceneByName(scene10->GetSceneName(), "scene/test_deseriallize.pearl");
+	//PrCore::SceneManager::GetInstance().SaveSceneByName(scene10->GetSceneName(), "scene/test_deseriallize.pearl");
 
 	// Physics Test
 	//auto physicsPtr = PrPhysics::PhysicsSystem::GetInstancePtr();

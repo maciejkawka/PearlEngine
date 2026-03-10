@@ -134,7 +134,7 @@ void GLWindow::BindCallbacks()
 	glfwSetWindowCloseCallback(m_window, [](GLFWwindow* p_window)
 		{
 			EventPtr event = std::make_shared<WindowCloseEvent>();
-			PrSystems::Get<EventManager>()->QueueEvent(event);
+			PrSystems::Get<EventManager>()->FireEvent(event);
 		});
 
 	//Resize Window Callback
@@ -145,7 +145,7 @@ void GLWindow::BindCallbacks()
 			windowSettings->height = p_height;
 
 			EventPtr event = std::make_shared<WindowResizeEvent>(p_width, p_height);
-			PrSystems::Get<EventManager>()->QueueEvent(event);
+			PrSystems::Get<EventManager>()->FireEvent(event);
 		});
 
 	//Minimalize Window Callback
@@ -153,7 +153,7 @@ void GLWindow::BindCallbacks()
 		{
 
 			EventPtr event = std::make_shared<WindowMinimalizeEvent>(p_iconified);
-			PrSystems::Get<EventManager>()->QueueEvent(event);
+			PrSystems::Get<EventManager>()->FireEvent(event);
 		});
 
 
@@ -163,12 +163,12 @@ void GLWindow::BindCallbacks()
 			if (p_action == GLFW_PRESS)
 			{
 				EventPtr event = std::make_shared<KeyPressedEvent>(p_key);
-				PrSystems::Get<EventManager>()->QueueEvent(event);
+				PrSystems::Get<EventManager>()->FireEvent(event);
 			}
 			else if (p_action == GLFW_RELEASE)
 			{
 				EventPtr event = std::make_shared<KeyReleasedEvent>(p_key);
-				PrSystems::Get<EventManager>()->QueueEvent(event);
+				PrSystems::Get<EventManager>()->FireEvent(event);
 			}
 		});
 
@@ -178,12 +178,12 @@ void GLWindow::BindCallbacks()
 			if (p_action == GLFW_PRESS)
 			{
 				EventPtr event = std::make_shared<MouseButtonPressedEvent>(p_button);
-				PrSystems::Get<EventManager>()->QueueEvent(event);
+				PrSystems::Get<EventManager>()->FireEvent(event);
 			}
 			else if (p_action == GLFW_RELEASE)
 			{
 				EventPtr event = std::make_shared<MouseButtonReleasedEvent>(p_button);
-				PrSystems::Get<EventManager>()->QueueEvent(event);
+				PrSystems::Get<EventManager>()->FireEvent(event);
 			}
 		});
 
@@ -191,12 +191,12 @@ void GLWindow::BindCallbacks()
 	glfwSetCursorPosCallback(m_window, [](GLFWwindow* p_window, double p_xPos, double p_yPos)
 		{
 			EventPtr event = std::make_shared<MouseMovedEvent>(p_xPos, p_yPos);
-			PrSystems::Get<EventManager>()->QueueEvent(event);
+			PrSystems::Get<EventManager>()->FireEvent(event);
 		});
 
 	glfwSetScrollCallback(m_window, [](GLFWwindow* p_window, double p_xOffset, double p_yOffset)
 		{
 			EventPtr event = std::make_shared<MouseScrollEvent>(p_xOffset, p_yOffset);
-			PrSystems::Get<EventManager>()->QueueEvent(event);
+			PrSystems::Get<EventManager>()->FireEvent(event);
 		});
 }

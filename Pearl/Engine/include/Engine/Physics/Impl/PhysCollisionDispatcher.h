@@ -82,12 +82,12 @@ namespace PrPhysics {
 				if (pair.status & PxPairFlag::Enum::eNOTIFY_TOUCH_FOUND)
 				{
 					PrCore::EventPtr eventPtr = std::make_shared<PrPhysics::TriggerEnter>(collisionInfo);
-					PrSystems::Get<PrCore::EventManager>()->FireEvent(eventPtr);
+					PrSystems::Get<PrCore::EventManager>()->QueueEvent(eventPtr);
 				}
 				else if (pair.status & PxPairFlag::Enum::eNOTIFY_TOUCH_LOST)
 				{
 					PrCore::EventPtr eventPtr = std::make_shared<PrPhysics::TriggerExit>(collisionInfo);
-					PrSystems::Get<PrCore::EventManager>()->FireEvent(eventPtr);
+					PrSystems::Get<PrCore::EventManager>()->QueueEvent(eventPtr);
 				}
 			}
 		}

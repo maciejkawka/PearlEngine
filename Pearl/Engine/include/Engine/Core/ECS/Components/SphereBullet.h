@@ -14,6 +14,6 @@ namespace PrCore {
 		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) {}
 
 		float time = 0.0f;
-		float maxTime = 5.0f;
+		float maxTime = 4.0f;
 	};
 }
