@@ -17,8 +17,8 @@ namespace PrCore {
 		void Terminate();
 
 	private:
-		std::unique_ptr<IContext>       m_context;
-		std::unique_ptr<IGameFramework> m_game;
+		std::unique_ptr<IContext>  m_context;
+		IGameFramework*            m_game;
 
 		const float m_physicsFixStep = 1.0f / 60.0f;
 		float       m_physicsStepAccumulator;

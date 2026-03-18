@@ -63,7 +63,7 @@ void RenderStressTest::OnEnable()
 	m_camera->SetPosition({ 15, 9, 3 });
 	m_camera->SetRotation(PrCore::Math::quat(PrCore::Math::radians(PrCore::Math::vec3(0, 0, 0))));
 
-	auto entity = m_entityViewer.CreateEntity("CameraCube");
+	auto entity = m_entityViewer.CreateEntity("CameraCube12");
 	m_cameraTransform = entity.AddComponent<PrCore::TransformComponent>();
 	m_cameraTransform->SetPosition(m_camera->GetPosition());
 	m_cameraTransform->SetRotation(m_camera->GetRotation());

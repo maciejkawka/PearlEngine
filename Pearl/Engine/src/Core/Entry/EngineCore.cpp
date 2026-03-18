@@ -280,10 +280,9 @@ namespace PrCore {
 		}
 
 		//-----------------------
-		// Init Game
-		if (!p_params.gameDLLPath.empty())
+		// Init Game Framework
+		if (m_game = CreateGameFramework())
 		{
-			// Init Game Framework
 			m_game->OnInitalize();
 		}
 
@@ -311,38 +310,41 @@ namespace PrCore {
 
 		//-----------------------
 		// Scene logic update
-		if (m_game)
-			return m_game->OnUpdate(deltaTime);
+		if (m_game && !m_game->OnUpdate(deltaTime))
+			return false;
 
 		auto scene = PrSystems::Get<SceneManager>()->GetActiveScene();
-		scene->OnEnable();
-
-		scene->Update(deltaTime);
-
-		// Fix Time Physics Update
-		m_physicsStepAccumulator += deltaTime;
-		while (m_physicsStepAccumulator >= m_physicsFixStep)
+		if (scene)
 		{
-			scene->PhysicsUpdate(m_physicsFixStep);
-			scene->FixUpdate(m_physicsFixStep);
-			m_physicsStepAccumulator -= m_physicsFixStep;
+			scene->OnEnable();
+
+			scene->Update(deltaTime);
+
+			// Fix Time Physics Update
+			m_physicsStepAccumulator += deltaTime;
+			while (m_physicsStepAccumulator >= m_physicsFixStep)
+			{
+				scene->PhysicsUpdate(m_physicsFixStep);
+				scene->FixUpdate(m_physicsFixStep);
+				m_physicsStepAccumulator -= m_physicsFixStep;
+			}
+
+			PrSystems::Get<EventManager>()->Update();
+
+			scene->LateUpdate(deltaTime);
+
+			scene->UpdateHierrarchicalEntities(deltaTime);
+
+			//-----------------------
+			// Audio Update
+			scene->AudioUpdate(deltaTime);
+
+			//-----------------------
+			// Move world to renderer
+			scene->RenderUpdate(deltaTime);
+
+			scene->OnDisable();
 		}
-
-		PrSystems::Get<EventManager>()->Update();
-
-		scene->LateUpdate(deltaTime);
-
-		scene->UpdateHierrarchicalEntities(deltaTime);
-
-		//-----------------------
-		// Audio Update
-		scene->AudioUpdate(deltaTime);
-
-		//-----------------------
-		// Move world to renderer
-		scene->RenderUpdate(deltaTime);
-
-		scene->OnDisable();
 
 		//-----------------------
 		// Renderer Update
@@ -356,8 +358,11 @@ namespace PrCore {
 
 		//-----------------------
 		// Frame Cleanup
-		scene->CleanDestroyedEntities();
-		scene->PhysicsCleanup(deltaTime);
+		if (scene)
+		{
+			scene->CleanDestroyedEntities();
+			scene->PhysicsCleanup(deltaTime);
+		}
 
 		//-----------------------
 		// Post Frame

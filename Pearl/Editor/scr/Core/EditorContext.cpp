@@ -22,7 +22,6 @@ namespace PrEditor {
 		PrSystems::Get<PrCore::ResourceSystem>()->RegisterDatabase<Assets::ModelResource>(std::move(modelDatabase));
 
 		// Test Components
-		m_testFeatures = new Components::TestFeatures();
 		m_basicCamera = new Components::BasicCamera(PrRenderer::CameraType::Perspective);
 		m_basicCamera->GetCamera()->SetSize(5.0f);
 		PrSystems::Get<PrRenderer::IRenderFrontend>()->SetCamera(m_basicCamera->GetCamera());
@@ -39,7 +38,6 @@ namespace PrEditor {
 		PRLOG_INFO("Terminating EditorContext");
 
 		delete m_basicCamera;
-		delete m_testFeatures;
 
 		PrSystems::Get<PrCore::ResourceSystem>()->UnregisterDatabase<Assets::ModelResource>();
 	}
@@ -47,7 +45,6 @@ namespace PrEditor {
 	bool EditorContext::OnUpdate(float p_dt)
 	{
 		m_basicCamera->Update(p_dt);
-		m_testFeatures->Update(p_dt);
 
 		//Show FPS
 		if (PrSystems::Get<PrCore::InputManager>()->IsKeyHold(PrCore::PrKey::F1))

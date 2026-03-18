@@ -6,7 +6,6 @@ namespace PrCore {
 
 	struct EngineCoreParams
 	{
-		std::string gameDLLPath{ "" };
 	};
 
 	class IContext {

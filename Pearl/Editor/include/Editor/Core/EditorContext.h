@@ -4,7 +4,6 @@
 #include "Engine/Core/Events/Event.h"
 
 #include "Editor/Components/BasicCamera.h"
-#include "Editor/Components/TestFeatures.h"
 
 namespace PrEditor {
 
@@ -20,7 +19,6 @@ namespace PrEditor {
 		void OnWindowClose(PrCore::EventPtr p_event);
 
 		Components::BasicCamera* m_basicCamera;
-		Components::TestFeatures* m_testFeatures;
 
 		bool m_shouldClose = false;
 	};
