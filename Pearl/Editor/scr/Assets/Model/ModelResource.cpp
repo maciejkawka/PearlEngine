@@ -32,7 +32,10 @@ void ModelResource::AddEntitesToScene(PrCore::Scene* p_scene)
 			entityMap.insert({ p_node->nodePath , sceneEntity });
 
 			auto transform = sceneEntity.AddComponent<TransformComponent>();
-			transform->SetLocalRotation(entity->rotation);
+			if (entity->rotation == PrCore::Math::quat{})
+				transform->SetLocalRotation(Math::identity<Math::quat>());
+			else
+				transform->SetLocalRotation(entity->rotation);
 			transform->SetLocalPosition(entity->position);
 			transform->SetLocalScale(entity->scale);
 

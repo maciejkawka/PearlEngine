@@ -17,39 +17,39 @@ namespace PrRenderer {
 
 		~Camera() {}
 
-		inline static Camera* GetMainCamera() { return s_mainCamera; }
-		inline static void SetMainCamera(Camera* p_mainCamera) { s_mainCamera = p_mainCamera; }
+		static Camera* GetMainCamera() { return s_mainCamera; }
+		static void SetMainCamera(Camera* p_mainCamera) { s_mainCamera = p_mainCamera; }
 
-		inline void SetType(CameraType p_type) { m_type = p_type; }
-		inline void SetPosition(const PrCore::Math::vec3& p_position) { m_position = p_position; }
-		inline void SetRotation(const PrCore::Math::vec3& p_rotation) { m_rotation = p_rotation; }
-		inline void SetRotation(const PrCore::Math::quat& p_rotation) { m_rotation = PrCore::Math::eulerAngles(p_rotation); }
-		inline void SetClearColor(const Color& p_clearColor) { m_clearColor = p_clearColor; }
+		void SetType(CameraType p_type) { m_type = p_type; }
+		void SetPosition(const PrCore::Math::vec3& p_position) { m_position = p_position; }
+		void SetRotation(const PrCore::Math::vec3& p_rotation) { m_rotation = p_rotation; }
+		void SetRotation(const PrCore::Math::quat& p_rotation) { m_rotation = PrCore::Math::eulerAngles(p_rotation); }
+		void SetClearColor(const Color& p_clearColor) { m_clearColor = p_clearColor; }
 		
-		inline void SetFar(float p_far) { m_far = p_far; }
-		inline void SetNear(float p_near) { m_near = p_near; }
-		inline void SetFOV(float p_FOV) { m_FOV = p_FOV; }
-		inline void SetRatio(float p_ratio) { m_ratio = p_ratio; }
-		inline void SetSize(float p_size) { m_size = p_size; }
+		void SetFar(float p_far) { m_far = p_far; }
+		void SetNear(float p_near) { m_near = p_near; }
+		void SetFOV(float p_FOV) { m_FOV = p_FOV; }
+		void SetRatio(float p_ratio) { m_ratio = p_ratio; }
+		void SetSize(float p_size) { m_size = p_size; }
 
-		inline CameraType GetType() const { return m_type; }
-		inline const PrCore::Math::vec3& GetPosition() const { return m_position; }
-		inline const PrCore::Math::vec3& GetRotation() const { return m_rotation; }
-		inline const Color GetClearColor() const { return m_clearColor; }
-				
-		inline float GetFar() const { return m_far; }
-		inline float GetNear() const { return m_near; }
-		inline float GetFOV() const { return m_FOV; }
-		inline float GetRatio() const { return m_ratio; }
-		inline float GetSize() const { return m_size; }
+		CameraType GetType() const { return m_type; }
+		const PrCore::Math::vec3& GetPosition() const { return m_position; }
+		const PrCore::Math::vec3& GetRotation() const { return m_rotation; }
+		const Color GetClearColor() const { return m_clearColor; }
+		
+		float GetFar() const { return m_far; }
+		float GetNear() const { return m_near; }
+		float GetFOV() const { return m_FOV; }
+		float GetRatio() const { return m_ratio; }
+		float GetSize() const { return m_size; }
 
-		inline const PrCore::Math::mat4& GetProjectionMatrix() const { return m_projectionMatrix; }
-		inline const PrCore::Math::mat4& GetViewMatrix() const { return m_viewMatrix; }
-		inline const PrCore::Math::mat4& GetCameraMatrix() const { return m_cameraMatrix; }
+		const PrCore::Math::mat4& GetProjectionMatrix() const { return m_projectionMatrix; }
+		const PrCore::Math::mat4& GetViewMatrix() const { return m_viewMatrix; }
+		const PrCore::Math::mat4& GetCameraMatrix() const { return m_cameraMatrix; }
 
 		const PrCore::Math::mat4& RecalculateMatrices();
 
-		//Culling in future
+		PrCore::Math::vec3 ScreenToWorldSpace(PrCore::Math::vec2 p_screenPos);
 
 	private:
 		CameraType m_type;

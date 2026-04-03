@@ -36,7 +36,7 @@ namespace PrCore {
 
 	class EntityViewer {
 	public:
-		EntityViewer() = delete;
+		EntityViewer();
 		EntityViewer(EntityManager* p_entityManager) :
 			m_entityManager(p_entityManager)
 		{}

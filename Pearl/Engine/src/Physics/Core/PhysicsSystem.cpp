@@ -15,9 +15,20 @@ using namespace physx;
 
 #define PVD_HOST "127.0.0.1"
 
+class ErrorCallback : public PxErrorCallback {
+public:
+	void reportError(PxErrorCode::Enum code,
+		const char* message,
+		const char* file,
+		int line) override
+	{
+		PRLOG_ERROR("PhysX Error [{}]: %s (File:{}:Line{})", code, message, file, line);
+	}
+};
+
 // Implementation PhysX Variables
-static PxDefaultErrorCallback s_defaultErrorCallback;
 static PxDefaultAllocator     s_defaultAllocatorCallback;
+static ErrorCallback          s_errorCallback;
 static PxFoundation*          s_foundation = nullptr;
 static PxPhysics*             s_physics = nullptr;
 static PxPvd*                 s_pvd = nullptr;
@@ -25,6 +36,7 @@ static PxPvd*                 s_pvd = nullptr;
 static PxDefaultCpuDispatcher*          s_dispatcher = nullptr;
 static PxScene*                         s_scene = nullptr;
 static PxSimulationEventCallback*       s_simulationCallback = nullptr;
+
 
 class IgnoreTriggerRaycastCallback : public PxQueryFilterCallback {
 public:
@@ -44,7 +56,7 @@ public:
 
 PhysicsSystem::PhysicsSystem(const PhysicsSettings& p_settings)
 {
-	s_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, s_defaultAllocatorCallback, s_defaultErrorCallback);
+	s_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, s_defaultAllocatorCallback, s_errorCallback);
 	if (!s_foundation)
 		PRLOG_ERROR("Physics failed to initalize! No fundation created!");
 

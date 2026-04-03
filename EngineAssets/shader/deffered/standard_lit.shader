@@ -106,8 +106,8 @@ void main()
     //Sample Textures
     vec3 albedoTex = texture(albedoMap, IN.uv0).rgb;
     albedoTex = pow(albedoTex.rgb, vec3(2.2));
-    float metallicTex = texture(metallicMap, IN.uv0).r;
-    float roughnessTex = texture(roughnessMap, IN.uv0).r;
+    float metallicTex = texture(metallicMap, IN.uv0).b;
+    float roughnessTex = texture(roughnessMap, IN.uv0).g;
     float aoTex = texture(aoMap, IN.uv0).r;
     vec3 emiss = texture(emissionMap, IN.uv0).rgb;
 

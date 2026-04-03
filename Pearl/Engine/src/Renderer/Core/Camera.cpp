@@ -1,7 +1,8 @@
-#include"Core/Common/pearl_pch.h"
+#include "Core/Common/pearl_pch.h"
 
-#include"Renderer/Core/Camera.h"
+#include "Core/Windowing/Window.h"
 
+#include "Renderer/Core/Camera.h"
 
 using namespace PrRenderer;
 namespace Math = PrCore::Math;
@@ -57,4 +58,20 @@ const PrCore::Math::mat4& Camera::RecalculateMatrices()
 	m_cameraMatrix = m_projectionMatrix * m_viewMatrix;
 
 	return m_cameraMatrix;
+}
+
+PrCore::Math::vec3 Camera::ScreenToWorldSpace(PrCore::Math::vec2 p_screenPos)
+{
+	float width = PrSystems::Get<PrCore::IWindow>()->GetWidth();
+	float height = PrSystems::Get<PrCore::IWindow>()->GetHeight();
+
+	float x = (2.0f * p_screenPos.x) / width - 1.0f;
+	float y = 1.0f - (2.0f * p_screenPos.y) / height;
+	float z = 1.0f;
+
+	Math::vec4 retVector{ x, y, z, 1.0f };
+	retVector = Math::inverse(m_projectionMatrix) * retVector;
+	retVector = Math::inverse(m_viewMatrix) * Math::vec4{ retVector.x, retVector.y, -1.0f, 0.0f };
+
+	return retVector;
 }

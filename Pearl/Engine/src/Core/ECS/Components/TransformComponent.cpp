@@ -8,12 +8,12 @@ TransformComponent::TransformComponent()
 {
 	m_worldMat = Math::mat4();
 	m_position = Math::vec3(0.0f);
-	m_rotation = Math::quat(Math::vec4(0.0f));
+	m_rotation = Math::identity<Math::quat>();
 	m_scale = Math::vec3(1.0f);
 	
 	m_localMat = Math::mat4();
 	m_localPosition  = Math::vec3(0.0f);
-	m_localRotation = Math::quat(Math::vec4(0.0f));
+	m_localRotation = Math::identity<Math::quat>();
 	m_localScale = Math::vec3(1.0f);
 
 	GenerateLocalMatrix();

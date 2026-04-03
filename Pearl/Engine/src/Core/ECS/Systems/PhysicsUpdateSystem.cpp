@@ -25,7 +25,7 @@ void PhysicsUpdateSystem::OnUpdate(float p_dt)
 
 	m_entityViewer.MT_EntitesWithComponents<TransformComponent, RigidBodyStaticComponent>([](Entity entity, auto transform, auto rigidStatic) {
 
-		if (transform->IsDirty())
+		//if (transform->IsDirty())
 		{
 			auto position = transform->GetPosition();
 			auto rotation = transform->GetRotation();
