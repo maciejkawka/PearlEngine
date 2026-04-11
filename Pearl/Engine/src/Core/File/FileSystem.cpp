@@ -31,9 +31,9 @@ void FileSystem::PrintError()
 	}
 }
 
-void FileSystem::MountDir(std::string_view p_path, std::string_view p_mountPoint)
+void FileSystem::MountDir(std::string_view p_path, std::string_view p_mountPoint, int p_priorityIndex)
 {
-	if(!PHYSFS_mount(p_path.data(), p_mountPoint.data(), 1))
+	if(!PHYSFS_mount(p_path.data(), p_mountPoint.data(), p_priorityIndex))
 		PrintError();
 }
 

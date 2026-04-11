@@ -22,7 +22,7 @@ namespace PrCore {
 		virtual ~FileSystem();
 
 		// Mounts the directory to the seach paths, last opened has the highest priority
-		void MountDir(std::string_view p_path, std::string_view p_mountPoint = "/");
+		void MountDir(std::string_view p_path, std::string_view p_mountPoint = "/", int p_priorityIndex = 0);
 
 		// Unmounts the directory from the seach path
 		void UnmountDir(std::string_view p_path);

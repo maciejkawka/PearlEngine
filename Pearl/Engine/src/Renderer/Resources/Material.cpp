@@ -44,6 +44,7 @@ Material::Material(const Material& p_material)
 {
 	m_shader = p_material.m_shader;
 	m_uniforms = p_material.m_uniforms;
+	m_name = p_material.m_name;
 
 	m_renderType = p_material.GetRenderType();
 	m_renderOrder = p_material.GetRenderOrder();
