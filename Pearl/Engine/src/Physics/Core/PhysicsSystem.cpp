@@ -37,6 +37,7 @@ static PxDefaultCpuDispatcher*          s_dispatcher = nullptr;
 static PxScene*                         s_scene = nullptr;
 static PxSimulationEventCallback*       s_simulationCallback = nullptr;
 
+static PxRaycastHit                     s_hitArray[10];
 
 class IgnoreTriggerRaycastCallback : public PxQueryFilterCallback {
 public:
@@ -219,6 +220,34 @@ bool PhysicsSystem::Raycast(const PrCore::Math::vec3& p_origin, const PrCore::Ma
 	}
 
 	return false;
+}
+
+bool PhysicsSystem::RaycastAll(const PrCore::Math::vec3& p_origin, const PrCore::Math::vec3& p_dir, float p_maxDistance, std::vector<RaycastHit>& p_rayInfoVec, bool ignoreTriggerObjects)
+{
+	PxQueryFilterData customRayFilterData;
+
+	if (ignoreTriggerObjects)
+		customRayFilterData.flags |= PxQueryFlag::ePREFILTER;
+
+	PxRaycastBuffer hitBuffer(s_hitArray, 10);
+	bool hasHit = s_scene->raycast(ToPxVec3(p_origin), ToPxVec3(p_dir), p_maxDistance, hitBuffer, PxHitFlag::eDEFAULT, customRayFilterData);
+
+
+	for (PxU32 i = 0; i < hitBuffer.nbTouches; ++i)
+	{
+		const PxRaycastHit& raycastHit = hitBuffer.touches[i];
+
+		RaycastHit rayInfo;
+		rayInfo.position = ToVec3(raycastHit.position);
+		rayInfo.normal = ToVec3(raycastHit.normal);;
+		rayInfo.distance = raycastHit.distance;
+
+		rayInfo.entity = ConvertToEntity(raycastHit.actor);
+
+		p_rayInfoVec.push_back(rayInfo);
+	}
+
+	return !p_rayInfoVec.empty();
 }
 
 PrPhysics::ITriangleMeshPtr PhysicsSystem::CreateTriangleMesh(PrRenderer::MeshPtr p_mesh)

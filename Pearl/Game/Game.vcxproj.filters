@@ -7,18 +7,36 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Game\test.h">
+    <ClInclude Include="include\Game\ChessFramework.h">
       <Filter>Test</Filter>
     </ClInclude>
     <ClInclude Include="include\Game\TestFeatures.h">
       <Filter>Test</Filter>
     </ClInclude>
+    <ClInclude Include="include\Game\SceneCreators\SceneCreator.h" />
+    <ClInclude Include="src\Game\SceneCreators\CreatorSystem.h" />
+    <ClInclude Include="include\Game\Systems\PieceSelector.h" />
+    <ClInclude Include="include\Game\Systems\MainCamera.h" />
+    <ClInclude Include="include\Game\ChessEngine\ChessLib.hpp" />
+    <ClInclude Include="include\Game\ChessEngine\ChessSystem.h" />
+    <ClInclude Include="include\Game\ChessEngine\BoardCoordinator.h" />
+    <ClInclude Include="include\Game\ChessEngine\BoardRender.h" />
+    <ClInclude Include="include\Game\Systems\OverlayComponent.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\TestFeatures.cpp">
+    <ClCompile Include="src\Game\TestFeatures.cpp">
       <Filter>Test</Filter>
     </ClCompile>
-    <ClCompile Include="src\test.cpp">
+    <ClCompile Include="src\Game\ChessFramework.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\SceneCreators\SceneCreator.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\ChessEngine\BoardCoordinator.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\ChessEngine\BoardRender.cpp">
       <Filter>Test</Filter>
     </ClCompile>
   </ItemGroup>

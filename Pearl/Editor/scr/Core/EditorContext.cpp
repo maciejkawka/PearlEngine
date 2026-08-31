@@ -30,6 +30,40 @@ namespace PrEditor {
 		windowCloseListener.Connect<&EditorContext::OnWindowClose>(this);
 		PrSystems::Get<PrCore::EventManager>()->AddListener(windowCloseListener, PrCore::WindowCloseEvent::s_type);
 
+
+		// Load Cheess Project
+		auto scene101 = PrSystems::Get<PrCore::SceneManager>()->CreateScene("ChessGame");
+
+		auto modeHandl = PrSystems::Get<PrCore::ResourceSystem>()->Load<Assets::ModelResource>("Chess/ChessCopy.glb");
+		modeHandl->AddEntitesToScene(scene101);
+
+		auto root = scene101->GetEntityByName("chesscopy").GetComponent<PrCore::TransformComponent>();
+		root->SetPosition(m_basicCamera->GetPosition() + PrCore::Math::vec3{0.0f, 0.0f, 0.0f});
+		root->SetLocalScale(PrCore::Math::vec3{ 1.0f });
+
+		scene101->RegisterSystem<PrCore::HierarchyTransform>();
+		scene101->RegisterSystem<PrCore::MeshRendererSystem>();
+		scene101->RegisterSystem<PrCore::PhysicsUpdateSystem>();
+
+
+		//auto light = std::make_shared<PrRenderer::Light>();
+		//light->SetType(PrRenderer::LightType::Directional);
+		//light->SetColor({ 2.5f,2.5f,2.5f,1.0f });
+
+		//auto lightEntity = scene101->CreateEntity("MainLight");
+		//auto lightComponent = lightEntity.AddComponent<PrCore::LightComponent>();
+		//lightComponent->m_light = light;
+		//lightComponent->mainDirectLight = true;
+
+		//auto loightTransform = lightEntity.AddComponent<PrCore::TransformComponent>();
+		//loightTransform->SetRotation({ -0.9f, 0.35f, 0.0f, 0.0f });
+		m_basicCamera->GetCamera()->SetNear(0.001f);
+		m_basicCamera->GetCamera()->SetPosition({ 7.0f, 1.0f, -2.0f });
+		m_basicCamera->GetCamera()->SetRotation({ -0.46f, 2.17f, 0.0f });
+
+
+
+		PrSystems::Get<PrRenderer::IRenderFrontend>()->SetCubemap(PrSystems::Get<PrCore::ResourceSystem>()->Load<PrRenderer::Material>("outdoor/suburban.mat").GetData());
 		return true;
 	}
 

@@ -69,6 +69,7 @@ namespace PrPhysics {
 
 		// Scene Queries
 		bool                 Raycast(const PrCore::Math::vec3& p_origin, const PrCore::Math::vec3& p_dir, float p_maxDistance, RaycastHit& p_rayInfo, bool ignoreTriggerObjects = true);
+		bool                 RaycastAll(const PrCore::Math::vec3& p_origin, const PrCore::Math::vec3& p_dir, float p_maxDistance, std::vector<RaycastHit>& p_rayInfoVec, bool ignoreTriggerObjects = true);
 
 	private:
 		std::unique_ptr<IFactory> m_physicsFactory;

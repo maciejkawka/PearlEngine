@@ -123,7 +123,7 @@
       <PreprocessorDefinitions>PR_ASSERTENABLE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>../Engine/include/Engine;../Engine/include;../../Dependencies/spdlog/include;../../Dependencies/glm;../../Dependencies/json/include;../../Dependencies/tinyObj/include;../../Dependencies/glad/include;../../Dependencies/Assimp/include;../../Dependencies/stb/include;include/Game</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include/Game;../Engine/include/Engine;../Engine/include;../../Dependencies/spdlog/include;../../Dependencies/glm;../../Dependencies/json/include;../../Dependencies/tinyObj/include;../../Dependencies/glad/include;../../Dependencies/Assimp/include;../../Dependencies/stb/include</AdditionalIncludeDirectories>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
@@ -158,12 +158,24 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Game\test.h" />
+    <ClInclude Include="include\Game\ChessEngine\BoardCoordinator.h" />
+    <ClInclude Include="include\Game\ChessEngine\BoardRender.h" />
+    <ClInclude Include="include\Game\ChessEngine\ChessLib.hpp" />
+    <ClInclude Include="include\Game\ChessEngine\ChessSystem.h" />
+    <ClInclude Include="include\Game\ChessFramework.h" />
+    <ClInclude Include="include\Game\Systems\OverlayComponent.h" />
+    <ClInclude Include="include\Game\Systems\PieceSelector.h" />
+    <ClInclude Include="include\Game\Systems\MainCamera.h" />
     <ClInclude Include="include\Game\TestFeatures.h" />
+    <ClInclude Include="include\Game\SceneCreators\SceneCreator.h" />
+    <ClInclude Include="src\Game\SceneCreators\CreatorSystem.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\test.cpp" />
-    <ClCompile Include="src\TestFeatures.cpp" />
+    <ClCompile Include="src\Game\ChessEngine\BoardCoordinator.cpp" />
+    <ClCompile Include="src\Game\ChessEngine\BoardRender.cpp" />
+    <ClCompile Include="src\Game\ChessFramework.cpp" />
+    <ClCompile Include="src\Game\SceneCreators\SceneCreator.cpp" />
+    <ClCompile Include="src\Game\TestFeatures.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
