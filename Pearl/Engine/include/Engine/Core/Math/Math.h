@@ -12,6 +12,7 @@
 #include <glm/gtx/hash.hpp>
 
 namespace PrCore {
+	using namespace glm;
 	namespace Math = glm;
 }
 

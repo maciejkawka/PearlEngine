@@ -42,6 +42,8 @@ BasicCamera::~BasicCamera()
 
 void BasicCamera::Update(float p_dt)
 {
+	return;
+
 	auto position = m_camera->GetPosition();
 	auto rotationRadians = m_camera->GetRotation();
 	auto rotation = PrCore::Math::degrees(rotationRadians);

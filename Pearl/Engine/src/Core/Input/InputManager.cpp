@@ -147,12 +147,13 @@ void InputManager::ResetFlags()
 {
 	s_anyPressed = false;
 	for (auto it = s_keyState.begin(); it != s_keyState.end(); ++it)
- 		s_anyPressed |= (it->second == PrInputState::PRESS);
+		s_anyPressed |= (it->second == PrInputState::PRESS);
 
 	s_anyHold = false;
 	for (auto it = s_keyHold.begin(); it != s_keyHold.end(); ++it)
 		s_anyHold |= it->second;
-	
+
+	s_mouseScroll = 0.0f;
 	s_keyState.clear();
 	s_buttonState.clear();
 }

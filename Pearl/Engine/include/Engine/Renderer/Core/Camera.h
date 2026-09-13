@@ -22,8 +22,8 @@ namespace PrRenderer {
 
 		void SetType(CameraType p_type) { m_type = p_type; }
 		void SetPosition(const PrCore::Math::vec3& p_position) { m_position = p_position; }
-		void SetRotation(const PrCore::Math::vec3& p_rotation) { m_rotation = p_rotation; }
-		void SetRotation(const PrCore::Math::quat& p_rotation) { m_rotation = PrCore::Math::eulerAngles(p_rotation); }
+		void SetRotation(const PrCore::Math::vec3& p_eulerAngles);
+		void SetRotation(const PrCore::Math::quat& p_rotation) { m_rotation = p_rotation; }
 		void SetClearColor(const Color& p_clearColor) { m_clearColor = p_clearColor; }
 		
 		void SetFar(float p_far) { m_far = p_far; }
@@ -34,7 +34,8 @@ namespace PrRenderer {
 
 		CameraType GetType() const { return m_type; }
 		const PrCore::Math::vec3& GetPosition() const { return m_position; }
-		const PrCore::Math::vec3& GetRotation() const { return m_rotation; }
+		PrCore::Math::vec3 GetRotation() const { return glm::eulerAngles(m_rotation); }
+		const PrCore::Math::quat& GetRotationQuat() const { return m_rotation; }
 		const Color GetClearColor() const { return m_clearColor; }
 		
 		float GetFar() const { return m_far; }
@@ -55,7 +56,7 @@ namespace PrRenderer {
 		CameraType m_type;
 
 		PrCore::Math::vec3 m_position;
-		PrCore::Math::vec3 m_rotation;
+		PrCore::Math::quat m_rotation;
 		
 		Color m_clearColor;
 

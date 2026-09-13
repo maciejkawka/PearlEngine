@@ -67,6 +67,5 @@ namespace ChessGame {
 		// Helper constants
 		float              m_squareStep = 0.25135f;
 		PrCore::Math::vec3 m_A1Pos = { 0.801838f , 0.064655f, 0.316983f };
-		PrCore::Math::vec3 m_gravePos = { 10.0f , 10.0f, 10.0f };
 	};
 }

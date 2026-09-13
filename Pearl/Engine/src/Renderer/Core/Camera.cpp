@@ -39,6 +39,11 @@ Camera::Camera(CameraType p_cameraType) :
 	m_rotation(Math::vec3(0))
 {}
 
+void Camera::SetRotation(const PrCore::Math::vec3& p_eulerAngles)
+{
+	glm::vec3 radiansAngles = glm::radians(p_eulerAngles);
+	m_rotation = glm::quat(p_eulerAngles);
+}
 
 const PrCore::Math::mat4& Camera::RecalculateMatrices()
 {
@@ -47,14 +52,10 @@ const PrCore::Math::mat4& Camera::RecalculateMatrices()
 	else if (m_type == CameraType::Ortographic)
 		m_projectionMatrix = Math::ortho(-m_ratio * m_size, m_ratio * m_size, -m_size, m_size, m_near, m_far);
 
-	auto pitch = Math::rotate(Math::mat4(1), m_rotation.x, Math::vec3(1, 0, 0));
-	auto yaw = Math::rotate(Math::mat4(1), m_rotation.y, Math::vec3(0, 1, 0));
-	auto roll = Math::rotate(Math::mat4(1), m_rotation.z, Math::vec3(0, 0, 1));
+	PrCore::mat4 rotationMatrix = PrCore::mat4_cast(conjugate(m_rotation));
+	PrCore::mat4 translationMatrix = PrCore::translate(PrCore::mat4(1.0f), -m_position);
 
-	auto rotationMatrix = yaw * pitch * roll;
-	auto translationMatrix = Math::translate(Math::mat4(1), m_position);
-
-	m_viewMatrix = Math::inverse(translationMatrix * rotationMatrix);
+	m_viewMatrix = rotationMatrix * translationMatrix;
 	m_cameraMatrix = m_projectionMatrix * m_viewMatrix;
 
 	return m_cameraMatrix;
