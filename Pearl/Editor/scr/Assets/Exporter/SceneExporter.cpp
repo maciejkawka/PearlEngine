@@ -12,6 +12,9 @@
 #include "Renderer/Resources/Material.h"
 #include "Renderer/Resources/MaterialLoader.h"
 
+#include "Physics/Resources/ConvexMeshLoader.h"
+#include "Physics/Shape/IShape.h"
+
 using namespace PrEditor::Assets;
 using namespace PrCore;
 
@@ -117,6 +120,35 @@ void BasicMaterialExport(ResourceDescConstPtr p_resDesc, std::string_view p_expo
 	}
 }
 
+void BasicConvexShapeExport(ResourceDescConstPtr p_resDesc, std::string_view p_exportRoot)
+{
+	if (p_resDesc->origin == ResourceOrigin::Memory)
+	{
+		auto resourceName = p_resDesc->origin == ResourceOrigin::File ? PrCore::PathUtils::GetFile(p_resDesc->filePath) : p_resDesc->data->GetName();
+		std::string path;
+		if (!p_exportRoot.empty())
+		{
+			path = PrCore::PathUtils::MakePath(p_exportRoot, resourceName);
+		}
+		path += ".physc";
+
+		if (PrSystems::Get<PrCore::FileSystem>()->FileExist(path))
+			return;
+
+		PrPhysics::ConvexMeshLoader loader;
+		auto success = loader.SaveResourceOnDisc(p_resDesc->data, path);
+		if (!success)
+		{
+			PR_ASSERT(false, "Cannot export resource!");
+			return;
+		}
+
+		p_resDesc->origin = ResourceOrigin::File;
+		p_resDesc->state = ResourceState::Loaded;
+		p_resDesc->filePath = path;
+	}
+}
+
 void SceneExporter::SaveMemoryResourcesToFile(std::string_view p_exportRoot)
 {
 	auto meshExporter = [p_exportRoot](ResourceDescConstPtr p_resDesc)
@@ -134,6 +166,11 @@ void SceneExporter::SaveMemoryResourcesToFile(std::string_view p_exportRoot)
 		BasicMaterialExport(p_resDesc, p_exportRoot);
 	};
 
+	auto convexShapeExporter = [p_exportRoot](ResourceDescConstPtr p_resDesc)
+	{
+		BasicConvexShapeExport(p_resDesc, p_exportRoot);
+	};
+
 	if (!PrSystems::Get<PrCore::FileSystem>()->FileExist(p_exportRoot))
 	{
 		PrSystems::Get<PrCore::FileSystem>()->CreateDir(p_exportRoot);
@@ -142,6 +179,7 @@ void SceneExporter::SaveMemoryResourcesToFile(std::string_view p_exportRoot)
 	auto pResourceSystem = PrSystems::Get<PrCore::ResourceSystem>();
 	pResourceSystem->ForEachResource<PrRenderer::Mesh>(meshExporter);
 	pResourceSystem->ForEachResource<PrRenderer::Texture>(textureExporter);
+	pResourceSystem->ForEachResource<PrPhysics::IConvexMesh>(convexShapeExporter);
 	PrSystems::Get<PrCore::JobSystem>()->WaitAll();
 	pResourceSystem->ForEachResource<PrRenderer::Material>(materialExporter);
 }

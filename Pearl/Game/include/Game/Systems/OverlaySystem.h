@@ -1,29 +1,11 @@
 #pragma once
 
-#include "Engine/Core/ECS/BaseSystem.h"
-#include "Engine/Core/ECS/Components/RendererComponents.h"
-#include "Engine/Core/ECS/Components/PhysicsComponents.h"
+#include "ChessEngine/ChessSystem.h"
+#include "Components/MainComponents.h"
 
-#include "Engine/Core/Events/EventManager.h"
-#include "Engine/Core/Events/ECSEvents.h"
+#include "Engine/Core/ECS/BaseSystem.h"
 
 namespace ChessGame {
-
-	class OverlayComponent : public PrCore::BaseComponent
-	{
-	public:
-		float m_time = 0.0f;
-		PrPhysics::IShapePtr m_shapeCache;
-
-		void OnSerialize(PrCore::Utils::JSON::json& p_serialized) override {};
-		void OnDeserialize(const PrCore::Utils::JSON::json& p_deserialized) override {};
-	};
-
-	class PossibleSquareOverlay : public PrCore::BaseComponent
-	{
-
-	};
-
 	class OverlaySystem : public PrCore::BaseSystem {
 	public:
 		void OnCreate() override
@@ -43,8 +25,8 @@ namespace ChessGame {
 			{
 				if (auto renderComponent = entity.GetComponent<PrCore::MeshRendererComponent>())
 				{
-					float alphaValue = 0.2f * (PrCore::Math::sin(overlay->m_time) + 1.0f) / 2.0f;
-					overlay->m_time += p_dt;
+					float alphaValue = 0.2f * (PrCore::Math::sin(overlay->time) + 1.0f) / 2.0f;
+					overlay->time += p_dt;
 
 					auto color = renderComponent->mainMaterial->GetColor();
 					color.w = alphaValue;
@@ -52,14 +34,33 @@ namespace ChessGame {
 					renderComponent->mainMaterial->SetColor(color);
 				}
 			}
+
+			for (auto [entity, overlay] : m_entityViewer.EntitesWithComponents<SquareComponent>())
+			{
+				if (auto renderComponent = entity.GetComponent<PrCore::MeshRendererComponent>())
+				{
+					auto color = renderComponent->mainMaterial->GetColor();
+					if (overlay->moveType == MoveType::Capture)
+						color = PrRenderer::Color{ 1.0f, 0.0f, 0.0f };
+					else if (overlay->moveType == MoveType::Promotion)
+						color = PrRenderer::Color{ 0.0f, 0.0f, 1.0f };
+					else
+						color = PrRenderer::Color{ 1.0f, 1.0f, 1.0f };
+
+					color.w = overlay->showOverlay ? 0.2f : 0.0f;
+
+					renderComponent->mainMaterial->SetColor(color);
+				}
+			}
 		}
 
+	private:
 		void OnComponentStaticAdded(PrCore::EventPtr p_eventType)
 		{
 			auto componentEvent = std::static_pointer_cast<PrCore::ComponentAddedEvent<OverlayComponent>>(p_eventType);
 			auto entity = componentEvent->m_entity;
-			componentEvent->m_component->m_shapeCache = entity.GetComponent<PrCore::RigidBodyStaticComponent>()->rigidBody->GetShape();
-			entity.GetComponent<PrCore::RigidBodyStaticComponent>()->rigidBody->DetachShape(componentEvent->m_component->m_shapeCache);
+			componentEvent->m_component->shapeCache = entity.GetComponent<PrCore::RigidBodyStaticComponent>()->rigidBody->GetShape();
+			entity.GetComponent<PrCore::RigidBodyStaticComponent>()->rigidBody->DetachShape(componentEvent->m_component->shapeCache);
 		}
 
 		void OnComponentStaticRemoved(PrCore::EventPtr p_eventType)
@@ -69,7 +70,7 @@ namespace ChessGame {
 			if (entity.HasComponent<PrCore::RigidBodyStaticComponent>())
 			{
 				auto physicsComponent = entity.GetComponent<PrCore::RigidBodyStaticComponent>();
-				physicsComponent->rigidBody->AttachShape(componentEvent->m_component->m_shapeCache);
+				physicsComponent->rigidBody->AttachShape(componentEvent->m_component->shapeCache);
 			}
 
 			if (entity.HasComponent<PrCore::MeshRendererComponent>())
@@ -80,8 +81,5 @@ namespace ChessGame {
 				renderComponent->mainMaterial->SetColor(color);
 			}
 		}
-
-		void OnSerialize(PrCore::Utils::JSON::json& p_serialized) override {};
-		void OnDeserialize(const PrCore::Utils::JSON::json& p_deserialized) override {};
 	};
 }

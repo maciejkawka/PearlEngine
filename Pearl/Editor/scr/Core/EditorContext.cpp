@@ -2,6 +2,7 @@
 
 #include "Editor/Assets/Model/ModelResource.h"
 #include "Editor/Assets/Model/ModelResourceLoader.h"
+#include "Editor/Assets/Exporter/SceneExporter.h"
 
 #include "Engine/Core/Events/WindowEvents.h"
 #include "Engine/Core/Resources/ResourceDatabase.h"
@@ -87,6 +88,13 @@ namespace PrEditor {
 		//Exit
 		if (PrSystems::Get<PrCore::InputManager>()->IsKeyPressed(PrCore::PrKey::ESCAPE))
 			return false;
+
+		if (PrSystems::Get<PrCore::InputManager>()->IsKeyPressed(PrCore::PrKey::F11))
+		{
+			Assets::SceneExporter sceneExporter;
+			sceneExporter.SaveMemoryResourcesToFile("Chess/ExportTemp");
+		}
+
 
 		return !m_shouldClose;
 	}

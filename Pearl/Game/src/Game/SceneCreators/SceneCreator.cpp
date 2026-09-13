@@ -101,6 +101,7 @@ namespace ChessGame {
 					else
 					{
 						auto convexMesh = PrSystems::Get<PrPhysics::PhysicsSystem>()->CreateConvexMesh(meshComponent->mesh.GetData());
+						convexMesh->SetName(name);
 						auto resourceHandle = PrSystems::Get<PrCore::ResourceSystem>()->Register<PrPhysics::IConvexMesh>(convexMesh);
 						m_convexMeshes[name.substr(0, name.find("_"))] = resourceHandle.GetID();
 
@@ -125,6 +126,7 @@ namespace ChessGame {
 					else
 					{
 						auto convexMesh = PrSystems::Get<PrPhysics::PhysicsSystem>()->CreateConvexMesh(meshComponent->mesh.GetData());
+						convexMesh->SetName(name);
 						auto resourceHandle = PrSystems::Get<PrCore::ResourceSystem>()->Register<PrPhysics::IConvexMesh>(convexMesh);
 						m_convexMeshes[name.substr(0, name.find("_"))] = resourceHandle.GetID();
 

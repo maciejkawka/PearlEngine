@@ -1,78 +1,69 @@
 #pragma once
 
 #include "Systems/MainCamera.h"
-#include "ChessEngine/BoardRender.h"
-#include "Systems/OverlayComponent.h"
+#include "Components/MainComponents.h"
 
 #include "Engine/Core/ECS/BaseSystem.h"
-
 #include "Engine/Renderer/Core/IRenderFrontend.h"
 #include "Engine/Renderer/Core/Camera.h"
 
 namespace ChessGame {
-
 	class PieceSelectorSystem : public PrCore::BaseSystem {
 	public:
 		void OnEnable() override
 		{
 			m_pMainCamera = m_entityViewer.GetEntityByName("MainCamera");
+			m_coordinator = BoardCoordinator::GetInstancePtr();
+		}
 
-			m_cor = BoardCoordinator{ &m_entityViewer };
+		void OnDisable() override 
+		{
+			DeselectPiece();
 		}
 
 		void OnUpdate(float p_dt) override
 		{
+			const float distance = 50.0f;
 			auto camera = m_pMainCamera.GetComponent<MainCamera>()->camera;
 			auto cameraTransform = m_pMainCamera.GetComponent<PrCore::TransformComponent>();
 
-			float distance = 50.0f;
-			std::vector <PrPhysics::RaycastHit> hits;
-
 			// Deselect always by G
-			if (m_selected.IsValid() && PrSystems::Get<PrCore::InputManager>()->IsKeyPressed(PrCore::PrKey::G))
+			if (PrSystems::Get<PrCore::InputManager>()->IsKeyPressed(PrCore::PrKey::G))
 			{
-				m_selected.RemoveComponent<OverlayComponent>();
-				m_render.Deselect();
-				m_selected = PrCore::Entity{};
+				DeselectPiece();
 			}
 
 			auto mousePos = camera->ScreenToWorldSpace(PrSystems::Get<PrCore::InputManager>()->GetMousePosition());
 			if (PrSystems::Get<PrCore::InputManager>()->IsButtonPressed(PrCore::PrMouseButton::BUTTON_LEFT))
 			{
+				std::vector <PrPhysics::RaycastHit> hits;
 				if (PrSystems::Get<PrPhysics::PhysicsSystem>()->RaycastAll(cameraTransform->GetPosition(), PrCore::Math::normalize(mousePos), distance, hits))
 				{
 					for (auto hit : hits)
 					{
-						auto name = hit.entity.GetComponent<PrCore::NameComponent>()->name;
+						auto parent = hit.entity.GetComponent<PrCore::ParentComponent>();
 
 						// Move piece
-						if (m_selected.IsValid() && name.find("Square") != name.npos)
+						if (m_selectedPiece.IsValid() && hit.entity.HasComponent<SquareComponent>())
 						{
-							auto pos1 = hit.entity.GetComponent<PrCore::TransformComponent>()->GetPosition();
-							auto destinationSquare = m_cor.GetSquare(pos1);
-							auto piece = m_cor.GetSqureByEntity(m_selected.GetComponent<PrCore::ParentComponent>()->GetParent());
+							auto pos = hit.entity.GetComponent<PrCore::TransformComponent>()->GetPosition();
+							auto destinationSquare = m_coordinator->GetSquare(pos);
+							auto squareComponent = hit.entity.GetComponent<SquareComponent>();
+							auto pieceComponent = m_selectedPiece.GetComponent<PrCore::ParentComponent>()->GetParent().GetComponent<PieceComponent>();
 
-							m_selected.RemoveComponent<OverlayComponent>();
-							m_render.Deselect();
-							m_selected = PrCore::Entity{};
+							DeselectPiece();
 
 							// Move piece only if destination square varies
-							if (piece != destinationSquare)
+							if (m_coordinator->TryMovePiece(pieceComponent->square, squareComponent->square))
 							{
-								m_cor.MovePiece(piece, destinationSquare);
+								m_coordinator->SetBoardDirty();
 							}
-
-							break;
 						}
-
 						// Select piece
-						if (!m_selected.IsValid() && name.find("Overlay") != name.npos && name.find("Square") == name.npos)
+						else if (SelectPiece(hit.entity))
 						{
+							const auto& name = m_selectedPiece.GetComponent<PrCore::NameComponent>()->name;
 							PRLOG_INFO("Selected {} position: x:{} y:{} z:{}", name, hit.position.x, hit.position.y, hit.position.z);
-
-							m_selected = hit.entity;
-							m_selected.AddComponent<OverlayComponent>();
-							m_render.Select(m_selected);
 							break;
 						}
 					}
@@ -80,7 +71,7 @@ namespace ChessGame {
 			}
 
 			// If selected render hollow on hovered square
-			if (m_selected.IsValid())
+			if (m_selectedPiece.IsValid())
 			{
 				std::vector <PrPhysics::RaycastHit> hits;
 				if (PrSystems::Get<PrPhysics::PhysicsSystem>()->RaycastAll(cameraTransform->GetPosition(), PrCore::Math::normalize(mousePos), distance, hits))
@@ -90,8 +81,23 @@ namespace ChessGame {
 						auto name = hit.entity.GetComponent<PrCore::NameComponent>()->name;
 						if (name.find("Square") != name.npos)
 						{
-							auto pos = hit.entity.GetComponent<PrCore::TransformComponent>()->GetPosition();
-							m_render.ShowMoveHollow(pos);
+							LegalMoves moves;
+							m_coordinator->GetMoves(moves);
+
+							auto parent = m_selectedPiece.GetComponent<PrCore::ParentComponent>()->GetParent();
+							auto squareCompoenent = hit.entity.GetComponent<SquareComponent>();
+							for (auto move : moves)
+							{
+								auto square = parent.GetComponent<PieceComponent>()->square;
+								if ((move.fromSquare == square && squareCompoenent->square == move.toSquare) ||
+									squareCompoenent->square == square)
+								{
+									auto pos = hit.entity.GetComponent<PrCore::TransformComponent>()->GetPosition();
+									ShowMoveHollow(pos);
+
+									PRLOG_INFO("{} {} {}", pos.x, pos.y, pos.z);
+								}
+							}
 						}
 					}
 				}
@@ -100,13 +106,56 @@ namespace ChessGame {
 			PrSystems::Get<PrRenderer::IRenderFrontend>()->DrawDebugLine(camera->GetPosition() - cameraTransform->GetUpVector() * 0.01f, camera->GetPosition() + PrCore::Math::normalize(mousePos) * distance);
 		}
 
-		void OnSerialize(PrCore::Utils::JSON::json& p_serialized) override {}
-		void OnDeserialize(const PrCore::Utils::JSON::json& p_deserialized) override {}
+		bool SelectPiece(PrCore::Entity p_entity)
+		{
+			PrCore::Entity parentEntity = p_entity.GetComponent<PrCore::ParentComponent>()->GetParent();
+
+			if (!m_selectedPiece.IsValid() && parentEntity.IsValid() && parentEntity.HasComponent<PieceComponent>())
+			{
+				PieceComponent* piece = parentEntity.GetComponent<PieceComponent>();
+				if (piece->color == m_coordinator->SideToMove())
+				{
+					m_selectedPiece = p_entity;
+					m_selectedOriginPos = parentEntity.GetComponent<PrCore::TransformComponent>()->GetPosition();
+
+					OverlayComponent* overlay = m_selectedPiece.AddComponent<OverlayComponent>();
+					overlay->pieceComponent = piece;
+
+					m_coordinator->GenerateMoves();
+					m_coordinator->ShowPossibleMovesFor(piece->square);
+					ShowMoveHollow(m_selectedOriginPos);
+
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		void DeselectPiece()
+		{
+			if (m_selectedPiece.IsValid())
+			{
+				m_selectedPiece.GetComponent<PrCore::ParentComponent>()->GetParent().GetComponent<PrCore::TransformComponent>()->SetPosition(m_selectedOriginPos);
+				m_selectedPiece.RemoveComponent<OverlayComponent>();
+				m_selectedPiece = PrCore::Entity{};
+
+				m_coordinator->DisablePossibleMoves();
+			}
+		}
+
+		void ShowMoveHollow(PrCore::Math::vec3 p_pos)
+		{
+			auto transform = m_selectedPiece.GetComponent<PrCore::ParentComponent>()->GetParent().GetComponent<PrCore::TransformComponent>();
+			p_pos.y = 0.1f;
+			transform->SetPosition(p_pos);
+		}
 
 	private:
-		PrCore::Entity   m_pMainCamera;
-		PrCore::Entity   m_selected;
-		BoardCoordinator m_cor;
-		BoardRender      m_render;
+		PrCore::Entity      m_pMainCamera;
+		PrCore::Entity      m_selectedPiece;
+		PrCore::Math::vec3  m_selectedOriginPos;
+		
+		BoardCoordinator* m_coordinator;
 	};
 }

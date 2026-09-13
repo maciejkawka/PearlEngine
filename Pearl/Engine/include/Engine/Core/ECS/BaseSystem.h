@@ -31,6 +31,14 @@ namespace PrCore {
 		inline void SetActive(bool p_isActive) { m_isActive = p_isActive; }
 		inline bool IsActive() const { return m_isActive; }
 
+		virtual void OnSerialize(Utils::JSON::json& p_serialized) override
+		{
+		}
+
+		virtual void OnDeserialize(const Utils::JSON::json& p_deserialized) override
+		{
+		}
+
 	protected:
 		EntityViewer m_entityViewer;
 		uint8_t m_updateGroup;

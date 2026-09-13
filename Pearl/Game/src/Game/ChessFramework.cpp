@@ -3,8 +3,10 @@
 #include "SceneCreators/SceneCreator.h"
 #include "SceneCreators/CreatorSystem.h"
 
-#include "Systems/PieceSelector.h"
+#include "Systems/GameSystem.h"
 #include "Systems/MainCamera.h"
+#include "Systems/OverlaySystem.h"
+#include "Systems/PieceSelector.h"
 
 #include "Engine/Core/Utils/ILogger.h"
 
@@ -17,6 +19,7 @@ namespace ChessGame {
         PrSystems::Get<PrCore::SceneManager>()->GetActiveScene()->RegisterSystem<MainCameraSystem>();
         PrSystems::Get<PrCore::SceneManager>()->GetActiveScene()->RegisterSystem<PieceSelectorSystem>();
         PrSystems::Get<PrCore::SceneManager>()->GetActiveScene()->RegisterSystem<OverlaySystem>();
+        PrSystems::Get<PrCore::SceneManager>()->GetActiveScene()->RegisterSystem<GameSystem>();
     }
 
     bool Game::OnUpdate(float p_dt)

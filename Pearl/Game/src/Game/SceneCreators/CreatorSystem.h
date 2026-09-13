@@ -10,7 +10,7 @@ namespace ChessGame {
 
 	class CreatorSystem : public PrCore::BaseSystem {
 	public:
-		void OnEnable() override
+		void OnCreate() override
 		{
 			SceneCreator creator{ &m_entityViewer };
 

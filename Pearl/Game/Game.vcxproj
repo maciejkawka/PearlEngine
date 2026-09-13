@@ -159,23 +159,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Game\ChessEngine\BoardCoordinator.h" />
-    <ClInclude Include="include\Game\ChessEngine\BoardRender.h" />
     <ClInclude Include="include\Game\ChessEngine\ChessLib.hpp" />
     <ClInclude Include="include\Game\ChessEngine\ChessSystem.h" />
     <ClInclude Include="include\Game\ChessFramework.h" />
-    <ClInclude Include="include\Game\Systems\OverlayComponent.h" />
+    <ClInclude Include="include\Game\SceneCreators\PiecesFactory.h" />
+    <ClInclude Include="include\Game\Systems\GameSystem.h" />
+    <ClInclude Include="include\Game\Components\MainComponents.h" />
+    <ClInclude Include="include\Game\Systems\OverlaySystem.h" />
     <ClInclude Include="include\Game\Systems\PieceSelector.h" />
     <ClInclude Include="include\Game\Systems\MainCamera.h" />
-    <ClInclude Include="include\Game\TestFeatures.h" />
     <ClInclude Include="include\Game\SceneCreators\SceneCreator.h" />
     <ClInclude Include="src\Game\SceneCreators\CreatorSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game\ChessEngine\BoardCoordinator.cpp" />
-    <ClCompile Include="src\Game\ChessEngine\BoardRender.cpp" />
+    <ClCompile Include="src\Game\ChessEngine\ChessSystem.cpp" />
     <ClCompile Include="src\Game\ChessFramework.cpp" />
+    <ClCompile Include="src\Game\SceneCreators\PiecesFactory.cpp" />
     <ClCompile Include="src\Game\SceneCreators\SceneCreator.cpp" />
-    <ClCompile Include="src\Game\TestFeatures.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
