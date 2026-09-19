@@ -38,7 +38,9 @@ namespace ChessGame {
 	enum class MoveType {
 		Normal,
 		Capture,
-		Promotion
+		Promotion,
+		Castling,
+		EnPassant
 	};
 
 	enum class GameOverResult
@@ -64,7 +66,7 @@ namespace ChessGame {
 		Square    toSquare;
 		Square    fromSquare;
 		MoveType  moveType;
-		PieceType pieceType;
+		PieceType promotedTo = PieceType::Knight;
 	};
 
 	struct Piece 

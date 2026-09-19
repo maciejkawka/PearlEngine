@@ -17,6 +17,7 @@ namespace ChessGame
 		PieceType  type;
 		Color      color;
 		Square     square;
+		bool       isPromoted = false;
 	};
 
 	class OverlayComponent : public PrCore::BaseComponent

@@ -32,11 +32,35 @@ namespace ChessGame {
 
 	void ChessSystem::MakeMove(Move p_move)
 	{
-		chess::Move move = chess::Move::make(
-			ToChessSquare(p_move.fromSquare),
-			ToChessSquare(p_move.toSquare),
-			ToChessPieceType(p_move.pieceType)
-		);
+		chess::Move move;
+		if (p_move.moveType == MoveType::Promotion)
+		{
+			move = chess::Move::make<chess::Move::PROMOTION>(
+				ToChessSquare(p_move.fromSquare),
+				ToChessSquare(p_move.toSquare),
+				ToChessPieceType(p_move.promotedTo));
+		}
+		else if (p_move.moveType == MoveType::Castling)
+		{
+			move = chess::Move::make<chess::Move::CASTLING>(
+				ToChessSquare(p_move.fromSquare),
+				ToChessSquare(p_move.toSquare),
+				ToChessPieceType(p_move.promotedTo));
+		}
+		else if (p_move.moveType == MoveType::EnPassant)
+		{
+			move = chess::Move::make<chess::Move::ENPASSANT>(
+				ToChessSquare(p_move.fromSquare),
+				ToChessSquare(p_move.toSquare),
+				ToChessPieceType(p_move.promotedTo));
+		}
+		else
+		{
+			move = chess::Move::make(
+				ToChessSquare(p_move.fromSquare),
+				ToChessSquare(p_move.toSquare),
+				ToChessPieceType(p_move.promotedTo));
+		}
 
 		m_board.makeMove(move);
 	}
@@ -52,14 +76,28 @@ namespace ChessGame {
 			Move move;
 			move.fromSquare = ToSquare(legalMove.from());
 			move.toSquare = ToSquare(legalMove.to());
-			move.pieceType = ToPieceType(legalMove.promotionType());
 
-			if (m_board.isCapture(legalMove))
-				move.moveType = MoveType::Capture;
-			else if (legalMove.typeOf() == chess::Move::PROMOTION)
+			if (legalMove.typeOf() == chess::Move::PROMOTION)
+			{
 				move.moveType = MoveType::Promotion;
+				move.promotedTo = ToPieceType(legalMove.promotionType());
+			}
+			else if (legalMove.typeOf() == chess::Move::CASTLING)
+			{
+				move.moveType = MoveType::Castling;
+			}
+			else if (legalMove.typeOf() == chess::Move::ENPASSANT)
+			{
+				move.moveType = MoveType::EnPassant;
+			}
+			else if (m_board.isCapture(legalMove))
+			{
+				move.moveType = MoveType::Capture;
+			}
 			else
+			{
 				move.moveType = MoveType::Normal;
+			}
 
 			p_outMoves.push_back(std::move(move));
 		}
@@ -98,7 +136,7 @@ namespace ChessGame {
 		chess::Move move = chess::Move::make(
 			ToChessSquare(p_move.fromSquare),
 			ToChessSquare(p_move.toSquare),
-			ToChessPieceType(p_move.pieceType)
+			ToChessPieceType(p_move.promotedTo)
 		);
 
 		return m_board.isCapture(move);

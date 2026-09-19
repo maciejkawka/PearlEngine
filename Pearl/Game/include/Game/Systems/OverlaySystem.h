@@ -44,6 +44,10 @@ namespace ChessGame {
 						color = PrRenderer::Color{ 1.0f, 0.0f, 0.0f };
 					else if (overlay->moveType == MoveType::Promotion)
 						color = PrRenderer::Color{ 0.0f, 0.0f, 1.0f };
+					else if (overlay->moveType == MoveType::Castling)
+						color = PrRenderer::Color{ 0.0f, 1.0f, 1.0f };
+					else if (overlay->moveType == MoveType::EnPassant)
+						color = PrRenderer::Color{ 1.0f, 0.0f, .5f };
 					else
 						color = PrRenderer::Color{ 1.0f, 1.0f, 1.0f };
 

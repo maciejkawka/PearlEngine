@@ -72,9 +72,59 @@ namespace ChessGame {
 		{
 			if (move.fromSquare == from && move.toSquare == to)
 			{
-				if (m_system.IsCapture(move))
+				if (move.moveType == MoveType::Castling)
+				{
+					if (m_system.SideToMove() == Color::White)
+					{
+						if (to == Square::H1)
+						{
+							m_pieces[static_cast<int>(from)]->square = Square::G1;
+							std::swap(m_pieces[static_cast<int>(from)], m_pieces[static_cast<int>(Square::G1)]);
+							m_pieces[static_cast<int>(to)]->square = Square::F1;
+							std::swap(m_pieces[static_cast<int>(to)], m_pieces[static_cast<int>(Square::F1)]);
+						}
+						else
+						{
+							m_pieces[static_cast<int>(from)]->square = Square::C1;
+							std::swap(m_pieces[static_cast<int>(from)], m_pieces[static_cast<int>(Square::C1)]);
+							m_pieces[static_cast<int>(to)]->square = Square::D1;
+							std::swap(m_pieces[static_cast<int>(to)], m_pieces[static_cast<int>(Square::D1)]);
+						}
+					}
+					else
+					{
+						if (to == Square::H8)
+						{
+							m_pieces[static_cast<int>(from)]->square = Square::G8;
+							std::swap(m_pieces[static_cast<int>(from)], m_pieces[static_cast<int>(Square::G8)]);
+							m_pieces[static_cast<int>(to)]->square = Square::F8;
+							std::swap(m_pieces[static_cast<int>(to)], m_pieces[static_cast<int>(Square::F8)]);
+						}
+						else
+						{
+							m_pieces[static_cast<int>(from)]->square = Square::C8;
+							std::swap(m_pieces[static_cast<int>(from)], m_pieces[static_cast<int>(Square::C8)]);
+							m_pieces[static_cast<int>(to)]->square = Square::D8;
+							std::swap(m_pieces[static_cast<int>(to)], m_pieces[static_cast<int>(Square::D8)]);
+						}
+					}
+
+					m_system.MakeMove(move);
+					return true;;
+				}
+				else if (move.moveType == MoveType::Capture)
 				{
 					m_pieces[static_cast<int>(to)]->square = Square::NoSquare;
+				}
+				else if (move.moveType == MoveType::Promotion)
+				{
+					m_pieces[static_cast<int>(from)]->type = move.promotedTo;
+					m_pieces[static_cast<int>(from)]->isPromoted = true;
+				}
+				else if (move.moveType == MoveType::EnPassant)
+				{
+					int offset = m_system.SideToMove() == Color::White ? -8 : 8;
+					m_pieces[static_cast<int>(to) + offset]->square = Square::NoSquare;
 				}
 
 				m_pieces[static_cast<int>(from)]->square = to;
@@ -135,6 +185,21 @@ namespace ChessGame {
 				{
 					entity.Destroy();
 				}
+				else if (pieceComponent->isPromoted)
+				{
+					entity.Destroy();
+
+					PiecesFactory factory;
+					auto newEntity = factory.CreatePieceEntity(pieceComponent->type, pieceComponent->color);
+					auto pNewPieceComponent = newEntity.GetComponent<PieceComponent>();
+					pNewPieceComponent->color = pieceComponent->color;
+					pNewPieceComponent->square = pieceComponent->square;
+					pNewPieceComponent->type = pieceComponent->type;
+					pNewPieceComponent->isPromoted = false;
+
+					m_pieces[static_cast<int>(pNewPieceComponent->square)] = pNewPieceComponent;
+					newEntity.GetComponent<PrCore::TransformComponent>()->SetPosition(GetSquarePos(pNewPieceComponent->square));
+				}
 				else
 				{
 					transform->SetPosition(GetSquarePos(pieceComponent->square));
@@ -149,6 +214,7 @@ namespace ChessGame {
 				}
 			}
 
+			DisablePossibleMoves();
 			m_isDirty = false;
 		}
 	}
