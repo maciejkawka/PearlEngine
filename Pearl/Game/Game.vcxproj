@@ -169,7 +169,9 @@
     <ClInclude Include="include\Game\Systems\PieceSelector.h" />
     <ClInclude Include="include\Game\Systems\MainCamera.h" />
     <ClInclude Include="include\Game\SceneCreators\SceneCreator.h" />
-    <ClInclude Include="src\Game\SceneCreators\CreatorSystem.h" />
+    <ClInclude Include="include\Game\Systems\CreatorSystem.h" />
+    <ClInclude Include="include\Game\GameConstants.h" />
+    <ClInclude Include="include\Game\ChessEngine\ChessEvents.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game\ChessEngine\BoardCoordinator.cpp" />
@@ -177,6 +179,11 @@
     <ClCompile Include="src\Game\ChessFramework.cpp" />
     <ClCompile Include="src\Game\SceneCreators\PiecesFactory.cpp" />
     <ClCompile Include="src\Game\SceneCreators\SceneCreator.cpp" />
+    <ClCompile Include="src\Game\Systems\CreatorSystem.cpp" />
+    <ClCompile Include="src\Game\Systems\GameSystem.cpp" />
+    <ClCompile Include="src\Game\Systems\MainCamera.cpp" />
+    <ClCompile Include="src\Game\Systems\OverlaySystem.cpp" />
+    <ClCompile Include="src\Game\Systems\PieceSelector.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

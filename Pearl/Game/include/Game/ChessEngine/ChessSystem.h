@@ -47,7 +47,7 @@ namespace ChessGame {
 	{
 		Checkmate,
 		Stalemate,
-		InsuddicientMaterial,
+		InsufficientMaterial,
 		FiftyMoveRule,
 		ThreefoldRepetition,
 		None
@@ -63,45 +63,44 @@ namespace ChessGame {
 
 	struct Move 
 	{
-		Square    toSquare;
-		Square    fromSquare;
-		MoveType  moveType;
-		PieceType promotedTo = PieceType::Knight;
+		Square    toSquare = Square::NoSquare;
+		Square    fromSquare = Square::NoSquare;
+		MoveType  moveType = MoveType::Normal;
+		PieceType promotedTo = PieceType::Queen; // Used only by MoveType::Promotion
 	};
 
 	struct Piece 
 	{
-		PieceType type;
-		Color     color;
-		Square    square;
+		PieceType type = PieceType::Invalid;
+		Color     color = Color::White;
+		Square    square = Square::NoSquare;
 	};
 
 	using LegalMoves = std::vector<Move>;
 
+	// Thin wrapper over chess-library, translates game types to the library types
 	class ChessSystem {
 	public:
 		ChessSystem();
 
-		void MakeMove(Move p_move);
-		void GetLegalMoves(LegalMoves& p_outMoves);
+		void MakeMove(const Move& p_move);
+		void GetLegalMoves(LegalMoves& p_outMoves) const;
 
-		Color SideToMove();
+		Color SideToMove() const;
 
-		bool           IsGameOver();
-		GameOverType   GetGameOverType();
-		GameOverResult GetGameOverResult();
+		bool           IsGameOver() const;
+		GameOverType   GetGameOverType() const;   // From the side to move perspective
+		GameOverResult GetGameOverResult() const;
 
-		bool           IsCheck();
-		bool           IsCapture(Move p_move);
+		bool           IsCheck() const;
 
-		Piece          PieceAt(Square p_square);
+		Piece          PieceAt(Square p_square) const;
 
 		void           ResetBoard();
 		void           LoadBoard(std::string_view p_fen);
-		std::string    SaveBoard();
+		std::string    SaveBoard() const;
 
-		Square                GetPiecePos(PieceType type, Color color);
-		std::array<Piece, 64> GetAllPieces();
+		std::array<Piece, 64> GetAllPieces() const;
 
 	private:
 		chess::Board m_board;

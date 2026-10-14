@@ -1,138 +1,117 @@
 #include "ChessEngine/BoardCoordinator.h"
+#include "ChessEngine/ChessEvents.h"
 #include "SceneCreators/PiecesFactory.h"
 
 #include "Engine/Core/ECS/Components/TransformComponent.h"
 #include "Engine/Core/ECS/Components/RendererComponents.h"
 #include "Engine/Core/ECS/Components/CoreComponents.h"
+#include "Engine/Core/Events/EventManager.h"
 #include "Engine/Core/File/FileSystem.h"
 #include "Engine/Core/Utils/ILogger.h"
 
 #include <string>
+#include <algorithm>
 
 namespace ChessGame {
 
-	constexpr std::string_view SaveFilePath = "save.chess";
-
-	BoardCoordinator::BoardCoordinator(PrCore::EntityViewer* p_entityViewer)
+	const char* ToString(GameOverResult p_result)
 	{
-		m_system = ChessSystem{};
-		m_entityViewer = p_entityViewer;
+		switch (p_result)
+		{
+		case GameOverResult::Checkmate:            return "checkmate";
+		case GameOverResult::Stalemate:            return "stalemate";
+		case GameOverResult::InsufficientMaterial: return "insufficient material";
+		case GameOverResult::FiftyMoveRule:        return "fifty move rule";
+		case GameOverResult::ThreefoldRepetition:  return "threefold repetition";
+		default:                                   return "unknown";
+		}
+	}
 
+	const char* ToString(Color p_color)
+	{
+		return p_color == Color::White ? "White" : "Black";
+	}
+
+	Color Opposite(Color p_color)
+	{
+		return p_color == Color::White ? Color::Black : Color::White;
+	}
+
+	void Fire(PrCore::EventPtr p_event)
+	{
+		PrSystems::Get<PrCore::EventManager>()->FireEvent(p_event);
+	}
+
+	BoardCoordinator::BoardCoordinator(PrCore::EntityViewer* p_entityViewer) :
+		m_entityViewer(p_entityViewer)
+	{
 		std::fill(m_pieces.begin(), m_pieces.end(), nullptr);
+		std::fill(m_squares.begin(), m_squares.end(), nullptr);
 
-		int collectedSquared = 0;
-		int collectedPieces = 0;
-		for (auto [entity, nameComponent, transformComponent] : p_entityViewer->EntitesWithComponents<PrCore::NameComponent, PrCore::TransformComponent>())
+		int collectedSquares = 0;
+		for (auto [entity, nameComponent] : p_entityViewer->EntitesWithComponents<PrCore::NameComponent>())
 		{
 			std::string_view name = nameComponent->name;
 
-			// Collect Square Overlays
-			if (name.find("Square_Overlay_") != name.npos)
+			// Collect Square Overlays, names end with the square e.g. Square_Overlay_A1
+			if (name.find(SquareOverlayPrefix) != name.npos)
 			{
-				collectedSquared++;
-
-				int squarePos = name.find_last_of('_');
+				auto squarePos = name.find_last_of('_');
 				std::string_view squareName = name.substr(squarePos + 1);
 
-				int squareIndex = squareName[0] - 'A' + 8 * (squareName[1] - '1');
-				m_squares[squareIndex] = entity.AddComponent<SquareComponent>();
-				m_squares[squareIndex]->square = static_cast<Square>(squareIndex);
+				bool isValidName = squareName.size() == 2 &&
+					squareName[0] >= 'A' && squareName[0] <= 'H' &&
+					squareName[1] >= '1' && squareName[1] <= '8';
+
+				PR_ASSERT(isValidName, "Invalid square overlay name " + std::string(name));
+				if (isValidName)
+				{
+					int squareIndex = squareName[0] - 'A' + BoardFilesCount * (squareName[1] - '1');
+					PR_ASSERT(m_squares[squareIndex] == nullptr, "Duplicated square overlay " + std::string(name));
+
+					m_squares[squareIndex] = entity.AddComponent<SquareComponent>();
+					m_squares[squareIndex]->square = static_cast<Square>(squareIndex);
+					collectedSquares++;
+				}
 			}
-
-			// Collect Pieces
-			if (name.find("Piece_") != name.npos)
+			// Pieces placed in the scene are replaced by the pieces spawned from the board state
+			else if (name.find(ScenePiecePrefix) != name.npos)
 			{
-				auto pieceName = name.substr(6);
-
-				PieceComponent* pieceComponent = entity.AddComponent<PieceComponent>();
-				pieceComponent->square = GetSquare(transformComponent->GetPosition());
-				pieceComponent->type = PieceNameToType(pieceName);
-				pieceComponent->color = PieceNameToColor(pieceName);
-				m_pieces[static_cast<int>(pieceComponent->square)] = pieceComponent;
-
-				collectedPieces++;
+				entity.Destroy();
 			}
 		}
 
 		// Validation
-		PR_ASSERT(collectedSquared == 64, "Square Overlay not scanned properly!");
-		PR_ASSERT(collectedPieces == 32, "Pieces not scanned properly!");
+		PR_ASSERT(collectedSquares == BoardSquaresCount, "Square Overlay not scanned properly!");
 
 		// Reset and update board
 		Reset();
 		UpdatePieces();
 	}
 
-	bool BoardCoordinator::TryMovePiece(Square from, Square to)
+	bool BoardCoordinator::TryMovePiece(Square p_from, Square p_to, PieceType p_promotion)
 	{
-		if (from == to)
+		if (p_from == p_to || m_gameState != GameState::Playing)
 			return false;
 
-		for (auto move : m_legalMoves)
+		for (const auto& move : m_legalMoves)
 		{
-			if (move.fromSquare == from && move.toSquare == to)
-			{
-				if (move.moveType == MoveType::Castling)
-				{
-					if (m_system.SideToMove() == Color::White)
-					{
-						if (to == Square::H1)
-						{
-							m_pieces[static_cast<int>(from)]->square = Square::G1;
-							std::swap(m_pieces[static_cast<int>(from)], m_pieces[static_cast<int>(Square::G1)]);
-							m_pieces[static_cast<int>(to)]->square = Square::F1;
-							std::swap(m_pieces[static_cast<int>(to)], m_pieces[static_cast<int>(Square::F1)]);
-						}
-						else
-						{
-							m_pieces[static_cast<int>(from)]->square = Square::C1;
-							std::swap(m_pieces[static_cast<int>(from)], m_pieces[static_cast<int>(Square::C1)]);
-							m_pieces[static_cast<int>(to)]->square = Square::D1;
-							std::swap(m_pieces[static_cast<int>(to)], m_pieces[static_cast<int>(Square::D1)]);
-						}
-					}
-					else
-					{
-						if (to == Square::H8)
-						{
-							m_pieces[static_cast<int>(from)]->square = Square::G8;
-							std::swap(m_pieces[static_cast<int>(from)], m_pieces[static_cast<int>(Square::G8)]);
-							m_pieces[static_cast<int>(to)]->square = Square::F8;
-							std::swap(m_pieces[static_cast<int>(to)], m_pieces[static_cast<int>(Square::F8)]);
-						}
-						else
-						{
-							m_pieces[static_cast<int>(from)]->square = Square::C8;
-							std::swap(m_pieces[static_cast<int>(from)], m_pieces[static_cast<int>(Square::C8)]);
-							m_pieces[static_cast<int>(to)]->square = Square::D8;
-							std::swap(m_pieces[static_cast<int>(to)], m_pieces[static_cast<int>(Square::D8)]);
-						}
-					}
+			if (move.fromSquare != p_from || move.toSquare != p_to)
+				continue;
 
-					m_system.MakeMove(move);
-					return true;;
-				}
-				else if (move.moveType == MoveType::Capture)
-				{
-					m_pieces[static_cast<int>(to)]->square = Square::NoSquare;
-				}
-				else if (move.moveType == MoveType::Promotion)
-				{
-					m_pieces[static_cast<int>(from)]->type = move.promotedTo;
-					m_pieces[static_cast<int>(from)]->isPromoted = true;
-				}
-				else if (move.moveType == MoveType::EnPassant)
-				{
-					int offset = m_system.SideToMove() == Color::White ? -8 : 8;
-					m_pieces[static_cast<int>(to) + offset]->square = Square::NoSquare;
-				}
+			// Each promotion target square has a move per piece type
+			if (move.moveType == MoveType::Promotion && move.promotedTo != p_promotion)
+				continue;
 
-				m_pieces[static_cast<int>(from)]->square = to;
-				std::swap(m_pieces[static_cast<int>(from)], m_pieces[static_cast<int>(to)]);
-				m_system.MakeMove(move);
+			const Move appliedMove = move;
+			const Color movedSide = m_system.SideToMove();
 
-				return true;
-			}
+			m_system.MakeMove(appliedMove);
+			m_legalMoves.clear();
+			SetBoardDirty();
+
+			Fire(std::make_shared<MoveMadeEvent>(appliedMove, movedSide));
+			return true;
 		}
 
 		return false;
@@ -144,16 +123,16 @@ namespace ChessGame {
 		m_system.GetLegalMoves(m_legalMoves);
 	}
 
-	void BoardCoordinator::GetMoves(LegalMoves& p_legalMoves)
+	const LegalMoves& BoardCoordinator::GetLegalMoves() const
 	{
-		p_legalMoves = m_legalMoves;
+		return m_legalMoves;
 	}
 
-	void BoardCoordinator::ShowPossibleMovesFor(Square from)
+	void BoardCoordinator::ShowPossibleMovesFor(Square p_from)
 	{
-		for (auto& move : m_legalMoves)
+		for (const auto& move : m_legalMoves)
 		{
-			if (move.fromSquare == from)
+			if (move.fromSquare == p_from)
 			{
 				SquareComponent* squareComponent = m_squares[static_cast<int>(move.toSquare)];
 				squareComponent->showOverlay = true;
@@ -179,197 +158,251 @@ namespace ChessGame {
 	{
 		if (m_isDirty)
 		{
-			for (auto [entity, pieceComponent, transform, mesh] : m_entityViewer->EntitesWithComponents<PieceComponent, PrCore::TransformComponent, PrCore::MeshRendererComponent>())
-			{
-				if (pieceComponent->square == Square::NoSquare)
-				{
-					entity.Destroy();
-				}
-				else if (pieceComponent->isPromoted)
-				{
-					entity.Destroy();
-
-					PiecesFactory factory;
-					auto newEntity = factory.CreatePieceEntity(pieceComponent->type, pieceComponent->color);
-					auto pNewPieceComponent = newEntity.GetComponent<PieceComponent>();
-					pNewPieceComponent->color = pieceComponent->color;
-					pNewPieceComponent->square = pieceComponent->square;
-					pNewPieceComponent->type = pieceComponent->type;
-					pNewPieceComponent->isPromoted = false;
-
-					m_pieces[static_cast<int>(pNewPieceComponent->square)] = pNewPieceComponent;
-					newEntity.GetComponent<PrCore::TransformComponent>()->SetPosition(GetSquarePos(pNewPieceComponent->square));
-				}
-				else
-				{
-					transform->SetPosition(GetSquarePos(pieceComponent->square));
-				}
-			}
-
-			for (auto& piece : m_pieces)
-			{
-				if (piece && piece->square == Square::NoSquare)
-				{
-					piece = nullptr;
-				}
-			}
-
+			SyncPiecesWithBoard();
 			DisablePossibleMoves();
+			UpdateGameState();
 			m_isDirty = false;
 		}
 	}
 
-	void BoardCoordinator::UpdateGameState()
+	void BoardCoordinator::SyncPiecesWithBoard()
 	{
+		struct PieceEntity
+		{
+			PrCore::Entity  entity;
+			PieceComponent* piece;
+		};
 
+		const auto boardPieces = m_system.GetAllPieces();
+		std::array<bool, BoardSquaresCount> filledSquares{};
+		std::fill(m_pieces.begin(), m_pieces.end(), nullptr);
+
+		auto isSamePiece = [](const Piece& p_boardPiece, const PieceComponent* p_piece)
+		{
+			return p_boardPiece.type == p_piece->type && p_boardPiece.color == p_piece->color;
+		};
+
+		// Gather all alive piece entities
+		std::vector<PieceEntity> unmatched;
+		for (auto [entity, pieceComponent] : m_entityViewer->EntitesWithComponents<PieceComponent>())
+		{
+			if (!entity.HasComponent<PrCore::ToDestoryTag>())
+				unmatched.push_back({ entity, pieceComponent });
+		}
+
+		// Keep pieces that already stand on the correct square
+		for (auto it = unmatched.begin(); it != unmatched.end();)
+		{
+			if (it->piece->square != Square::NoSquare)
+			{
+				int squareIndex = static_cast<int>(it->piece->square);
+				if (!filledSquares[squareIndex] && isSamePiece(boardPieces[squareIndex], it->piece))
+				{
+					PlacePiece(it->entity, it->piece, it->piece->square);
+					filledSquares[squareIndex] = true;
+					it = unmatched.erase(it);
+					continue;
+				}
+			}
+
+			++it;
+		}
+
+		// Move pieces to their new squares, covers normal moves and castling
+		for (int i = 0; i < BoardSquaresCount; i++)
+		{
+			if (filledSquares[i] || boardPieces[i].type == PieceType::Invalid)
+				continue;
+
+			auto it = std::find_if(unmatched.begin(), unmatched.end(), [&](const PieceEntity& p_pieceEntity)
+			{
+				return isSamePiece(boardPieces[i], p_pieceEntity.piece);
+			});
+
+			if (it != unmatched.end())
+			{
+				PlacePiece(it->entity, it->piece, static_cast<Square>(i));
+				filledSquares[i] = true;
+				unmatched.erase(it);
+			}
+		}
+
+		// Destroy pieces that left the board, covers captures, en passant and promoted pawns
+		for (auto& pieceEntity : unmatched)
+		{
+			pieceEntity.piece->square = Square::NoSquare;
+			pieceEntity.entity.Destroy();
+		}
+
+		// Spawn missing pieces, covers promotions and the new board
+		PiecesFactory factory;
+		for (int i = 0; i < BoardSquaresCount; i++)
+		{
+			if (filledSquares[i] || boardPieces[i].type == PieceType::Invalid)
+				continue;
+
+			auto entity = factory.CreatePieceEntity(boardPieces[i].type, boardPieces[i].color);
+			PlacePiece(entity, entity.GetComponent<PieceComponent>(), static_cast<Square>(i));
+		}
 	}
 
-	Color BoardCoordinator::SideToMove()
+	void BoardCoordinator::PlacePiece(PrCore::Entity p_entity, PieceComponent* p_piece, Square p_square)
+	{
+		p_piece->square = p_square;
+		m_pieces[static_cast<int>(p_square)] = p_piece;
+		p_entity.GetComponent<PrCore::TransformComponent>()->SetPosition(GetSquarePos(p_square));
+	}
+
+	void BoardCoordinator::UpdateGameState()
+	{
+		if (m_gameState == GameState::GameOver || !m_system.IsGameOver())
+			return;
+
+		m_gameState = GameState::GameOver;
+
+		const GameOverResult result = m_system.GetGameOverResult();
+		const GameOverType sideToMoveResult = m_system.GetGameOverType();
+
+		// Library reports the result from the side to move perspective
+		const Color sideToMove = m_system.SideToMove();
+		GameOverType type = GameOverType::Draw;
+		Color winner = sideToMove;
+		if (sideToMoveResult == GameOverType::Lose)
+		{
+			type = GameOverType::Win;
+			winner = Opposite(sideToMove);
+		}
+		else if (sideToMoveResult == GameOverType::Win)
+		{
+			type = GameOverType::Win;
+		}
+
+		if (type == GameOverType::Win)
+		{
+			PRLOG_INFO("Game over, {} wins by {}", ToString(winner), ToString(result));
+		}
+		else
+		{
+			PRLOG_INFO("Game over, draw by {}", ToString(result));
+		}
+
+		Fire(std::make_shared<GameOverEvent>(result, type, winner));
+	}
+
+	Color BoardCoordinator::SideToMove() const
 	{
 		return m_system.SideToMove();
 	}
 
+	bool BoardCoordinator::IsCheck() const
+	{
+		return m_system.IsCheck();
+	}
+
+	GameState BoardCoordinator::GetGameState() const
+	{
+		return m_gameState;
+	}
+
+	bool BoardCoordinator::CanSelectPiece(Color p_pieceColor) const
+	{
+		// Extend here with player color and AI turn rules
+		return m_gameState == GameState::Playing && p_pieceColor == m_system.SideToMove();
+	}
+
 	void BoardCoordinator::Save()
 	{
+		auto fileSystem = PrSystems::Get<PrCore::FileSystem>();
+		auto filehandle = fileSystem->FileOpen(SaveFilePath, PrCore::FileOpenMode::Write);
+		if (!filehandle)
+		{
+			PRLOG_WARN("Cannot open save file {}, save skipped", SaveFilePath);
+			return;
+		}
+
 		std::string fen = m_system.SaveBoard();
-		auto filehandle = PrSystems::Get<PrCore::FileSystem>()->FileOpen(SaveFilePath, PrCore::FileOpenMode::Write);
-		PrSystems::Get<PrCore::FileSystem>()->FileWrite(filehandle, fen.data(), fen.length());
-		PrSystems::Get<PrCore::FileSystem>()->FileClose(filehandle);
+		fileSystem->FileWrite(filehandle, fen.data(), fen.length());
+		fileSystem->FileClose(filehandle);
+
+		PRLOG_INFO("Game saved: {}", fen);
 	}
 
 	void BoardCoordinator::Load()
 	{
-		// Destory all pieces
-		for (auto [entity, pieceComponent] : m_entityViewer->EntitesWithComponents<PieceComponent>())
+		// Read the save file first, keep the current game if there is nothing to load
+		auto fileSystem = PrSystems::Get<PrCore::FileSystem>();
+		auto filehandle = fileSystem->FileOpen(SaveFilePath, PrCore::FileOpenMode::Read);
+		if (!filehandle)
 		{
-			pieceComponent->square = Square::NoSquare;
-			entity.Destroy();
+			PRLOG_WARN("Cannot open save file {}, load skipped", SaveFilePath);
+			return;
 		}
 
-		auto filehandle = PrSystems::Get<PrCore::FileSystem>()->FileOpen(SaveFilePath, PrCore::FileOpenMode::Read);
-		if (filehandle)
+		std::string fen;
+		fen.resize(fileSystem->FileSize(filehandle));
+		fileSystem->FileRead(filehandle, fen.data(), fen.length());
+		fileSystem->FileClose(filehandle);
+
+		// Trim whitespaces, a manually edited save file can end with a new line
+		const char* whitespaces = " \t\r\n";
+		auto first = fen.find_first_not_of(whitespaces);
+		if (first == std::string::npos)
 		{
-			std::string fen;
-			fen.resize(PrSystems::Get<PrCore::FileSystem>()->FileSize(filehandle));
-			PrSystems::Get<PrCore::FileSystem>()->FileRead(filehandle, fen.data(), fen.length());
-			PrSystems::Get<PrCore::FileSystem>()->FileClose(filehandle);
-
-			PiecesFactory factory;
-			std::fill(m_pieces.begin(), m_pieces.end(), nullptr);
-			m_system.LoadBoard(fen);
-
-			const auto pieces = m_system.GetAllPieces();
-			for (const auto& piece : pieces)
-			{
-				if (piece.type != PieceType::Invalid)
-				{
-					auto entity = factory.CreatePieceEntity(piece.type, piece.color);
-					auto pieceComponent = entity.GetComponent<PieceComponent>();
-					pieceComponent->square = piece.square;
-					pieceComponent->color = piece.color;
-					pieceComponent->type = piece.type;
-
-					m_pieces[static_cast<int>(pieceComponent->square)] = pieceComponent;
-				}
-			}
+			PRLOG_WARN("Save file {} is empty, load skipped", SaveFilePath);
+			return;
 		}
+		fen = fen.substr(first, fen.find_last_not_of(whitespaces) - first + 1);
 
-		SetBoardDirty();
+		m_system.LoadBoard(fen);
+		OnBoardReplaced();
+
+		PRLOG_INFO("Game loaded: {}", fen);
 	}
 
 	void BoardCoordinator::Reset()
 	{
-		// Destory all pieces
-		for (auto [entity, pieceComponent] : m_entityViewer->EntitesWithComponents<PieceComponent>())
-		{
-			entity.Destroy();
-			pieceComponent->square = Square::NoSquare;
-		}
-
-		PiecesFactory factory;
-		std::fill(m_pieces.begin(), m_pieces.end(), nullptr);
-		m_system = ChessSystem{};
-
-		auto pieces = m_system.GetAllPieces();
-		for (auto& piece : pieces)
-		{
-			if (piece.type != PieceType::Invalid)
-			{
-				auto entity = factory.CreatePieceEntity(piece.type, piece.color);
-				auto pieceComponent = entity.GetComponent<PieceComponent>();
-				pieceComponent->square = piece.square;
-				pieceComponent->color = piece.color;
-				pieceComponent->type = piece.type;
-
-				m_pieces[static_cast<int>(pieceComponent->square)] = pieceComponent;
-			}
-		}
-
-		SetBoardDirty();
+		m_system.ResetBoard();
+		OnBoardReplaced();
 	}
 
-	void BoardCoordinator::SetGameRules(GameRules rules)
+	void BoardCoordinator::OnBoardReplaced()
 	{
-		m_gameRules = rules;
+		m_legalMoves.clear();
+		m_gameState = GameState::Playing;
+		SetBoardDirty();
+
+		Fire(std::make_shared<BoardChangedEvent>());
 	}
 
-	GameRules BoardCoordinator::GetGameRules()
+	void BoardCoordinator::SetGameRules(GameRules p_rules)
+	{
+		m_gameRules = p_rules;
+	}
+
+	GameRules BoardCoordinator::GetGameRules() const
 	{
 		return m_gameRules;
 	}
 
-	PrCore::Math::vec3 BoardCoordinator::GetSquarePos(Square p_square)
+	void BoardCoordinator::SetPlayerColor(Color p_color)
 	{
-		int zOffset = static_cast<int>(p_square) % 8;
-		int xOffset = (static_cast<int>(p_square) - zOffset) / 8;
+		m_playerColor = p_color;
+	}
 
+	Color BoardCoordinator::GetPlayerColor() const
+	{
+		return m_playerColor;
+	}
+
+	PrCore::Math::vec3 BoardCoordinator::GetSquarePos(Square p_square) const
+	{
+		int zOffset = static_cast<int>(p_square) % BoardFilesCount;
+		int xOffset = (static_cast<int>(p_square) - zOffset) / BoardFilesCount;
 
 		auto returnPos = m_A1Pos;
 		returnPos.x -= xOffset * m_squareStep;
 		returnPos.z -= zOffset * m_squareStep;
 
 		return returnPos;
-	}
-
-	Square BoardCoordinator::GetSquare(PrCore::Math::vec3 p_pos)
-	{
-		float x = p_pos.x;
-		float z = p_pos.z;
-
-		float xOffset = PrCore::Math::abs((m_A1Pos.x - x) / m_squareStep) + 0.2f;
-		float zOffset = PrCore::Math::abs((m_A1Pos.z - z) / m_squareStep) + 0.2f;
-
-		int squareIndex = static_cast<int>(xOffset) * 8 + static_cast<int>(zOffset);
-		return static_cast<Square>(squareIndex);
-	}
-
-	Color BoardCoordinator::PieceNameToColor(std::string_view p_name)
-	{
-		int pos = p_name.find_first_of('_');
-		auto pieceSide = p_name.substr(pos + 1);
-		return pieceSide[0] == 'B' ? Color::Black : Color::White;
-	}
-
-	PieceType BoardCoordinator::PieceNameToType(std::string_view p_name)
-	{
-		int pos = p_name.find_first_of('_');
-
-		auto pieceName = p_name.substr(0, pos);
-
-		PieceType pieceType;
-		if (pieceName == "Pawn")
-			pieceType = PieceType::Pawn;
-		else if (pieceName == "Knight")
-			pieceType = PieceType::Knight;
-		else if (pieceName == "Bishop")
-			pieceType = PieceType::Bishop;
-		else if (pieceName == "Castle")
-			pieceType = PieceType::Rook;
-		else if (pieceName == "Queen")
-			pieceType = PieceType::Queen;
-		else if (pieceName == "King")
-			pieceType = PieceType::King;
-
-		return pieceType;
 	}
 }

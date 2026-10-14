@@ -11,7 +11,9 @@
       <Filter>Test</Filter>
     </ClInclude>
     <ClInclude Include="include\Game\SceneCreators\SceneCreator.h" />
-    <ClInclude Include="src\Game\SceneCreators\CreatorSystem.h" />
+    <ClInclude Include="include\Game\Systems\CreatorSystem.h" />
+    <ClInclude Include="include\Game\GameConstants.h" />
+    <ClInclude Include="include\Game\ChessEngine\ChessEvents.h" />
     <ClInclude Include="include\Game\Systems\PieceSelector.h" />
     <ClInclude Include="include\Game\Systems\MainCamera.h" />
     <ClInclude Include="include\Game\ChessEngine\ChessLib.hpp" />
@@ -38,5 +40,10 @@
     <ClCompile Include="src\Game\SceneCreators\PiecesFactory.cpp">
       <Filter>Test</Filter>
     </ClCompile>
+    <ClCompile Include="src\Game\Systems\CreatorSystem.cpp" />
+    <ClCompile Include="src\Game\Systems\GameSystem.cpp" />
+    <ClCompile Include="src\Game\Systems\MainCamera.cpp" />
+    <ClCompile Include="src\Game\Systems\OverlaySystem.cpp" />
+    <ClCompile Include="src\Game\Systems\PieceSelector.cpp" />
   </ItemGroup>
 </Project>

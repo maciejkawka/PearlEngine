@@ -1,8 +1,8 @@
 #include "ChessEngine/ChessSystem.h"
 
-
 namespace ChessGame {
 
+	// Conversions between game and chess-library types
 	Square ToSquare(chess::Square p_square)
 	{
 		return static_cast<Square>(p_square.index());
@@ -10,8 +10,21 @@ namespace ChessGame {
 
 	PieceType ToPieceType(chess::PieceType p_pieceType)
 	{
-		int undelying = static_cast<int>(p_pieceType);
-		return static_cast<PieceType>(undelying);
+		switch (p_pieceType.internal())
+		{
+		case chess::PieceType::PAWN:   return PieceType::Pawn;
+		case chess::PieceType::KNIGHT: return PieceType::Knight;
+		case chess::PieceType::BISHOP: return PieceType::Bishop;
+		case chess::PieceType::ROOK:   return PieceType::Rook;
+		case chess::PieceType::QUEEN:  return PieceType::Queen;
+		case chess::PieceType::KING:   return PieceType::King;
+		default:                       return PieceType::Invalid;
+		}
+	}
+
+	Color ToColor(chess::Color p_color)
+	{
+		return p_color == chess::Color::WHITE ? Color::White : Color::Black;
 	}
 
 	chess::Square ToChessSquare(Square p_square)
@@ -21,8 +34,16 @@ namespace ChessGame {
 
 	chess::PieceType ToChessPieceType(PieceType p_pieceType)
 	{
-		int underlying = static_cast<int>(p_pieceType);
-		return static_cast<chess::PieceType::underlying>(underlying);
+		switch (p_pieceType)
+		{
+		case PieceType::Pawn:   return chess::PieceType::PAWN;
+		case PieceType::Knight: return chess::PieceType::KNIGHT;
+		case PieceType::Bishop: return chess::PieceType::BISHOP;
+		case PieceType::Rook:   return chess::PieceType::ROOK;
+		case PieceType::Queen:  return chess::PieceType::QUEEN;
+		case PieceType::King:   return chess::PieceType::KING;
+		default:                return chess::PieceType::NONE;
+		}
 	}
 
 	ChessSystem::ChessSystem() :
@@ -30,46 +51,36 @@ namespace ChessGame {
 	{
 	}
 
-	void ChessSystem::MakeMove(Move p_move)
+	void ChessSystem::MakeMove(const Move& p_move)
 	{
+		const auto from = ToChessSquare(p_move.fromSquare);
+		const auto to = ToChessSquare(p_move.toSquare);
+
+		// Promotion piece type is encoded only for promotion moves
 		chess::Move move;
-		if (p_move.moveType == MoveType::Promotion)
+		switch (p_move.moveType)
 		{
-			move = chess::Move::make<chess::Move::PROMOTION>(
-				ToChessSquare(p_move.fromSquare),
-				ToChessSquare(p_move.toSquare),
-				ToChessPieceType(p_move.promotedTo));
-		}
-		else if (p_move.moveType == MoveType::Castling)
-		{
-			move = chess::Move::make<chess::Move::CASTLING>(
-				ToChessSquare(p_move.fromSquare),
-				ToChessSquare(p_move.toSquare),
-				ToChessPieceType(p_move.promotedTo));
-		}
-		else if (p_move.moveType == MoveType::EnPassant)
-		{
-			move = chess::Move::make<chess::Move::ENPASSANT>(
-				ToChessSquare(p_move.fromSquare),
-				ToChessSquare(p_move.toSquare),
-				ToChessPieceType(p_move.promotedTo));
-		}
-		else
-		{
-			move = chess::Move::make(
-				ToChessSquare(p_move.fromSquare),
-				ToChessSquare(p_move.toSquare),
-				ToChessPieceType(p_move.promotedTo));
+		case MoveType::Promotion:
+			move = chess::Move::make<chess::Move::PROMOTION>(from, to, ToChessPieceType(p_move.promotedTo));
+			break;
+		case MoveType::Castling:
+			move = chess::Move::make<chess::Move::CASTLING>(from, to);
+			break;
+		case MoveType::EnPassant:
+			move = chess::Move::make<chess::Move::ENPASSANT>(from, to);
+			break;
+		default:
+			move = chess::Move::make(from, to);
+			break;
 		}
 
 		m_board.makeMove(move);
 	}
 
-	void ChessSystem::GetLegalMoves(LegalMoves& p_outMoves)
+	void ChessSystem::GetLegalMoves(LegalMoves& p_outMoves) const
 	{
 		chess::Movelist moveList;
 		chess::movegen::legalmoves(moveList, m_board);
-
 
 		for (auto& legalMove : moveList)
 		{
@@ -103,58 +114,53 @@ namespace ChessGame {
 		}
 	}
 
-	Color ChessSystem::SideToMove()
+	Color ChessSystem::SideToMove() const
 	{
-		auto color = static_cast<int>(m_board.sideToMove());
-		return static_cast<Color>(color);
+		return ToColor(m_board.sideToMove());
 	}
 
-	bool ChessSystem::IsGameOver()
+	bool ChessSystem::IsGameOver() const
 	{
 		return m_board.isGameOver().first != chess::GameResultReason::NONE;
 	}
 
-	GameOverType ChessSystem::GetGameOverType()
+	GameOverType ChessSystem::GetGameOverType() const
 	{
-		auto underlying = static_cast<int>(m_board.isGameOver().first);
-		return static_cast<GameOverType>(underlying);
+		switch (m_board.isGameOver().second)
+		{
+		case chess::GameResult::WIN:  return GameOverType::Win;
+		case chess::GameResult::LOSE: return GameOverType::Lose;
+		case chess::GameResult::DRAW: return GameOverType::Draw;
+		default:                      return GameOverType::None;
+		}
 	}
 
-	GameOverResult ChessSystem::GetGameOverResult()
+	GameOverResult ChessSystem::GetGameOverResult() const
 	{
-		auto underlying = static_cast<int>(m_board.isGameOver().second);
-		return static_cast<GameOverResult>(underlying);
+		switch (m_board.isGameOver().first)
+		{
+		case chess::GameResultReason::CHECKMATE:             return GameOverResult::Checkmate;
+		case chess::GameResultReason::STALEMATE:             return GameOverResult::Stalemate;
+		case chess::GameResultReason::INSUFFICIENT_MATERIAL: return GameOverResult::InsufficientMaterial;
+		case chess::GameResultReason::FIFTY_MOVE_RULE:       return GameOverResult::FiftyMoveRule;
+		case chess::GameResultReason::THREEFOLD_REPETITION:  return GameOverResult::ThreefoldRepetition;
+		default:                                             return GameOverResult::None;
+		}
 	}
 
-	bool ChessSystem::IsCheck()
+	bool ChessSystem::IsCheck() const
 	{
 		return m_board.inCheck();
 	}
 
-	bool ChessSystem::IsCapture(Move p_move)
-	{
-		chess::Move move = chess::Move::make(
-			ToChessSquare(p_move.fromSquare),
-			ToChessSquare(p_move.toSquare),
-			ToChessPieceType(p_move.promotedTo)
-		);
-
-		return m_board.isCapture(move);
-	}
-
-	Piece ChessSystem::PieceAt(Square p_square)
+	Piece ChessSystem::PieceAt(Square p_square) const
 	{
 		chess::Piece chessPiece = m_board.at(ToChessSquare(p_square));
 
 		Piece piece;
-		piece.type = PieceType::Invalid;
-		piece.square = Square::NoSquare;
-
 		if (chessPiece.type() != chess::PieceType::NONE)
 		{
-			auto color = static_cast<int>(chessPiece.color());
-			piece.color = static_cast<Color>(color);
-
+			piece.color = ToColor(chessPiece.color());
 			piece.type = ToPieceType(chessPiece.type());
 			piece.square = p_square;
 		}
@@ -172,38 +178,16 @@ namespace ChessGame {
 		m_board = m_board.fromFen(p_fen);
 	}
 
-	std::string ChessSystem::SaveBoard()
+	std::string ChessSystem::SaveBoard() const
 	{
 		return m_board.getFen();
 	}
 
-	Square ChessSystem::GetPiecePos(PieceType type, Color color)
-	{
-		return Square::NoSquare;
-	}
-
-	std::array<Piece, 64> ChessSystem::GetAllPieces()
+	std::array<Piece, 64> ChessSystem::GetAllPieces() const
 	{
 		std::array<Piece, 64> pieces;
-
 		for (int i = 0; i < 64; i++)
-		{
-			chess::Piece chessPiece = m_board.at(chess::Square{ i });
-
-			Piece piece;
-			piece.type = PieceType::Invalid;
-
-			if (chessPiece.type() != chess::PieceType::NONE)
-			{
-				auto color = static_cast<int>(chessPiece.color());
-				piece.color = static_cast<Color>(color);
-
-				piece.type = ToPieceType(chessPiece.type());
-				piece.square = static_cast<Square>(i);
-			}
-
-			pieces[i] = std::move(piece);
-		}
+			pieces[i] = PieceAt(static_cast<Square>(i));
 
 		return pieces;
 	}
