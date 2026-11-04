@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ChessEngine/ChessSystem.h"
-#include "Components/MainComponents.h"
+#include "Systems/MainComponents.h"
 #include "GameConstants.h"
 
 #include "Engine/Core/ECS/EntityViewer.h"

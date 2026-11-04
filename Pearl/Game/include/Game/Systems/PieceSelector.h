@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Components/MainComponents.h"
+#include "Systems/MainComponents.h"
 #include "Systems/PromotionPicker.h"
 
 #include "Engine/Core/ECS/BaseSystem.h"

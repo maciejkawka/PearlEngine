@@ -164,7 +164,7 @@
     <ClInclude Include="include\Game\ChessFramework.h" />
     <ClInclude Include="include\Game\SceneCreators\PiecesFactory.h" />
     <ClInclude Include="include\Game\Systems\GameSystem.h" />
-    <ClInclude Include="include\Game\Components\MainComponents.h" />
+    <ClInclude Include="include\Game\Systems\MainComponents.h" />
     <ClInclude Include="include\Game\Systems\OverlaySystem.h" />
     <ClInclude Include="include\Game\Systems\PieceSelector.h" />
     <ClInclude Include="include\Game\Systems\MainCamera.h" />

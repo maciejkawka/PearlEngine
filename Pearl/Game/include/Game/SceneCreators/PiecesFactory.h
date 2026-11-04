@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Components/MainComponents.h"
+#include "Systems/MainComponents.h"
 
 #include "Engine/Physics/Shape/IConvexMesh.h"
 #include "Renderer/Resources/Material.h"

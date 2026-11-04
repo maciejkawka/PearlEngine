@@ -1,53 +1,97 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Test">
+    <Filter Include="ChessEngine">
+      <UniqueIdentifier>{f578a5f5-353c-4a64-85c6-d53f0a53f1df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="SceneCreators">
+      <UniqueIdentifier>{ceb7c741-3811-405f-9237-229078ea78c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Game\ChessFramework.h">
-      <Filter>Test</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Game\SceneCreators\SceneCreator.h" />
-    <ClInclude Include="include\Game\Systems\CreatorSystem.h" />
     <ClInclude Include="include\Game\GameConstants.h" />
-    <ClInclude Include="include\Game\ChessEngine\ChessEvents.h" />
-    <ClInclude Include="include\Game\Systems\PromotionPicker.h" />
-    <ClInclude Include="include\Game\Systems\GameOverSystem.h" />
-    <ClInclude Include="include\Game\Systems\PieceSelector.h" />
-    <ClInclude Include="include\Game\Systems\MainCamera.h" />
-    <ClInclude Include="include\Game\ChessEngine\ChessLib.hpp" />
-    <ClInclude Include="include\Game\ChessEngine\ChessSystem.h" />
-    <ClInclude Include="include\Game\ChessEngine\BoardCoordinator.h" />
-    <ClInclude Include="include\Game\Components\MainComponents.h" />
-    <ClInclude Include="include\Game\Systems\OverlaySystem.h" />
-    <ClInclude Include="include\Game\SceneCreators\PiecesFactory.h" />
-    <ClInclude Include="include\Game\Systems\GameSystem.h" />
+    <ClInclude Include="include\Game\ChessEngine\BoardCoordinator.h">
+      <Filter>ChessEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\ChessEngine\ChessEvents.h">
+      <Filter>ChessEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\ChessEngine\ChessLib.hpp">
+      <Filter>ChessEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\ChessEngine\ChessSystem.h">
+      <Filter>ChessEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\Systems\CreatorSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\Systems\GameOverSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\Systems\GameSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\Systems\MainCamera.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\Systems\MainComponents.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\Systems\OverlaySystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\Systems\PieceSelector.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\Systems\PromotionPicker.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\SceneCreators\SceneCreator.h">
+      <Filter>SceneCreators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\SceneCreators\PiecesFactory.h">
+      <Filter>SceneCreators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\ChessFramework.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Game\ChessFramework.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Game\SceneCreators\SceneCreator.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
     <ClCompile Include="src\Game\ChessEngine\BoardCoordinator.cpp">
-      <Filter>Test</Filter>
+      <Filter>ChessEngine</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\ChessEngine\ChessSystem.cpp">
-      <Filter>Test</Filter>
+      <Filter>ChessEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Systems\CreatorSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Systems\GameOverSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Systems\GameSystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Systems\MainCamera.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Systems\OverlaySystem.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Systems\PieceSelector.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Systems\PromotionPicker.cpp">
+      <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\SceneCreators\SceneCreator.cpp">
+      <Filter>SceneCreators</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\SceneCreators\PiecesFactory.cpp">
-      <Filter>Test</Filter>
+      <Filter>SceneCreators</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Systems\CreatorSystem.cpp" />
-    <ClCompile Include="src\Game\Systems\GameSystem.cpp" />
-    <ClCompile Include="src\Game\Systems\MainCamera.cpp" />
-    <ClCompile Include="src\Game\Systems\OverlaySystem.cpp" />
-    <ClCompile Include="src\Game\Systems\PieceSelector.cpp" />
-    <ClCompile Include="src\Game\Systems\PromotionPicker.cpp" />
-    <ClCompile Include="src\Game\Systems\GameOverSystem.cpp" />
+    <ClCompile Include="src\Game\ChessFramework.cpp" />
   </ItemGroup>
 </Project>

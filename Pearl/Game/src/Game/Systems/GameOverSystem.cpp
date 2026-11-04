@@ -1,7 +1,7 @@
 #include "Systems/GameOverSystem.h"
 
 #include "ChessEngine/ChessEvents.h"
-#include "Components/MainComponents.h"
+#include "Systems/MainComponents.h"
 
 #include "Engine/Core/ECS/Components/CoreComponents.h"
 #include "Engine/Core/ECS/Components/TransformComponent.h"
