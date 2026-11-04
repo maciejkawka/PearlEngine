@@ -81,26 +81,12 @@ namespace ChessGame {
 		auto scene = PrSystems::Get<PrCore::SceneManager>()->GetActiveScene();
 
 		// Parent piece
-		PrCore::Entity entity = scene->CreateEntity(GetName(p_type, p_color));
-
-		// White knights face the opposite direction
-		PrCore::Math::quat rotation = PieceRotation;
-		if (p_type == PieceType::Knight && p_color == Color::White)
-			rotation.w = -rotation.w;
-
-		auto transform = entity.AddComponent<PrCore::TransformComponent>();
-		transform->SetLocalScale(PieceScale);
-		transform->SetRotation(rotation);
+		PrCore::Entity entity = CreatePieceVisual(p_type, p_color, GetName(p_type, p_color));
 
 		auto pieceComponent = entity.AddComponent<PieceComponent>();
 		pieceComponent->color = p_color;
 		pieceComponent->type = p_type;
 		pieceComponent->square = Square::NoSquare;
-
-		auto mesh = entity.AddComponent<PrCore::MeshRendererComponent>();
-		mesh->mesh = GetMesh(p_type, p_color);
-		mesh->shadowMesh = mesh->mesh;
-		mesh->materials = GetMaterials(p_type, p_color);
 
 		// Overlay
 		PrCore::Entity overlayEntity = scene->CreateEntity(GetName(p_type, p_color).append("_Overlay"));
@@ -125,6 +111,38 @@ namespace ChessGame {
 		rigidbody->rigidBody->AttachShape(shape);
 
 		return entity;
+	}
+
+	PrCore::Entity PiecesFactory::CreatePreviewEntity(PieceType p_type, Color p_color)
+	{
+		return CreatePieceVisual(p_type, p_color, GetName(p_type, p_color).append("_Preview"));
+	}
+
+	PrCore::Entity PiecesFactory::CreatePieceVisual(PieceType p_type, Color p_color, const std::string& p_name)
+	{
+		auto scene = PrSystems::Get<PrCore::SceneManager>()->GetActiveScene();
+		PrCore::Entity entity = scene->CreateEntity(p_name);
+
+		auto transform = entity.AddComponent<PrCore::TransformComponent>();
+		transform->SetLocalScale(PieceScale);
+		transform->SetRotation(GetPieceRotation(p_type, p_color));
+
+		auto mesh = entity.AddComponent<PrCore::MeshRendererComponent>();
+		mesh->mesh = GetMesh(p_type, p_color);
+		mesh->shadowMesh = mesh->mesh;
+		mesh->materials = GetMaterials(p_type, p_color);
+
+		return entity;
+	}
+
+	PrCore::Math::quat PiecesFactory::GetPieceRotation(PieceType p_type, Color p_color)
+	{
+		// White knights face the opposite direction
+		PrCore::Math::quat rotation = PieceRotation;
+		if (p_type == PieceType::Knight && p_color == Color::White)
+			rotation.w = -rotation.w;
+
+		return rotation;
 	}
 
 	std::string PiecesFactory::GetName(PieceType p_type, Color p_color)

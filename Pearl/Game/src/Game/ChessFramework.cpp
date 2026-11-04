@@ -2,6 +2,7 @@
 
 #include "Systems/CreatorSystem.h"
 #include "Systems/GameSystem.h"
+#include "Systems/GameOverSystem.h"
 #include "Systems/MainCamera.h"
 #include "Systems/OverlaySystem.h"
 #include "Systems/PieceSelector.h"
@@ -25,6 +26,7 @@ namespace ChessGame {
         scene->RegisterSystem<MainCameraSystem>();
         scene->RegisterSystem<PieceSelectorSystem>();
         scene->RegisterSystem<OverlaySystem>();
+        scene->RegisterSystem<GameOverSystem>();
         scene->RegisterSystem<GameSystem>();
     }
 

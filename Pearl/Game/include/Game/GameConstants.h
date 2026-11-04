@@ -41,4 +41,11 @@ namespace ChessGame {
 	constexpr PrCore::PrKey CameraPreset2Key = PrCore::PrKey::KEY_2;
 	constexpr PrCore::PrKey CameraPreset3Key = PrCore::PrKey::KEY_3;
 	constexpr PrCore::PrKey CameraPreset4Key = PrCore::PrKey::KEY_4;
+
+	// Promotion choice, R and number keys are taken by reset and camera presets
+	constexpr PrCore::PrKey PromotionNextKey      = PrCore::PrKey::RIGHT;
+	constexpr PrCore::PrKey PromotionNextAltKey   = PrCore::PrKey::TAB;
+	constexpr PrCore::PrKey PromotionPreviousKey  = PrCore::PrKey::LEFT;
+	constexpr PrCore::PrKey PromotionConfirmKey   = PrCore::PrKey::ENTER;
+	constexpr PrCore::PrKey PromotionCancelKey    = PrCore::PrKey::ESCAPE;
 }

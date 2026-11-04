@@ -18,6 +18,9 @@ namespace ChessGame {
 		// Draws the mouse picking ray
 		constexpr bool  DrawSelectorDebug = false;
 		constexpr float RaycastDistance   = 50.0f;
+
+		// Mouse distance in pixels from the press position that starts dragging
+		constexpr float DragStartDistance = 5.0f;
 	}
 
 	void PieceSelectorSystem::OnCreate()
@@ -41,6 +44,7 @@ namespace ChessGame {
 
 	void PieceSelectorSystem::OnDisable()
 	{
+		m_promotionPicker.Cancel();
 		DeselectPiece();
 	}
 
@@ -49,6 +53,13 @@ namespace ChessGame {
 		if (!m_coordinator)
 			return;
 
+		// Promotion choice blocks the piece selection until confirmed or canceled
+		if (m_promotionPicker.IsActive())
+		{
+			HandlePromotionInput();
+			return;
+		}
+
 		auto input = PrSystems::Get<PrCore::InputManager>();
 		auto camera = m_pMainCamera.GetComponent<MainCamera>()->camera;
 		auto cameraTransform = m_pMainCamera.GetComponent<PrCore::TransformComponent>();
@@ -56,80 +67,277 @@ namespace ChessGame {
 		if (input->IsKeyPressed(DeselectKey))
 			DeselectPiece();
 
-		const bool isClicked = input->IsButtonPressed(PrCore::PrMouseButton::BUTTON_LEFT);
-		if (!isClicked && !IsPieceSelected())
+		const bool isPressed = input->IsButtonPressed(PrCore::PrMouseButton::BUTTON_LEFT);
+		const bool isReleased = input->IsButtonReleased(PrCore::PrMouseButton::BUTTON_LEFT) ||
+			(m_isMouseDown && !isPressed && !input->IsButtonHold(PrCore::PrMouseButton::BUTTON_LEFT));
+
+		if (!isPressed && !isReleased && !IsPieceSelected())
 			return;
 
-		// One raycast for both click and hover handling
-		auto mouseDir = PrCore::Math::normalize(camera->ScreenToWorldSpace(input->GetMousePosition()));
-		RaycastHits hits;
-		PrSystems::Get<PrPhysics::PhysicsSystem>()->RaycastAll(cameraTransform->GetPosition(), mouseDir, RaycastDistance, hits);
+		// One raycast for press, release, drag and hover handling
+		const auto mousePosition = input->GetMousePosition();
+		const auto rayOrigin = cameraTransform->GetPosition();
+		const auto rayDirection = PrCore::Math::normalize(camera->ScreenToWorldSpace(mousePosition));
 
-		if (isClicked)
-			HandleClick(hits);
+		RaycastHits hits;
+		PrSystems::Get<PrPhysics::PhysicsSystem>()->RaycastAll(rayOrigin, rayDirection, RaycastDistance, hits);
+
+		if (isPressed)
+			HandlePress(hits, mousePosition);
+		else if (isReleased)
+			HandleRelease();
 
 		if (IsPieceSelected())
-			HandleHover(hits);
+		{
+			if (m_isMouseDown)
+				UpdateDrag(hits, mousePosition);
+			else
+				HandleHover(hits);
+		}
 
 		if constexpr (DrawSelectorDebug)
-			PrSystems::Get<PrRenderer::IRenderFrontend>()->DrawDebugLine(camera->GetPosition() - cameraTransform->GetUpVector() * 0.01f, camera->GetPosition() + mouseDir * RaycastDistance);
+			PrSystems::Get<PrRenderer::IRenderFrontend>()->DrawDebugLine(camera->GetPosition() - cameraTransform->GetUpVector() * 0.01f, camera->GetPosition() + rayDirection * RaycastDistance);
 	}
 
-	void PieceSelectorSystem::HandleClick(const RaycastHits& p_hits)
+	void PieceSelectorSystem::HandlePress(const RaycastHits& p_hits, const PrCore::Math::vec2& p_mousePosition)
 	{
-		// Entity is copied, GetComponent is not const
-		for (auto hit : p_hits)
+		PrCore::Entity pieceOverlay = FindPieceOverlayHit(p_hits);
+
+		if (IsPieceSelected())
 		{
-			// Move the selected piece
-			if (IsPieceSelected() && hit.entity.HasComponent<SquareComponent>())
-			{
-				const Square from = GetSelectedPiece()->square;
-				const Square to = hit.entity.GetComponent<SquareComponent>()->square;
+			const Square targetSquare = FindTargetSquare(p_hits);
 
+			// Press on the selected piece, it can be dragged or released to keep the selection
+			if (targetSquare == GetSelectedPiece()->square)
+			{
+				StartPress(p_mousePosition);
+				return;
+			}
+
+			// Press on another own piece switches the selection
+			if (pieceOverlay.IsValid() && IsSelectablePiece(pieceOverlay))
+			{
 				DeselectPiece();
-				m_coordinator->TryMovePiece(from, to);
+				if (SelectPiece(pieceOverlay))
+					StartPress(p_mousePosition);
 				return;
 			}
 
-			// Select a piece
-			if (SelectPiece(hit.entity))
-			{
-				const auto& name = GetSelectedPieceEntity().GetComponent<PrCore::NameComponent>()->name;
-				PRLOG_INFO("Selected {} on square {}", name, static_cast<int>(GetSelectedPiece()->square));
-				return;
-			}
+			// Press on a square or an enemy piece moves the selected piece
+			if (targetSquare != Square::NoSquare)
+				MoveSelectedPiece(targetSquare);
+
+			return;
 		}
+
+		if (pieceOverlay.IsValid() && SelectPiece(pieceOverlay))
+		{
+			const auto& name = GetSelectedPieceEntity().GetComponent<PrCore::NameComponent>()->name;
+			PRLOG_INFO("Selected {} on square {}", name, static_cast<int>(GetSelectedPiece()->square));
+
+			StartPress(p_mousePosition);
+		}
+	}
+
+	void PieceSelectorSystem::HandleRelease()
+	{
+		const bool wasDragging = m_isDragging;
+		const Square dropSquare = m_dragSquare;
+		StopDrag();
+
+		// Release without dragging keeps the selection for the click to move
+		if (!wasDragging || !IsPieceSelected())
+			return;
+
+		// The piece flies only over allowed squares, dropping it over own square keeps the selection
+		const Square selectedSquare = GetSelectedPiece()->square;
+		if (dropSquare == Square::NoSquare || dropSquare == selectedSquare)
+		{
+			DeselectPiece();
+			return;
+		}
+
+		MoveSelectedPiece(dropSquare);
 	}
 
 	void PieceSelectorSystem::HandleHover(const RaycastHits& p_hits)
 	{
-		const Square selectedSquare = GetSelectedPiece()->square;
-		const auto& legalMoves = m_coordinator->GetLegalMoves();
+		// Lift the piece over the hovered square if it is allowed, otherwise keep the last position
+		const Square hoveredSquare = FindTargetSquare(p_hits);
+		if (IsAllowedSquare(GetSelectedPiece()->square, hoveredSquare))
+			LiftSelectedPiece(m_coordinator->GetSquarePos(hoveredSquare));
+	}
 
-		// Lift the piece over the hovered square if it is a legal destination or its own square
+	void PieceSelectorSystem::HandlePromotionInput()
+	{
+		auto input = PrSystems::Get<PrCore::InputManager>();
+
+		if (input->IsKeyPressed(PromotionCancelKey) || input->IsKeyPressed(DeselectKey) ||
+			input->IsButtonPressed(PrCore::PrMouseButton::BUTTON_RIGHT))
+		{
+			PRLOG_INFO("Promotion canceled");
+			m_promotionPicker.Cancel();
+			return;
+		}
+
+		if (input->IsKeyPressed(PromotionNextKey) || input->IsKeyPressed(PromotionNextAltKey))
+			m_promotionPicker.Next();
+
+		if (input->IsKeyPressed(PromotionPreviousKey))
+			m_promotionPicker.Previous();
+
+		if (input->IsKeyPressed(PromotionConfirmKey) || input->IsKeyPressed(PrCore::PrKey::KP_ENTER) ||
+			input->IsButtonPressed(PrCore::PrMouseButton::BUTTON_LEFT))
+		{
+			const Square from = m_promotionPicker.GetFromSquare();
+			const Square to = m_promotionPicker.GetToSquare();
+			const PieceType choice = m_promotionPicker.GetChoice();
+
+			m_promotionPicker.Cancel();
+			m_coordinator->TryMovePiece(from, to, choice);
+		}
+	}
+
+	//-----------------------------------------------------------------------------
+	// Drag
+	//-----------------------------------------------------------------------------
+
+	void PieceSelectorSystem::StartPress(const PrCore::Math::vec2& p_mousePosition)
+	{
+		m_isMouseDown = true;
+		m_isDragging = false;
+		m_dragSquare = GetSelectedPiece()->square;
+		m_pressMousePosition = p_mousePosition;
+	}
+
+	void PieceSelectorSystem::UpdateDrag(const RaycastHits& p_hits, const PrCore::Math::vec2& p_mousePosition)
+	{
+		//if (!m_isDragging && PrCore::Math::distance(p_mousePosition, m_pressMousePosition) < DragStartDistance)
+		//	return;
+
+		m_isDragging = true;
+
+		// Fly over the hovered square only if it is allowed, otherwise go back over own square
+		const Square selectedSquare = GetSelectedPiece()->square;
+		const Square hoveredSquare = FindTargetSquare(p_hits);
+		const bool isAllowed = IsAllowedSquare(selectedSquare, hoveredSquare);
+		m_dragSquare = isAllowed ? hoveredSquare : selectedSquare;
+		
+		if (isAllowed)
+		{
+			m_dragSquare = hoveredSquare;
+			LiftSelectedPiece(m_coordinator->GetSquarePos(m_dragSquare));
+		}
+	}
+
+	void PieceSelectorSystem::StopDrag()
+	{
+		m_isMouseDown = false;
+		m_isDragging = false;
+		m_dragSquare = Square::NoSquare;
+	}
+
+	//-----------------------------------------------------------------------------
+	// Raycast helpers
+	//-----------------------------------------------------------------------------
+
+	PrCore::Entity PieceSelectorSystem::FindPieceOverlayHit(const RaycastHits& p_hits) const
+	{
 		// Entity is copied, GetComponent is not const
 		for (auto hit : p_hits)
 		{
-			if (!hit.entity.HasComponent<SquareComponent>())
+			if (!hit.entity.HasComponent<PrCore::ParentComponent>())
 				continue;
 
-			const Square hoveredSquare = hit.entity.GetComponent<SquareComponent>()->square;
-			bool isValidSquare = hoveredSquare == selectedSquare;
-			for (const auto& move : legalMoves)
-			{
-				if (isValidSquare)
-					break;
-
-				isValidSquare = move.fromSquare == selectedSquare && move.toSquare == hoveredSquare;
-			}
-
-			if (isValidSquare)
-			{
-				LiftSelectedPiece(hit.entity.GetComponent<PrCore::TransformComponent>()->GetPosition());
-				return;
-			}
+			PrCore::Entity parent = hit.entity.GetComponent<PrCore::ParentComponent>()->GetParent();
+			if (parent.IsValid() && parent.HasComponent<PieceComponent>())
+				return hit.entity;
 		}
+
+		return PrCore::Entity{};
 	}
+
+	Square PieceSelectorSystem::FindTargetSquare(const RaycastHits& p_hits) const
+	{
+		// A piece hit is more accurate than the square behind it when the ray goes through the piece top
+		PrCore::Entity pieceOverlay = FindPieceOverlayHit(p_hits);
+		if (pieceOverlay.IsValid())
+			return pieceOverlay.GetComponent<PrCore::ParentComponent>()->GetParent().GetComponent<PieceComponent>()->square;
+
+		// Entity is copied, GetComponent is not const
+		for (auto hit : p_hits)
+		{
+			if (hit.entity.HasComponent<SquareComponent>())
+				return hit.entity.GetComponent<SquareComponent>()->square;
+		}
+
+		return Square::NoSquare;
+	}
+
+	bool PieceSelectorSystem::IsSelectablePiece(PrCore::Entity p_overlayEntity) const
+	{
+		PrCore::Entity pieceEntity = p_overlayEntity.GetComponent<PrCore::ParentComponent>()->GetParent();
+		return m_coordinator->CanSelectPiece(pieceEntity.GetComponent<PieceComponent>()->color);
+	}
+
+	//-----------------------------------------------------------------------------
+	// Moves
+	//-----------------------------------------------------------------------------
+
+	void PieceSelectorSystem::MovePiece(Square p_from, Square p_to, Color p_color)
+	{
+		// Promotion waits for the player choice, the move is made after the confirmation
+		if (IsPromotionMove(p_from, p_to))
+		{
+			auto previewPosition = m_coordinator->GetSquarePos(p_to);
+			previewPosition.y = PieceLiftHeight;
+			m_promotionPicker.Start(p_from, p_to, p_color, previewPosition);
+			return;
+		}
+
+		m_coordinator->TryMovePiece(p_from, p_to);
+	}
+
+	void PieceSelectorSystem::MoveSelectedPiece(Square p_to)
+	{
+		const Square from = GetSelectedPiece()->square;
+		const Color color = GetSelectedPiece()->color;
+
+		DeselectPiece();
+		MovePiece(from, p_to, color);
+	}
+
+	bool PieceSelectorSystem::IsPromotionMove(Square p_from, Square p_to) const
+	{
+		for (const auto& move : m_coordinator->GetLegalMoves())
+		{
+			if (move.fromSquare == p_from && move.toSquare == p_to && move.moveType == MoveType::Promotion)
+				return true;
+		}
+
+		return false;
+	}
+
+	bool PieceSelectorSystem::IsAllowedSquare(Square p_from, Square p_square) const
+	{
+		if (p_square == Square::NoSquare)
+			return false;
+
+		if (p_square == p_from)
+			return true;
+
+		for (const auto& move : m_coordinator->GetLegalMoves())
+		{
+			if (move.fromSquare == p_from && move.toSquare == p_square)
+				return true;
+		}
+
+		return false;
+	}
+
+	//-----------------------------------------------------------------------------
+	// Selection
+	//-----------------------------------------------------------------------------
 
 	bool PieceSelectorSystem::SelectPiece(PrCore::Entity p_overlayEntity)
 	{
@@ -156,6 +364,8 @@ namespace ChessGame {
 
 	void PieceSelectorSystem::DeselectPiece()
 	{
+		StopDrag();
+
 		if (!IsPieceSelected())
 			return;
 
@@ -197,6 +407,7 @@ namespace ChessGame {
 
 	void PieceSelectorSystem::OnBoardChanged(PrCore::EventPtr p_event)
 	{
+		m_promotionPicker.Cancel();
 		DeselectPiece();
 	}
 }

@@ -2,12 +2,34 @@
 
 #include "Engine/Core/Events/EventManager.h"
 #include "Engine/Core/Events/ECSEvents.h"
+#include "Engine/Core/ECS/Components/TransformComponent.h"
 
 namespace ChessGame {
 
 	namespace {
 		constexpr float SelectedMaxAlpha = 0.2f;
 		constexpr float SquareAlpha      = 0.2f;
+		constexpr float LastMoveAlpha    = 0.25f;
+		constexpr float LastMoveFadeTime = 5.0f;  // Seconds until the last move highlight disappears
+		constexpr float CheckMinAlpha    = 0.1f;
+		constexpr float CheckMaxAlpha    = 0.6f;
+		constexpr float CheckFlashSpeed  = 6.0f;
+
+		constexpr float GameOverMinAlpha = 0.2f;
+		constexpr float GameOverMaxAlpha = 0.5f;
+		constexpr float GameOverPulseSpeed = 2.0f;
+
+		const PrRenderer::Color SelectedColor{ 1.0f, 1.0f, 0.0f }; // Matches overlay.mat albedo
+		const PrRenderer::Color LastMoveColor{ 1.0f, 0.85f, 0.2f };
+		const PrRenderer::Color CheckColor{ 1.0f, 0.0f, 0.0f };
+		const PrRenderer::Color WinnerColor{ 1.0f, 0.75f, 0.1f };
+		const PrRenderer::Color DrawColor{ 0.4f, 0.7f, 1.0f };
+
+		void SetOverlayColor(PrCore::MeshRendererComponent* p_renderComponent, PrRenderer::Color p_color, float p_alpha)
+		{
+			p_color.w = p_alpha;
+			p_renderComponent->mainMaterial->SetColor(p_color);
+		}
 
 		PrRenderer::Color GetMoveTypeColor(MoveType p_moveType)
 		{
@@ -37,30 +59,62 @@ namespace ChessGame {
 
 	void OverlaySystem::OnUpdate(float p_dt)
 	{
-		// Pulse the selected piece overlay
-		for (auto [entity, overlay] : m_entityViewer.EntitesWithComponents<OverlayComponent>())
+		m_time += p_dt;
+		const float checkFlash = (PrCore::Math::sin(m_time * CheckFlashSpeed) + 1.0f) / 2.0f;
+		const float checkAlpha = CheckMinAlpha + (CheckMaxAlpha - CheckMinAlpha) * checkFlash;
+
+		const float gameOverPulse = 1.0f;
+		const float gameOverAlpha = GameOverMinAlpha + (GameOverMaxAlpha - GameOverMinAlpha) * gameOverPulse;
+
+		// Piece overlays are children of the piece entities
+		for (auto [entity, parentComponent, renderComponent] : m_entityViewer.EntitesWithComponents<PrCore::ParentComponent, PrCore::MeshRendererComponent>())
 		{
-			if (auto renderComponent = entity.GetComponent<PrCore::MeshRendererComponent>())
+			PrCore::Entity pieceEntity = parentComponent->GetParent();
+			if (!pieceEntity.IsValid() || !pieceEntity.HasComponent<PieceComponent>())
+				continue;
+
+			if (entity.HasComponent<OverlayComponent>())
 			{
+				// Pulse the selected piece
+				auto overlay = entity.GetComponent<OverlayComponent>();
 				float alphaValue = SelectedMaxAlpha * (PrCore::Math::sin(overlay->time) + 1.0f) / 2.0f;
 				overlay->time += p_dt;
 
-				auto color = renderComponent->mainMaterial->GetColor();
-				color.w = alphaValue;
-
-				renderComponent->mainMaterial->SetColor(color);
+				SetOverlayColor(renderComponent, SelectedColor, alphaValue);
+			}
+			else
+			{
+				switch (pieceEntity.GetComponent<PieceComponent>()->highlight)
+				{
+				case PieceHighlight::Check:  SetOverlayColor(renderComponent, CheckColor, checkAlpha);       break;
+				case PieceHighlight::Winner: SetOverlayColor(renderComponent, WinnerColor, gameOverAlpha);   break;
+				case PieceHighlight::Draw:   SetOverlayColor(renderComponent, DrawColor, gameOverAlpha);     break;
+				default:                     SetOverlayColor(renderComponent, SelectedColor, 0.0f);          break;
+				}
 			}
 		}
 
-		// Show possible moves on squares
+		// Square overlays, the last move highlight fades out
 		for (auto [entity, square] : m_entityViewer.EntitesWithComponents<SquareComponent>())
 		{
 			if (auto renderComponent = entity.GetComponent<PrCore::MeshRendererComponent>())
 			{
-				auto color = GetMoveTypeColor(square->moveType);
-				color.w = square->showOverlay ? SquareAlpha : 0.0f;
+				if (square->isLastMove)
+					square->lastMoveTime += p_dt;
 
-				renderComponent->mainMaterial->SetColor(color);
+				if (square->showOverlay)
+				{
+					SetOverlayColor(renderComponent, GetMoveTypeColor(square->moveType), SquareAlpha);
+				}
+				else if (square->isLastMove && square->lastMoveTime < LastMoveFadeTime)
+				{
+					const float fade = 1.0f - square->lastMoveTime / LastMoveFadeTime;
+					SetOverlayColor(renderComponent, LastMoveColor, LastMoveAlpha * fade);
+				}
+				else
+				{
+					SetOverlayColor(renderComponent, LastMoveColor, 0.0f);
+				}
 			}
 		}
 	}

@@ -1,7 +1,10 @@
 #include "GameConstants.h"
 #include "Systems/MainCamera.h"
 
+#include "ChessEngine/ChessEvents.h"
+
 #include "Engine/Core/ECS/Components/TransformComponent.h"
+#include "Engine/Core/Events/EventManager.h"
 #include "Engine/Core/Input/InputManager.h"
 
 #include <array>
@@ -16,6 +19,22 @@ namespace ChessGame {
 		constexpr float MinRadius = 1.0f;
 		constexpr float MaxRadius = 3.0f;
 		constexpr float ScrollZoomSpeed = 0.1f;
+
+		// Degrees per second, set 0 to disable the game over orbit
+		constexpr float GameOverOrbitSpeed = 10.0f;
+	}
+
+	void MainCameraSystem::OnCreate()
+	{
+		auto eventManager = PrSystems::Get<PrCore::EventManager>();
+
+		PrCore::EventListener gameOverListener;
+		gameOverListener.Connect<&MainCameraSystem::OnGameOver>(this);
+		eventManager->AddListener(gameOverListener, GameOverEvent::s_type);
+
+		PrCore::EventListener boardChangedListener;
+		boardChangedListener.Connect<&MainCameraSystem::OnBoardChanged>(this);
+		eventManager->AddListener(boardChangedListener, BoardChangedEvent::s_type);
 	}
 
 	void MainCameraSystem::OnEnable()
@@ -49,6 +68,9 @@ namespace ChessGame {
 		if (input->IsKeyHold(CameraRightKey))
 			m_rotation += m_rotationSpeed * p_dt;
 
+		if (m_isGameOverOrbit)
+			m_rotation += GameOverOrbitSpeed * p_dt;
+
 		for (const auto& [key, preset] : presets)
 		{
 			if (input->IsKeyPressed(key))
@@ -78,6 +100,16 @@ namespace ChessGame {
 
 		transformComponent->SetPosition(m_lookAt + pos);
 		transformComponent->SetRotation(rotation);
+	}
+
+	void MainCameraSystem::OnGameOver(PrCore::EventPtr p_event)
+	{
+		m_isGameOverOrbit = true;
+	}
+
+	void MainCameraSystem::OnBoardChanged(PrCore::EventPtr p_event)
+	{
+		m_isGameOverOrbit = false;
 	}
 
 	void MainCameraSystem::ApplyPreset(const CameraPreset& p_preset)

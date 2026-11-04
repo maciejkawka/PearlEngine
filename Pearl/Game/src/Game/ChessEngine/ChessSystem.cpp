@@ -168,6 +168,12 @@ namespace ChessGame {
 		return piece;
 	}
 
+	Square ChessSystem::GetKingSquare(Color p_color) const
+	{
+		const auto color = p_color == Color::White ? chess::Color::WHITE : chess::Color::BLACK;
+		return ToSquare(m_board.kingSq(color));
+	}
+
 	void ChessSystem::ResetBoard()
 	{
 		m_board = chess::Board();

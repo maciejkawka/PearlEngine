@@ -14,6 +14,8 @@
     <ClInclude Include="include\Game\Systems\CreatorSystem.h" />
     <ClInclude Include="include\Game\GameConstants.h" />
     <ClInclude Include="include\Game\ChessEngine\ChessEvents.h" />
+    <ClInclude Include="include\Game\Systems\PromotionPicker.h" />
+    <ClInclude Include="include\Game\Systems\GameOverSystem.h" />
     <ClInclude Include="include\Game\Systems\PieceSelector.h" />
     <ClInclude Include="include\Game\Systems\MainCamera.h" />
     <ClInclude Include="include\Game\ChessEngine\ChessLib.hpp" />
@@ -45,5 +47,7 @@
     <ClCompile Include="src\Game\Systems\MainCamera.cpp" />
     <ClCompile Include="src\Game\Systems\OverlaySystem.cpp" />
     <ClCompile Include="src\Game\Systems\PieceSelector.cpp" />
+    <ClCompile Include="src\Game\Systems\PromotionPicker.cpp" />
+    <ClCompile Include="src\Game\Systems\GameOverSystem.cpp" />
   </ItemGroup>
 </Project>

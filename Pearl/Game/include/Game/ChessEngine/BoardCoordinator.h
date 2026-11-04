@@ -7,6 +7,7 @@
 #include "Engine/Core/ECS/EntityViewer.h"
 #include "Engine/Core/Utils/Singleton.h"
 
+#include <optional>
 #include <vector>
 
 namespace ChessGame {
@@ -41,6 +42,9 @@ namespace ChessGame {
 		void              GenerateMoves();
 		const LegalMoves& GetLegalMoves() const;
 
+		// Last move applied to the board, empty after Reset() and Load()
+		const std::optional<Move>& GetLastMove() const;
+
 		// Square overlays
 		void ShowPossibleMovesFor(Square p_from);
 		void DisablePossibleMoves();
@@ -73,6 +77,7 @@ namespace ChessGame {
 		void PlacePiece(PrCore::Entity p_entity, PieceComponent* p_piece, Square p_square);
 		void UpdateGameState();
 		void OnBoardReplaced();
+		void UpdateHighlights();
 
 		using PiecesArray =  std::array<PieceComponent*, BoardSquaresCount>;
 		using SquaresArray = std::array<SquareComponent*, BoardSquaresCount>;
@@ -84,6 +89,8 @@ namespace ChessGame {
 		GameState    m_gameState = GameState::Playing;
 		Color        m_playerColor = Color::White;
 		bool         m_isDirty = false;
+
+		std::optional<Move> m_lastMove;
 
 		ChessSystem           m_system;
 		PrCore::EntityViewer* m_entityViewer;

@@ -95,6 +95,7 @@ namespace ChessGame {
 		bool           IsCheck() const;
 
 		Piece          PieceAt(Square p_square) const;
+		Square         GetKingSquare(Color p_color) const;
 
 		void           ResetBoard();
 		void           LoadBoard(std::string_view p_fen);

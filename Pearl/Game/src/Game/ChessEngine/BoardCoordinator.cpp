@@ -108,6 +108,7 @@ namespace ChessGame {
 
 			m_system.MakeMove(appliedMove);
 			m_legalMoves.clear();
+			m_lastMove = appliedMove;
 			SetBoardDirty();
 
 			Fire(std::make_shared<MoveMadeEvent>(appliedMove, movedSide));
@@ -126,6 +127,11 @@ namespace ChessGame {
 	const LegalMoves& BoardCoordinator::GetLegalMoves() const
 	{
 		return m_legalMoves;
+	}
+
+	const std::optional<Move>& BoardCoordinator::GetLastMove() const
+	{
+		return m_lastMove;
 	}
 
 	void BoardCoordinator::ShowPossibleMovesFor(Square p_from)
@@ -160,8 +166,49 @@ namespace ChessGame {
 		{
 			SyncPiecesWithBoard();
 			DisablePossibleMoves();
+			UpdateHighlights();
 			UpdateGameState();
 			m_isDirty = false;
+		}
+	}
+
+	void BoardCoordinator::UpdateHighlights()
+	{
+		for (SquareComponent* square : m_squares)
+		{
+			square->isLastMove = false;
+			square->lastMoveTime = 0.0f;
+		}
+
+		for (PieceComponent* piece : m_pieces)
+		{
+			if (piece)
+				piece->highlight = PieceHighlight::None;
+		}
+
+		if (m_lastMove)
+		{
+			Square to = m_lastMove->toSquare;
+
+			// Castling is encoded as the king capturing own rook, highlight the king destination instead
+			if (m_lastMove->moveType == MoveType::Castling)
+			{
+				const int from = static_cast<int>(m_lastMove->fromSquare);
+				const int rank = from / BoardFilesCount;
+				const bool isKingSide = static_cast<int>(to) % BoardFilesCount > from % BoardFilesCount;
+				to = static_cast<Square>(rank * BoardFilesCount + (isKingSide ? 6 : 2));
+			}
+
+			m_squares[static_cast<int>(m_lastMove->fromSquare)]->isLastMove = true;
+			m_squares[static_cast<int>(to)]->isLastMove = true;
+		}
+
+		if (m_system.IsCheck())
+		{
+			// Pieces are synchronized before, m_pieces is up to date
+			const Square kingSquare = m_system.GetKingSquare(m_system.SideToMove());
+			if (kingSquare != Square::NoSquare && m_pieces[static_cast<int>(kingSquare)])
+				m_pieces[static_cast<int>(kingSquare)]->highlight = PieceHighlight::Check;
 		}
 	}
 
@@ -250,7 +297,11 @@ namespace ChessGame {
 	{
 		p_piece->square = p_square;
 		m_pieces[static_cast<int>(p_square)] = p_piece;
-		p_entity.GetComponent<PrCore::TransformComponent>()->SetPosition(GetSquarePos(p_square));
+
+		// Rotation is restored too, game over effects can change it
+		auto transform = p_entity.GetComponent<PrCore::TransformComponent>();
+		transform->SetPosition(GetSquarePos(p_square));
+		transform->SetRotation(PiecesFactory::GetPieceRotation(p_piece->type, p_piece->color));
 	}
 
 	void BoardCoordinator::UpdateGameState()
@@ -277,14 +328,27 @@ namespace ChessGame {
 			type = GameOverType::Win;
 		}
 
+		// Highlight the kings, the mated king keeps the check highlight
+		auto setKingHighlight = [this](Color p_color, PieceHighlight p_highlight)
+		{
+			const Square kingSquare = m_system.GetKingSquare(p_color);
+			if (kingSquare != Square::NoSquare && m_pieces[static_cast<int>(kingSquare)])
+				m_pieces[static_cast<int>(kingSquare)]->highlight = p_highlight;
+		};
+
 		if (type == GameOverType::Win)
 		{
+			setKingHighlight(winner, PieceHighlight::Winner);
 			PRLOG_INFO("Game over, {} wins by {}", ToString(winner), ToString(result));
 		}
 		else
 		{
+			setKingHighlight(Color::White, PieceHighlight::Draw);
+			setKingHighlight(Color::Black, PieceHighlight::Draw);
 			PRLOG_INFO("Game over, draw by {}", ToString(result));
 		}
+
+		PRLOG_INFO("Press R to restart or L to load the saved game");
 
 		Fire(std::make_shared<GameOverEvent>(result, type, winner));
 	}
@@ -368,6 +432,7 @@ namespace ChessGame {
 	void BoardCoordinator::OnBoardReplaced()
 	{
 		m_legalMoves.clear();
+		m_lastMove.reset();
 		m_gameState = GameState::Playing;
 		SetBoardDirty();
 

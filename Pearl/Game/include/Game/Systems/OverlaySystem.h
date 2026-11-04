@@ -7,7 +7,9 @@
 
 namespace ChessGame {
 
-	// Animates the selected piece overlay and colors square overlays by the move type
+	// Animates piece and square overlays
+	// Piece overlay: selected piece pulses, king in check flashes red, kings glow on game over
+	// Square overlay: possible move of the selected piece, otherwise the fading last move
 	class OverlaySystem : public PrCore::BaseSystem {
 	public:
 		OverlaySystem() = default;
@@ -20,6 +22,8 @@ namespace ChessGame {
 		void OnDeserialize(const PrCore::Utils::JSON::json& p_deserialized) override {}
 
 	private:
+		float m_time = 0.0f;
+
 		void OnOverlayAdded(PrCore::EventPtr p_event);
 		void OnOverlayRemoved(PrCore::EventPtr p_event);
 	};
