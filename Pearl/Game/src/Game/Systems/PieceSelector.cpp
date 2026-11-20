@@ -198,10 +198,6 @@ namespace ChessGame {
 		}
 	}
 
-	//-----------------------------------------------------------------------------
-	// Drag
-	//-----------------------------------------------------------------------------
-
 	void PieceSelectorSystem::StartPress(const PrCore::Math::vec2& p_mousePosition)
 	{
 		m_isMouseDown = true;
@@ -212,9 +208,6 @@ namespace ChessGame {
 
 	void PieceSelectorSystem::UpdateDrag(const RaycastHits& p_hits, const PrCore::Math::vec2& p_mousePosition)
 	{
-		//if (!m_isDragging && PrCore::Math::distance(p_mousePosition, m_pressMousePosition) < DragStartDistance)
-		//	return;
-
 		m_isDragging = true;
 
 		// Fly over the hovered square only if it is allowed, otherwise go back over own square
@@ -236,10 +229,6 @@ namespace ChessGame {
 		m_isDragging = false;
 		m_dragSquare = Square::NoSquare;
 	}
-
-	//-----------------------------------------------------------------------------
-	// Raycast helpers
-	//-----------------------------------------------------------------------------
 
 	PrCore::Entity PieceSelectorSystem::FindPieceOverlayHit(const RaycastHits& p_hits) const
 	{
@@ -279,10 +268,6 @@ namespace ChessGame {
 		PrCore::Entity pieceEntity = p_overlayEntity.GetComponent<PrCore::ParentComponent>()->GetParent();
 		return m_coordinator->CanSelectPiece(pieceEntity.GetComponent<PieceComponent>()->color);
 	}
-
-	//-----------------------------------------------------------------------------
-	// Moves
-	//-----------------------------------------------------------------------------
 
 	void PieceSelectorSystem::MovePiece(Square p_from, Square p_to, Color p_color)
 	{
@@ -334,10 +319,6 @@ namespace ChessGame {
 
 		return false;
 	}
-
-	//-----------------------------------------------------------------------------
-	// Selection
-	//-----------------------------------------------------------------------------
 
 	bool PieceSelectorSystem::SelectPiece(PrCore::Entity p_overlayEntity)
 	{
