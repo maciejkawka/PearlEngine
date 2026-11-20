@@ -6,6 +6,7 @@
 #include "Engine/Core/ECS/BaseSystem.h"
 #include "Engine/Core/Events/Event.h"
 #include "Engine/Physics/Core/PhysicsSystem.h"
+#include "Engine/Audio/Core/ISoundEvent.h"
 
 #include <vector>
 
@@ -60,6 +61,9 @@ namespace ChessGame {
 		void DeselectPiece();
 		bool IsPieceSelected() const;
 
+		// Events
+		void OnMove(PrCore::EventPtr p_event);
+
 		PrCore::Entity  GetSelectedPieceEntity();
 		PieceComponent* GetSelectedPiece();
 		void            LiftSelectedPiece(PrCore::Math::vec3 p_position);
@@ -76,5 +80,11 @@ namespace ChessGame {
 		bool               m_isDragging = false;   // Mouse moved far enough from the press position
 		Square             m_dragSquare = Square::NoSquare; // Allowed square the dragged piece flies over
 		PrCore::Math::vec2 m_pressMousePosition{ 0.0f };
+
+		PrAudio::ISoundEventPtr m_dropEvent;
+		PrAudio::ISoundEventPtr m_castling;
+		PrAudio::ISoundEventPtr m_capture;
+		PrAudio::ISoundEventPtr m_promotion;
+		PrAudio::ISoundEventPtr m_load;
 	};
 }

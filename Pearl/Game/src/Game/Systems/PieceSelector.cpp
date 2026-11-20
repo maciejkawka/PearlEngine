@@ -11,6 +11,8 @@
 #include "Engine/Core/Input/InputManager.h"
 #include "Engine/Core/Utils/ILogger.h"
 #include "Engine/Renderer/Core/IRenderFrontend.h"
+#include "Engine/Audio/Core/IAudioSystem.h"
+#include "Engine/Audio/Core/ISoundEvent.h"
 
 namespace ChessGame {
 
@@ -21,6 +23,28 @@ namespace ChessGame {
 
 		// Mouse distance in pixels from the press position that starts dragging
 		constexpr float DragStartDistance = 5.0f;
+	}
+
+	void PieceSelectorSystem::OnMove(PrCore::EventPtr p_event)
+	{
+		auto moveEvent = std::static_pointer_cast<MoveMadeEvent>(p_event);
+
+		if (moveEvent->m_move.moveType == MoveType::Castling)
+		{
+			m_castling->Play();
+		}
+		else if (moveEvent->m_move.moveType == MoveType::Capture)
+		{
+			m_capture->Play();
+		}
+		else if (moveEvent->m_move.moveType == MoveType::Promotion)
+		{
+			m_promotion->Play();
+		}
+		else
+		{
+			m_dropEvent->Play();
+		}
 	}
 
 	void PieceSelectorSystem::OnCreate()
@@ -34,6 +58,16 @@ namespace ChessGame {
 		PrCore::EventListener gameOverListener;
 		gameOverListener.Connect<&PieceSelectorSystem::OnBoardChanged>(this);
 		eventManager->AddListener(gameOverListener, GameOverEvent::s_type);
+
+		PrCore::EventListener moveListsner;
+		moveListsner.Connect<&PieceSelectorSystem::OnMove>(this);
+		eventManager->AddListener(moveListsner, MoveMadeEvent::s_type);
+
+		m_dropEvent = PrSystems::Get<PrAudio::IAudioSystem>()->CreateSoundEvent("event:/PieceDrop");
+		m_castling = PrSystems::Get<PrAudio::IAudioSystem>()->CreateSoundEvent("event:/Castling");
+		m_capture = PrSystems::Get<PrAudio::IAudioSystem>()->CreateSoundEvent("event:/Capture");
+		m_promotion = PrSystems::Get<PrAudio::IAudioSystem>()->CreateSoundEvent("event:/Promotion");
+		m_load = PrSystems::Get<PrAudio::IAudioSystem>()->CreateSoundEvent("event:/Load");
 	}
 
 	void PieceSelectorSystem::OnEnable()
@@ -388,6 +422,8 @@ namespace ChessGame {
 
 	void PieceSelectorSystem::OnBoardChanged(PrCore::EventPtr p_event)
 	{
+		if(m_load)
+			m_load->Play();
 		m_promotionPicker.Cancel();
 		DeselectPiece();
 	}

@@ -2,6 +2,7 @@
 
 #include "Engine/Core/Entry/GameFramework.h"
 #include "Engine/Core/Utils/SystemProvider.h"
+#include "Engine/Audio/Core/ISoundEvent.h"
 
 #include <memory>
 
@@ -12,6 +13,10 @@ namespace ChessGame {
         void OnInitalize() override;
         bool OnUpdate(float p_dt) override;
         void OnTerminate() override;
+
+    private:
+        PrAudio::ISoundEventPtr m_pSoundEvent = nullptr;
+
     };
 }
 

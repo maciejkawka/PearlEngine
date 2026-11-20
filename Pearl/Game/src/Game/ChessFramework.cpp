@@ -9,12 +9,25 @@
 #include "ChessEngine/BoardCoordinator.h"
 
 #include "Engine/Core/ECS/SceneManager.h"
+#include "Engine/Core/ECS/Systems/AudioSystem.h"
 
 #include "Engine/Core/Utils/ILogger.h"
+#include "Engine/Audio/Resources/ISoundBank.h"
+#include "Engine/Audio/Core/IAudioSystem.h"
 
 namespace ChessGame {
     void Game::OnInitalize()
     {
+
+        PrSystems::Get<PrCore::ResourceSystem>()->Load<PrAudio::ISoundBank>("Chess/audio/Master.bank");
+        PrSystems::Get<PrCore::ResourceSystem>()->Load<PrAudio::ISoundBank>("Chess/audio/Master.strings.bank");
+        
+        m_pSoundEvent = PrSystems::Get<PrAudio::IAudioSystem>()->CreateSoundEvent("event:/Ambient");
+        if (m_pSoundEvent)
+        {
+            m_pSoundEvent->Play();
+        }
+
         PRLOG_INFO("Initializing Chess Game");
 
         auto scene = PrSystems::Get<PrCore::SceneManager>()->GetActiveScene();
@@ -28,6 +41,7 @@ namespace ChessGame {
         scene->RegisterSystem<OverlaySystem>();
         scene->RegisterSystem<GameOverSystem>();
         scene->RegisterSystem<GameSystem>();
+        scene->RegisterSystem<PrCore::AudioSystem>();
     }
 
     bool Game::OnUpdate(float p_dt)
@@ -37,6 +51,10 @@ namespace ChessGame {
 
     void Game::OnTerminate()
     {
+        if (m_pSoundEvent)
+            m_pSoundEvent->Stop(PrAudio::StopMode::Immediate);
+
+        PrSystems::Get<PrCore::ResourceSystem>()->UnloadAll<PrAudio::ISoundBank>();
         PRLOG_INFO("Terminating Chess Game");
 
         BoardCoordinator::Terminate();
