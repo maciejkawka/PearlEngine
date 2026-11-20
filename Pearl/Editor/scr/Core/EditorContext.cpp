@@ -46,25 +46,12 @@ namespace PrEditor {
 		scene101->RegisterSystem<PrCore::MeshRendererSystem>();
 		scene101->RegisterSystem<PrCore::PhysicsUpdateSystem>();
 
-
-		//auto light = std::make_shared<PrRenderer::Light>();
-		//light->SetType(PrRenderer::LightType::Directional);
-		//light->SetColor({ 2.5f,2.5f,2.5f,1.0f });
-
-		//auto lightEntity = scene101->CreateEntity("MainLight");
-		//auto lightComponent = lightEntity.AddComponent<PrCore::LightComponent>();
-		//lightComponent->m_light = light;
-		//lightComponent->mainDirectLight = true;
-
-		//auto loightTransform = lightEntity.AddComponent<PrCore::TransformComponent>();
-		//loightTransform->SetRotation({ -0.9f, 0.35f, 0.0f, 0.0f });
 		m_basicCamera->GetCamera()->SetNear(0.001f);
 		m_basicCamera->GetCamera()->SetPosition({ 7.0f, 1.0f, -2.0f });
 		m_basicCamera->GetCamera()->SetRotation({ -0.46f, 2.17f, 0.0f });
 
+		PrSystems::Get<PrRenderer::IRenderFrontend>()->SetCubemap(PrSystems::Get<PrCore::ResourceSystem>()->Load<PrRenderer::Material>("Chess/materials/suburban.mat").GetData());
 
-
-		PrSystems::Get<PrRenderer::IRenderFrontend>()->SetCubemap(PrSystems::Get<PrCore::ResourceSystem>()->Load<PrRenderer::Material>("outdoor/suburban.mat").GetData());
 		return true;
 	}
 
